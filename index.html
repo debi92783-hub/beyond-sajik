@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비욘드잉글리쉬 사직캠퍼스 | 결과가 다른 영어, 특허받은 영어</title>
+<meta name="description" content="부산 연제구 초등·중등 영어학원. 파닉스부터 중등 문법까지, 문제풀이가 아니라 이해하고 표현하는 영어.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --bg: #F5F4EE;
+    --card: #FFFFFF;
+    --ink: #1E2A44;
+    --ink-soft: #57607A;
+    --ink-faint: #8B92A6;
+    --accent: #E2A33B;
+    --accent-deep: #C2801F;
+    --line: #DCD8C9;
+    --danger-bg: #FBEFE6;
+    --danger-ink: #9A5B1E;
+    --radius: 4px;
+    --serif: "Noto Serif KR", serif;
+    --sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+    --max: 1080px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+  :focus-visible{
+    outline: 2px solid var(--accent-deep);
+    outline-offset: 3px;
+  }
+
+  .wrap{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- Header ---------- */
+  header.site{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(245,244,238,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-bar{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    max-width: var(--max);
+    margin: 0 auto;
+  }
+  .brand{
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+  .brand span{ color: var(--accent-deep); }
+  .site-bar .cta-small{
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: var(--radius);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-bar .cta-small:hover{ background: var(--accent-deep); }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding: 96px 0 80px;
+    border-bottom: 1px solid var(--line);
+    background:
+      linear-gradient(160deg, rgba(20,28,48,0.86) 10%, rgba(20,28,48,0.62) 60%, rgba(20,28,48,0.78) 100%),
+      url('https://images.pexels.com/photos/10638213/pexels-photo-10638213.jpeg?auto=compress&cs=tinysrgb&w=1920')
+      center / cover no-repeat;
+    color: #fff;
+  }
+  .hero-grid{
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .hero-eyebrow{
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.78);
+    margin: 0 0 18px;
+  }
+  h1.hero-title{
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    margin: 0 0 22px;
+    max-width: 15ch;
+    color: #fff;
+    text-shadow: 0 2px 18px rgba(0,0,0,0.25);
+  }
+  .hero-sub{
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.88);
+    max-width: 46ch;
+    margin: 0 0 32px;
+  }
+  .hero-ctas{
+    display:flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn-primary{
+    background: var(--accent);
+    color: var(--ink);
+    font-weight: 700;
+    padding: 14px 26px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    border: 1px solid var(--accent);
+    display: inline-block;
+  }
+  .btn-primary:hover{ background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; }
+  .btn-ghost{
+    padding: 14px 22px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.45);
+    color: #fff;
+    font-weight: 600;
+  }
+  .btn-ghost:hover{ border-color: #fff; background: rgba(255,255,255,0.1); }
+
+  /* word-block motif */
+  .block-art{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+  }
+  .block-art .blk{
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+  }
+  .block-art .blk.acc{ background: var(--accent); border-color: var(--accent); font-weight: 700; }
+  .block-art .blk.deep{ background: var(--ink); color: #fff; border-color: rgba(255,255,255,0.3); }
+  .hero-art-caption{
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ---------- Section shell ---------- */
+  section{ padding: 72px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type{ border-bottom: none; }
+  h2.section-title{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+    letter-spacing: -0.01em;
+    margin: 0 0 40px;
+    max-width: 20ch;
+  }
+
+  /* ---------- Empathy ---------- */
+  .concerns{
+    display: grid;
+    gap: 2px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .concern{
+    background: var(--card);
+    padding: 26px 28px;
+    display: grid;
+    grid-template-columns: 3px 1fr;
+    gap: 22px;
+  }
+  .concern::before{
+    content: "";
+    background: var(--accent);
+  }
+  .concern p{
+    margin: 0;
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+  }
+
+  .pull{
+    margin: 56px 0 0;
+    text-align: center;
+  }
+  .pull p{
+    font-family: var(--serif);
+    font-size: clamp(1.25rem, 2.6vw, 1.65rem);
+    line-height: 1.55;
+    max-width: 34ch;
+    margin: 0 auto;
+    color: var(--ink);
+  }
+  .pull .brandline{
+    display:inline-block;
+    margin-top: 4px;
+    border-bottom: 3px solid var(--accent);
+  }
+
+  /* ---------- Philosophy ---------- */
+  .philo-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .philo-copy p{
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    margin: 0 0 18px;
+  }
+  .tagline{
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 26px 0 0;
+    color: var(--ink);
+  }
+  .stack-diagram{
+    display:flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .stack-row{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .stack-row .lbl{
+    width: 64px;
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    text-align: right;
+  }
+  .stack-row .cells{ display:flex; gap: 8px; flex-wrap: wrap; }
+  .stack-row .cell{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    font-family: var(--serif);
+  }
+  .stack-row.final .cell{ background: var(--ink); color:#fff; border-color: var(--ink); font-weight: 600; }
+
+  /* ---------- Reservation ---------- */
+  .reserve-panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 40px;
+  }
+  .reserve-note{
+    color: var(--ink-soft);
+    margin: 0 0 30px;
+    font-size: 0.98rem;
+  }
+  form.reserve-form{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 24px;
+  }
+  form.reserve-form .field.full{ grid-column: 1 / -1; }
+  .field label{
+    display:block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .field .req{ color: var(--accent-deep); }
+  .field input,
+  .field select,
+  .field textarea{
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #FDFCF9;
+    font-family: var(--sans);
+    font-size: 0.96rem;
+    color: var(--ink);
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus{
+    outline: none;
+    border-color: var(--accent-deep);
+    background: #fff;
+  }
+  .field textarea{ resize: vertical; min-height: 96px; }
+  .field .err{
+    display: none;
+    color: var(--accent-deep);
+    font-size: 0.82rem;
+    margin-top: 6px;
+  }
+  .field.invalid input,
+  .field.invalid select,
+  .field.invalid textarea{ border-color: var(--accent-deep); }
+  .field.invalid .err{ display: block; }
+
+  .form-actions{
+    grid-column: 1 / -1;
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    margin-top: 6px;
+  }
+  .form-actions button{
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px 30px;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .form-actions button:hover{ background: var(--accent-deep); }
+  .form-status{
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .form-status.ok{ color: #2E6B3E; font-weight: 600; }
+  .form-status.fail{ color: var(--accent-deep); font-weight: 600; }
+
+  /* ---------- Info / footer ---------- */
+  .info-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .info-block h3{
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    margin: 0 0 16px;
+  }
+  .info-line{
+    display:flex;
+    gap: 14px;
+    padding: 6px 0;
+    font-size: 0.96rem;
+    color: var(--ink-soft);
+  }
+  .info-line .k{
+    flex: 0 0 72px;
+    color: var(--ink-faint);
+  }
+  .info-line a{ text-decoration: underline; text-underline-offset: 3px; }
+
+  table.hours{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.94rem;
+    margin-top: 4px;
+  }
+  table.hours td{
+    padding: 7px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+  table.hours td:first-child{ color: var(--ink); font-weight: 600; width: 48px; }
+  table.hours tr:last-child td{ border-bottom: none; }
+  table.hours tr.closed td{ color: var(--ink-faint); }
+
+  .parking-note{
+    margin-top: 18px;
+    background: var(--danger-bg);
+    color: var(--danger-ink);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 0.92rem;
+  }
+
+  .sns-links{
+    display:flex;
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .sns-links a{
+    font-size: 0.92rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--ink-soft);
+  }
+
+  footer.legal{
+    padding: 26px 0 48px;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px){
+    .hero-grid, .philo-grid, .info-grid{
+      grid-template-columns: 1fr;
+    }
+    .hero{ padding: 56px 0 44px; }
+    section{ padding: 52px 0; }
+    form.reserve-form{ grid-template-columns: 1fr; gap: 22px; }
+    .reserve-panel{ padding: 24px 20px; }
+    .site-bar{ padding: 14px 20px; }
+    .wrap{ padding: 0 20px; }
+
+    /* 모바일 가독성 강화: 폼 요소를 더 크게, 라벨을 더 또렷하게 */
+    .field label{ font-size: 0.95rem; margin-bottom: 10px; }
+    .field input,
+    .field select,
+    .field textarea{
+      font-size: 1rem;
+      padding: 14px 14px;
+    }
+    .field textarea{ min-height: 110px; }
+    .field .err{ font-size: 0.86rem; }
+    .reserve-note{ font-size: 1rem; }
+
+    .form-actions{
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .form-actions button{
+      width: 100%;
+      padding: 15px 30px;
+      font-size: 1.05rem;
+    }
+    .form-status{ text-align: center; }
+  }
+
+  @media (max-width: 480px){
+    .reserve-panel{ padding: 20px 16px; }
+    h2.section-title{ margin-bottom: 28px; }
+  }
+
+  /* ================= 추가된 스타일 ================= */
+  .todo{ background: #FFF3CF; border-bottom: 1px dashed var(--accent-deep); padding: 0 2px; }
+
+  /* 상단 메뉴 */
+  .site-nav{ display:flex; gap: 20px; font-size: 0.92rem; }
+  .site-nav a{ text-decoration: none; color: var(--ink-soft); white-space: nowrap; }
+  .site-nav a:hover{ color: var(--ink); }
+
+  /* 개요·현황 숫자 */
+  .stats{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+    background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow:hidden;
+  }
+  .stat{ background: var(--card); padding: 24px 20px; text-align:center; }
+  .stat .num{ font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--ink); }
+  .stat .cap{ font-size: 0.88rem; color: var(--ink-faint); }
+
+  /* 원장님 소개 */
+  .director{ display:grid; grid-template-columns: 220px 1fr; gap: 40px; align-items:start; }
+  .director-photo{
+    aspect-ratio: 3/4; border-radius: var(--radius); border: 1px solid var(--line);
+    background: linear-gradient(160deg, #E9E4D3, #D6CFB8); display:flex; align-items:center; justify-content:center;
+    color: var(--ink-faint); font-size: 0.88rem; text-align:center; padding: 12px;
+  }
+  .director-photo img{ width:100%; height:100%; object-fit: cover; border-radius: var(--radius); }
+  .director h3{ font-family: var(--serif); font-size: 1.3rem; margin: 0 0 6px; }
+  .director .role{ color: var(--accent-deep); font-weight: 600; margin: 0 0 18px; }
+  .career{ list-style:none; padding:0; margin: 0 0 20px; }
+  .career li{ padding: 8px 0 8px 18px; border-bottom: 1px solid var(--line); position:relative; color: var(--ink-soft); }
+  .career li::before{ content:""; position:absolute; left:0; top: 17px; width:6px; height:6px; background: var(--accent); }
+  .director blockquote{ margin:0; font-family: var(--serif); color: var(--ink); font-size: 1.05rem; border-left: 3px solid var(--accent); padding-left: 16px; }
+
+  /* 커리큘럼 */
+  .levels{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .level{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 20px; display:flex; flex-direction:column; }
+  .level .step{ font-size: 0.8rem; color: var(--ink-faint); letter-spacing: 0.06em; }
+  .level h3{ font-family: var(--serif); font-size: 1.2rem; margin: 4px 0 2px; }
+  .level .target{ font-size: 0.86rem; color: var(--accent-deep); font-weight: 600; margin: 0 0 14px; }
+  .level ul{ margin: 0 0 16px; padding-left: 18px; color: var(--ink-soft); font-size: 0.93rem; }
+  .level ul li{ margin-bottom: 4px; }
+  .level .ex{ margin-top:auto; background: var(--bg); border-radius: var(--radius); padding: 12px 14px; font-size: 0.88rem; }
+  .level .ex .en{ font-family: var(--serif); color: var(--ink); font-weight: 600; display:block; }
+  .level .ex .ko{ color: var(--ink-soft); display:block; margin-top: 2px; }
+  .level .ex .tag{ display:inline-block; font-size: 0.72rem; padding: 1px 6px; border-radius: 3px; background: var(--ink); color:#fff; margin-bottom: 6px; }
+  .level .ex .tag.w{ background: var(--accent-deep); }
+
+  /* 소식 */
+  .news-tabs{ display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .news-tabs button{
+    border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+    padding: 9px 16px; border-radius: 999px; font-family: var(--sans); font-size: 0.92rem; cursor:pointer;
+  }
+  .news-tabs button[aria-selected="true"]{ background: var(--ink); color:#fff; border-color: var(--ink); }
+  .news-panel[hidden]{ display:none; }
+  .photo-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .photo{
+    aspect-ratio: 4/3; border-radius: var(--radius); border: 1px solid var(--line); overflow:hidden; position:relative;
+    background: linear-gradient(160deg, #E9E4D3, #D6CFB8);
+  }
+  .photo img{ width:100%; height:100%; object-fit: cover; display:block; }
+  .photo figcaption{
+    position:absolute; left:0; right:0; bottom:0; padding: 8px 12px; font-size: 0.85rem; color:#fff;
+    background: linear-gradient(transparent, rgba(20,28,48,0.75));
+  }
+  .post-list{ display:grid; gap: 12px; }
+  .post{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; }
+  .post .date{ font-size: 0.82rem; color: var(--ink-faint); }
+  .post h3{ font-size: 1.05rem; margin: 4px 0 6px; }
+  .post p{ margin:0; color: var(--ink-soft); font-size: 0.95rem; }
+  .grad-table{ width:100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); font-size: 0.95rem; }
+  .grad-table th, .grad-table td{ padding: 12px 14px; border-bottom: 1px solid var(--line); text-align:left; }
+  .grad-table th{ background: var(--bg); font-weight: 600; font-size: 0.88rem; color: var(--ink-soft); }
+  .seminar{ background: var(--ink); color:#fff; border-radius: var(--radius); padding: 28px; display:flex; justify-content: space-between; align-items:center; gap: 20px; flex-wrap: wrap; }
+  .seminar h3{ font-family: var(--serif); margin: 0 0 6px; font-size: 1.2rem; }
+  .seminar p{ margin:0; color: rgba(255,255,255,0.8); }
+  .more-link{ display:inline-block; margin-top: 18px; color: var(--ink-soft); font-size: 0.92rem; text-underline-offset: 3px; }
+
+  /* 상담 예약: 달력 + 시간 */
+  .form-section-title{ grid-column: 1 / -1; font-family: var(--serif); font-size: 1.08rem; margin: 18px 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
+  .form-section-title:first-child{ margin-top: 0; padding-top: 0; border-top: none; }
+  .picker{ grid-column: 1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .cal{ border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; background: #FDFCF9; }
+  .cal-head{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px; }
+  .cal-head strong{ font-family: var(--serif); }
+  .cal-head button{ border: 1px solid var(--line); background: var(--card); width: 36px; height: 36px; border-radius: var(--radius); cursor:pointer; font-size: 1rem; color: var(--ink); }
+  .cal-head button:disabled{ opacity: 0.35; cursor: default; }
+  .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align:center; }
+  .cal-grid .dow{ font-size: 0.78rem; color: var(--ink-faint); padding: 4px 0; }
+  .cal-grid .dow.sun{ color: #B5513A; }
+  .cal-grid button{
+    aspect-ratio: 1; border: 1px solid transparent; background: transparent; border-radius: var(--radius);
+    font-family: var(--sans); font-size: 0.92rem; color: var(--ink); cursor:pointer; min-height: 36px;
+  }
+  .cal-grid button:hover:not(:disabled){ border-color: var(--accent-deep); }
+  .cal-grid button:disabled{ color: #C9C6BA; cursor: default; }
+  .cal-grid button.today{ font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .cal-grid button[aria-pressed="true"]{ background: var(--ink); color:#fff; }
+  .slots-box{ border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; background: #FDFCF9; }
+  .slots-box .hint{ color: var(--ink-faint); font-size: 0.92rem; margin: 0; }
+  .slots-box .picked{ font-weight: 600; margin: 0 0 10px; }
+  .slots{ display:flex; flex-wrap: wrap; gap: 8px; }
+  .slots button{
+    border: 1px solid var(--line); background: var(--card); padding: 9px 14px; border-radius: var(--radius);
+    font-family: var(--sans); font-size: 0.92rem; color: var(--ink); cursor:pointer; min-width: 72px;
+  }
+  .slots button:hover:not(:disabled){ border-color: var(--accent-deep); }
+  .slots button:disabled{ text-decoration: line-through; color: #B9B6AA; cursor: default; }
+  .slots button[aria-pressed="true"]{ background: var(--accent); border-color: var(--accent); font-weight: 700; }
+  .picker-err{ grid-column: 1 / -1; display:none; color: var(--accent-deep); font-size: 0.85rem; margin: -10px 0 0; }
+  .picker.invalid + .picker-err{ display:block; }
+
+  /* 사전 설문 */
+  fieldset.q{ border: none; padding: 0; margin: 0; }
+  fieldset.q legend{ font-size: 0.88rem; font-weight: 600; margin-bottom: 8px; padding: 0; }
+  .chips{ display:flex; flex-wrap: wrap; gap: 8px; }
+  .chips label{ position:relative; }
+  .chips input{ position:absolute; opacity:0; width:1px; height:1px; }
+  .chips span{
+    display:inline-block; border: 1px solid var(--line); background: #FDFCF9; padding: 8px 14px;
+    border-radius: 999px; font-size: 0.92rem; cursor:pointer; color: var(--ink-soft);
+  }
+  .chips input:checked + span{ background: var(--ink); color:#fff; border-color: var(--ink); }
+  .chips input:focus-visible + span{ outline: 2px solid var(--accent-deep); outline-offset: 2px; }
+  .consent{ grid-column: 1 / -1; font-size: 0.9rem; color: var(--ink-soft); }
+  .consent label{ display:flex; gap: 10px; align-items:flex-start; font-weight: 500; }
+  .consent input{ margin-top: 4px; width: 18px; height: 18px; flex: 0 0 auto; }
+  .consent details{ margin-top: 6px; font-size: 0.85rem; }
+  .consent .err{ display:none; color: var(--accent-deep); font-size: 0.82rem; margin: 6px 0 0; }
+  .consent.invalid .err{ display:block; }
+  .hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  .form-actions button:disabled{ opacity: 0.6; cursor: wait; }
+
+  .done-box{ text-align:center; padding: 30px 10px; }
+  .done-box h3{ font-family: var(--serif); font-size: 1.3rem; margin: 0 0 10px; }
+  .done-box p{ color: var(--ink-soft); margin: 0 0 6px; }
+
+  @media (max-width: 860px){
+    .site-nav{ display:none; }
+    .stats{ grid-template-columns: repeat(2, 1fr); }
+    .director{ grid-template-columns: 1fr; gap: 24px; }
+    .director-photo{ max-width: 200px; }
+    .levels{ grid-template-columns: 1fr 1fr; }
+    .photo-grid{ grid-template-columns: 1fr 1fr; }
+    .picker{ grid-template-columns: 1fr; gap: 16px; }
+    .seminar{ padding: 22px; }
+  }
+  @media (max-width: 480px){
+    .levels{ grid-template-columns: 1fr; }
+    .grad-table{ font-size: 0.88rem; }
+    .grad-table th, .grad-table td{ padding: 10px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-bar">
+    <div class="brand">비욘드잉글리쉬 <span>사직캠퍼스</span></div>
+    <nav class="site-nav" aria-label="주요 메뉴">
+      <a href="#about">학원 소개</a>
+      <a href="#director">원장 소개</a>
+      <a href="#curriculum">커리큘럼</a>
+      <a href="#news">소식</a>
+      <a href="#info">오시는 길</a>
+    </nav>
+    <a class="cta-small" href="#reserve">상담 예약</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="hero-eyebrow">부산 연제구 종합운동장로 · 비욘드잉글리쉬 사직어학원</p>
+      <h1 class="hero-title">아이의 영어가,<br>말이 되고 표현이 될 때까지</h1>
+      <p class="hero-sub">문제풀이가 아니라 이해하고 표현하는 영어. 결과가 다른 영어, 특허받은 영어 — 지금 부모님이 찾고 계신 답, 비욘드잉글리쉬 사직캠퍼스입니다.</p>
+      <div class="hero-ctas">
+        <a class="btn-primary" href="#reserve">상담 예약하기</a>
+        <a class="btn-ghost" href="tel:051-502-3596">051-502-3596</a>
+      </div>
+    </div>
+    <div>
+      <div class="block-art" aria-hidden="true">
+        <span class="blk">I</span>
+        <span class="blk">want</span>
+        <span class="blk">to</span>
+        <span class="blk acc">speak</span>
+        <span class="blk deep">up.</span>
+      </div>
+      <p class="hero-art-caption">단어에서 문장으로, Sentence Build Up 학습법</p>
+    </div>
+  </div>
+</section>
+
+<section id="concerns">
+  <div class="wrap">
+    <h2 class="section-title">이런 고민, 익숙하신가요?</h2>
+    <div class="concerns">
+      <div class="concern">
+        <p>우리 아이들의 영어가 걱정스러워 영어유치원부터 보내고 싶으신가요?</p>
+      </div>
+      <div class="concern">
+        <p>영어 학원수업을 열심히 하는 것 같은데, 아이가 변화하는 모습이 잘 보이지 않아 걱정되시나요?</p>
+      </div>
+      <div class="concern">
+        <p>개편된 교육과정에서는 초등부터 이해와 표현 능력이 중요해졌다는데 — 문제풀이가 아니라 영어로 이해하고 생각을 표현하는 능력, 무엇부터 시작해야 할까요?</p>
+      </div>
+    </div>
+
+    <div class="pull">
+      <p>우리 아이의 영어실력 향상으로 가는 가장 정확하고 빠른 길은,<br>
+      <span class="brandline">지금 부모님이 선택하신 비욘드잉글리쉬 사직캠퍼스입니다.</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="philosophy">
+  <div class="wrap philo-grid">
+    <div class="philo-copy">
+      <h2 class="section-title">문제풀이가 아니라,<br>표현하는 영어</h2>
+      <p>비욘드잉글리쉬는 정답을 고르는 훈련이 아니라, 아이가 스스로 문장을 만들고 자신의 생각을 표현할 수 있도록 돕는 특허받은 학습 시스템으로 수업합니다.</p>
+      <p>단어에서 구, 구에서 문장으로 — 이해와 표현이 함께 자라야 중·고등 과정까지 흔들림 없이 이어집니다.</p>
+      <p class="tagline">다가오는 미래, 바른 영어교육 · 즐거운 영어교육으로 준비합니다.</p>
+    </div>
+    <div>
+      <div class="stack-diagram" aria-hidden="true">
+        <div class="stack-row">
+          <span class="lbl">단어</span>
+          <div class="cells"><span class="cell">speak</span><span class="cell">up</span></div>
+        </div>
+        <div class="stack-row">
+          <span class="lbl">구</span>
+          <div class="cells"><span class="cell">want to speak up</span></div>
+        </div>
+        <div class="stack-row final">
+          <span class="lbl">문장</span>
+          <div class="cells"><span class="cell">I want to speak up.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 1. 학원 개요·현황 (노란 표시 = 원장님이 채우실 부분) ===== -->
+<section id="about">
+  <div class="wrap">
+    <h2 class="section-title">학원 개요</h2>
+    <div class="stats">
+      <div class="stat"><div class="num"><span class="todo">20XX</span></div><div class="cap">개원 연도</div></div>
+      <div class="stat"><div class="num"><span class="todo">00</span>명</div><div class="cap">재원생</div></div>
+      <div class="stat"><div class="num">4단계</div><div class="cap">레벨 커리큘럼</div></div>
+      <div class="stat"><div class="num">초1–중3</div><div class="cap">수강 대상</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 원장님 소개 ===== -->
+<section id="director">
+  <div class="wrap">
+    <h2 class="section-title">원장 소개</h2>
+    <div class="director">
+      <div class="director-photo">
+        <!-- 사진 넣는 법: 아래 span을 지우고 <img src="원장사진.jpg" alt="원장 사진"> 로 바꿔 주세요 -->
+        <span>원장님 사진 자리</span>
+      </div>
+      <div>
+        <h3><span class="todo">○○○</span> 원장</h3>
+        <p class="role">비욘드잉글리쉬 사직캠퍼스</p>
+        <ul class="career">
+          <li><span class="todo">학력 (예: ○○대학교 영어영문학과 졸업)</span></li>
+          <li><span class="todo">경력 (예: 초·중등 영어 지도 ○○년)</span></li>
+          <li><span class="todo">자격 (예: TESOL, TTC 수료 등)</span></li>
+          <li><span class="todo">기타 (예: 파닉스 교재 집필, 학부모 강연 등)</span></li>
+        </ul>
+        <blockquote><span class="todo">아이 한 명 한 명이 자기 생각을 영어로 말할 수 있을 때까지 함께하겠습니다. (원장님 한마디로 바꿔 주세요)</span></blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2. 수업 커리큘럼 ===== -->
+<section id="curriculum">
+  <div class="wrap">
+    <h2 class="section-title">수업 커리큘럼</h2>
+    <div class="levels">
+      <article class="level">
+        <span class="step">STEP 1</span>
+        <h3>Phonics</h3>
+        <p class="target"><span class="todo">초1–초2 / 영어 첫걸음</span></p>
+        <ul>
+          <li>알파벳 소리와 글자 연결</li>
+          <li>단모음·장모음, 이중자음 읽기</li>
+          <li>사이트워드로 짧은 문장 읽기</li>
+        </ul>
+        <div class="ex"><span class="tag">spoken</span>
+          <span class="en">I have a red bag.</span>
+          <span class="ko">나는 빨간 가방이 하나 있어요.</span></div>
+      </article>
+      <article class="level">
+        <span class="step">STEP 2</span>
+        <h3>Basic</h3>
+        <p class="target"><span class="todo">초2–초4 / 파닉스 완료 후</span></p>
+        <ul>
+          <li>기초 문장 패턴 익히기</li>
+          <li>짧은 이야기 듣고 읽기</li>
+          <li>단어 → 구 → 문장 만들기</li>
+        </ul>
+        <div class="ex"><span class="tag">spoken</span>
+          <span class="en">Can I go to the bathroom?</span>
+          <span class="ko">제가 화장실에 가도 돼요?</span></div>
+      </article>
+      <article class="level">
+        <span class="step">STEP 3</span>
+        <h3>Intermediate</h3>
+        <p class="target"><span class="todo">초4–초6</span></p>
+        <ul>
+          <li>이유·예시를 넣어 말하기</li>
+          <li>문단 단위 읽기와 요약</li>
+          <li>문법을 문장 속에서 익히기</li>
+        </ul>
+        <div class="ex"><span class="tag w">written</span>
+          <span class="en">I like summer because I can swim in the sea.</span>
+          <span class="ko">나는 바다에서 수영할 수 있기 때문에 여름을 좋아한다.</span></div>
+      </article>
+      <article class="level">
+        <span class="step">STEP 4</span>
+        <h3>Advanced</h3>
+        <p class="target"><span class="todo">초6–중3 / 중등 내신 대비</span></p>
+        <ul>
+          <li>중등 핵심 문법과 구문</li>
+          <li>자기 생각을 담은 에세이 쓰기</li>
+          <li>내신·서술형 대비</li>
+        </ul>
+        <div class="ex"><span class="tag w">written</span>
+          <span class="en">If I had more time, I would read more books.</span>
+          <span class="ko">만약 내게 시간이 더 있다면, 나는 책을 더 많이 읽을 텐데.</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3. 소식 ===== -->
+<section id="news">
+  <div class="wrap">
+    <h2 class="section-title">비욘드 사직 소식</h2>
+    <div class="news-tabs" role="tablist" aria-label="소식 분류">
+      <button role="tab" aria-selected="true" aria-controls="p-mood" id="t-mood">학습 분위기</button>
+      <button role="tab" aria-selected="false" aria-controls="p-class" id="t-class">수업 내용</button>
+      <button role="tab" aria-selected="false" aria-controls="p-grad" id="t-grad">졸업생 현황</button>
+      <button role="tab" aria-selected="false" aria-controls="p-seminar" id="t-seminar">학부모 설명회</button>
+    </div>
+
+    <div class="news-panel" role="tabpanel" id="p-mood" aria-labelledby="t-mood">
+      <!-- 사진 바꾸는 법: <figure class="photo"> 안에 <img src="사진.jpg" alt="설명"> 를 넣어 주세요 -->
+      <div class="photo-grid">
+        <figure class="photo" style="margin:0"><figcaption>파닉스반 수업 모습</figcaption></figure>
+        <figure class="photo" style="margin:0"><figcaption>스피킹 발표 시간</figcaption></figure>
+        <figure class="photo" style="margin:0"><figcaption>Sentence Build Up 활동</figcaption></figure>
+        <figure class="photo" style="margin:0"><figcaption>원서 읽기</figcaption></figure>
+        <figure class="photo" style="margin:0"><figcaption>할로윈 이벤트</figcaption></figure>
+        <figure class="photo" style="margin:0"><figcaption>자습 공간</figcaption></figure>
+      </div>
+      <a class="more-link" href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타그램에서 더 보기 →</a>
+    </div>
+
+    <div class="news-panel" role="tabpanel" id="p-class" aria-labelledby="t-class" hidden>
+      <div class="post-list">
+        <div class="post"><span class="date"><span class="todo">2026.10</span></span><h3><span class="todo">Intermediate반 · 이유 말하기 프로젝트</span></h3><p><span class="todo">수업 내용을 2~3줄로 소개해 주세요.</span></p></div>
+        <div class="post"><span class="date"><span class="todo">2026.09</span></span><h3><span class="todo">Phonics반 · 장모음 읽기 완성</span></h3><p><span class="todo">수업 내용을 2~3줄로 소개해 주세요.</span></p></div>
+      </div>
+      <a class="more-link" href="https://blog.naver.com/beyondsajik" target="_blank" rel="noopener">블로그에서 더 보기 →</a>
+    </div>
+
+    <div class="news-panel" role="tabpanel" id="p-grad" aria-labelledby="t-grad" hidden>
+      <table class="grad-table">
+        <thead><tr><th>연도</th><th>졸업생</th><th>진학 / 성과</th></tr></thead>
+        <tbody>
+          <tr><td><span class="todo">2025</span></td><td><span class="todo">00명</span></td><td><span class="todo">예: ○○중 내신 영어 A 다수</span></td></tr>
+          <tr><td><span class="todo">2024</span></td><td><span class="todo">00명</span></td><td><span class="todo">예: 영어 말하기 대회 수상</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="news-panel" role="tabpanel" id="p-seminar" aria-labelledby="t-seminar" hidden>
+      <div class="seminar">
+        <div>
+          <h3><span class="todo">2026 겨울방학 학부모 설명회</span></h3>
+          <p><span class="todo">일시: 0월 0일(토) 오전 10시 · 장소: 학원 4층</span></p>
+        </div>
+        <a class="btn-primary" href="#reserve" data-purpose="학부모 설명회 신청">설명회 신청하기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 상담 예약 ===== -->
+<section id="reserve">
+  <div class="wrap">
+    <h2 class="section-title">상담 예약</h2>
+    <div class="reserve-panel" id="reservePanel">
+      <p class="reserve-note">원하시는 시간 최대한 반영하여 상담 확정하도록 하겠습니다. 편하게 문의주세요~</p>
+
+      <form class="reserve-form" id="reserveForm" novalidate>
+        <h3 class="form-section-title">1. 신청 종류와 날짜</h3>
+
+        <div class="field full" data-field="purpose">
+          <label for="f-purpose">신청 종류</label>
+          <select id="f-purpose" name="purpose">
+            <option>입학 상담</option>
+            <option>레벨테스트</option>
+            <option>학부모 설명회 신청</option>
+          </select>
+        </div>
+
+        <div class="picker" id="picker">
+          <div class="cal" aria-label="상담 날짜 선택">
+            <div class="cal-head">
+              <button type="button" id="calPrev" aria-label="이전 달">‹</button>
+              <strong id="calTitle"></strong>
+              <button type="button" id="calNext" aria-label="다음 달">›</button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+          <div class="slots-box">
+            <p class="picked" id="slotTitle" hidden></p>
+            <p class="hint" id="slotHint">왼쪽 달력에서 날짜를 먼저 골라 주세요. (일요일 휴무)</p>
+            <div class="slots" id="slots"></div>
+          </div>
+        </div>
+        <p class="picker-err">상담 날짜와 시간을 골라 주세요.</p>
+
+        <h3 class="form-section-title">2. 보호자 · 학생 정보</h3>
+
+        <div class="field" data-field="name">
+          <label for="f-name">보호자 성함 <span class="req">*</span></label>
+          <input type="text" id="f-name" name="name" autocomplete="name">
+          <p class="err">성함을 입력해 주세요.</p>
+        </div>
+
+        <div class="field" data-field="phone">
+          <label for="f-phone">연락처 <span class="req">*</span></label>
+          <input type="tel" id="f-phone" name="phone" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric">
+          <p class="err">연락 가능한 전화번호를 입력해 주세요.</p>
+        </div>
+
+        <div class="field" data-field="student">
+          <label for="f-student">학생 이름</label>
+          <input type="text" id="f-student" name="student">
+        </div>
+
+        <div class="field" data-field="grade">
+          <label for="f-grade">학생 학년 <span class="req">*</span></label>
+          <select id="f-grade" name="grade">
+            <option value="">선택해 주세요</option>
+            <option>7세 이하</option>
+            <option>초1</option><option>초2</option><option>초3</option>
+            <option>초4</option><option>초5</option><option>초6</option>
+            <option>중1</option><option>중2</option><option>중3</option>
+          </select>
+          <p class="err">학생 학년을 골라 주세요.</p>
+        </div>
+
+        <h3 class="form-section-title">3. 사전 설문 <span style="font-family:var(--sans);font-weight:400;font-size:0.85rem;color:var(--ink-faint)">(상담 준비에 도움이 돼요)</span></h3>
+
+        <fieldset class="q field full">
+          <legend>영어유치원을 다녔나요?</legend>
+          <div class="chips">
+            <label><input type="radio" name="q_kinder" value="다녔음"><span>다녔어요</span></label>
+            <label><input type="radio" name="q_kinder" value="안 다녔음"><span>안 다녔어요</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="q field full">
+          <legend>다른 영어학원 경험이 있나요?</legend>
+          <div class="chips">
+            <label><input type="radio" name="q_academy" value="없음"><span>없어요</span></label>
+            <label><input type="radio" name="q_academy" value="1년 미만"><span>1년 미만</span></label>
+            <label><input type="radio" name="q_academy" value="1~3년"><span>1~3년</span></label>
+            <label><input type="radio" name="q_academy" value="3년 이상"><span>3년 이상</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="q field full">
+          <legend>파닉스는 어디까지 했나요?</legend>
+          <div class="chips">
+            <label><input type="radio" name="q_phonics" value="처음"><span>처음이에요</span></label>
+            <label><input type="radio" name="q_phonics" value="배우는 중"><span>배우는 중이에요</span></label>
+            <label><input type="radio" name="q_phonics" value="완료"><span>끝냈어요</span></label>
+            <label><input type="radio" name="q_phonics" value="모름"><span>잘 모르겠어요</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="q field full">
+          <legend>지금 영어 실력은 어느 정도인가요?</legend>
+          <div class="chips">
+            <label><input type="radio" name="q_level" value="알파벳 단계"><span>알파벳 단계</span></label>
+            <label><input type="radio" name="q_level" value="짧은 문장 읽기"><span>짧은 문장을 읽어요</span></label>
+            <label><input type="radio" name="q_level" value="짧은 글 읽고 이해"><span>짧은 글을 읽고 이해해요</span></label>
+            <label><input type="radio" name="q_level" value="문법·쓰기 학습 중"><span>문법·쓰기도 해요</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="q field full">
+          <legend>레벨테스트를 원하시나요?</legend>
+          <div class="chips">
+            <label><input type="radio" name="q_test" value="상담 때 함께"><span>상담 때 함께 볼게요</span></label>
+            <label><input type="radio" name="q_test" value="상담 먼저"><span>상담 먼저 할게요</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field full" data-field="message">
+          <label for="f-message">문의 내용</label>
+          <textarea id="f-message" name="message" placeholder="궁금하신 점을 편하게 남겨주세요."></textarea>
+        </div>
+
+        <div class="hp" aria-hidden="true"><label>비워 두세요<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <div class="consent" id="consentBox">
+          <label><input type="checkbox" id="f-consent" name="consent"> <span>상담을 위한 개인정보 수집·이용에 동의해요. <span class="req">*</span></span></label>
+          <details>
+            <summary>자세히 보기</summary>
+            수집 항목: 보호자 성함, 연락처, 학생 이름·학년, 설문 응답 / 이용 목적: 상담 일정 안내 및 상담 진행 /
+            보관 기간: 상담 완료 후 <span class="todo">1년</span> 뒤 파기 / 동의하지 않으셔도 전화(051-502-3596)로 상담하실 수 있어요.
+          </details>
+          <p class="err">개인정보 수집·이용에 동의해 주세요.</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="submitBtn">상담 예약 신청</button>
+          <span class="form-status" id="formStatus" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="info">
+  <div class="wrap info-grid">
+    <div class="info-block">
+      <h3>오시는 길</h3>
+      <div class="info-line"><span class="k">주소</span><span>부산 연제구 종합운동장로28번길 10 JS빌딩 4층</span></div>
+      <div class="info-line"><span class="k">전화</span><a href="tel:051-502-3596">051-502-3596</a></div>
+      <div class="info-line"><span class="k">이메일</span><a href="mailto:debi92@naver.com">debi92@naver.com</a></div>
+      <div class="info-line"><span class="k">등록번호</span><span>학원등록번호 제5340호</span></div>
+      <div class="info-line"><span class="k">지도</span><a href="https://map.naver.com/p/search/%EB%B6%80%EC%82%B0%20%EC%97%B0%EC%A0%9C%EA%B5%AC%20%EC%A2%85%ED%95%A9%EC%9A%B4%EB%8F%99%EC%9E%A5%EB%A1%9C28%EB%B2%88%EA%B8%B8%2010" target="_blank" rel="noopener">네이버 지도에서 보기</a></div>
+
+      <div class="parking-note">
+        주차가 불가합니다. 인근 <strong>사직체육관 공영주차장</strong>을 이용해 주세요.
+      </div>
+
+      <div class="sns-links">
+        <a href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타그램</a>
+        <a href="https://blog.naver.com/beyondsajik" target="_blank" rel="noopener">블로그</a>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <h3>운영시간</h3>
+      <table class="hours">
+        <tr><td>월</td><td>13:00 – 21:00</td></tr>
+        <tr><td>화</td><td>13:00 – 20:00</td></tr>
+        <tr><td>수</td><td>13:00 – 21:00</td></tr>
+        <tr><td>목</td><td>13:00 – 20:00</td></tr>
+        <tr><td>금</td><td>13:00 – 21:00</td></tr>
+        <tr><td>토</td><td>09:30 – 12:00</td></tr>
+        <tr class="closed"><td>일</td><td>정기휴무</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="legal">
+  <div class="wrap" style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:8px;">
+    <span>© 비욘드잉글리쉬 사직어학원</span>
+    <span>부산 연제구 종합운동장로28번길 10 JS빌딩 4층 · 051-502-3596</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   설정 (원장님이 바꾸실 곳은 여기만이에요)
+   ============================================================ */
+var CONFIG = {
+  // 구글 시트 연동 주소: apps-script.gs 를 배포한 뒤 받은 "웹 앱 URL"을 붙여 넣어 주세요.
+  // 비워 두면 예전처럼 메일 앱이 열리는 방식으로 동작해요.
+  SHEET_URL: '',
+  CONTACT_EMAIL: 'debi92@naver.com',
+  // 요일별 상담 가능 시간 (0=일 ~ 6=토). [시작, 끝] 24시간 'HH:MM'
+  HOURS: {
+    1: ['13:00', '21:00'], 2: ['13:00', '20:00'], 3: ['13:00', '21:00'],
+    4: ['13:00', '20:00'], 5: ['13:00', '21:00'], 6: ['09:30', '12:00']
+  },
+  SLOT_STEP_MIN: 60,     // 상담 시작 시간 간격(분)
+  SLOT_LENGTH_MIN: 30,   // 상담 1회 길이(분) - 마감 시간 전에 끝나는 슬롯만 보여요
+  DAYS_AHEAD: 30,        // 오늘부터 며칠 뒤까지 예약 가능
+  MIN_NOTICE_HOURS: 3,   // 지금으로부터 최소 몇 시간 뒤부터 예약 가능
+  CLOSED_DATES: []       // 임시 휴무일 예: ['2026-10-09', '2026-12-25']
+};
+
+/* ---------- 소식 탭 ---------- */
+(function(){
+  var tabs = document.querySelectorAll('.news-tabs [role="tab"]');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+    });
+  });
+  document.querySelectorAll('[data-purpose]').forEach(function(a){
+    a.addEventListener('click', function(){
+      document.getElementById('f-purpose').value = a.getAttribute('data-purpose');
+    });
+  });
+})();
+
+/* ---------- 달력 + 시간 선택 + 신청 ---------- */
+(function(){
+  var DOW = ['일','월','화','수','목','금','토'];
+  var state = { view: null, date: '', time: '', booked: {} };
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function toMin(hhmm){ var p = hhmm.split(':'); return +p[0] * 60 + +p[1]; }
+  function fromMin(m){ return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+
+  var today = new Date(); today.setHours(0,0,0,0);
+  var lastDay = new Date(today); lastDay.setDate(lastDay.getDate() + CONFIG.DAYS_AHEAD);
+  state.view = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  var calGrid = document.getElementById('calGrid');
+  var calTitle = document.getElementById('calTitle');
+  var prevBtn = document.getElementById('calPrev');
+  var nextBtn = document.getElementById('calNext');
+  var slotsEl = document.getElementById('slots');
+  var slotHint = document.getElementById('slotHint');
+  var slotTitle = document.getElementById('slotTitle');
+  var picker = document.getElementById('picker');
+
+  function slotsFor(dateStr){
+    var d = new Date(dateStr + 'T00:00:00');
+    var h = CONFIG.HOURS[d.getDay()];
+    if(!h) return [];
+    var out = [], start = toMin(h[0]), end = toMin(h[1]);
+    var earliest = Date.now() + CONFIG.MIN_NOTICE_HOURS * 3600 * 1000;
+    for(var m = start; m + CONFIG.SLOT_LENGTH_MIN <= end; m += CONFIG.SLOT_STEP_MIN){
+      var t = fromMin(m);
+      var when = new Date(dateStr + 'T' + t + ':00').getTime();
+      if(when < earliest) continue;
+      out.push(t);
+    }
+    return out;
+  }
+
+  function dayOpen(d){
+    if(d < today || d > lastDay) return false;
+    if(CONFIG.CLOSED_DATES.indexOf(ymd(d)) !== -1) return false;
+    return slotsFor(ymd(d)).length > 0;
+  }
+
+  function renderCal(){
+    var y = state.view.getFullYear(), m = state.view.getMonth();
+    calTitle.textContent = y + '년 ' + (m + 1) + '월';
+    prevBtn.disabled = (y === today.getFullYear() && m === today.getMonth());
+    nextBtn.disabled = new Date(y, m + 1, 1) > lastDay;
+    calGrid.innerHTML = '';
+    DOW.forEach(function(n, i){
+      var s = document.createElement('div');
+      s.className = 'dow' + (i === 0 ? ' sun' : '');
+      s.textContent = n;
+      calGrid.appendChild(s);
+    });
+    var first = new Date(y, m, 1).getDay();
+    for(var i = 0; i < first; i++) calGrid.appendChild(document.createElement('span'));
+    var days = new Date(y, m + 1, 0).getDate();
+    for(var dnum = 1; dnum <= days; dnum++){
+      var d = new Date(y, m, dnum);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = dnum;
+      b.dataset.date = ymd(d);
+      b.setAttribute('aria-label', (m + 1) + '월 ' + dnum + '일 ' + DOW[d.getDay()] + '요일');
+      if(d.getTime() === today.getTime()) b.classList.add('today');
+      b.disabled = !dayOpen(d);
+      b.setAttribute('aria-pressed', b.dataset.date === state.date ? 'true' : 'false');
+      b.addEventListener('click', function(){ pickDate(this.dataset.date); });
+      calGrid.appendChild(b);
+    }
+  }
+
+  function pickDate(ds){
+    state.date = ds; state.time = '';
+    renderCal(); renderSlots();
+  }
+
+  function renderSlots(){
+    slotsEl.innerHTML = '';
+    if(!state.date){ slotTitle.hidden = true; slotHint.hidden = false; return; }
+    var d = new Date(state.date + 'T00:00:00');
+    slotTitle.hidden = false;
+    slotTitle.textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + DOW[d.getDay()] + ') 가능한 시간';
+    slotHint.hidden = true;
+    slotsFor(state.date).forEach(function(t){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = t;
+      var taken = !!state.booked[state.date + ' ' + t];
+      b.disabled = taken;
+      if(taken) b.title = '이미 예약된 시간이에요';
+      b.setAttribute('aria-pressed', t === state.time ? 'true' : 'false');
+      b.addEventListener('click', function(){
+        state.time = t;
+        picker.classList.remove('invalid');
+        renderSlots();
+      });
+      slotsEl.appendChild(b);
+    });
+  }
+
+  prevBtn.addEventListener('click', function(){ state.view = new Date(state.view.getFullYear(), state.view.getMonth() - 1, 1); renderCal(); });
+  nextBtn.addEventListener('click', function(){ state.view = new Date(state.view.getFullYear(), state.view.getMonth() + 1, 1); renderCal(); });
+
+  // 시트에 이미 들어온 예약 시간은 회색으로 막아요 (이름·전화번호는 받아오지 않아요)
+  function loadBooked(){
+    if(!CONFIG.SHEET_URL) return;
+    fetch(CONFIG.SHEET_URL + '?action=booked')
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        state.booked = {};
+        (j.booked || []).forEach(function(k){ state.booked[k] = true; });
+        renderSlots();
+      })
+      .catch(function(){ /* 못 불러와도 신청은 가능해요 */ });
+  }
+
+  renderCal(); renderSlots(); loadBooked();
+
+  /* ---------- 신청 ---------- */
+  var form = document.getElementById('reserveForm');
+  var status = document.getElementById('formStatus');
+  var submitBtn = document.getElementById('submitBtn');
+
+  var required = {
+    name: function(v){ return v.trim().length > 0; },
+    phone: function(v){ return /^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(v.trim()); },
+    grade: function(v){ return v.trim().length > 0; }
+  };
+
+  function radio(name){
+    var c = form.querySelector('input[name="' + name + '"]:checked');
+    return c ? c.value : '';
+  }
+
+  function collect(){
+    var v = function(n){ return form.querySelector('[name="' + n + '"]').value.trim(); };
+    return {
+      purpose: v('purpose'),
+      date: state.date,
+      time: state.time,
+      name: v('name'),
+      phone: v('phone'),
+      student: v('student'),
+      grade: v('grade'),
+      q_kinder: radio('q_kinder'),
+      q_academy: radio('q_academy'),
+      q_phonics: radio('q_phonics'),
+      q_level: radio('q_level'),
+      q_test: radio('q_test'),
+      message: v('message'),
+      website: v('website')
+    };
+  }
+
+  function sendMail(data){
+    var lines = [
+      '신청 종류: ' + data.purpose,
+      '희망 날짜/시간: ' + data.date + ' ' + data.time,
+      '보호자 성함: ' + data.name,
+      '연락처: ' + data.phone,
+      '학생 이름: ' + (data.student || '미기재'),
+      '학생 학년: ' + data.grade,
+      '영어유치원: ' + (data.q_kinder || '-'),
+      '타학원 경력: ' + (data.q_academy || '-'),
+      '파닉스: ' + (data.q_phonics || '-'),
+      '현재 실력: ' + (data.q_level || '-'),
+      '레벨테스트: ' + (data.q_test || '-'),
+      '문의 내용: ' + (data.message || '없음')
+    ];
+    window.location.href = 'mailto:' + CONFIG.CONTACT_EMAIL
+      + '?subject=' + encodeURIComponent('[' + data.purpose + '] ' + data.name + ' 님')
+      + '&body=' + encodeURIComponent(lines.join('\n'));
+  }
+
+  function showDone(data){
+    var d = new Date(data.date + 'T00:00:00');
+    document.getElementById('reservePanel').innerHTML =
+      '<div class="done-box" role="status">' +
+      '<h3>신청이 잘 접수됐어요</h3>' +
+      '<p>' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + DOW[d.getDay()] + ') ' + data.time + ' · ' + data.purpose + '</p>' +
+      '<p>확인 후 남겨 주신 번호로 연락드릴게요. 급하신 일은 <a href="tel:051-502-3596">051-502-3596</a>으로 전화 주세요.</p>' +
+      '</div>';
+  }
+
+  // 고친 칸은 바로 빨간 안내를 지워요
+  form.addEventListener('input', function(e){
+    var f = e.target.closest('.field, .consent');
+    if(f) f.classList.remove('invalid');
+  });
+  form.addEventListener('change', function(e){
+    var f = e.target.closest('.field, .consent');
+    if(f) f.classList.remove('invalid');
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var valid = true;
+
+    Object.keys(required).forEach(function(name){
+      var input = form.querySelector('[name="' + name + '"]');
+      var ok = required[name](input.value);
+      input.closest('.field').classList.toggle('invalid', !ok);
+      if(!ok) valid = false;
+    });
+
+    var slotOk = !!(state.date && state.time);
+    picker.classList.toggle('invalid', !slotOk);
+    if(!slotOk) valid = false;
+
+    var consentOk = document.getElementById('f-consent').checked;
+    document.getElementById('consentBox').classList.toggle('invalid', !consentOk);
+    if(!consentOk) valid = false;
+
+    if(!valid){
+      status.textContent = '표시된 항목을 확인해 주세요.';
+      status.className = 'form-status fail';
+      var firstBad = form.querySelector('.invalid, .picker.invalid');
+      if(firstBad) firstBad.scrollIntoView({ block: 'center' });
+      return;
+    }
+
+    var data = collect();
+    if(data.website) return; // 스팸 봇
+
+    if(!CONFIG.SHEET_URL){
+      sendMail(data);
+      status.textContent = '메일 작성 창이 열립니다. 내용을 확인 후 전송해 주세요. (수신: ' + CONFIG.CONTACT_EMAIL + ')';
+      status.className = 'form-status ok';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    status.textContent = '보내는 중이에요…';
+    status.className = 'form-status';
+
+    // text/plain 으로 보내면 구글 Apps Script 와 브라우저 보안(CORS) 문제 없이 결과를 받을 수 있어요
+    fetch(CONFIG.SHEET_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(j.ok){ showDone(data); return; }
+        if(j.error === 'taken'){
+          state.booked[data.date + ' ' + data.time] = true;
+          state.time = '';
+          renderSlots();
+          picker.classList.add('invalid');
+          status.textContent = '방금 다른 분이 그 시간을 예약했어요. 다른 시간을 골라 주세요.';
+        } else {
+          status.textContent = '접수 중 문제가 생겼어요. 051-502-3596으로 전화 주시면 바로 도와드릴게요.';
+        }
+        status.className = 'form-status fail';
+        submitBtn.disabled = false;
+      })
+      .catch(function(){
+        status.innerHTML = '인터넷 연결 문제로 접수하지 못했어요. <a href="#" id="mailFallback">메일로 보내기</a> 또는 051-502-3596으로 연락 주세요.';
+        status.className = 'form-status fail';
+        submitBtn.disabled = false;
+        document.getElementById('mailFallback').addEventListener('click', function(ev){ ev.preventDefault(); sendMail(data); });
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
