@@ -46,7 +46,7 @@
   .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 28px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; }
   .topbar-left, .topbar-right{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
   .brand{ display:flex; align-items:center; gap:10px; }
-  .brand-mark{ width:34px; height:34px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; letter-spacing:-0.02em; }
+  .brand-mark{ width:38px; height:38px; display:block; flex:none; }
   .brand-text{ display:flex; flex-direction:column; line-height:1.15; }
   .brand-text b{ font-weight:800; font-size:16px; }
   .brand-text small{ font-size:11px; color:var(--ink-soft); }
@@ -184,7 +184,7 @@
 <header class="topbar">
   <div class="topbar-left">
     <a class="brand" href="./" title="학원 안내 페이지로">
-      <div class="brand-mark">BE</div>
+      <img class="brand-mark" src="logo.png" alt="비욘드잉글리쉬 로고" width="38" height="38">
       <div class="brand-text"><b>비욘드잉글리쉬</b><small>사직캠퍼스 학원 관리</small></div>
     </a>
     <div class="seg" role="group" aria-label="화면 선택">
