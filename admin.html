@@ -163,6 +163,64 @@
   .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--surface); font-size:13px; padding:11px 18px; border-radius:10px; opacity:0; pointer-events:none; transition:all .2s ease; z-index:20; max-width:calc(100% - 32px); text-align:center; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   .sample-note{ font-size:11.5px; color:var(--ink-faint); margin-top:28px; }
+  /* 일정 달력 */
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+  .cal-title{ display:flex; align-items:center; gap:10px; }
+  .cal-title h1{ margin:0; font-size:22px; font-weight:800; min-width:150px; text-align:center; font-variant-numeric:tabular-nums; }
+  .cal-tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .chk{ display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; padding:7px 12px; border:1px solid var(--border); border-radius:9px; background:var(--surface); cursor:pointer; user-select:none; }
+  .chk input{ width:15px; height:15px; margin:0; }
+  .chk.common input{ accent-color:var(--accent); }
+  .chk.mine input{ accent-color:var(--good); }
+  .chk .sw{ width:9px; height:9px; border-radius:50%; }
+  .btn.ghost{ background:var(--surface); color:var(--ink); border:1px solid var(--border); padding:8px 12px; }
+  .plus{ width:40px; height:40px; padding:0; justify-content:center; border-radius:50%; font-size:22px; font-weight:500; line-height:1; }
+  .cal-wrap{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .cal{ flex:3 1 560px; min-width:0; padding:0; overflow:hidden; }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); }
+  .cal-grid .dow{ padding:10px 8px; font-size:12px; font-weight:700; text-align:center; color:var(--ink-soft); border-bottom:1px solid var(--border); background:var(--surface-soft); }
+  .cal-grid .dow.sun, .cell.sun .num{ color:var(--warn); }
+  .cal-grid .dow.sat, .cell.sat .num{ color:var(--accent); }
+  .cell{ min-height:112px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); padding:6px 6px 8px; display:flex; flex-direction:column; gap:3px; cursor:pointer; text-align:left; background:var(--surface); font:inherit; color:inherit; border-top:0; border-left:0; min-width:0; }
+  .cell:nth-child(7n+7){ border-right:0; }
+  .cell:hover{ background:var(--surface-soft); }
+  .cell.other{ background:var(--ground); }
+  .cell.other .num, .cell.other .ev{ opacity:0.45; }
+  .cell .num{ font-size:12.5px; font-weight:700; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-variant-numeric:tabular-nums; }
+  .cell.today .num{ background:var(--accent); color:#fff !important; }
+  .cell.sel{ box-shadow:inset 0 0 0 2px var(--accent); }
+  .ev{ font-size:11.5px; line-height:1.35; padding:2px 6px; border-radius:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
+  .ev.common{ background:var(--accent-soft); color:var(--accent); }
+  .ev.mine{ background:var(--good-soft); color:var(--good); }
+  .ev-more{ font-size:11px; color:var(--ink-soft); padding-left:4px; }
+  .day-panel{ flex:1 1 260px; position:sticky; top:93px; }
+  .day-panel h2{ margin-bottom:4px; }
+  .day-list{ display:flex; flex-direction:column; gap:10px; margin:14px 0; }
+  .day-item{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:10px; background:var(--surface-soft); }
+  .day-item .bar-v{ width:4px; align-self:stretch; border-radius:2px; flex:none; }
+  .day-item .body{ flex:1; min-width:0; }
+  .day-item b{ display:block; font-size:13.5px; }
+  .day-item small{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .day-item p{ margin:6px 0 0; font-size:12.5px; white-space:pre-line; }
+  .day-item .del{ border:0; background:none; color:var(--ink-faint); cursor:pointer; font-size:12px; padding:2px 4px; }
+  .day-item .del:hover{ color:var(--warn); }
+  .empty{ font-size:13px; color:var(--ink-soft); padding:6px 0; }
+  .overlay{ position:fixed; inset:0; background:rgba(20,22,26,0.45); display:flex; align-items:center; justify-content:center; padding:16px; z-index:30; }
+  .modal{ background:var(--surface); border-radius:16px; padding:24px; width:100%; max-width:420px; box-shadow:0 12px 40px rgba(0,0,0,0.2); display:flex; flex-direction:column; gap:14px; max-height:calc(100vh - 32px); overflow:auto; }
+  .modal h2{ margin:0; font-size:17px; font-weight:800; }
+  .modal label{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .modal input, .modal textarea{ border:1px solid var(--border); border-radius:9px; padding:10px 12px; font-size:13.5px; background:var(--surface-soft); color:var(--ink); font-family:inherit; font-weight:400; }
+  .modal textarea{ min-height:70px; resize:vertical; }
+  .kind{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .kind input{ position:absolute; opacity:0; pointer-events:none; }
+  .kind span{ display:block; text-align:center; padding:10px; border:1px solid var(--border); border-radius:9px; font-size:13px; font-weight:700; color:var(--ink-soft); cursor:pointer; }
+  .kind label{ position:relative; }
+  .kind input:checked + span.common{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+  .kind input:checked + span.mine{ background:var(--good-soft); border-color:var(--good); color:var(--good); }
+  .kind input:focus-visible + span{ outline:2px solid var(--accent); outline-offset:2px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:8px; }
+  .form-err{ font-size:12.5px; color:var(--warn); min-height:1em; margin:0; }
   [hidden]{ display:none !important; }
 
   @media (max-width: 860px){
@@ -176,6 +234,13 @@
     .t-aside{ position:static; }
     .sched div{ grid-template-columns:90px 1fr; }
     .sched .r{ grid-column:2; }
+    .cell{ min-height:64px; padding:4px 3px; }
+    .cell .ev{ font-size:0; padding:0; height:6px; border-radius:3px; }
+    .cell .ev.common{ background:var(--accent); }
+    .cell .ev.mine{ background:var(--good); }
+    .cell .ev-more{ font-size:10px; padding:0; }
+    .day-panel{ position:static; }
+    .cal-title h1{ font-size:19px; min-width:120px; }
   }
 </style>
 </head>
@@ -315,7 +380,58 @@
         </aside>
       </div>
     </section>
+
+    <!-- 일정 달력 -->
+    <section id="view-calendar" hidden>
+      <div class="cal-head">
+        <div class="cal-title">
+          <button class="sq" type="button" id="calPrev" aria-label="이전 달"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button>
+          <h1 id="calMonth"></h1>
+          <button class="sq" type="button" id="calNext" aria-label="다음 달"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
+          <button class="btn ghost" type="button" id="calToday">오늘</button>
+        </div>
+        <div class="cal-tools">
+          <label class="chk common"><input type="checkbox" id="showCommon" checked><span class="sw" style="background:var(--accent)"></span>전체일정 보기</label>
+          <label class="chk mine"><input type="checkbox" id="showMine" checked><span class="sw" style="background:var(--good)"></span>개인일정 보기</label>
+          <button class="btn plus" type="button" id="calAdd" aria-label="일정 추가" title="일정 추가">+</button>
+        </div>
+      </div>
+
+      <div class="cal-wrap">
+        <div class="card cal">
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <aside class="card day-panel">
+          <h2 id="dayTitle"></h2>
+          <span class="muted" id="dayOwner"></span>
+          <div class="day-list" id="dayList"></div>
+          <button class="btn soft" type="button" id="dayAdd">+ 이 날에 일정 추가</button>
+        </aside>
+      </div>
+      <p class="sample-note">공통일정은 모든 선생님이 함께 보고, 개인일정은 쓴 사람만 봐요. 지금은 이 브라우저에만 저장되고, 구글 시트를 연결하면 모두에게 공유돼요. 처음 보이는 일정은 예시예요.</p>
+    </section>
   </main>
+</div>
+
+<div class="overlay" id="evOverlay" hidden>
+  <form class="modal" id="evForm" novalidate>
+    <h2>일정 추가</h2>
+    <div class="kind" role="radiogroup" aria-label="일정 구분">
+      <label><input type="radio" name="evKind" id="kindCommon" value="common" checked><span class="common">공통일정</span></label>
+      <label><input type="radio" name="evKind" id="kindMine" value="mine"><span class="mine">개인일정</span></label>
+    </div>
+    <label>제목<input type="text" id="evTitle" placeholder="예: 학부모 설명회" maxlength="40"></label>
+    <div class="row2">
+      <label>날짜<input type="date" id="evDate"></label>
+      <label>시간 (선택)<input type="time" id="evTime"></label>
+    </div>
+    <label>메모 (선택)<textarea id="evMemo" placeholder="장소, 준비물 등"></textarea></label>
+    <p class="form-err" id="evErr"></p>
+    <div class="modal-actions">
+      <button class="btn ghost" type="button" id="evCancel">취소</button>
+      <button class="btn" type="submit">저장</button>
+    </div>
+  </form>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -360,6 +476,7 @@ var ICON = {
   chart:'<line x1="5" y1="20" x2="5" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="19" y1="20" x2="19" y2="14"/>',
   check:'<circle cx="12" cy="12" r="9"/><polyline points="8,12.5 11,15.5 16,9"/>',
   msg:'<path d="M4 5h16v11H8l-4 4z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15.5,14"/>',
   card:'<rect x="2.5" y="5.5" width="19" height="13" rx="2"/><line x1="2.5" y1="10" x2="21.5" y2="10"/>',
   gear:'<circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 000-3l2-1.5-2-3.4-2.3.9a7.8 7.8 0 00-2.6-1.5L14 2h-4l-.5 2.4a7.8 7.8 0 00-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.8 7.8 0 000 3l-2 1.5 2 3.4 2.3-.9a7.8 7.8 0 002.6 1.5L10 22h4l.5-2.4a7.8 7.8 0 002.6-1.5l2.3.9 2-3.4z"/>'
 };
@@ -371,12 +488,12 @@ function $(id){ return document.getElementById(id); }
 
 var MENU = {
   director: [
-    ['운영', [['grid','대시보드','dashboard'],['users','학생 관리'],['cal','시간표']]],
+    ['운영', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['users','학생 관리'],['clock','시간표']]],
     ['학습 관리', [['book','수업 일지','journal'],['chart','성적·테스트 관리'],['check','출결 현황']]],
     ['소통·운영', [['msg','알림장·상담'],['card','수납 관리'],['gear','선생님·설정']]]
   ],
   teacher: [
-    ['', [['book','수업 일지','journal'],['chart','성적·테스트 관리'],['check','출결 현황'],['cal','시간표'],['msg','상담 기록']]]
+    ['', [['book','수업 일지','journal'],['cal','일정','calendar'],['chart','성적·테스트 관리'],['check','출결 현황'],['clock','시간표'],['msg','상담 기록']]]
   ]
 };
 
@@ -394,25 +511,29 @@ var day = new Date(); day.setHours(0,0,0,0);
 
 /* ===== 화면 전환 ===== */
 var state = {
-  view:'director', teacher:'이수진', classId:'r-2',
+  view:'director', page:'main', teacher:'이수진', classId:'r-2',
   entries:{},   // classId -> { book, progress, homework, rows:{name:{checked,hw,score,memo}} }
   sent:{}       // classId -> 보낸 명 수
 };
 
-function setView(v){
+function setView(v, page){
   state.view = v;
+  state.page = page || 'main';
+  var cal = state.page === 'calendar';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  $('view-director').hidden = v !== 'director';
-  $('view-teacher').hidden = v !== 'teacher';
+  $('view-director').hidden = cal || v !== 'director';
+  $('view-teacher').hidden = cal || v !== 'teacher';
+  $('view-calendar').hidden = !cal;
   renderSide();
-  if(v === 'teacher') renderTeacher();
-  try{ history.replaceState(null, '', '#' + v); }catch(e){}
+  if(cal) renderCalendar();
+  else if(v === 'teacher') renderTeacher();
+  try{ history.replaceState(null, '', '#' + (cal ? (v === 'teacher' ? 'teacher-calendar' : 'calendar') : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
 
 function renderSide(){
-  var current = state.view === 'director' ? 'dashboard' : 'journal';
+  var current = state.page === 'calendar' ? 'calendar' : state.view === 'director' ? 'dashboard' : 'journal';
   var html = '';
   MENU[state.view].forEach(function(group){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
@@ -433,8 +554,9 @@ $('side').addEventListener('click', function(e){
   var a = e.target.closest('a');
   if(a){
     e.preventDefault();
-    if(a.dataset.key === 'journal' && state.view !== 'teacher') return setView('teacher');
-    if(a.dataset.key === 'dashboard' && state.view !== 'director') return setView('director');
+    if(a.dataset.key === 'journal') return setView('teacher');
+    if(a.dataset.key === 'dashboard') return setView('director');
+    if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(!a.dataset.key) soon(a.dataset.name);
     return;
   }
@@ -453,7 +575,7 @@ $('side').addEventListener('keydown', function(e){
 });
 
 document.querySelector('.seg').addEventListener('click', function(e){
-  var b = e.target.closest('button'); if(b) setView(b.dataset.view);
+  var b = e.target.closest('button'); if(b) setView(b.dataset.view, state.page);
 });
 document.addEventListener('click', function(e){
   var s = e.target.closest('[data-soon]'); if(s) soon(s.dataset.soon);
@@ -636,7 +758,11 @@ function onStudentChange(ev){
 
 $('previewPick').addEventListener('change', renderPreview);
 $('classPick').addEventListener('change', function(){ state.classId = this.value; renderTeacher(); });
-$('teacherPick').addEventListener('change', function(){ state.teacher = this.value; renderTeacher(); });
+$('teacherPick').addEventListener('change', function(){
+  state.teacher = this.value;
+  if(state.page === 'calendar'){ $('teacherInitial').textContent = state.teacher.charAt(0); renderCalendar(); }
+  else renderTeacher();
+});
 $('myClasses').addEventListener('click', function(e){
   var b = e.target.closest('[data-class]'); if(b){ state.classId = b.dataset.class; renderTeacher(); }
 });
@@ -650,9 +776,152 @@ $('sendBtn').addEventListener('click', function(){
   toast(n + '명 학부모님께 보낼 준비가 됐어요. (시안이라 실제 알림톡은 나가지 않아요)');
 });
 
+/* ===== 일정 달력 ===== */
+var CAL_KEY = 'beyond-schedule-v1';
+function ymd(d){ return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
+function parseYmd(s){ var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function shift(days){ var d = new Date(day); d.setDate(d.getDate() + days); return ymd(d); }
+function me(){ return state.view === 'director' ? '원장님' : state.teacher + ' 선생님'; }
+
+// 예시 일정: 오늘을 기준으로 앞뒤에 배치 (저장된 일정이 없을 때만)
+function sampleEvents(){
+  return [
+    { kind:'common', title:'주간 회의', date:shift(3), time:'12:30', memo:'안건: 월말 리포트 일정, 교재 출고', owner:'원장님' },
+    { kind:'common', title:'학부모 설명회', date:shift(8), time:'11:00', memo:'2층 세미나실', owner:'원장님' },
+    { kind:'common', title:'월말 리포트 마감', date:shift(7), time:'', memo:'', owner:'원장님' },
+    { kind:'common', title:'TTC 교육', date:shift(-4), time:'10:00', memo:'', owner:'원장님' },
+    { kind:'common', title:'중등 내신 대비 보강', date:shift(12), time:'14:00', memo:'중등 내신 A·B', owner:'김민아 선생님' },
+    { kind:'mine', title:'교재 주문 확인', date:shift(1), time:'', memo:'', owner:'원장님' },
+    { kind:'mine', title:'신규 상담 (초3)', date:shift(2), time:'15:30', memo:'', owner:'원장님' },
+    { kind:'mine', title:'리딩 2 단어 시험지 준비', date:shift(1), time:'', memo:'', owner:'이수진 선생님' },
+    { kind:'mine', title:'학부모 통화 (최유나)', date:shift(5), time:'18:00', memo:'숙제 미완료 상담', owner:'이수진 선생님' }
+  ].map(function(e, i){ e.id = 'sample-' + i; return e; });
+}
+var EVENTS = (function(){
+  try{ var raw = localStorage.getItem(CAL_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return sampleEvents();
+})();
+function saveEvents(){ try{ localStorage.setItem(CAL_KEY, JSON.stringify(EVENTS)); }catch(e){} }
+
+var calMonth = new Date(day.getFullYear(), day.getMonth(), 1);
+var selDate = ymd(day);
+
+function visibleEvents(dateStr){
+  var showC = $('showCommon').checked, showM = $('showMine').checked, who = me();
+  return EVENTS.filter(function(e){
+    if(e.date !== dateStr) return false;
+    if(e.kind === 'common') return showC;
+    return showM && e.owner === who;
+  }).sort(function(a, b){
+    if(a.kind !== b.kind) return a.kind === 'common' ? -1 : 1;
+    return (a.time || '99') < (b.time || '99') ? -1 : 1;
+  });
+}
+
+function renderCalendar(){
+  if(state.view === 'teacher'){
+    $('teacherPick').innerHTML = TEACHERS.map(function(t){ return '<option value="'+t+'"'+(t===state.teacher?' selected':'')+'>'+t+' 선생님</option>'; }).join('');
+    $('teacherInitial').textContent = state.teacher.charAt(0);
+  }
+  $('calMonth').textContent = calMonth.getFullYear() + '년 ' + (calMonth.getMonth()+1) + '월';
+  var html = DAYS.map(function(d, i){ return '<div class="dow'+(i===0?' sun':i===6?' sat':'')+'">'+d+'</div>'; }).join('');
+  var start = new Date(calMonth); start.setDate(1 - calMonth.getDay());
+  var last = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 0);
+  var weeks = Math.ceil((calMonth.getDay() + last.getDate()) / 7);
+  var todayStr = ymd(day);
+  for(var i = 0; i < weeks * 7; i++){
+    var d = new Date(start); d.setDate(start.getDate() + i);
+    var ds = ymd(d), evs = visibleEvents(ds);
+    var cls = ['cell'];
+    if(d.getMonth() !== calMonth.getMonth()) cls.push('other');
+    if(d.getDay() === 0) cls.push('sun');
+    if(d.getDay() === 6) cls.push('sat');
+    if(ds === todayStr) cls.push('today');
+    if(ds === selDate) cls.push('sel');
+    var label = (d.getMonth()+1) + '월 ' + d.getDate() + '일, 일정 ' + evs.length + '개';
+    html += '<button type="button" class="'+cls.join(' ')+'" data-date="'+ds+'" aria-label="'+label+'"><span class="num">'+d.getDate()+'</span>' +
+      evs.slice(0, 3).map(function(e){ return '<span class="ev '+e.kind+'">'+(e.time ? e.time + ' ' : '')+esc(e.title)+'</span>'; }).join('') +
+      (evs.length > 3 ? '<span class="ev-more">+'+(evs.length-3)+'개 더</span>' : '') + '</button>';
+  }
+  $('calGrid').innerHTML = html;
+  renderDay();
+}
+
+function renderDay(){
+  var d = parseYmd(selDate), evs = visibleEvents(selDate);
+  $('dayTitle').textContent = (d.getMonth()+1) + '월 ' + d.getDate() + '일 ' + DAYS[d.getDay()] + '요일';
+  $('dayOwner').textContent = me() + ' 화면으로 보는 중';
+  $('dayList').innerHTML = evs.length ? evs.map(function(e){
+    return '<div class="day-item"><span class="bar-v" style="background:var('+(e.kind==='common'?'--accent':'--good')+')"></span><div class="body">' +
+      '<b>'+esc(e.title)+'</b><small>'+(e.kind==='common'?'공통일정':'개인일정')+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
+      (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') + '</div>' +
+      '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">삭제</button></div>';
+  }).join('') : '<div class="empty">이 날은 일정이 없어요.</div>';
+}
+
+$('calGrid').addEventListener('click', function(e){
+  var c = e.target.closest('[data-date]'); if(!c) return;
+  selDate = c.dataset.date;
+  var d = parseYmd(selDate);
+  if(d.getMonth() !== calMonth.getMonth()){ calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
+  renderCalendar();
+});
+$('calGrid').addEventListener('dblclick', function(e){
+  var c = e.target.closest('[data-date]'); if(c) openEvForm(c.dataset.date);
+});
+$('calPrev').addEventListener('click', function(){ calMonth.setMonth(calMonth.getMonth() - 1); renderCalendar(); });
+$('calNext').addEventListener('click', function(){ calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
+$('calToday').addEventListener('click', function(){ calMonth = new Date(day.getFullYear(), day.getMonth(), 1); selDate = ymd(day); renderCalendar(); });
+$('showCommon').addEventListener('change', renderCalendar);
+$('showMine').addEventListener('change', renderCalendar);
+$('calAdd').addEventListener('click', function(){ openEvForm(selDate); });
+$('dayAdd').addEventListener('click', function(){ openEvForm(selDate); });
+
+var pendingDel = null;
+$('dayList').addEventListener('click', function(e){
+  var b = e.target.closest('[data-del]'); if(!b) return;
+  if(pendingDel !== b.dataset.del){
+    pendingDel = b.dataset.del; b.textContent = '정말 삭제?'; b.style.color = 'var(--warn)';
+    return;
+  }
+  EVENTS = EVENTS.filter(function(x){ return x.id !== pendingDel; });
+  pendingDel = null; saveEvents(); renderCalendar(); toast('일정을 삭제했어요.');
+});
+
+function openEvForm(dateStr){
+  $('evForm').reset();
+  $('evDate').value = dateStr || ymd(day);
+  $('evErr').textContent = '';
+  $('evOverlay').hidden = false;
+  $('evTitle').focus();
+}
+function closeEvForm(){ $('evOverlay').hidden = true; }
+$('evCancel').addEventListener('click', closeEvForm);
+$('evOverlay').addEventListener('click', function(e){ if(e.target === this) closeEvForm(); });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !$('evOverlay').hidden) closeEvForm(); });
+$('evForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var title = $('evTitle').value.trim(), date = $('evDate').value;
+  if(!title){ $('evErr').textContent = '제목을 입력해 주세요.'; $('evTitle').focus(); return; }
+  if(!date){ $('evErr').textContent = '날짜를 골라 주세요.'; $('evDate').focus(); return; }
+  var kind = $('kindMine').checked ? 'mine' : 'common';
+  EVENTS.push({ id:'e' + Date.now(), kind:kind, title:title, date:date, time:$('evTime').value, memo:$('evMemo').value.trim(), owner:me() });
+  saveEvents();
+  if(kind === 'common') $('showCommon').checked = true; else $('showMine').checked = true;
+  selDate = date;
+  var d = parseYmd(date); calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+  closeEvForm(); renderCalendar();
+  toast((kind === 'common' ? '공통일정' : '개인일정') + '을 저장했어요.');
+});
+
 /* ===== 시작 ===== */
 renderDirector();
-setView(location.hash === '#teacher' ? 'teacher' : 'director');
+(function(){
+  var h = location.hash;
+  if(h === '#calendar') setView('director', 'calendar');
+  else if(h === '#teacher-calendar') setView('teacher', 'calendar');
+  else setView(h === '#teacher' ? 'teacher' : 'director');
+})();
 </script>
 </body>
 </html>
