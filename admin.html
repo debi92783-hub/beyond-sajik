@@ -233,6 +233,9 @@
   .dt-head select{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); }
   .dt-lesson{ display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; padding:16px 18px; margin-bottom:16px; }
   .dt-lesson label{ min-width:0; display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .dt-lesson .pg{ display:flex; align-items:stretch; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface); }
+  .dt-lesson .pg b{ display:flex; align-items:center; padding:0 10px; background:var(--surface-soft); color:var(--ink-soft); font-size:12.5px; border-right:1px solid var(--border); }
+  .dt-lesson .pg input{ border:0; border-radius:0; flex:1; min-width:0; }
   .dt-lesson .prog{ display:flex; gap:8px; }
   .dt-lesson select{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 8px; background:var(--surface); color:var(--ink); font-weight:600; }
   .dt-lesson select#dtBook{ flex:0 0 auto; }
@@ -532,8 +535,8 @@
       <div id="dtBody">
         <div class="card dt-lesson">
           <label>진도 (교재명 &gt; 책진도)<span class="prog"><select id="dtBook" aria-label="교재명"></select><select id="dtProg" aria-label="책진도"></select></span></label>
-          <label>숙제 · SB <input type="text" id="dtSb" placeholder="예: P15-16"></label>
-          <label>숙제 · PB <input type="text" id="dtPb" placeholder="예: P11-13"></label>
+          <label>숙제 · SB <span class="pg"><b>page</b><input type="text" id="dtSb" inputmode="numeric" placeholder="예: 15-16"></span></label>
+          <label>숙제 · PB <span class="pg"><b>page</b><input type="text" id="dtPb" inputmode="numeric" placeholder="예: 11-13"></span></label>
         </div>
         <div class="dt-sum" id="dtSum"></div>
         <div class="card">
@@ -1419,7 +1422,7 @@ function wordText(r, e){
   var parts = [r.w1, r.w2, r.w3].map(function(v, i){ return num(v) === null ? null : (i+1) + '회 ' + v + '/' + e.max.word; }).filter(Boolean);
   return (parts.join(', ') || '응시 전') + (r.wDone ? ' → 완료' : parts.length ? ' → 재시험 예정' : '');
 }
-function hwRange(e){ return [e.sb ? 'SB: ' + e.sb : '', e.pb ? 'PB: ' + e.pb : ''].filter(Boolean).join('  '); }
+function hwRange(e){ return [e.sb ? 'SB: page ' + e.sb : '', e.pb ? 'PB: page ' + e.pb : ''].filter(Boolean).join('  '); }
 function opts(f, v){ return DT_OPT[f].map(function(o){ return '<span class="opt'+(o===v?' on':'')+'">'+o+'</span>'; }).join(', '); }
 function dtCard(s, e){
   var c = dtCls(), r = e.rows[s];
@@ -1502,7 +1505,12 @@ $('dtPass').addEventListener('change', function(){
 $('dtBook').addEventListener('change', function(){ var e = dtEntry(); e.book = this.value; e.prog = bookItems(e.book)[0] || ''; fillProg(e); dtSave(); });
 $('dtProg').addEventListener('change', function(){ dtEntry().prog = this.value; dtSave(); });
 [['dtSb','sb'],['dtPb','pb']].forEach(function(x){
-  $(x[0]).addEventListener('input', function(){ dtEntry()[x[1]] = this.value; dtSave(); });
+  // 숫자만 받아요. 쪽 범위를 적을 수 있게 - , ~ 는 남겨 둬요.
+  $(x[0]).addEventListener('input', function(){
+    var clean = this.value.replace(/[^0-9,~\- ]/g, '');
+    if(clean !== this.value) this.value = clean;
+    dtEntry()[x[1]] = clean.trim(); dtSave();
+  });
 });
 $('dtClass').addEventListener('change', function(){ dtClassId = this.value; renderDaily(); });
 $('dtPrev').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() - 1); renderDaily(); });
