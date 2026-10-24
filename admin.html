@@ -286,11 +286,16 @@
   .rc .foot{ gap:8px; }
   .rc .foot .okbtn[aria-pressed="true"]{ background:var(--good); color:#fff; }
   @media (max-width: 720px){ .flow .step{ flex-basis:140px; } }
-  .mo-table{ min-width:980px; }
+  .mo-table{ min-width:1060px; }
   .mo-table td{ font-variant-numeric:tabular-nums; }
   .mo-table .mo-att, .mo-table .mo-prog{ font-size:12px; text-align:left; max-width:200px; line-height:1.45; }
   .mo-table textarea, .rc textarea{ width:100%; min-width:220px; font:inherit; font-size:12.5px; line-height:1.5; border:1px solid var(--border); border-radius:8px; padding:6px 8px; background:var(--surface); color:var(--ink); resize:vertical; }
   .rc textarea{ min-width:0; border-color:var(--accent); }
+  .mo-cm label{ display:flex; flex-direction:column; gap:3px; text-align:left; margin-bottom:6px; }
+  .mo-cm label:last-child{ margin-bottom:0; }
+  .mo-cm span{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .mo-table .mo-cm{ min-width:300px; }
+  .rc .mo-sec td{ background:var(--accent-soft); color:var(--accent); font-weight:800; font-size:12px; padding:6px 10px; }
   .mo-edited{ display:inline-block; margin-top:6px; background:var(--hold-soft); color:var(--hold); }
   .rc .foot{ flex-wrap:wrap; }
   .dt-cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:14px; margin-top:14px; }
@@ -626,7 +631,7 @@
                 <th class="stick"><input type="checkbox" id="moAll" checked aria-label="전체 선택"></th>
                 <th class="stick2" style="text-align:left;padding-left:8px">이름</th>
                 <th class="grp">출결</th><th>교재 지참</th><th>숙제 완료</th><th>Speaking</th><th>단어 통과</th><th>진도</th>
-                <th class="grp">선생님 코멘트</th>
+                <th class="grp">선생님 코멘트 (강점 · 개선할 점 · 학원과 함께 보완할 내용)</th>
               </tr></thead>
               <tbody id="moRows"></tbody>
             </table>
@@ -1684,7 +1689,12 @@ function moEntry(){
   var c = moCls(), k = c.id + '|' + ym(moMonth);
   if(!moStore[k]) moStore[k] = { stage:'draft', rows:{}, made:[], tOk:{}, dOk:{}, edit:{} };
   var e = moStore[k];
-  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = { on:true, comment:'' }; });
+  e.dcom = e.dcom || {};
+  c.students.forEach(function(s){
+    var r = e.rows[s] || (e.rows[s] = { on:true });
+    if(r.comment != null && r.strength == null) r.strength = r.comment;   // 예전 한 칸 코멘트는 '강점'으로 옮겨요
+    MO_FIELDS.forEach(function(f){ if(r[f[0]] == null) r[f[0]] = ''; });
+  });
   return e;
 }
 function canT(){ return state.view === 'teacher'; }
@@ -1710,7 +1720,14 @@ function moAgg(s){
   g.progText = g.prog.length ? (g.prog.length > 1 ? g.prog[0] + ' ~ ' + last : g.prog[0]) : '–';
   return g;
 }
-function moComment(e, s){ return e.edit && e.edit[s] != null ? e.edit[s] : e.rows[s].comment; }
+// 선생님 코멘트 세 칸 [키, 이름, 안내]
+var MO_FIELDS = [
+  ['strength', '강점', '학습 태도, 사고력, 이해도, 성실함'],
+  ['improve', '개선할 점', '부족한 부분, 개선이 필요한 관찰 내용'],
+  ['plan', '학원과 함께 보완할 내용', '개선 방법, 학원 지도 계획과 실행 방법']
+];
+function moComment(e, s, f){ var ed = e.edit && e.edit[s]; return ed && ed[f] != null ? ed[f] : e.rows[s][f]; }
+function moEdited(e, s){ return MO_FIELDS.some(function(f){ return moComment(e, s, f[0]) !== e.rows[s][f[0]]; }); }
 
 function renderMonthly(){
   fillTeacherPick();
@@ -1734,7 +1751,7 @@ function renderMonthly(){
       '<td>'+pct(g.book, g.in)+'</td><td>'+pct(g.hw, g.in)+'</td><td>'+pct(g.spk, g.in)+'</td>' +
       '<td>'+(g.wTaken ? g.wPass + ' / ' + g.wTaken + '회' : '–')+'</td>' +
       '<td class="mo-prog">'+esc(g.progText)+'</td>' +
-      '<td class="grp"><textarea data-f="comment" rows="2" placeholder="한 달 동안의 모습, 칭찬할 점, 보완할 점" aria-label="'+esc(s)+' 선생님 코멘트">'+esc(r.comment)+'</textarea></td></tr>';
+      '<td class="grp mo-cm">' + MO_FIELDS.map(function(f){ return '<label><span>'+f[1]+'</span><textarea data-f="'+f[0]+'" rows="2" placeholder="'+f[2]+'" aria-label="'+esc(s)+' '+f[1]+'">'+esc(r[f[0]])+'</textarea></label>'; }).join('') + '</td></tr>';
   }).join('');
   $('moAll').checked = c.students.every(function(s){ return e.rows[s].on; });
   renderMoFlow();
@@ -1742,12 +1759,16 @@ function renderMonthly(){
 
 function moCard(s, e){
   var c = moCls(), g = moAgg(s), t = !!e.tOk[s], d = !!e.dOk[s], st = e.stage;
-  var edited = e.edit && e.edit[s] != null && e.edit[s] !== e.rows[s].comment;
+  var edited = moEdited(e, s);
   var editable = canD() && st === 'made' && t && !d;
-  var cm = moComment(e, s);
-  var commentCell = editable
-    ? '<textarea data-dedit rows="4" aria-label="'+esc(s)+' 코멘트 수정">'+esc(cm)+'</textarea>'
-    : esc(cm || '–').replace(/\n/g, '<br>');
+  var cmRows = MO_FIELDS.map(function(f, i){
+    var v = moComment(e, s, f[0]);
+    var cell = editable ? '<textarea data-dedit="'+f[0]+'" rows="3" aria-label="'+esc(s)+' '+f[1]+' 수정">'+esc(v)+'</textarea>' : esc(v || '–').replace(/\n/g, '<br>');
+    return '<tr><th>'+f[1].replace('학원과 함께 ', '학원과 함께<br>')+'</th><td>'+cell+(i === 2 && edited ? '<span class="tag mo-edited">원장님 수정</span>' : '')+'</td></tr>';
+  }).join('');
+  var dv = e.dcom[s] || '';
+  var dCell = editable ? '<textarea data-dcom rows="3" placeholder="원장님이 학부모님께 전하는 말" aria-label="'+esc(s)+' 원장님 코멘트">'+esc(dv)+'</textarea>'
+    : dv ? esc(dv).replace(/\n/g, '<br>') : '<span class="muted">'+(d ? '–' : '원장님 확인 때 써요')+'</span>';
   var tBtn = '<button class="btn soft okbtn" type="button" data-tok aria-pressed="'+t+'"'+(st !== 'made' || !canT() || d ? ' disabled' : '')+'>'+(t ? '선생님 확인함' : '선생님 확인')+'</button>';
   var dBtn = '<button class="btn soft okbtn" type="button" data-dok aria-pressed="'+d+'"'+(st !== 'made' || !canD() || !t ? ' disabled' : '')+'>'+(d ? '원장님 확인함' : '원장님 확인')+'</button>';
   return '<div class="rc'+(t && d ? ' ok' : '')+'" data-name="'+esc(s)+'"><table>' +
@@ -1759,7 +1780,8 @@ function moCard(s, e){
     '<tr><th>숙제</th><td>완료 '+pct(g.hw, g.in)+' // Speaking 완료 '+pct(g.spk, g.in)+'</td></tr>' +
     '<tr><th>단어</th><td>'+(g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음')+'</td></tr>' +
     '<tr><th>진도</th><td>'+esc(g.progText)+'</td></tr>' +
-    '<tr><th>선생님<br>코멘트</th><td>'+commentCell+(edited ? '<span class="tag mo-edited">원장님 수정</span>' : '')+'</td></tr>' +
+    '<tr class="mo-sec"><td colspan="2">선생님 코멘트</td></tr>' + cmRows +
+    '<tr class="mo-sec"><td colspan="2">원장님 코멘트</td></tr><tr><th>원장님</th><td>'+dCell+'</td></tr>' +
     '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button>'+tBtn+dBtn+'</div></div>';
 }
 function moText(s, e){
@@ -1771,7 +1793,9 @@ function moText(s, e){
   L.push('숙제: 완료 ' + pct(g.hw, g.in) + ' / Speaking: 완료 ' + pct(g.spk, g.in));
   L.push('단어: ' + (g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음'));
   if(g.prog.length) L.push('진도: ' + g.progText);
-  var cm = moComment(e, s); if(cm.trim()) L.push('선생님 코멘트: ' + cm.trim());
+  var cms = MO_FIELDS.map(function(f){ var v = (moComment(e, s, f[0]) || '').trim(); return v ? '· ' + f[1] + ': ' + v : ''; }).filter(Boolean);
+  if(cms.length){ L.push(''); L.push('[선생님 코멘트]'); L = L.concat(cms); }
+  if((e.dcom[s] || '').trim()){ L.push(''); L.push('[원장님 코멘트]'); L.push(e.dcom[s].trim()); }
   return L.join('\n');
 }
 
@@ -1799,7 +1823,7 @@ function renderMoFlow(){
     $('moMsgs').innerHTML = made.map(function(s){ return moCard(s, e); }).join('');
     $('moOkCount').textContent = st === 'sent' ? e.sent + '명에게 보냈어요' : '선생님 ' + tN + ' · 원장님 ' + dN + ' / ' + made.length + '명';
     $('moHelp').textContent = canD()
-      ? '선생님이 확인한 리포트는 원장님이 코멘트를 고친 뒤 \'원장님 확인\'을 눌러 주세요. 두 분 모두 확인한 리포트만 발송돼요.'
+      ? '선생님이 확인한 리포트는 원장님이 선생님 코멘트를 다듬고 원장님 코멘트를 쓴 뒤 \'원장님 확인\'을 눌러 주세요. 두 분 모두 확인한 리포트만 발송돼요.'
       : '리포트를 읽어 보고 \'선생님 확인\'을 눌러 주세요. 그다음 원장님이 확인하고, 필요하면 코멘트를 고쳐요.';
   }
 }
@@ -1825,13 +1849,13 @@ $('moAll').addEventListener('change', function(){
 $('moSaveBtn').addEventListener('click', function(){
   var e = moEntry();
   if(e.stage !== 'draft'){ toast('이미 저장돼 있어요.'); return; }
-  e.stage = 'saved'; e.savedAt = Date.now(); e.made = []; e.tOk = {}; e.dOk = {}; e.edit = {};
+  e.stage = 'saved'; e.savedAt = Date.now(); e.made = []; e.tOk = {}; e.dOk = {}; e.edit = {}; e.dcom = {};
   moSave(); renderMoFlow(); toast('저장했어요. 이제 월말 리포트를 만들 수 있어요.');
 });
 $('moMake').addEventListener('click', function(){
   var e = moEntry(), picked = moCls().students.filter(function(s){ return e.rows[s].on; });
   if(!picked.length){ toast('리포트를 만들 학생을 먼저 체크해 주세요.'); return; }
-  e.made = picked; e.tOk = {}; e.dOk = {}; e.edit = {}; e.stage = 'made';
+  e.made = picked; e.tOk = {}; e.dOk = {}; e.edit = {}; e.dcom = {}; e.stage = 'made';
   moSave(); renderMoFlow();
   $('moMsgCard').scrollIntoView({ behavior:'smooth', block:'start' });
 });
@@ -1846,9 +1870,9 @@ $('moDAll').addEventListener('click', function(){
   moSave(); renderMoFlow(); toast('원장님 확인 ' + n + '명을 마쳤어요.');
 });
 $('moMsgs').addEventListener('input', function(ev){
-  if(!ev.target.matches('[data-dedit]')) return;
-  var e = moEntry(), s = ev.target.closest('.rc').dataset.name;
-  e.edit[s] = ev.target.value; moSave();
+  var el = ev.target, e = moEntry(), s = el.closest('.rc') && el.closest('.rc').dataset.name; if(!s) return;
+  if(el.matches('[data-dedit]')){ e.edit[s] = e.edit[s] || {}; e.edit[s][el.dataset.dedit] = el.value; moSave(); }
+  else if(el.matches('[data-dcom]')){ e.dcom[s] = el.value; moSave(); }
 });
 $('moMsgs').addEventListener('click', function(ev){
   var e = moEntry(), card = ev.target.closest('.rc'); if(!card) return;
@@ -1856,7 +1880,7 @@ $('moMsgs').addEventListener('click', function(ev){
   if(ev.target.closest('[data-tok]')){ e.tOk[s] = !e.tOk[s]; moSave(); renderMoFlow(); return; }
   if(ev.target.closest('[data-dok]')){
     e.dOk[s] = !e.dOk[s];
-    if(e.edit[s] != null && e.edit[s] === e.rows[s].comment) delete e.edit[s];
+    if(e.edit[s] && !moEdited(e, s)) delete e.edit[s];
     moSave(); renderMoFlow(); return;
   }
   if(ev.target.closest('[data-copy]')){
