@@ -1318,9 +1318,10 @@ var DT_BOOKS = (function(){
     var span = 20 / units.length;
     return ['BEYOND PHONICS ' + (b+1), units.map(function(u, i){ return (b+1) + '권 ' + (i*span+1) + '~' + ((i+1)*span) + '일차 · ' + u; })];
   });
-  var story = []; for(var v = 1; v <= 6; v++){ var g = []; for(var i = 1; i <= 5; i++) g.push('(' + v + '-unit' + i + ')'); story.push([v + '권', g]); }
+  var units = function(vols, per){ var out = []; for(var v = 1; v <= vols; v++){ var g = []; for(var i = 1; i <= per; i++) g.push('(' + v + '-unit' + i + ')'); out.push([v + '권', g]); } return out; };
+  var story = units(6, 5);
   var fmt = function(v, i){ return '(' + v + '-' + i + ')'; };
-  return [ ['FUN PHONICS', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONICS', ph], ['STORY', story] ];
+  return [ ['FUN PHONICS', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONICS', ph], ['STORY', story], ['BASIC', units(12, 4)], ['INTERMEDIATE', units(12, 4)] ];
 })();
 function bookItems(name){ var b = DT_BOOKS.find(function(x){ return x[0] === name; }); return b ? [].concat.apply([], b[1].map(function(g){ return g[1]; })) : []; }
 function progText(e){ return e.book && e.prog ? e.book + ' > ' + e.prog : (e.unit || ''); }
