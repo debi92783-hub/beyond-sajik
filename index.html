@@ -486,6 +486,10 @@
 
   /* 상단 메뉴 */
   .site-nav{ display:flex; gap: 20px; font-size: 0.92rem; }
+  .bar-actions{ display:flex; align-items:center; gap: 14px; }
+  .enter-link{ display:inline-flex; align-items:center; gap: 6px; font-size: 0.86rem; color: var(--ink-soft); text-decoration:none; white-space:nowrap; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius); }
+  .enter-link:hover{ color: var(--ink); border-color: var(--ink-faint); }
+  .enter-link .short{ display:none; }
   .site-nav a{ text-decoration: none; color: var(--ink-soft); white-space: nowrap; }
   .site-nav a:hover{ color: var(--ink); }
 
@@ -615,6 +619,12 @@
 
   @media (max-width: 860px){
     .site-nav{ display:none; }
+    .bar-actions{ gap: 8px; }
+    .enter-link .long{ display:none; }
+    .enter-link .short{ display:inline; }
+    .site-bar .brand{ white-space: nowrap; font-size: 0.95rem; }
+    .enter-link{ padding: 6px 8px; }
+    .site-bar .cta-small{ padding-left: 12px; padding-right: 12px; }
     .director{ grid-template-columns: 1fr; gap: 24px; }
     .cb-body{ grid-template-columns: 1fr; }
     .cur-board{ padding: 10px; }
@@ -640,7 +650,10 @@
       <a href="#news">소식</a>
       <a href="#info">오시는 길</a>
     </nav>
-    <a class="cta-small" href="#reserve">상담 예약</a>
+    <div class="bar-actions">
+      <a class="enter-link" href="admin.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="long">원장님·선생님 입장</span><span class="short">입장</span></a>
+      <a class="cta-small" href="#reserve">상담 예약</a>
+    </div>
   </div>
 </header>
 
@@ -1021,7 +1034,6 @@
 <footer class="legal">
   <div class="wrap" style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:8px;">
     <span>© 비욘드잉글리쉬 사직어학원</span>
-    <a href="admin.html" style="color:inherit;">원장님·선생님 입장</a>
     <span>부산 연제구 종합운동장로28번길 10 JS빌딩 4층 · 051-502-3596</span>
   </div>
 </footer>

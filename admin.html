@@ -226,6 +226,39 @@
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .modal-actions{ display:flex; justify-content:flex-end; gap:8px; }
   .form-err{ font-size:12.5px; color:var(--warn); min-height:1em; margin:0; }
+  /* 로그인 */
+  .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
+  .login-card{ width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 26px; box-shadow:0 8px 30px rgba(32,36,43,0.06); display:flex; flex-direction:column; gap:14px; }
+  .login-card .brand{ justify-content:center; margin-bottom:4px; }
+  .login-card h1{ margin:0; font-size:19px; font-weight:800; text-align:center; }
+  .login-card p.sub{ margin:0; font-size:12.5px; color:var(--ink-soft); text-align:center; line-height:1.6; }
+  .login-card form{ display:flex; flex-direction:column; gap:12px; }
+  .login-card label, .reg label{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .login-card input, .reg input[type=text], .reg input[type=password]{ border:1px solid var(--border); border-radius:9px; padding:11px 12px; font-size:14px; background:var(--surface-soft); color:var(--ink); font-weight:400; }
+  .login-card .btn{ justify-content:center; padding:12px; font-size:14px; }
+  .login-note{ font-size:11.5px; color:var(--ink-faint); text-align:center; line-height:1.6; margin:4px 0 0; }
+  .login-card .back{ font-size:12.5px; color:var(--ink-soft); text-align:center; }
+
+  /* 선생님 등록 */
+  .set-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; align-items:start; }
+  .reg{ display:flex; flex-direction:column; gap:12px; }
+  .reg .row2{ grid-template-columns:1fr 1fr; }
+  .class-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .class-chips label{ flex-direction:row; align-items:center; gap:6px; border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:12.5px; color:var(--ink); background:var(--surface); cursor:pointer; font-weight:600; }
+  .class-chips input{ accent-color:var(--accent); margin:0; }
+  .class-chips small{ color:var(--ink-faint); font-weight:500; }
+  .hint{ font-size:11.5px; color:var(--ink-faint); font-weight:500; }
+  .t-list{ font-size:13px; min-width:520px; }
+  .t-list th{ padding:8px 10px; color:var(--ink-soft); font-weight:600; font-size:12px; border-bottom:1px solid var(--border); }
+  .t-list td{ padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .t-list tr:last-child td{ border-bottom:0; }
+  .t-list .acts{ white-space:nowrap; text-align:right; }
+  .t-list .acts button{ border:1px solid var(--border); background:var(--surface); border-radius:7px; padding:5px 9px; font-size:12px; cursor:pointer; margin-left:4px; }
+  .t-list .acts button.danger{ color:var(--warn); }
+  .t-list .pw-row td{ background:var(--surface-soft); }
+  .t-list .pw-row form{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .t-list .pw-row input{ border:1px solid var(--border); border-radius:7px; padding:6px 9px; font-size:12.5px; background:var(--surface); }
+  .ok-msg{ font-size:12.5px; color:var(--good); margin:0; min-height:1em; }
   [hidden]{ display:none !important; }
 
   @media (max-width: 860px){
@@ -254,6 +287,41 @@
 </head>
 <body>
 
+<div class="login" id="loginScreen" hidden>
+  <div class="login-card">
+    <a class="brand" href="./" title="학원 안내 페이지로">
+      <img class="brand-mark" src="logo.png" alt="비욘드잉글리쉬 로고" width="38" height="38">
+      <div class="brand-text"><b>비욘드잉글리쉬</b><small>사직캠퍼스 학원 관리</small></div>
+    </a>
+
+    <div id="loginBox">
+      <h1>원장님·선생님 입장</h1>
+      <p class="sub">원장님이 등록해 준 아이디와 비밀번호로 들어와요.</p>
+      <form id="loginForm" novalidate style="margin-top:14px">
+        <label>아이디<input type="text" id="loginId" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+        <label>비밀번호<input type="password" id="loginPw" autocomplete="current-password"></label>
+        <p class="form-err" id="loginErr"></p>
+        <button class="btn" type="submit">입장하기</button>
+      </form>
+    </div>
+
+    <div id="setupBox" hidden>
+      <h1>원장님 계정 만들기</h1>
+      <p class="sub">처음 사용하시네요. 원장님 아이디와 비밀번호를 정해 주세요. 선생님 계정은 들어간 뒤 "선생님·설정"에서 만들어요.</p>
+      <form id="setupForm" novalidate style="margin-top:14px">
+        <label>아이디 <span class="hint">영문·숫자 4~20자</span><input type="text" id="setupId" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+        <label>비밀번호 <span class="hint">6자 이상</span><input type="password" id="setupPw" autocomplete="new-password"></label>
+        <label>비밀번호 확인<input type="password" id="setupPw2" autocomplete="new-password"></label>
+        <p class="form-err" id="setupErr"></p>
+        <button class="btn" type="submit">계정 만들고 입장하기</button>
+      </form>
+    </div>
+
+    <p class="login-note">시안 단계라 계정은 이 기기 브라우저에만 저장돼요. 실제로 쓰기 전에 구글 계정 로그인 같은 안전한 방식으로 바꿀 거예요.</p>
+    <a class="back" href="./">← 학원 안내 페이지로</a>
+  </div>
+</div>
+
 <header class="topbar">
   <div class="topbar-left">
     <a class="brand" href="./" title="학원 안내 페이지로">
@@ -277,13 +345,15 @@
     <div class="who" data-only="director"><div class="avatar">원</div>원장님</div>
     <div class="who" data-only="teacher" hidden>
       <div class="avatar" id="teacherInitial">이</div>
-      <select id="teacherPick" aria-label="선생님 선택"></select>
+      <select id="teacherPick" aria-label="선생님 선택 (원장님 미리보기)"></select>
+      <span id="teacherName" hidden></span>
     </div>
     <a class="link-soft" href="./">안내 페이지</a>
+    <a class="link-soft" href="#" id="logoutBtn">로그아웃</a>
   </div>
 </header>
 
-<div class="layout">
+<div class="layout" id="appLayout">
   <nav class="side" aria-label="메뉴" id="side"></nav>
 
   <main>
@@ -335,7 +405,11 @@
 
     <!-- 선생님 수업 일지 -->
     <section id="view-teacher" hidden>
-      <div class="t-grid">
+      <div class="card" id="noClass" hidden>
+        <h2>아직 담당 반이 없어요</h2>
+        <p class="muted" style="margin:8px 0 0">원장님이 "선생님·설정"에서 담당 반을 정해 주면 여기에 수업 일지가 나타나요.</p>
+      </div>
+      <div class="t-grid" id="tGrid">
         <div class="t-main">
           <div class="card datebar">
             <div class="nav">
@@ -386,6 +460,54 @@
             <div id="myClasses"></div>
           </div>
         </aside>
+      </div>
+    </section>
+
+    <!-- 선생님·설정 (원장님 전용) -->
+    <section id="view-settings" hidden>
+      <div class="greet"><div><h1>선생님·설정</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
+      <div class="set-grid">
+        <div class="card">
+          <div class="card-head"><h2>선생님 등록</h2></div>
+          <form class="reg" id="regForm" novalidate>
+            <label>이름<input type="text" id="regName" placeholder="예: 박지은" maxlength="10"></label>
+            <div class="row2">
+              <label>아이디 <span class="hint">영문·숫자 4~20자</span><input type="text" id="regId" placeholder="예: jieun" autocapitalize="off" spellcheck="false" autocomplete="off"></label>
+              <label>비밀번호 <span class="hint">6자 이상</span><input type="password" id="regPw" autocomplete="new-password"></label>
+            </div>
+            <label>비밀번호 확인<input type="password" id="regPw2" autocomplete="new-password"></label>
+            <div>
+              <span class="hint" style="display:block; margin-bottom:6px; font-size:12px; font-weight:600; color:var(--ink-soft)">담당 반 (선택)</span>
+              <div class="class-chips" id="regClasses"></div>
+            </div>
+            <p class="form-err" id="regErr"></p>
+            <p class="ok-msg" id="regOk"></p>
+            <button class="btn" type="submit" style="align-self:flex-start">선생님 등록</button>
+          </form>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:20px; min-width:0">
+          <div class="card">
+            <div class="card-head"><h2>등록된 선생님</h2><span class="muted" id="tCount"></span></div>
+            <div class="table-wrap">
+              <table class="t-list">
+                <thead><tr><th>이름</th><th>아이디</th><th>담당 반</th><th></th></tr></thead>
+                <tbody id="tRows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>원장님 비밀번호 바꾸기</h2></div>
+            <form class="reg" id="myPwForm" novalidate>
+              <div class="row2">
+                <label>새 비밀번호<input type="password" id="myPw" autocomplete="new-password"></label>
+                <label>새 비밀번호 확인<input type="password" id="myPw2" autocomplete="new-password"></label>
+              </div>
+              <p class="form-err" id="myPwErr"></p>
+              <p class="ok-msg" id="myPwOk"></p>
+              <button class="btn soft" type="submit" style="align-self:flex-start">비밀번호 바꾸기</button>
+            </form>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -508,7 +630,7 @@ var MENU = {
   director: [
     ['운영', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['users','학생 관리'],['clock','시간표']]],
     ['학습 관리', [['book','수업 일지','journal'],['chart','성적·테스트 관리'],['check','출결 현황']]],
-    ['소통·운영', [['msg','알림장·상담'],['card','수납 관리'],['gear','선생님·설정']]],
+    ['소통·운영', [['msg','알림장·상담'],['card','수납 관리'],['gear','선생님·설정','settings']]],
     ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
   ],
   teacher: [
@@ -537,23 +659,27 @@ var state = {
 };
 
 function setView(v, page){
+  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings') page = 'main'; }
   state.view = v;
   state.page = page || 'main';
-  var cal = state.page === 'calendar';
+  if(state.page === 'settings' && v !== 'director') state.page = 'main';
+  var cal = state.page === 'calendar', set = state.page === 'settings';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  $('view-director').hidden = cal || v !== 'director';
-  $('view-teacher').hidden = cal || v !== 'teacher';
+  $('view-director').hidden = cal || set || v !== 'director';
+  $('view-teacher').hidden = cal || set || v !== 'teacher';
   $('view-calendar').hidden = !cal;
+  $('view-settings').hidden = !set;
   renderSide();
   if(cal) renderCalendar();
+  else if(set) renderSettings();
   else if(v === 'teacher') renderTeacher();
-  try{ history.replaceState(null, '', '#' + (cal ? (v === 'teacher' ? 'teacher-calendar' : 'calendar') : v)); }catch(e){}
+  try{ history.replaceState(null, '', '#' + (set ? 'settings' : cal ? (v === 'teacher' ? 'teacher-calendar' : 'calendar') : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
 
 function renderSide(){
-  var current = state.page === 'calendar' ? 'calendar' : state.view === 'director' ? 'dashboard' : 'journal';
+  var current = state.page === 'calendar' ? 'calendar' : state.page === 'settings' ? 'settings' : state.view === 'director' ? 'dashboard' : 'journal';
   var html = '';
   MENU[state.view].forEach(function(group){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
@@ -577,6 +703,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'journal') return setView('teacher');
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
+    if(a.dataset.key === 'settings') return setView('director', 'settings');
     if(!a.dataset.key) soon(a.dataset.name);
     return;
   }
@@ -595,7 +722,7 @@ $('side').addEventListener('keydown', function(e){
 });
 
 document.querySelector('.seg').addEventListener('click', function(e){
-  var b = e.target.closest('button'); if(b) setView(b.dataset.view, state.page);
+  var b = e.target.closest('button'); if(b) setView(b.dataset.view, state.page === 'settings' ? 'main' : state.page);
 });
 document.addEventListener('click', function(e){
   var s = e.target.closest('[data-soon]'); if(s) soon(s.dataset.soon);
@@ -630,10 +757,10 @@ function renderDirector(){
     .sort(function(a,b){ return a.time < b.time ? -1 : 1; })
     .map(function(c){ return '<div><span class="t">'+c.time+'</span><span class="c">'+esc(c.name)+'</span><span class="r">'+c.teacher+' · '+c.room+'</span></div>'; }).join('');
 
-  var counts = TEACHERS.map(function(t){
+  var counts = teacherNames().map(function(t){
     var n = 0; CLASSES.forEach(function(c){ if(c.teacher === t) n += c.students.length; }); return [t, n];
-  }).sort(function(a,b){ return b[1]-a[1]; });
-  var max = counts[0][1];
+  }).filter(function(c){ return c[1] > 0; }).sort(function(a,b){ return b[1]-a[1]; });
+  var max = counts.length ? counts[0][1] : 1;
   $('bars').innerHTML = counts.map(function(c){
     return '<div class="bar-row"><div class="top"><b>'+c[0]+'</b><span>'+c[1]+'명</span></div><div class="bar"><i style="width:'+Math.round(c[1]/max*100)+'%"></i></div></div>';
   }).join('');
@@ -683,9 +810,11 @@ function entry(){
 }
 
 function renderTeacher(){
-  $('teacherPick').innerHTML = TEACHERS.map(function(t){ return '<option value="'+t+'"'+(t===state.teacher?' selected':'')+'>'+t+' 선생님</option>'; }).join('');
-  $('teacherInitial').textContent = state.teacher.charAt(0);
+  fillTeacherPick();
   var mine = CLASSES.filter(function(c){ return c.teacher === state.teacher; });
+  $('noClass').hidden = mine.length > 0;
+  $('tGrid').hidden = mine.length === 0;
+  if(!mine.length) return;
   if(!mine.some(function(c){ return c.id === state.classId; })) state.classId = mine[0].id;
   $('classPick').innerHTML = mine.map(function(c){ return '<option value="'+c.id+'"'+(c.id===state.classId?' selected':'')+'>'+esc(c.name)+'</option>'; }).join('');
 
@@ -780,7 +909,7 @@ $('previewPick').addEventListener('change', renderPreview);
 $('classPick').addEventListener('change', function(){ state.classId = this.value; renderTeacher(); });
 $('teacherPick').addEventListener('change', function(){
   state.teacher = this.value;
-  if(state.page === 'calendar'){ $('teacherInitial').textContent = state.teacher.charAt(0); renderCalendar(); }
+  if(state.page === 'calendar'){ fillTeacherPick(); renderCalendar(); }
   else renderTeacher();
 });
 $('myClasses').addEventListener('click', function(e){
@@ -876,8 +1005,7 @@ function visibleEvents(dateStr){
 
 function renderCalendar(){
   if(state.view === 'teacher'){
-    $('teacherPick').innerHTML = TEACHERS.map(function(t){ return '<option value="'+t+'"'+(t===state.teacher?' selected':'')+'>'+t+' 선생님</option>'; }).join('');
-    $('teacherInitial').textContent = state.teacher.charAt(0);
+    fillTeacherPick();
   }
   $('calMonth').textContent = calMonth.getFullYear() + '년 ' + (calMonth.getMonth()+1) + '월';
   var html = DAYS.map(function(d, i){ return '<div class="dow'+(i===0?' sun':i===6?' sat':'')+'">'+d+'</div>'; }).join('');
@@ -1017,14 +1145,182 @@ $('evForm').addEventListener('submit', function(e){
   toast((kind === 'common' ? '공통일정' : '개인일정') + '을 저장했어요.' + (ev.end ? ' (' + spanDays(ev) + '일 연속)' : ''));
 });
 
+/* ===== 계정 · 로그인 =====
+   시안용: 계정은 이 브라우저(localStorage)에만 저장하고 비밀번호는 SHA-256 해시로만 보관해요.
+   정적 페이지라 진짜 보안은 아니에요. 실제 운영 전에는 구글 로그인 등 서버 인증으로 바꿔야 해요. */
+var ACC_KEY = 'beyond-accounts-v1', SES_KEY = 'beyond-session-v1';
+var store = (function(){
+  try{ var raw = localStorage.getItem(ACC_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return { accounts:[], assign:{} };
+})();
+var session = null;
+function saveStore(){ try{ localStorage.setItem(ACC_KEY, JSON.stringify(store)); }catch(e){} }
+function findAcc(id){ id = String(id).toLowerCase(); return store.accounts.find(function(a){ return a.id === id; }); }
+function applyAssign(){ Object.keys(store.assign || {}).forEach(function(cid){ var c = CLASSES.find(function(x){ return x.id === cid; }); if(c) c.teacher = store.assign[cid]; }); }
+function teacherNames(){
+  var names = TEACHERS.slice();
+  store.accounts.forEach(function(a){ if(a.role === 'teacher' && names.indexOf(a.name) === -1) names.push(a.name); });
+  return names;
+}
+function fillTeacherPick(){
+  var own = session && session.role === 'teacher';
+  $('teacherPick').hidden = own;
+  $('teacherName').hidden = !own;
+  $('teacherName').textContent = state.teacher + ' 선생님';
+  $('teacherPick').innerHTML = teacherNames().map(function(t){ return '<option value="'+esc(t)+'"'+(t===state.teacher?' selected':'')+'>'+esc(t)+' 선생님</option>'; }).join('');
+  $('teacherInitial').textContent = state.teacher.charAt(0);
+}
+function randSalt(){ var a = new Uint8Array(16); crypto.getRandomValues(a); return Array.from(a, function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
+function hashPw(pw, salt){
+  if(!(window.crypto && crypto.subtle)) return Promise.reject(new Error('no-crypto'));
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + pw)).then(function(buf){
+    return Array.from(new Uint8Array(buf), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+  });
+}
+function checkId(id){
+  if(!/^[a-zA-Z0-9_]{4,20}$/.test(id)) return '아이디는 영문·숫자 4~20자로 정해 주세요.';
+  if(findAcc(id)) return '이미 쓰고 있는 아이디예요. 다른 아이디를 정해 주세요.';
+  return '';
+}
+function checkPw(pw, pw2){
+  if(pw.length < 6) return '비밀번호는 6자 이상으로 정해 주세요.';
+  if(pw !== pw2) return '비밀번호 확인이 달라요. 같게 입력해 주세요.';
+  return '';
+}
+
+function showLogin(){
+  $('loginScreen').hidden = false;
+  document.querySelector('.topbar').hidden = true;
+  $('appLayout').hidden = true;
+  var first = !store.accounts.some(function(a){ return a.role === 'director'; });
+  $('setupBox').hidden = !first;
+  $('loginBox').hidden = first;
+  (first ? $('setupId') : $('loginId')).focus();
+}
+function enter(acc){
+  session = { id:acc.id, role:acc.role, name:acc.name };
+  try{ sessionStorage.setItem(SES_KEY, JSON.stringify(session)); }catch(e){}
+  $('loginScreen').hidden = true;
+  document.querySelector('.topbar').hidden = false;
+  $('appLayout').hidden = false;
+  document.querySelector('.seg').hidden = acc.role === 'teacher';
+  renderDirector();
+  if(acc.role === 'teacher'){
+    state.teacher = acc.name;
+    setView('teacher', location.hash === '#teacher-calendar' ? 'calendar' : 'main');
+  } else {
+    var h = location.hash;
+    if(h === '#calendar') setView('director', 'calendar');
+    else if(h === '#teacher-calendar') setView('teacher', 'calendar');
+    else if(h === '#settings') setView('director', 'settings');
+    else setView(h === '#teacher' ? 'teacher' : 'director');
+  }
+}
+
+$('setupForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var id = $('setupId').value.trim(), pw = $('setupPw').value, err = checkId(id) || checkPw(pw, $('setupPw2').value);
+  if(err){ $('setupErr').textContent = err; return; }
+  var salt = randSalt();
+  hashPw(pw, salt).then(function(h){
+    var acc = { id:id.toLowerCase(), name:'원장님', role:'director', salt:salt, hash:h };
+    store.accounts.push(acc); saveStore(); enter(acc);
+    toast('원장님 계정을 만들었어요. 다음부터 이 아이디로 들어오시면 돼요.');
+  }).catch(function(){ $('setupErr').textContent = '이 브라우저에서는 계정을 만들 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
+});
+$('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var acc = findAcc($('loginId').value.trim()), pw = $('loginPw').value;
+  var fail = function(){ $('loginErr').textContent = '아이디 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요.'; $('loginPw').value = ''; $('loginPw').focus(); };
+  if(!acc) return fail();
+  hashPw(pw, acc.salt).then(function(h){ if(h !== acc.hash) return fail(); $('loginErr').textContent = ''; $('loginForm').reset(); enter(acc); })
+    .catch(function(){ $('loginErr').textContent = '이 브라우저에서는 로그인할 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
+});
+$('logoutBtn').addEventListener('click', function(e){
+  e.preventDefault();
+  session = null;
+  try{ sessionStorage.removeItem(SES_KEY); }catch(err){}
+  try{ history.replaceState(null, '', location.pathname); }catch(err){}
+  showLogin();
+});
+
+/* ===== 선생님·설정 ===== */
+function renderSettings(){
+  $('regClasses').innerHTML = CLASSES.map(function(c){
+    return '<label><input type="checkbox" value="'+c.id+'">'+esc(c.name)+' <small>'+esc(c.teacher)+'</small></label>';
+  }).join('');
+  var teachers = store.accounts.filter(function(a){ return a.role === 'teacher'; });
+  $('tCount').textContent = teachers.length + '명';
+  $('tRows').innerHTML = teachers.length ? teachers.map(function(a){
+    var cl = CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; });
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b></td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
+      '<td class="acts"><button type="button" data-act="pw">비밀번호 바꾸기</button><button type="button" class="danger" data-act="del">삭제</button></td></tr>';
+  }).join('') : '<tr><td colspan="4" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 왼쪽에서 첫 선생님을 등록해 주세요.</td></tr>';
+}
+
+$('regForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  $('regOk').textContent = '';
+  var name = $('regName').value.trim(), id = $('regId').value.trim(), pw = $('regPw').value;
+  var dupName = store.accounts.some(function(a){ return a.role === 'teacher' && a.name === name; });
+  var err = !name ? '이름을 입력해 주세요.' : dupName ? '같은 이름의 선생님 계정이 이미 있어요. 이름 뒤에 구분을 붙여 주세요. (예: 박지은B)' : (checkId(id) || checkPw(pw, $('regPw2').value));
+  if(err){ $('regErr').textContent = err; return; }
+  $('regErr').textContent = '';
+  var picked = Array.from(document.querySelectorAll('#regClasses input:checked')).map(function(i){ return i.value; });
+  var salt = randSalt();
+  hashPw(pw, salt).then(function(h){
+    store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', salt:salt, hash:h });
+    picked.forEach(function(cid){ store.assign[cid] = name; });
+    saveStore(); applyAssign(); renderDirector();
+    $('regForm').reset(); renderSettings();
+    $('regOk').textContent = name + ' 선생님을 등록했어요. 아이디: ' + id.toLowerCase() + ' · 비밀번호는 방금 정하신 대로예요. 선생님께 알려 주세요.';
+  }).catch(function(){ $('regErr').textContent = '이 브라우저에서는 등록할 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
+});
+
+var pendingTDel = null;
+$('tRows').addEventListener('click', function(e){
+  var b = e.target.closest('[data-act]'); if(!b) return;
+  var tr = b.closest('tr'), acc = findAcc(tr.dataset.id);
+  if(b.dataset.act === 'del'){
+    if(pendingTDel !== acc.id){ pendingTDel = acc.id; b.textContent = '정말 삭제?'; return; }
+    pendingTDel = null;
+    store.accounts = store.accounts.filter(function(a){ return a.id !== acc.id; });
+    CLASSES.forEach(function(c){ if(c.teacher === acc.name){ c.teacher = '미배정'; store.assign[c.id] = '미배정'; } });
+    saveStore(); renderDirector(); renderSettings(); toast(acc.name + ' 선생님 계정을 삭제했어요.');
+    return;
+  }
+  if(b.dataset.act === 'pw'){
+    var next = tr.nextElementSibling;
+    if(next && next.classList.contains('pw-row')){ next.remove(); return; }
+    tr.insertAdjacentHTML('afterend', '<tr class="pw-row"><td colspan="4"><form data-id="'+acc.id+'"><input type="password" placeholder="새 비밀번호 (6자 이상)" autocomplete="new-password" aria-label="새 비밀번호"><button class="btn soft" type="submit">저장</button><span class="form-err"></span></form></td></tr>');
+    tr.nextElementSibling.querySelector('input').focus();
+  }
+});
+$('tRows').addEventListener('submit', function(e){
+  e.preventDefault();
+  var f = e.target, acc = findAcc(f.dataset.id), pw = f.querySelector('input').value;
+  if(pw.length < 6){ f.querySelector('.form-err').textContent = '6자 이상으로 정해 주세요.'; return; }
+  var salt = randSalt();
+  hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 바꿨어요.'); });
+});
+$('myPwForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  $('myPwOk').textContent = '';
+  var pw = $('myPw').value, err = checkPw(pw, $('myPw2').value);
+  if(err){ $('myPwErr').textContent = err; return; }
+  $('myPwErr').textContent = '';
+  var acc = findAcc(session.id), salt = randSalt();
+  hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; saveStore(); $('myPwForm').reset(); $('myPwOk').textContent = '비밀번호를 바꿨어요.'; });
+});
+
 /* ===== 시작 ===== */
-renderDirector();
+applyAssign();
 loadSheetConsults();
 (function(){
-  var h = location.hash;
-  if(h === '#calendar') setView('director', 'calendar');
-  else if(h === '#teacher-calendar') setView('teacher', 'calendar');
-  else setView(h === '#teacher' ? 'teacher' : 'director');
+  var saved = null;
+  try{ saved = JSON.parse(sessionStorage.getItem(SES_KEY) || 'null'); }catch(e){}
+  var acc = saved && findAcc(saved.id);
+  if(acc) enter(acc); else showLogin();
 })();
 </script>
 </body>
