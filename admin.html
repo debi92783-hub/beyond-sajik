@@ -271,6 +271,21 @@
   .dt-table input[type=checkbox]{ width:16px; height:16px; accent-color:var(--accent); }
   .dt-table tr.absent td:not(.stick):not(.stick2):not(.keep){ opacity:.4; }
   .dt-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .flow{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+  .flow .step{ display:flex; align-items:center; gap:10px; text-align:left; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--ink); cursor:pointer; font:inherit; }
+  .flow .step b{ display:block; font-size:13.5px; }
+  .flow .step small{ display:block; font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+  .flow .n{ flex:none; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:800; background:var(--surface-soft); color:var(--ink-soft); }
+  .flow .step.now{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .flow .step.now small{ color:rgba(255,255,255,.85); }
+  .flow .step.now .n{ background:#fff; color:var(--accent); }
+  .flow .step.done{ background:var(--good-soft); border-color:transparent; }
+  .flow .step.done .n{ background:var(--good); color:#fff; }
+  .flow .step:disabled{ opacity:.45; cursor:not-allowed; }
+  .rc.ok{ border-color:var(--good); box-shadow:0 0 0 1px var(--good); }
+  .rc .foot{ gap:8px; }
+  .rc .foot .okbtn[aria-pressed="true"]{ background:var(--good); color:#fff; }
+  @media (max-width: 720px){ .flow{ grid-template-columns:1fr 1fr; } }
   .dt-cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:14px; margin-top:14px; }
   .rc{ border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface); }
   .rc table{ width:100%; border-collapse:collapse; font-size:12.5px; }
@@ -540,7 +555,7 @@
         </div>
         <div class="dt-sum" id="dtSum"></div>
         <div class="card">
-          <div class="card-head"><h2>학생별 점검표 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved">입력하면 바로 저장돼요</span></div>
+          <div class="card-head"><h2>학생별 점검표 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved"></span></div>
           <p class="muted" style="margin:0 0 10px">점수는 '획득점수 / 만점'으로 적어요. 만점은 맨 윗줄에서 바꿀 수 있고, 단어는 통과 점수 이상이면 '완료'가 자동으로 체크돼요.</p>
           <div class="table-wrap">
             <table class="dt-table">
@@ -566,14 +581,18 @@
             <button class="btn soft" type="button" data-bulk="book">체크한 학생 교재 지참</button>
             <button class="btn soft" type="button" data-bulk="hw">체크한 학생 숙제 완료</button>
             <button class="btn soft" type="button" data-bulk="spk">체크한 학생 Speaking 완료</button>
-            <button class="btn" type="button" id="dtMake">체크한 학생 개인 리포트 만들기</button>
+          </div>
+          <div class="flow" id="dtFlow">
+            <button type="button" class="step" id="dtSaveBtn"><span class="n">1</span><span><b>저장</b><small id="dtStep1">점검표를 저장해요</small></span></button>
+            <button type="button" class="step" id="dtMake"><span class="n">2</span><span><b>리포트 만들기</b><small id="dtStep2">체크한 학생 리포트</small></span></button>
+            <button type="button" class="step" id="dtOkAll"><span class="n">3</span><span><b>확인</b><small id="dtStep3">리포트를 하나씩 확인</small></span></button>
+            <button type="button" class="step" id="dtSend"><span class="n">4</span><span><b>발송</b><small id="dtStep4">확인한 리포트만 보내요</small></span></button>
           </div>
         </div>
         <div class="card" id="dtMsgCard" hidden style="margin-top:20px">
-          <div class="card-head"><h2>개인 리포트</h2><span class="muted">점검표에서 고치면 다시 만들어 주세요</span></div>
-          <p class="muted" style="margin:0">학부모님께 보내는 개인 리포트 양식이에요. '문자용 복사'를 누르면 문자·카톡에 붙여 넣을 글로 복사돼요.</p>
+          <div class="card-head"><h2>개인 리포트</h2><span class="muted" id="dtOkCount"></span></div>
+          <p class="muted" style="margin:0">리포트를 읽어 보고 '확인'을 눌러 주세요. 확인한 리포트만 발송돼요. 점검표를 고치면 다시 저장하고 리포트를 새로 만들어야 해요.</p>
           <div class="dt-cards" id="dtMsgs"></div>
-          <div class="dt-actions"><button class="btn" type="button" id="dtSend">리포트 전체 발송</button></div>
         </div>
       </div>
     </section>
@@ -1390,8 +1409,8 @@ function renderDaily(){
       '<td class="grp keep"><input type="text" data-f="memo" value="'+esc(r.memo)+'" placeholder="기타사항" aria-label="'+esc(s)+' NOTE"></td></tr>';
   }).join('');
   $('dtAll').checked = c.students.every(function(s){ return e.rows[s].on; });
-  $('dtMsgCard').hidden = true;
   renderDtSum();
+  renderFlow();
 }
 function fillProg(e){
   var b = DT_BOOKS.find(function(x){ return x[0] === e.book; });
@@ -1412,7 +1431,6 @@ function renderDtSum(){
   $('dtSum').innerHTML = cards.map(function(k){
     return '<div class="card"><b>'+k[0]+'</b><span>'+k[1]+'</span><small'+(k[3]?' class="warn"':'')+'>'+esc(k[2])+'</small></div>';
   }).join('');
-  $('dtSaved').textContent = e.sent ? '저장됨 · 오늘 ' + e.sent + '명에게 리포트를 보냈어요' : '입력하면 바로 저장돼요';
 }
 
 /* 개인 리포트 (원장님 리포트 양식) */
@@ -1441,7 +1459,7 @@ function dtCard(s, e){
     '<tr><th>반/담임</th><td>'+esc(c.name)+' · '+esc(c.teacher)+' 선생님</td></tr>' +
     '<tr><th>날짜</th><td>'+dtDateText()+' ('+DAYS[dtDay.getDay()]+')</td></tr>' +
     rows.map(function(x){ return '<tr><th>'+x[0]+'</th><td>'+x[1]+'</td></tr>'; }).join('') +
-    '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button></div></div>';
+    '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button><button class="btn soft okbtn" type="button" data-ok aria-pressed="false">확인</button></div></div>';
 }
 function dtText(s, e){
   var c = dtCls(), r = e.rows[s], L = [];
@@ -1464,7 +1482,7 @@ $('dtRows').addEventListener('input', function(ev){
   var tr = el.closest('tr'), e = dtEntry(), r = e.rows[tr.dataset.name];
   r[f] = el.type === 'checkbox' ? el.checked : el.value;
   if(DT_OPT[f]) el.className = tone(el.value);
-  if(f === 'att'){ dtSave(); renderDaily(); return; }
+  if(f === 'att'){ dtEdit(); renderDaily(); return; }
   if(/^w[123]$/.test(f) || DT_SCORES.indexOf(f) !== -1){
     var v = num(el.value), max = /^w/.test(f) ? e.max.word : e.max[f];
     el.parentNode.classList.toggle('low', v !== null && v / max < 0.7);
@@ -1474,12 +1492,12 @@ $('dtRows').addEventListener('input', function(ev){
     tr.querySelector('[data-f=wDone]').checked = r.wDone;
   }
   if(f === 'on') $('dtAll').checked = dtCls().students.every(function(s){ return e.rows[s].on; });
-  dtSave(); renderDtSum();
+  dtEdit(f === 'on'); renderDtSum();
 });
 $('dtAll').addEventListener('change', function(){
   var e = dtEntry(), on = this.checked;
   dtCls().students.forEach(function(s){ e.rows[s].on = on; });
-  dtSave(); renderDaily();
+  dtEdit(true); renderDaily();
 });
 document.querySelectorAll('#view-daily [data-bulk]').forEach(function(b){
   b.addEventListener('click', function(){
@@ -1488,7 +1506,7 @@ document.querySelectorAll('#view-daily [data-bulk]').forEach(function(b){
     if(!picked.length){ toast('먼저 학생을 체크해 주세요.'); return; }
     var n = 0;
     picked.forEach(function(s){ var r = e.rows[s]; if(f === 'att' || r.att !== '결석'){ r[f] = DT_OPT[f][0]; n++; } });
-    dtSave(); renderDaily();
+    dtEdit(); renderDaily();
     toast('체크한 학생 ' + n + '명을 ' + { att:'출석으로', book:'교재 지참으로', hw:'숙제 완료로', spk:'Speaking 완료로' }[f] + ' 바꿨어요.' + (n < picked.length ? ' 결석한 학생은 그대로 둬요.' : ''));
   });
 });
@@ -1497,38 +1515,90 @@ document.querySelectorAll('#view-daily [data-max]').forEach(function(i){
     var e = dtEntry(), v = Math.max(1, Math.min(200, parseInt(this.value, 10) || 1));
     e.max[this.dataset.max] = v;
     if(this.dataset.max === 'word' && e.pass > v) e.pass = v;
-    dtSave(); renderDaily();
+    dtEdit(); renderDaily();
   });
 });
 $('dtPass').addEventListener('change', function(){
   var e = dtEntry();
   e.pass = Math.max(0, Math.min(e.max.word, parseInt(this.value, 10) || 0));
   dtCls().students.forEach(function(s){ var r = e.rows[s]; if(wordTries(r).length) r.wDone = wordTries(r).some(function(v){ return v >= e.pass; }); });
-  dtSave(); renderDaily();
+  dtEdit(); renderDaily();
 });
-$('dtBook').addEventListener('change', function(){ var e = dtEntry(); e.book = this.value; e.prog = bookItems(e.book)[0] || ''; fillProg(e); dtSave(); });
-$('dtProg').addEventListener('change', function(){ dtEntry().prog = this.value; dtSave(); });
+$('dtBook').addEventListener('change', function(){ var e = dtEntry(); e.book = this.value; e.prog = bookItems(e.book)[0] || ''; fillProg(e); dtEdit(); });
+$('dtProg').addEventListener('change', function(){ dtEntry().prog = this.value; dtEdit(); });
 [['dtSb','sb'],['dtPb','pb']].forEach(function(x){
   // 숫자만 받아요. 쪽 범위를 적을 수 있게 - , ~ 는 남겨 둬요.
   $(x[0]).addEventListener('input', function(){
     var clean = this.value.replace(/[^0-9,~\- ]/g, '');
     if(clean !== this.value) this.value = clean;
-    dtEntry()[x[1]] = clean.trim(); dtSave();
+    dtEntry()[x[1]] = clean.trim(); dtEdit();
   });
 });
 $('dtClass').addEventListener('change', function(){ dtClassId = this.value; renderDaily(); });
 $('dtPrev').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() - 1); renderDaily(); });
 $('dtNext').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() + 1); renderDaily(); });
+/* 흐름: 저장 → 리포트 만들기 → 확인 → 발송.
+   입력 중인 내용은 잃어버리지 않게 늘 임시로 보관하고, '저장'을 눌러야 다음 단계로 가요.
+   점검표를 고치면 저장 전 상태로 돌아가요. 체크만 바꾸면 리포트 만들기 단계로 돌아가요. */
+function hm(t){ var d = new Date(t); return d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2); }
+function dtEdit(selOnly){
+  var e = dtEntry();
+  if(selOnly){ if(e.stage === 'made') e.stage = 'saved'; }
+  else if(e.stage && e.stage !== 'draft') e.stage = 'draft';
+  dtSave(); renderFlow();
+}
+function renderFlow(){
+  var e = dtEntry(), st = e.stage || 'draft', order = ['draft','saved','made','sent'], at = order.indexOf(st);
+  var made = st === 'made' || st === 'sent' ? (e.made || []) : [];
+  var okN = made.filter(function(s){ return e.ok && e.ok[s]; }).length;
+  var steps = [$('dtSaveBtn'), $('dtMake'), $('dtOkAll'), $('dtSend')];
+  var nowIdx = st === 'draft' ? 0 : st === 'saved' ? 1 : st === 'made' ? (okN < made.length ? 2 : 3) : -1;
+  steps.forEach(function(b, i){
+    var done = st === 'sent' || i < nowIdx;
+    b.className = 'step' + (done ? ' done' : i === nowIdx ? ' now' : '');
+  });
+  $('dtSaveBtn').disabled = false;
+  $('dtMake').disabled = at < 1;
+  $('dtOkAll').disabled = !made.length || st === 'sent';
+  $('dtSend').disabled = st !== 'made' || okN === 0;
+  $('dtStep1').textContent = at >= 1 ? '저장됨 ' + hm(e.savedAt) : '점검표를 저장해요';
+  $('dtStep2').textContent = made.length ? made.length + '명 리포트 완성' : '체크한 학생 리포트';
+  $('dtStep3').textContent = made.length ? '확인 ' + okN + ' / ' + made.length + '명' + (st === 'made' && okN < made.length ? ' · 누르면 모두 확인' : '') : '리포트를 하나씩 확인';
+  $('dtStep4').textContent = st === 'sent' ? e.sent + '명 발송 완료 ' + hm(e.sentAt) : okN ? '확인한 ' + okN + '명에게 보내요' : '확인한 리포트만 보내요';
+  $('dtSaved').textContent = st === 'draft' ? (e.savedAt ? '고친 내용이 있어요 · 다시 저장해 주세요' : '아직 저장 전이에요') : st === 'sent' ? '발송 완료' : '저장됨 · ' + hm(e.savedAt);
+  $('dtMsgCard').hidden = !made.length;
+  if(made.length){
+    $('dtMsgs').innerHTML = made.map(function(s){ return dtCard(s, e); }).join('');
+    $('dtMsgs').querySelectorAll('.rc').forEach(function(card){
+      var ok = !!(e.ok && e.ok[card.dataset.name]), b = card.querySelector('[data-ok]');
+      card.classList.toggle('ok', ok); b.setAttribute('aria-pressed', ok); b.textContent = ok ? '확인함' : '확인';
+      b.disabled = st === 'sent';
+    });
+    $('dtOkCount').textContent = st === 'sent' ? e.sent + '명에게 보냈어요' : '확인 ' + okN + ' / ' + made.length + '명';
+  }
+}
+$('dtSaveBtn').addEventListener('click', function(){
+  var e = dtEntry();
+  if(e.stage && e.stage !== 'draft'){ toast('이미 저장돼 있어요.'); return; }
+  e.stage = 'saved'; e.savedAt = Date.now(); e.made = []; e.ok = {};
+  dtSave(); renderFlow(); toast('점검표를 저장했어요. 이제 리포트를 만들 수 있어요.');
+});
 $('dtMake').addEventListener('click', function(){
   var c = dtCls(), e = dtEntry();
   var picked = c.students.filter(function(s){ return e.rows[s].on; });
   if(!picked.length){ toast('리포트를 만들 학생을 먼저 체크해 주세요.'); return; }
-  $('dtMsgs').innerHTML = picked.map(function(s){ return dtCard(s, e); }).join('');
-  $('dtSend').textContent = picked.length + '명에게 리포트 발송';
-  $('dtMsgCard').hidden = false;
+  e.made = picked; e.ok = {}; e.stage = 'made';
+  dtSave(); renderFlow();
   $('dtMsgCard').scrollIntoView({ behavior:'smooth', block:'start' });
 });
+$('dtOkAll').addEventListener('click', function(){
+  var e = dtEntry(); if(e.stage !== 'made') return;
+  e.ok = {}; (e.made || []).forEach(function(s){ e.ok[s] = true; });
+  dtSave(); renderFlow(); toast('리포트 ' + e.made.length + '개를 모두 확인했어요.');
+});
 $('dtMsgs').addEventListener('click', function(ev){
+  var ok = ev.target.closest('[data-ok]');
+  if(ok){ var e0 = dtEntry(), nm = ok.closest('.rc').dataset.name; e0.ok = e0.ok || {}; e0.ok[nm] = !e0.ok[nm]; dtSave(); renderFlow(); return; }
   var b = ev.target.closest('[data-copy]'); if(!b) return;
   var text = dtText(b.closest('.rc').dataset.name, dtEntry());
   var done = function(){ toast('리포트를 글로 복사했어요. 문자나 카톡에 붙여 넣으면 돼요.'); };
@@ -1536,9 +1606,12 @@ $('dtMsgs').addEventListener('click', function(ev){
   if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
 });
 $('dtSend').addEventListener('click', function(){
-  var n = $('dtMsgs').children.length, e = dtEntry();
-  e.sent = n; dtSave(); renderDtSum();
-  toast('시안이라 실제 문자는 가지 않아요. ' + n + '명에게 보낸 것으로 기록했어요.');
+  var e = dtEntry(); if(e.stage !== 'made') return;
+  var names = (e.made || []).filter(function(s){ return e.ok && e.ok[s]; });
+  if(!names.length){ toast('먼저 리포트를 확인해 주세요.'); return; }
+  e.made = names; e.sent = names.length; e.sentAt = Date.now(); e.stage = 'sent';
+  dtSave(); renderFlow();
+  toast('시안이라 실제 문자는 가지 않아요. ' + names.length + '명에게 보낸 것으로 기록했어요.');
 });
 
 /* ===== 계정 · 로그인 =====
