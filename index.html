@@ -484,14 +484,14 @@
   .site-nav a{ text-decoration: none; color: var(--ink-soft); white-space: nowrap; }
   .site-nav a:hover{ color: var(--ink); }
 
-  /* 개요·현황 숫자 */
-  .stats{
-    display:grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
-    background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow:hidden;
+  /* 개요·현황 숫자 (원장 소개 아래 작게) */
+  .stats-mini{
+    display:flex; flex-wrap:wrap; gap: 8px 28px; margin-top: 28px; padding: 14px 18px;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
   }
-  .stat{ background: var(--card); padding: 24px 20px; text-align:center; }
-  .stat .num{ font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--ink); }
-  .stat .cap{ font-size: 0.88rem; color: var(--ink-faint); }
+  .stats-mini .stat{ display:flex; align-items:baseline; gap: 8px; }
+  .stats-mini .cap{ font-size: 0.82rem; color: var(--ink-faint); }
+  .stats-mini .num{ font-size: 0.98rem; font-weight: 700; color: var(--ink); }
 
   /* 원장님 소개 */
   .director{ display:grid; grid-template-columns: 220px 1fr; gap: 40px; align-items:start; }
@@ -616,7 +616,6 @@
 
   @media (max-width: 860px){
     .site-nav{ display:none; }
-    .stats{ grid-template-columns: repeat(2, 1fr); }
     .director{ grid-template-columns: 1fr; gap: 24px; }
     .director-photo{ max-width: 200px; }
     .levels{ grid-template-columns: 1fr 1fr; }
@@ -637,9 +636,8 @@
   <div class="site-bar">
     <div class="brand">비욘드잉글리쉬 <span>사직캠퍼스</span></div>
     <nav class="site-nav" aria-label="주요 메뉴">
-      <a href="#about">학원 소개</a>
-      <a href="#director">원장 소개</a>
       <a href="#curriculum">커리큘럼</a>
+      <a href="#director">원장 소개</a>
       <a href="#news">소식</a>
       <a href="#info">오시는 길</a>
     </nav>
@@ -720,44 +718,7 @@
   </div>
 </section>
 
-<!-- ===== 1. 학원 개요·현황 (노란 표시 = 원장님이 채우실 부분) ===== -->
-<section id="about">
-  <div class="wrap">
-    <h2 class="section-title">학원 개요</h2>
-    <div class="stats">
-      <div class="stat"><div class="num"><span class="todo">20XX</span></div><div class="cap">개원 연도</div></div>
-      <div class="stat"><div class="num"><span class="todo">00</span>명</div><div class="cap">재원생</div></div>
-      <div class="stat"><div class="num">4단계</div><div class="cap">레벨 커리큘럼</div></div>
-      <div class="stat"><div class="num">초1–중3</div><div class="cap">수강 대상</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== 원장님 소개 ===== -->
-<section id="director">
-  <div class="wrap">
-    <h2 class="section-title">원장 소개</h2>
-    <div class="director">
-      <div class="director-photo">
-        <!-- 사진 넣는 법: 아래 span을 지우고 <img src="원장사진.jpg" alt="원장 사진"> 로 바꿔 주세요 -->
-        <span>원장님 사진 자리</span>
-      </div>
-      <div>
-        <h3><span class="todo">○○○</span> 원장</h3>
-        <p class="role">비욘드잉글리쉬 사직캠퍼스</p>
-        <ul class="career">
-          <li><span class="todo">학력 (예: ○○대학교 영어영문학과 졸업)</span></li>
-          <li><span class="todo">경력 (예: 초·중등 영어 지도 ○○년)</span></li>
-          <li><span class="todo">자격 (예: TESOL, TTC 수료 등)</span></li>
-          <li><span class="todo">기타 (예: 파닉스 교재 집필, 학부모 강연 등)</span></li>
-        </ul>
-        <blockquote><span class="todo">아이 한 명 한 명이 자기 생각을 영어로 말할 수 있을 때까지 함께하겠습니다. (원장님 한마디로 바꿔 주세요)</span></blockquote>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== 2. 수업 커리큘럼 ===== -->
+<!-- ===== 1. 수업 커리큘럼 ===== -->
 <section id="curriculum">
   <div class="wrap">
     <h2 class="section-title">수업 커리큘럼</h2>
@@ -817,6 +778,39 @@
     </div>
   </div>
 </section>
+
+<!-- ===== 2. 원장님 소개 + 학원 개요 ===== -->
+<section id="director">
+  <div class="wrap">
+    <h2 class="section-title">원장 소개</h2>
+    <div class="director">
+      <div class="director-photo">
+        <!-- 사진 넣는 법: 아래 span을 지우고 <img src="원장사진.jpg" alt="원장 사진"> 로 바꿔 주세요 -->
+        <span>원장님 사진 자리</span>
+      </div>
+      <div>
+        <h3><span class="todo">○○○</span> 원장</h3>
+        <p class="role">비욘드잉글리쉬 사직캠퍼스</p>
+        <ul class="career">
+          <li><span class="todo">학력 (예: ○○대학교 영어영문학과 졸업)</span></li>
+          <li><span class="todo">경력 (예: 초·중등 영어 지도 ○○년)</span></li>
+          <li><span class="todo">자격 (예: TESOL, TTC 수료 등)</span></li>
+          <li><span class="todo">기타 (예: 파닉스 교재 집필, 학부모 강연 등)</span></li>
+        </ul>
+        <blockquote><span class="todo">아이 한 명 한 명이 자기 생각을 영어로 말할 수 있을 때까지 함께하겠습니다. (원장님 한마디로 바꿔 주세요)</span></blockquote>
+      </div>
+    </div>
+
+    <!-- 학원 개요·현황 (노란 표시 = 원장님이 채우실 부분) -->
+    <div id="about" class="stats-mini" aria-label="학원 개요">
+      <div class="stat"><span class="cap">개원</span><span class="num"><span class="todo">20XX</span>년</span></div>
+      <div class="stat"><span class="cap">재원생</span><span class="num"><span class="todo">00</span>명</span></div>
+      <div class="stat"><span class="cap">커리큘럼</span><span class="num">4단계</span></div>
+      <div class="stat"><span class="cap">수강 대상</span><span class="num">초1–중3</span></div>
+    </div>
+  </div>
+</section>
+
 
 <!-- ===== 3. 소식 ===== -->
 <section id="news">
