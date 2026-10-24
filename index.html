@@ -508,19 +508,37 @@
   .career li::before{ content:""; position:absolute; left:0; top: 17px; width:6px; height:6px; background: var(--accent); }
   .director blockquote{ margin:0; font-family: var(--serif); color: var(--ink); font-size: 1.05rem; border-left: 3px solid var(--accent); padding-left: 16px; }
 
-  /* 커리큘럼 */
-  .levels{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .level{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 20px; display:flex; flex-direction:column; }
-  .level .step{ font-size: 0.8rem; color: var(--ink-faint); letter-spacing: 0.06em; }
-  .level h3{ font-family: var(--serif); font-size: 1.2rem; margin: 4px 0 2px; }
-  .level .target{ font-size: 0.86rem; color: var(--accent-deep); font-weight: 600; margin: 0 0 14px; }
-  .level ul{ margin: 0 0 16px; padding-left: 18px; color: var(--ink-soft); font-size: 0.93rem; }
-  .level ul li{ margin-bottom: 4px; }
-  .level .ex{ margin-top:auto; background: var(--bg); border-radius: var(--radius); padding: 12px 14px; font-size: 0.88rem; }
-  .level .ex .en{ font-family: var(--serif); color: var(--ink); font-weight: 600; display:block; }
-  .level .ex .ko{ color: var(--ink-soft); display:block; margin-top: 2px; }
-  .level .ex .tag{ display:inline-block; font-size: 0.72rem; padding: 1px 6px; border-radius: 3px; background: var(--ink); color:#fff; margin-bottom: 6px; }
-  .level .ex .tag.w{ background: var(--accent-deep); }
+  /* 커리큘럼: 빌딩(왼쪽 층) + 단계 설명(오른쪽) */
+  .cur-intro{ max-width: 68ch; margin-bottom: 32px; color: var(--ink-soft); }
+  .cur-intro p{ margin: 0 0 8px; }
+  .cur-lead{ font-family: var(--serif); font-size: 1.15rem; color: var(--ink) !important; }
+  .cur-lead b{ color: var(--accent-deep); }
+  .tower{ display:grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); column-gap: 28px; }
+  .t-roof{ justify-self:center; width: 62%; background: var(--ink); color: var(--accent); text-align:center; padding: 12px 8px; font-family: var(--serif); font-weight: 700; font-size: 1.05rem; border-radius: 6px 6px 0 0; position:relative; }
+  .t-roof::after{ content:""; position:absolute; left:50%; bottom:100%; transform:translateX(-50%); width: 34%; height: 14px; background: var(--ink); border-radius: 4px 4px 0 0; }
+  .t-seg{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; border-left: 6px solid var(--seg); border-right: 1px solid var(--line); background: var(--card); }
+  .t-seg.s4{ --seg: #1E2A44; border-top: 1px solid var(--line); }
+  .t-seg.s3{ --seg: #4A5A7E; }
+  .t-seg.s2{ --seg: #E2A33B; }
+  .floor{ flex: 1 0 auto; display:flex; align-items:center; gap: 10px; padding: 5px 10px; border-bottom: 1px solid var(--line); font-size: 0.8rem; min-height: 28px; }
+  .floor .no{ flex: 0 0 auto; width: 7.6em; font-weight: 700; color: var(--ink); font-size: 0.76rem; }
+  .floor .topic{ flex: 1; min-width: 0; color: var(--ink-soft); }
+  .floor .mile{ flex: 0 0 auto; font-size: 0.7rem; font-weight: 700; color: #fff; background: var(--accent-deep); padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+  .floor.goal{ background: #FBF4E6; }
+  .t-seg.s2 .floor:last-child{ border-bottom: 0; }
+  .t-base{ margin: 0 -14px; background: #2B3550; color: #E8EBF2; border-radius: 0 0 6px 6px; padding: 8px 14px; display:flex; flex-direction:column; justify-content:space-evenly; gap: 4px; }
+  .t-base-title{ font-size: 0.72rem; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; text-align:center; }
+  .t-base-row{ display:flex; justify-content:space-between; gap: 10px; font-size: 0.82rem; font-weight: 600; padding: 5px 4px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+  .t-base-row:last-child{ border-bottom: 0; }
+  .t-card{ align-self:center; margin: 14px 0; padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--seg, #2B3550); border-radius: var(--radius); font-size: 0.92rem; color: var(--ink-soft); position:relative; }
+  .t-card.s4{ --seg: #1E2A44; } .t-card.s3{ --seg: #4A5A7E; } .t-card.s2{ --seg: #E2A33B; } .t-card.s1{ --seg: #2B3550; }
+  .t-card::before{ content:""; position:absolute; right:100%; top:50%; width: 24px; border-top: 2px dotted var(--seg, #2B3550); }
+  .t-card p{ margin: 0 0 8px; } .t-card p:last-child{ margin-bottom: 0; }
+  .t-card h3{ font-family: var(--serif); font-size: 1.1rem; color: var(--ink); margin: 2px 0 8px; }
+  .t-stage{ display:inline-block; font-size: 0.78rem; font-weight: 700; color: #fff; background: var(--seg, #2B3550); padding: 2px 10px; border-radius: 999px; }
+  .t-sub{ font-size: 0.85rem; border-top: 1px dashed var(--line); padding-top: 8px; }
+  .t-sub b, .t-card p b{ color: var(--ink); }
+  .cur-note{ margin: 24px 0 0; font-size: 0.88rem; color: var(--ink-soft); }
 
   /* 소식 */
   .news-tabs{ display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -618,13 +636,20 @@
     .site-nav{ display:none; }
     .director{ grid-template-columns: 1fr; gap: 24px; }
     .director-photo{ max-width: 200px; }
-    .levels{ grid-template-columns: 1fr 1fr; }
     .photo-grid{ grid-template-columns: 1fr 1fr; }
     .picker{ grid-template-columns: 1fr; gap: 16px; }
     .seminar{ padding: 22px; }
   }
   @media (max-width: 480px){
-    .levels{ grid-template-columns: 1fr; }
+    .tower{ grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); column-gap: 14px; }
+    .floor .topic{ display:none; }
+    .floor{ flex-wrap: wrap; gap: 4px 8px; }
+    .floor .no{ width:auto; }
+    .floor .mile{ white-space: normal; min-width: 0; max-width: 100%; font-size: 0.64rem; line-height: 1.3; }
+    .t-card{ padding: 14px; font-size: 0.85rem; }
+    .t-card::before{ width: 12px; }
+    .t-base{ margin: 0 -6px; padding: 8px; }
+    .t-base-row{ flex-direction:column; gap: 2px; font-size: 0.74rem; }
     .grad-table{ font-size: 0.88rem; }
     .grad-table th, .grad-table td{ padding: 10px 8px; }
   }
@@ -722,60 +747,90 @@
 <section id="curriculum">
   <div class="wrap">
     <h2 class="section-title">수업 커리큘럼</h2>
-    <div class="levels">
-      <article class="level">
-        <span class="step">STEP 1</span>
-        <h3>Phonics</h3>
-        <p class="target"><span class="todo">초1–초2 / 영어 첫걸음</span></p>
-        <ul>
-          <li>알파벳 소리와 글자 연결</li>
-          <li>단모음·장모음, 이중자음 읽기</li>
-          <li>사이트워드로 짧은 문장 읽기</li>
-        </ul>
-        <div class="ex"><span class="tag">spoken</span>
-          <span class="en">I have a red bag.</span>
-          <span class="ko">나는 빨간 가방이 하나 있어요.</span></div>
+    <div class="cur-intro">
+      <p class="cur-lead">특허받은 <b>Sentence Build</b> 학습법, 충분한 반복으로 완벽하게 익혀지는 비욘드 프로그램</p>
+      <p>우리나라 학생들에게 영어는 모국어도, 제2국어(ESL)도 아닌 외국어(EFL)예요. 그래서 영어권 학생들과 같은 방법·같은 교재로 배워서는 안 돼요.
+      비욘드는 Sentence Build가 잡힐 때까지 반복하는 자체 코스북으로 Listening, Speaking, Reading, Writing을 함께 이끌어 내요.</p>
+    </div>
+
+    <div class="tower" aria-label="비욘드 교재 단계: 아래층부터 위층으로 올라가요">
+      <div class="t-roof"><span>Sentence Build Up!</span></div>
+      <div class="t-label t-label-roof" aria-hidden="true"></div>
+
+      <ol class="t-seg s4" aria-label="4단계 Advanced 1~9">
+          <li class="floor goal"><span class="no">Advanced 9</span><span class="topic" lang="en">Relative pronoun, Relative adverb</span><span class="mile">토익브릿지 150점 · 토플 주니어</span></li>
+          <li class="floor"><span class="no">Advanced 8</span><span class="topic" lang="en">Passive voice</span></li>
+          <li class="floor"><span class="no">Advanced 7</span><span class="topic" lang="en">Modals</span></li>
+          <li class="floor"><span class="no">Advanced 6</span><span class="topic" lang="en">Subjunctive mood, Indirect/Direct speech</span></li>
+          <li class="floor"><span class="no">Advanced 5</span><span class="topic" lang="en">Tense</span></li>
+          <li class="floor"><span class="no">Advanced 4</span><span class="topic" lang="en">Participle</span></li>
+          <li class="floor"><span class="no">Advanced 3</span><span class="topic" lang="en">Verbs, Sentence form</span></li>
+          <li class="floor"><span class="no">Advanced 2</span><span class="topic" lang="en">Gerund</span></li>
+          <li class="floor"><span class="no">Advanced 1</span><span class="topic" lang="en">Infinitive</span></li>
+      </ol>
+      <article class="t-card s4">
+        <span class="t-stage">4단계 · 완성단계</span>
+        <h3>Beyond Advanced 1~9</h3>
+        <p>Intermediate를 끝낸 고급자를 위한 교재예요. 내신, 수능, 토익, iBT 토플, 텝스 같은 시험에서 자유로워지고, 이때부터는 원서를 가지고 진정한 Debate 수업도 할 수 있어요.</p>
       </article>
-      <article class="level">
-        <span class="step">STEP 2</span>
-        <h3>Basic</h3>
-        <p class="target"><span class="todo">초2–초4 / 파닉스 완료 후</span></p>
-        <ul>
-          <li>기초 문장 패턴 익히기</li>
-          <li>짧은 이야기 듣고 읽기</li>
-          <li>단어 → 구 → 문장 만들기</li>
-        </ul>
-        <div class="ex"><span class="tag">spoken</span>
-          <span class="en">Can I go to the bathroom?</span>
-          <span class="ko">제가 화장실에 가도 돼요?</span></div>
+
+      <ol class="t-seg s3" aria-label="3단계 Intermediate 1~12">
+          <li class="floor"><span class="no">Intermediate 12</span><span class="topic" lang="en">Possessives, Agreement, Inversion, Emphasis</span></li>
+          <li class="floor"><span class="no">Intermediate 11</span><span class="topic" lang="en">Conjunctions</span></li>
+          <li class="floor"><span class="no">Intermediate 10</span><span class="topic" lang="en">Prepositions, Idioms</span></li>
+          <li class="floor"><span class="no">Intermediate 9</span><span class="topic" lang="en">Adjectives and adverbs, Articles</span></li>
+          <li class="floor"><span class="no">Intermediate 8</span><span class="topic" lang="en">Determiners, Numbers, Money, Frequency</span></li>
+          <li class="floor"><span class="no">Intermediate 7</span><span class="topic" lang="en">Comparative and superlative forms</span></li>
+          <li class="floor goal"><span class="no">Intermediate 6</span><span class="topic" lang="en">Modals: can, could, may, will, would, should</span><span class="mile">JET 1급 · 토플 프라이머리 Step 2</span></li>
+          <li class="floor"><span class="no">Intermediate 5</span><span class="topic" lang="en">Modals: must, have to, can, could</span></li>
+          <li class="floor"><span class="no">Intermediate 4</span><span class="topic" lang="en">How + adjective/adverb, How many/much</span></li>
+          <li class="floor"><span class="no">Intermediate 3</span><span class="topic" lang="en">Wh-questions, Interrogative pronouns</span></li>
+          <li class="floor"><span class="no">Intermediate 2</span><span class="topic" lang="en">Some, Any / Indefinite pronouns, Uncountable nouns</span></li>
+          <li class="floor"><span class="no">Intermediate 1</span><span class="topic" lang="en">Reflexive pronouns, Impersonal subject &quot;it&quot;</span></li>
+      </ol>
+      <article class="t-card s3">
+        <span class="t-stage">3단계 · 중간단계</span>
+        <h3>Beyond Intermediate 1~12</h3>
+        <p>Student book, Practice book, Audio CD 12세트로 된 자체 개발 교재예요. 중3 과정까지 익히는 2,500단어를 넘어 약 6,800단어의 어휘를 쌓고, 복잡한 문장 구조까지 표현하며 읽고, 쓰고, 듣고, 말할 수 있게 해요.</p>
+        <p class="t-sub"><b>Final Intermediate 1~6</b> 배운 단계를 복습하고 더 다양한 표현을 반복해 영어를 넓혀 주는 보충 교재예요.</p>
       </article>
-      <article class="level">
-        <span class="step">STEP 3</span>
-        <h3>Intermediate</h3>
-        <p class="target"><span class="todo">초4–초6</span></p>
-        <ul>
-          <li>이유·예시를 넣어 말하기</li>
-          <li>문단 단위 읽기와 요약</li>
-          <li>문법을 문장 속에서 익히기</li>
-        </ul>
-        <div class="ex"><span class="tag w">written</span>
-          <span class="en">I like summer because I can swim in the sea.</span>
-          <span class="ko">나는 바다에서 수영할 수 있기 때문에 여름을 좋아한다.</span></div>
+
+      <ol class="t-seg s2" aria-label="2단계 Basic 1~12">
+          <li class="floor goal"><span class="no">Basic 12</span><span class="topic" lang="en">Tag questions</span><span class="mile">JET 3급</span></li>
+          <li class="floor"><span class="no">Basic 11</span><span class="topic" lang="en">Exclamatory, Imperative sentences, Suggestion</span></li>
+          <li class="floor goal"><span class="no">Basic 10</span><span class="topic" lang="en">Future tense, Past continuous</span><span class="mile">JET 5급 · 토플 프라이머리 Step 1</span></li>
+          <li class="floor"><span class="no">Basic 9</span><span class="topic" lang="en">Present continuous</span></li>
+          <li class="floor"><span class="no">Basic 8</span><span class="topic" lang="en">Past simple</span></li>
+          <li class="floor"><span class="no">Basic 7</span><span class="topic" lang="en">Past be verb, Common verb</span></li>
+          <li class="floor"><span class="no">Basic 6</span><span class="topic" lang="en">Common verb</span></li>
+          <li class="floor"><span class="no">Basic 5</span><span class="topic" lang="en">Common verb (third person singular)</span></li>
+          <li class="floor"><span class="no">Basic 4</span><span class="topic" lang="en">Case inflection (plural)</span></li>
+          <li class="floor"><span class="no">Basic 3</span><span class="topic" lang="en">Case inflection (singular)</span></li>
+          <li class="floor"><span class="no">Basic 2</span><span class="topic" lang="en">Be verb, Pronoun (plural)</span></li>
+          <li class="floor"><span class="no">Basic 1</span><span class="topic" lang="en">Be verb, Pronoun (singular)</span></li>
+      </ol>
+      <article class="t-card s2">
+        <span class="t-stage">2단계 · 기본단계</span>
+        <h3>Beyond Basic 1~12</h3>
+        <p>Student book, Practice book, Audio CD 12세트예요. be동사 현재형, 현재형, 과거형, 현재진행형, 미래형 같은 시제의 문장 구조를 잡아, 그 시제로 표현할 수 있는 말을 영어로 읽고, 쓰고, 듣고, 말할 수 있게 해요.</p>
+        <p class="t-sub"><b>Final Basic 1~6</b> 배운 단계를 복습하고 부족한 부분을 보충·보강하는 교재예요.</p>
       </article>
-      <article class="level">
-        <span class="step">STEP 4</span>
-        <h3>Advanced</h3>
-        <p class="target"><span class="todo">초6–중3 / 중등 내신 대비</span></p>
-        <ul>
-          <li>중등 핵심 문법과 구문</li>
-          <li>자기 생각을 담은 에세이 쓰기</li>
-          <li>내신·서술형 대비</li>
-        </ul>
-        <div class="ex"><span class="tag w">written</span>
-          <span class="en">If I had more time, I would read more books.</span>
-          <span class="ko">만약 내게 시간이 더 있다면, 나는 책을 더 많이 읽을 텐데.</span></div>
+
+      <div class="t-base" aria-label="1단계 Phonics 1~6, Story 1~6">
+        <div class="t-base-title">FOUNDATION · 기반</div>
+        <div class="t-base-row"><span>Beyond Phonics 1 · 2</span><span>Beyond Story 1 · 2</span></div>
+        <div class="t-base-row"><span>Beyond Phonics 3 · 4</span><span>Beyond Story 3 · 4</span></div>
+        <div class="t-base-row"><span>Beyond Phonics 5 · 6</span><span>Beyond Story 5 · 6</span></div>
+      </div>
+      <article class="t-card s1">
+        <span class="t-stage">1단계 · 기반을 다지는 단계</span>
+        <h3>Beyond Phonics 1~6 · Beyond Story 1~6</h3>
+        <p><b>Phonics</b> 6권과 Audio CD로 알파벳 첫소리, 자음과 모음, 이중자음과 이중모음이 결합된 글자와 소리를 익혀요. <span lang="en">cloudy</span>를 읽을 수 있다면 처음 보는 <span lang="en">pouch</span>도 읽을 수 있게, 어려운 단어도 술술 읽게 돼요.</p>
+        <p><b>Story</b> 6권과 Audio CD의 창작 스토리로 일상에서 쓰는 자연스러운 표현과 어휘, 문법을 익혀 구사력을 키워요.</p>
       </article>
     </div>
+
+    <p class="cur-note">Phonics와 Story를 완벽하게 한 뒤 비욘드 잉글리쉬의 표준 수업 방법에 따라 수업을 진행하면 위와 같은 결과를 보장합니다.</p>
   </div>
 </section>
 
