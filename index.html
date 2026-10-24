@@ -603,6 +603,8 @@
   .consent label{ display:flex; gap: 10px; align-items:flex-start; font-weight: 500; }
   .consent input{ margin-top: 4px; width: 18px; height: 18px; flex: 0 0 auto; }
   .consent details{ margin-top: 6px; font-size: 0.85rem; }
+  .privacy-note{ display:flex; gap:10px; align-items:flex-start; margin:0 0 12px; padding:12px 14px; background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); color:var(--ink); font-size:0.88rem; line-height:1.6; }
+  .privacy-note svg{ flex:0 0 auto; margin-top:3px; color:var(--accent-deep); }
   .consent .err{ display:none; color: var(--accent-deep); font-size: 0.82rem; margin: 6px 0 0; }
   .consent.invalid .err{ display:block; }
   .hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
@@ -993,11 +995,15 @@
         <div class="hp" aria-hidden="true"><label>비워 두세요<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
 
         <div class="consent" id="consentBox">
+          <p class="privacy-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            <span>보내 주신 상담 신청 내용은 상담 안내에만 사용하며, <strong>외부에 일체 제공하거나 공개하지 않아요.</strong></span>
+          </p>
           <label><input type="checkbox" id="f-consent" name="consent"> <span>상담을 위한 개인정보 수집·이용에 동의해요. <span class="req">*</span></span></label>
           <details>
             <summary>자세히 보기</summary>
             수집 항목: 보호자 성함, 연락처, 학생 이름·학년, 설문 응답 / 이용 목적: 상담 일정 안내 및 상담 진행 /
-            보관 기간: 상담 완료 후 <span class="todo">1년</span> 뒤 파기 / 동의하지 않으셔도 전화(051-502-3596)로 상담하실 수 있어요.
+            보관 기간: 상담 완료 후 <span class="todo">1년</span> 뒤 파기 / 제3자 제공: 없음 / 동의하지 않으셔도 전화(051-502-3596)로 상담하실 수 있어요.
           </details>
           <p class="err">개인정보 수집·이용에 동의해 주세요.</p>
         </div>
@@ -1195,6 +1201,19 @@ var CONFIG = {
   prevBtn.addEventListener('click', function(){ state.view = new Date(state.view.getFullYear(), state.view.getMonth() - 1, 1); renderCal(); });
   nextBtn.addEventListener('click', function(){ state.view = new Date(state.view.getFullYear(), state.view.getMonth() + 1, 1); renderCal(); });
 
+  // 학원 관리 화면의 공통 일정표에 상담 예약을 표시하기 위한 기록
+  // (같은 브라우저 미리보기용. 구글 시트를 연결하면 관리 화면이 시트에서 직접 불러와요)
+  var CONSULT_KEY = 'beyond-consult-v1';
+  function readConsults(){ try{ return JSON.parse(localStorage.getItem(CONSULT_KEY) || '[]'); }catch(e){ return []; } }
+  function saveConsult(data){
+    try{
+      var list = readConsults();
+      list.push({ date: data.date, time: data.time, grade: data.grade, kind: data.purpose, status: '대기' });
+      localStorage.setItem(CONSULT_KEY, JSON.stringify(list));
+    }catch(e){}
+  }
+  readConsults().forEach(function(c){ state.booked[c.date + ' ' + c.time] = true; });
+
   // 시트에 이미 들어온 예약 시간은 회색으로 막아요 (이름·전화번호는 받아오지 않아요)
   function loadBooked(){
     if(!CONFIG.SHEET_URL) return;
@@ -1317,6 +1336,8 @@ var CONFIG = {
     if(data.website) return; // 스팸 봇
 
     if(!CONFIG.SHEET_URL){
+      saveConsult(data);
+      state.booked[data.date + ' ' + data.time] = true;
       sendMail(data);
       status.textContent = '메일 작성 창이 열립니다. 내용을 확인 후 전송해 주세요. (수신: ' + CONFIG.CONTACT_EMAIL + ')';
       status.className = 'form-status ok';
@@ -1335,7 +1356,7 @@ var CONFIG = {
     })
       .then(function(r){ return r.json(); })
       .then(function(j){
-        if(j.ok){ showDone(data); return; }
+        if(j.ok){ saveConsult(data); showDone(data); return; }
         if(j.error === 'taken'){
           state.booked[data.date + ' ' + data.time] = true;
           state.time = '';

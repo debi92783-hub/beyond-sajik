@@ -39,25 +39,34 @@ function json_(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/** 이미 잡힌 예약 시간 목록 (이름·연락처는 내보내지 않아요) */
-function bookedKeys_(sh) {
+/** 이미 잡힌 예약 목록 (이름·연락처는 내보내지 않아요. 날짜·시간·상태·종류·학년만) */
+function bookedItems_(sh) {
   var last = sh.getLastRow();
   if (last < 2) return [];
-  var rows = sh.getRange(2, 2, last - 1, 4).getDisplayValues(); // 상태, 종류, 날짜, 시간
-  var today = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
+  var rows = sh.getRange(2, 2, last - 1, 8).getDisplayValues(); // 상태, 종류, 날짜, 시간, 성함, 연락처, 학생이름, 학년
+  var since = Utilities.formatDate(new Date(Date.now() - 62 * 864e5), 'Asia/Seoul', 'yyyy-MM-dd');
   var out = [];
   rows.forEach(function (r) {
     var status = r[0], date = r[2], time = r[3];
     if (status === '취소' || !date || !time) return;
-    if (date < today) return;
-    out.push(date + ' ' + time);
+    if (date < since) return;
+    out.push({ date: date, time: time, status: status, kind: r[1], grade: r[7] });
   });
   return out;
 }
 
+/** 지금부터 예약할 수 없는 시간 목록 */
+function bookedKeys_(sh) {
+  var today = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
+  return bookedItems_(sh).filter(function (b) { return b.date >= today; })
+    .map(function (b) { return b.date + ' ' + b.time; });
+}
+
 function doGet(e) {
   if (e && e.parameter && e.parameter.action === 'booked') {
-    return json_({ booked: bookedKeys_(getSheet_()) });
+    var sh = getSheet_();
+    // booked: 홈페이지 달력용, items: 학원 관리 화면 공통 일정표용
+    return json_({ booked: bookedKeys_(sh), items: bookedItems_(sh) });
   }
   return json_({ ok: true, msg: '비욘드 사직 상담 접수 서버가 켜져 있어요.' });
 }

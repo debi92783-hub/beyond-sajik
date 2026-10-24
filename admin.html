@@ -172,6 +172,7 @@
   .chk input{ width:15px; height:15px; margin:0; }
   .chk.common input{ accent-color:var(--accent); }
   .chk.mine input{ accent-color:var(--good); }
+  .chk.consult input{ accent-color:var(--warn); }
   .chk .sw{ width:9px; height:9px; border-radius:50%; }
   .btn.ghost{ background:var(--surface); color:var(--ink); border:1px solid var(--border); padding:8px 12px; }
   .plus{ width:40px; height:40px; padding:0; justify-content:center; border-radius:50%; font-size:22px; font-weight:500; line-height:1; }
@@ -192,6 +193,7 @@
   .ev{ font-size:11.5px; line-height:1.35; padding:2px 6px; border-radius:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
   .ev.common{ background:var(--accent-soft); color:var(--accent); }
   .ev.mine{ background:var(--good-soft); color:var(--good); }
+  .ev.consult{ background:var(--warn-soft); color:var(--warn); }
   .ev-more{ font-size:11px; color:var(--ink-soft); padding-left:4px; }
   .day-panel{ flex:1 1 260px; position:sticky; top:93px; }
   .day-panel h2{ margin-bottom:4px; }
@@ -238,6 +240,7 @@
     .cell .ev{ font-size:0; padding:0; height:6px; border-radius:3px; }
     .cell .ev.common{ background:var(--accent); }
     .cell .ev.mine{ background:var(--good); }
+    .cell .ev.consult{ background:var(--warn); }
     .cell .ev-more{ font-size:10px; padding:0; }
     .day-panel{ position:static; }
     .cal-title h1{ font-size:19px; min-width:120px; }
@@ -393,6 +396,7 @@
         <div class="cal-tools">
           <label class="chk common"><input type="checkbox" id="showCommon" checked><span class="sw" style="background:var(--accent)"></span>전체일정 보기</label>
           <label class="chk mine"><input type="checkbox" id="showMine" checked><span class="sw" style="background:var(--good)"></span>개인일정 보기</label>
+          <label class="chk consult"><input type="checkbox" id="showConsult" checked><span class="sw" style="background:var(--warn)"></span>상담 예약</label>
           <button class="btn plus" type="button" id="calAdd" aria-label="일정 추가" title="일정 추가">+</button>
         </div>
       </div>
@@ -408,7 +412,7 @@
           <button class="btn soft" type="button" id="dayAdd">+ 이 날에 일정 추가</button>
         </aside>
       </div>
-      <p class="sample-note">공통일정은 모든 선생님이 함께 보고, 개인일정은 쓴 사람만 봐요. 지금은 이 브라우저에만 저장되고, 구글 시트를 연결하면 모두에게 공유돼요. 처음 보이는 일정은 예시예요.</p>
+      <p class="sample-note">공통일정은 모든 선생님이 함께 보고, 개인일정은 쓴 사람만 봐요. 홈페이지에서 들어온 상담 예약은 날짜·시간·학년만 주황색으로 자동 표시되고, 보호자 이름과 연락처는 구글 시트에서만 볼 수 있어요. 지금은 이 브라우저에만 저장되고, 구글 시트를 연결하면 모두에게 공유돼요. 처음 보이는 일정은 예시예요.</p>
     </section>
   </main>
 </div>
@@ -437,6 +441,10 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+/* ===== 설정 ===== */
+// 안내 페이지(index.html)와 같은 구글 Apps Script 웹 앱 주소. 넣으면 상담 예약이 공통 일정표에 자동으로 떠요.
+var SHEET_URL = '';
+
 /* ===== 예시 데이터 (나중에 구글 시트에서 불러올 자리) ===== */
 var TEACHERS = ['박지은', '이수진', '최현우', '김민아'];
 var CLASSES = [
@@ -809,17 +817,45 @@ var EVENTS = (function(){
 })();
 function saveEvents(){ try{ localStorage.setItem(CAL_KEY, JSON.stringify(EVENTS)); }catch(e){} }
 
+// 상담 예약: 안내 페이지에서 신청된 예약을 공통 일정으로 보여 줘요 (지울 수 없고, 시트에서 '취소'로 바꾸면 사라져요)
+var CONSULT_KEY = 'beyond-consult-v1';
+var sheetConsults = [];
+function consultEvents(){
+  var local = [];
+  try{ local = JSON.parse(localStorage.getItem(CONSULT_KEY) || '[]'); }catch(e){}
+  var seen = {}, out = [];
+  sheetConsults.concat(local).forEach(function(c){
+    var k = c.date + ' ' + c.time;
+    if(seen[k] || !c.date || !c.time) return;
+    seen[k] = true;
+    out.push({ id:'consult-' + k, kind:'consult', date:c.date, time:c.time,
+      title:'상담 예약' + (c.grade ? ' · ' + c.grade : ''),
+      memo:(c.kind ? c.kind : '상담') + ' · ' + (c.status || '대기') + '\n보호자 이름과 연락처는 구글 시트에서 확인해요.',
+      owner:'홈페이지 신청' });
+  });
+  return out;
+}
+function loadSheetConsults(){
+  if(!SHEET_URL) return;
+  fetch(SHEET_URL + '?action=booked')
+    .then(function(r){ return r.json(); })
+    .then(function(j){ sheetConsults = j.items || []; if(state.page === 'calendar') renderCalendar(); })
+    .catch(function(){});
+}
+
 var calMonth = new Date(day.getFullYear(), day.getMonth(), 1);
 var selDate = ymd(day);
 
 function visibleEvents(dateStr){
-  var showC = $('showCommon').checked, showM = $('showMine').checked, who = me();
-  return EVENTS.filter(function(e){
+  var showC = $('showCommon').checked, showM = $('showMine').checked, showS = $('showConsult').checked, who = me();
+  var order = { consult:0, common:1, mine:2 };
+  return EVENTS.concat(showS ? consultEvents() : []).filter(function(e){
     if(e.date !== dateStr) return false;
+    if(e.kind === 'consult') return true;
     if(e.kind === 'common') return showC;
     return showM && e.owner === who;
   }).sort(function(a, b){
-    if(a.kind !== b.kind) return a.kind === 'common' ? -1 : 1;
+    if(a.kind !== b.kind) return order[a.kind] - order[b.kind];
     return (a.time || '99') < (b.time || '99') ? -1 : 1;
   });
 }
@@ -858,10 +894,12 @@ function renderDay(){
   $('dayTitle').textContent = (d.getMonth()+1) + '월 ' + d.getDate() + '일 ' + DAYS[d.getDay()] + '요일';
   $('dayOwner').textContent = me() + ' 화면으로 보는 중';
   $('dayList').innerHTML = evs.length ? evs.map(function(e){
-    return '<div class="day-item"><span class="bar-v" style="background:var('+(e.kind==='common'?'--accent':'--good')+')"></span><div class="body">' +
-      '<b>'+esc(e.title)+'</b><small>'+(e.kind==='common'?'공통일정':'개인일정')+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
+    var color = { common:'--accent', mine:'--good', consult:'--warn' }[e.kind];
+    var label = { common:'공통일정', mine:'개인일정', consult:'상담 예약' }[e.kind];
+    return '<div class="day-item"><span class="bar-v" style="background:var('+color+')"></span><div class="body">' +
+      '<b>'+esc(e.title)+'</b><small>'+label+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
       (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') + '</div>' +
-      '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">삭제</button></div>';
+      (e.kind === 'consult' ? '' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">삭제</button>') + '</div>';
   }).join('') : '<div class="empty">이 날은 일정이 없어요.</div>';
 }
 
@@ -880,6 +918,8 @@ $('calNext').addEventListener('click', function(){ calMonth.setMonth(calMonth.ge
 $('calToday').addEventListener('click', function(){ calMonth = new Date(day.getFullYear(), day.getMonth(), 1); selDate = ymd(day); renderCalendar(); });
 $('showCommon').addEventListener('change', renderCalendar);
 $('showMine').addEventListener('change', renderCalendar);
+$('showConsult').addEventListener('change', renderCalendar);
+window.addEventListener('storage', function(e){ if(e.key === CONSULT_KEY && state.page === 'calendar') renderCalendar(); });
 $('calAdd').addEventListener('click', function(){ openEvForm(selDate); });
 $('dayAdd').addEventListener('click', function(){ openEvForm(selDate); });
 
@@ -922,6 +962,7 @@ $('evForm').addEventListener('submit', function(e){
 
 /* ===== 시작 ===== */
 renderDirector();
+loadSheetConsults();
 (function(){
   var h = location.hash;
   if(h === '#calendar') setView('director', 'calendar');
