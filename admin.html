@@ -1282,7 +1282,7 @@ var DT_OPT = {
 };
 var DT_TONE = { '출석':'good','지참':'good','완료':'good', '지각':'mid','조퇴':'mid','기타':'mid','일부지참':'mid','일부완료':'mid', '결석':'bad','미지참':'bad','미완료':'bad' };
 var DT_SCORES = ['flash','self','inter','text'];
-/* 진도: 교재명 > 책진도. PHONIC은 BEYOND PHONICS 1~6 월간 수업계획표의 [단원]이에요. */
+/* 진도: 교재명 > 책진도. PHONICS는 BEYOND PHONICS 1~6 월간 수업계획표의 [단원]이에요. */
 var DT_BOOKS = (function(){
   var range = function(prefix, fmt){ var out = []; for(var v = 1; v <= 3; v++){ var g = []; for(var i = 1; i <= 10; i++) g.push(fmt(v, i)); out.push([v + '권', g]); } return out; };
   var ph = [
@@ -1298,7 +1298,7 @@ var DT_BOOKS = (function(){
   });
   var story = []; for(var v = 1; v <= 6; v++){ var g = []; for(var i = 1; i <= 5; i++) g.push('(' + v + '-unit' + i + ')'); story.push([v + '권', g]); }
   var fmt = function(v, i){ return '(' + v + '-' + i + ')'; };
-  return [ ['FUN PHONIC', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONIC', ph], ['STORY', story] ];
+  return [ ['FUN PHONICS', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONICS', ph], ['STORY', story] ];
 })();
 function bookItems(name){ var b = DT_BOOKS.find(function(x){ return x[0] === name; }); return b ? [].concat.apply([], b[1].map(function(g){ return g[1]; })) : []; }
 function progText(e){ return e.book && e.prog ? e.book + ' > ' + e.prog : (e.unit || ''); }
