@@ -227,36 +227,52 @@
   .modal-actions{ display:flex; justify-content:flex-end; gap:8px; }
   .form-err{ font-size:12.5px; color:var(--warn); min-height:1em; margin:0; }
   /* 데일리 테스트 */
-  .dt-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; margin-bottom:20px; }
+  .dt-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; margin-bottom:16px; }
   .dt-head .nav{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:700; }
   .dt-head .tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
-  .dt-head select, .dt-head input{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); }
-  .dt-head input{ width:56px; text-align:center; }
-  .dt-sum{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px; margin-bottom:20px; }
-  .dt-sum .card{ padding:16px 18px; }
-  .dt-sum b{ display:block; font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
-  .dt-sum span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
-  .dt-table{ font-size:13px; min-width:760px; }
-  .dt-table th{ padding:9px 8px; color:var(--ink-soft); font-weight:600; font-size:12px; border-bottom:1px solid var(--border); white-space:nowrap; }
-  .dt-table td{ padding:7px 8px; border-bottom:1px solid var(--border); }
-  .dt-table tr:last-child td{ border-bottom:0; }
-  .dt-table .nm{ font-weight:700; white-space:nowrap; }
-  .dt-table input[type=number]{ width:58px; font-size:13px; border:1px solid var(--border); border-radius:7px; padding:6px 6px; text-align:center; background:var(--surface); font-variant-numeric:tabular-nums; }
-  .dt-table input[type=text]{ width:100%; min-width:140px; font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface); }
-  .dt-table select{ font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 6px; background:var(--surface); font-weight:700; }
-  .dt-table select.s-done{ background:var(--good-soft); color:var(--good); }
-  .dt-table select.s-todo{ background:var(--warn-soft); color:var(--warn); }
-  .dt-table select.s-hold{ background:var(--hold-soft); color:var(--hold); }
-  .dt-table .of{ color:var(--ink-faint); font-size:12px; margin-left:3px; }
+  .dt-head select{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); }
+  .dt-lesson{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding:16px 18px; margin-bottom:16px; }
+  .dt-lesson label{ display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .dt-lesson input{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); }
+  .dt-sum{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:16px; }
+  .dt-sum .card{ padding:14px 16px; }
+  .dt-sum b{ display:block; font-size:20px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .dt-sum span{ display:block; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .dt-sum small{ display:block; margin-top:4px; font-size:11.5px; color:var(--ink-soft); line-height:1.5; }
+  .dt-sum small.warn{ color:var(--warn); font-weight:700; }
+  .dt-table{ font-size:12.5px; min-width:1080px; border-collapse:separate; border-spacing:0; }
+  .dt-table th{ padding:7px 5px; color:var(--ink-soft); font-weight:700; font-size:12px; border-bottom:1px solid var(--border); white-space:nowrap; text-align:center; background:var(--surface); }
+  .dt-table thead tr:first-child th{ border-bottom-color:transparent; }
+  .dt-table thead tr:first-child th[rowspan]{ border-bottom-color:var(--border); }
+  .dt-table th input{ width:40px; font-size:12px; border:1px solid var(--border); border-radius:6px; padding:3px 4px; text-align:center; background:var(--surface-soft); color:var(--ink); font-weight:700; }
+  .dt-table td{ padding:5px 4px; border-bottom:1px solid var(--border); text-align:center; background:var(--surface); }
+  .dt-table tbody tr:last-child td{ border-bottom:0; }
+  .dt-table .stick{ position:sticky; left:0; z-index:1; }
+  .dt-table .stick2{ position:sticky; left:34px; z-index:1; box-shadow:1px 0 0 var(--border); }
+  .dt-table .nm{ font-weight:700; white-space:nowrap; text-align:left; padding-left:8px; padding-right:10px; }
+  .dt-table .grp{ border-left:1px solid var(--border); }
+  .dt-table input[type=number]{ width:48px; font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; text-align:center; background:var(--surface); color:var(--ink); font-variant-numeric:tabular-nums; }
+  .dt-table input[type=text]{ width:100%; min-width:120px; font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface); color:var(--ink); }
+  .dt-table input.att-note{ min-width:0; width:46px; margin-top:4px; padding:4px; text-align:center; }
+  .dt-table select{ font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; background:var(--surface); color:var(--ink); font-weight:700; }
   .dt-table .low input{ border-color:var(--warn); color:var(--warn); font-weight:700; }
-  .dt-table select.lv-상{ color:var(--good); } .dt-table select.lv-하{ color:var(--warn); }
+  .dt-table select.v-good{ background:var(--good-soft); color:var(--good); }
+  .dt-table select.v-mid{ background:var(--hold-soft); color:var(--hold); }
+  .dt-table select.v-bad{ background:var(--warn-soft); color:var(--warn); }
   .dt-table input[type=checkbox]{ width:16px; height:16px; accent-color:var(--accent); }
+  .dt-table tr.absent td:not(.stick):not(.stick2):not(.keep){ opacity:.4; }
   .dt-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-  .dt-msgs{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px; margin-top:14px; }
-  .dt-msg{ background:var(--surface-soft); border:1px solid var(--border); border-radius:12px; padding:14px 16px; font-size:12.5px; line-height:1.65; display:flex; flex-direction:column; gap:10px; }
-  .dt-msg textarea{ width:100%; min-height:230px; border:1px solid var(--border); border-radius:8px; padding:10px; font:inherit; font-size:12.5px; line-height:1.6; background:var(--surface); color:var(--ink); resize:vertical; }
-  .dt-msg .row{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
-  .dt-msg b{ font-size:13px; }
+  .dt-cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:14px; margin-top:14px; }
+  .rc{ border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface); }
+  .rc table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .rc th, .rc td{ border-bottom:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; line-height:1.5; }
+  .rc th{ width:62px; background:var(--surface-soft); color:var(--ink-soft); font-weight:700; text-align:center; white-space:nowrap; }
+  .rc tr:last-child th, .rc tr:last-child td{ border-bottom:0; }
+  .rc .opt{ color:var(--ink-faint); }
+  .rc .opt.on{ color:var(--accent); font-weight:800; }
+  .rc .top td{ font-weight:800; font-size:13.5px; }
+  .rc .foot{ display:flex; justify-content:flex-end; padding:8px 10px; background:var(--surface-soft); border-top:1px solid var(--border); }
+  @media (max-width: 720px){ .dt-lesson{ grid-template-columns:1fr; } }
 
   /* 로그인 */
   .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
@@ -497,40 +513,58 @@
 
     <!-- 데일리 테스트 -->
     <section id="view-daily" hidden>
-      <div class="greet"><div><h1>데일리 테스트</h1><p>반별로 오늘 단어·듣기 점수와 말하기·쓰기·숙제를 입력하고, 학부모 알림 문구를 만들어요.</p></div></div>
+      <div class="greet"><div><h1>데일리 테스트</h1><p>점검표 항목대로 학생별로 입력하면 반 집계와 개인 리포트가 함께 만들어져요.</p></div></div>
       <div class="card dt-head">
         <div class="nav">
           <button class="sq" type="button" id="dtPrev" aria-label="이전 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button>
           <span id="dtDay"></span>
           <button class="sq" type="button" id="dtNext" aria-label="다음 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
         </div>
-        <div class="tools">
-          <label>반 <select id="dtClass" aria-label="반 선택"></select></label>
-          <label>단어 만점 <input type="number" id="dtWordMax" min="1" max="200" inputmode="numeric"></label>
-          <label>듣기 만점 <input type="number" id="dtListenMax" min="1" max="200" inputmode="numeric"></label>
-        </div>
+        <div class="tools"><label>반 <select id="dtClass" aria-label="반 선택"></select></label></div>
       </div>
       <div class="card" id="dtEmpty" hidden><h2>담당 반이 없어요</h2><p class="muted" style="margin:8px 0 0">원장님이 담당 반을 정해 주면 여기에서 입력할 수 있어요.</p></div>
       <div id="dtBody">
+        <div class="card dt-lesson">
+          <label>진도 <input type="text" id="dtUnit" placeholder="예: UNIT 1"></label>
+          <label>숙제 · SB <input type="text" id="dtSb" placeholder="예: P15-16"></label>
+          <label>숙제 · PB <input type="text" id="dtPb" placeholder="예: P11-13"></label>
+        </div>
         <div class="dt-sum" id="dtSum"></div>
         <div class="card">
-          <div class="card-head"><h2>학생별 입력 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved">입력하면 바로 저장돼요</span></div>
+          <div class="card-head"><h2>학생별 점검표 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved">입력하면 바로 저장돼요</span></div>
+          <p class="muted" style="margin:0 0 10px">괄호 안 숫자는 만점이에요. 단어는 통과 점수 이상이면 '완료'가 자동으로 체크돼요.</p>
           <div class="table-wrap">
             <table class="dt-table">
-              <thead><tr><th><input type="checkbox" id="dtAll" checked aria-label="전체 선택"></th><th>이름</th><th>단어</th><th>듣기</th><th>말하기</th><th>쓰기</th><th>숙제</th><th>선생님 메모 (알림에 들어가요)</th></tr></thead>
+              <thead>
+                <tr>
+                  <th rowspan="2" class="stick"><input type="checkbox" id="dtAll" checked aria-label="전체 선택"></th>
+                  <th rowspan="2" class="stick2" style="text-align:left;padding-left:8px">이름</th>
+                  <th rowspan="2" class="grp">출결</th><th rowspan="2">교재</th><th rowspan="2">숙제</th><th rowspan="2">Speaking</th>
+                  <th rowspan="2" class="grp">flash (<input type="number" data-max="flash" aria-label="flash 만점">)</th>
+                  <th rowspan="2">self (<input type="number" data-max="self" aria-label="self 만점">)</th>
+                  <th rowspan="2">inter (<input type="number" data-max="inter" aria-label="inter 만점">)</th>
+                  <th rowspan="2">본문 (<input type="number" data-max="text" aria-label="본문 만점">)</th>
+                  <th colspan="4" class="grp">단어 (<input type="number" data-max="word" aria-label="단어 만점">) · 통과 <input type="number" id="dtPass" aria-label="단어 통과 점수"></th>
+                  <th rowspan="2" class="grp">NOTE (기타사항)</th>
+                </tr>
+                <tr><th class="grp">1회</th><th>2회</th><th>3회</th><th>완료</th></tr>
+              </thead>
               <tbody id="dtRows"></tbody>
             </table>
           </div>
           <div class="dt-actions">
-            <button class="btn soft" type="button" id="dtHwAll">숙제 모두 완료로</button>
-            <button class="btn" type="button" id="dtMake">체크한 학생 알림 문구 만들기</button>
+            <button class="btn soft" type="button" data-bulk="att">모두 출석</button>
+            <button class="btn soft" type="button" data-bulk="book">교재 모두 지참</button>
+            <button class="btn soft" type="button" data-bulk="hw">숙제 모두 완료</button>
+            <button class="btn soft" type="button" data-bulk="spk">Speaking 모두 완료</button>
+            <button class="btn" type="button" id="dtMake">체크한 학생 개인 리포트 만들기</button>
           </div>
         </div>
         <div class="card" id="dtMsgCard" hidden style="margin-top:20px">
-          <div class="card-head"><h2>학부모 알림 문구</h2><span class="muted">보내기 전에 고칠 수 있어요</span></div>
-          <p class="muted" style="margin:0">점수와 메모로 자동으로 만든 문구예요. 나중에 AI를 연결하면 학생마다 더 자연스러운 문장으로 바꿔 줄 거예요.</p>
-          <div class="dt-msgs" id="dtMsgs"></div>
-          <div class="dt-actions"><button class="btn" type="button" id="dtSend">문구 전체 발송</button></div>
+          <div class="card-head"><h2>개인 리포트</h2><span class="muted">점검표에서 고치면 다시 만들어 주세요</span></div>
+          <p class="muted" style="margin:0">학부모님께 보내는 개인 리포트 양식이에요. '문자용 복사'를 누르면 문자·카톡에 붙여 넣을 글로 복사돼요.</p>
+          <div class="dt-cards" id="dtMsgs"></div>
+          <div class="dt-actions"><button class="btn" type="button" id="dtSend">리포트 전체 발송</button></div>
         </div>
       </div>
     </section>
@@ -1231,38 +1265,63 @@ $('evForm').addEventListener('submit', function(e){
 });
 
 /* ===== 데일리 테스트 =====
+   원장님 점검표 양식(출결·교재·숙제·Speaking / flash·self·inter·본문 / 단어 1~3회·완료 / NOTE).
    시안용: 이 브라우저(localStorage)에 반|날짜별로 저장해요. */
-var DT_KEY = 'beyond-daily-v1';
+var DT_KEY = 'beyond-daily-v2';
+var DT_OPT = {
+  att:  ['출석','지각','결석','조퇴','기타'],
+  book: ['지참','일부지참','미지참'],
+  hw:   ['완료','일부완료','미완료'],
+  spk:  ['완료','미완료']
+};
+var DT_TONE = { '출석':'good','지참':'good','완료':'good', '지각':'mid','조퇴':'mid','기타':'mid','일부지참':'mid','일부완료':'mid', '결석':'bad','미지참':'bad','미완료':'bad' };
+var DT_SCORES = ['flash','self','inter','text'];
+var DT_LABEL = { flash:'flash', self:'self', inter:'inter', text:'본문' };
 var dtStore = (function(){ try{ return JSON.parse(localStorage.getItem(DT_KEY) || '{}'); }catch(e){ return {}; } })();
 var dtDay = new Date(); dtDay.setHours(0,0,0,0);
 var dtClassId = null;
 function dtSave(){ try{ localStorage.setItem(DT_KEY, JSON.stringify(dtStore)); }catch(e){} }
 function dtClasses(){ return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher; }); }
 function dtCls(){ return CLASSES.find(function(c){ return c.id === dtClassId; }); }
+function dtNewRow(){ return { on:true, att:'출석', attNote:'', book:'지참', hw:'완료', spk:'완료', flash:'', self:'', inter:'', text:'', w1:'', w2:'', w3:'', wDone:false, memo:'' }; }
 function dtEntry(){
   var c = dtCls(), k = c.id + '|' + ymd(dtDay);
   if(!dtStore[k]){
-    var rows = {};
-    c.students.forEach(function(s){ rows[s] = { on:true, word:'', listen:'', speak:'', write:'', hw:'완료', memo:'' }; });
-    dtStore[k] = { wordMax:20, listenMax:10, rows:rows, sent:0 };
+    // 반 설정(만점·통과 점수)은 그 반의 가장 최근 기록을 이어 받아요.
+    var last = Object.keys(dtStore).filter(function(x){ return x.indexOf(c.id + '|') === 0; }).sort().pop();
+    var prev = last ? dtStore[last] : null;
+    dtStore[k] = { unit:'', sb:'', pb:'', sent:0,
+      max: prev ? JSON.parse(JSON.stringify(prev.max)) : { flash:10, self:10, inter:10, text:10, word:20 },
+      pass: prev ? prev.pass : 18, rows:{} };
   }
   var e = dtStore[k];
-  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = { on:true, word:'', listen:'', speak:'', write:'', hw:'완료', memo:'' }; });
+  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = dtNewRow(); });
   return e;
 }
 function num(v){ return v === '' || v == null || isNaN(+v) ? null : +v; }
 function avg(list){ return list.length ? list.reduce(function(a, b){ return a + b; }, 0) / list.length : null; }
-function dtStats(e, names){
-  var w = [], l = [], hw = 0, retest = [];
-  names.forEach(function(s){
-    var r = e.rows[s], wv = num(r.word), lv = num(r.listen);
-    if(wv !== null){ w.push(wv); if(wv / e.wordMax < 0.7) retest.push(s); }
-    if(lv !== null) l.push(lv);
-    if(r.hw === '완료') hw++;
-  });
-  return { taken:w.length, wAvg:avg(w), lAvg:avg(l), hwRate: names.length ? Math.round(hw / names.length * 100) : 0, retest:retest };
-}
 function one(n){ return n === null ? '–' : (Math.round(n * 10) / 10).toString(); }
+function tone(v){ return DT_TONE[v] ? 'v-' + DT_TONE[v] : ''; }
+function wordTries(r){ return [r.w1, r.w2, r.w3].map(num).filter(function(v){ return v !== null; }); }
+
+function dtStats(e, names){
+  var st = { att:{}, book:{}, hw:{}, spk:{}, noBook:[], hwMiss:[], wordTodo:[], wordDone:0, w1:[], avg:{} };
+  DT_SCORES.forEach(function(f){ st.avg[f] = []; });
+  ['att','book','hw','spk'].forEach(function(f){ DT_OPT[f].forEach(function(o){ st[f][o] = 0; }); });
+  names.forEach(function(s){
+    var r = e.rows[s];
+    st.att[r.att]++;
+    if(r.att === '결석') return;
+    st.book[r.book]++; st.hw[r.hw]++; st.spk[r.spk]++;
+    if(r.book !== '지참') st.noBook.push(s + (r.book === '일부지참' ? '(일부)' : ''));
+    if(r.hw !== '완료') st.hwMiss.push(s + (r.hw === '일부완료' ? '(일부)' : ''));
+    DT_SCORES.forEach(function(f){ var v = num(r[f]); if(v !== null) st.avg[f].push(v); });
+    var w1 = num(r.w1); if(w1 !== null) st.w1.push(w1);
+    if(r.wDone) st.wordDone++; else if(wordTries(r).length) st.wordTodo.push(s);
+  });
+  st.present = names.length - st.att['결석'];
+  return st;
+}
 
 function renderDaily(){
   fillTeacherPick();
@@ -1277,73 +1336,105 @@ function renderDaily(){
   $('dtClass').innerHTML = list.map(function(c){ return '<option value="'+c.id+'"'+(c.id===dtClassId?' selected':'')+'>'+esc(c.name)+(state.view==='director'?' · '+esc(c.teacher):'')+'</option>'; }).join('');
   var c = dtCls(), e = dtEntry();
   $('dtClassName').textContent = c.name + ' · ' + c.students.length + '명';
-  $('dtWordMax').value = e.wordMax;
-  $('dtListenMax').value = e.listenMax;
-  var lvOpt = function(v){ return ['','상','중','하'].map(function(o){ return '<option value="'+o+'"'+(o===v?' selected':'')+'>'+(o||'–')+'</option>'; }).join(''); };
+  $('dtUnit').value = e.unit; $('dtSb').value = e.sb; $('dtPb').value = e.pb;
+  document.querySelectorAll('#view-daily [data-max]').forEach(function(i){ i.value = e.max[i.dataset.max]; });
+  $('dtPass').value = e.pass;
+  var sel = function(f, v, s){ return '<select data-f="'+f+'" class="'+tone(v)+'" aria-label="'+esc(s)+' '+f+'">'+DT_OPT[f].map(function(o){ return '<option'+(o===v?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'; };
+  var score = function(f, r, s, max, first){
+    var v = num(r[f]), low = v !== null && v / max < 0.7;
+    return '<td class="'+(first?'grp':'')+(low?' low':'')+'"><input type="number" data-f="'+f+'" min="0" max="'+max+'" inputmode="numeric" value="'+esc(r[f])+'" aria-label="'+esc(s)+' '+(DT_LABEL[f]||f)+'"></td>';
+  };
   $('dtRows').innerHTML = c.students.map(function(s){
-    var r = e.rows[s], wv = num(r.word), low = wv !== null && wv / e.wordMax < 0.7;
-    return '<tr data-name="'+esc(s)+'">' +
-      '<td><input type="checkbox" data-f="on"'+(r.on?' checked':'')+' aria-label="'+esc(s)+' 선택"></td>' +
-      '<td class="nm">'+esc(s)+'</td>' +
-      '<td'+(low?' class="low"':'')+'><input type="number" data-f="word" min="0" max="'+e.wordMax+'" inputmode="numeric" value="'+esc(r.word)+'" aria-label="'+esc(s)+' 단어 점수"><span class="of">/'+e.wordMax+'</span></td>' +
-      '<td><input type="number" data-f="listen" min="0" max="'+e.listenMax+'" inputmode="numeric" value="'+esc(r.listen)+'" aria-label="'+esc(s)+' 듣기 점수"><span class="of">/'+e.listenMax+'</span></td>' +
-      '<td><select data-f="speak" class="lv-'+r.speak+'" aria-label="'+esc(s)+' 말하기">'+lvOpt(r.speak)+'</select></td>' +
-      '<td><select data-f="write" class="lv-'+r.write+'" aria-label="'+esc(s)+' 쓰기">'+lvOpt(r.write)+'</select></td>' +
-      '<td><select data-f="hw" class="'+hwClass(r.hw)+'" aria-label="'+esc(s)+' 숙제">'+['완료','일부','미완료'].map(function(o){ return '<option'+(o===r.hw?' selected':'')+'>'+o+'</option>'; }).join('')+'</select></td>' +
-      '<td><input type="text" data-f="memo" value="'+esc(r.memo)+'" placeholder="예: 발음이 많이 좋아졌어요" aria-label="'+esc(s)+' 메모"></td></tr>';
+    var r = e.rows[s], note = r.att === '지각' || r.att === '기타';
+    return '<tr data-name="'+esc(s)+'"'+(r.att==='결석'?' class="absent"':'')+'>' +
+      '<td class="stick"><input type="checkbox" data-f="on"'+(r.on?' checked':'')+' aria-label="'+esc(s)+' 선택"></td>' +
+      '<td class="nm stick2">'+esc(s)+'</td>' +
+      '<td class="grp keep">'+sel('att', r.att, s)+(note?'<br><input type="text" class="att-note" data-f="attNote" value="'+esc(r.attNote)+'" placeholder="'+(r.att==='지각'?'분':'사유')+'" aria-label="'+esc(s)+' 출결 메모">':'')+'</td>' +
+      '<td>'+sel('book', r.book, s)+'</td><td>'+sel('hw', r.hw, s)+'</td><td>'+sel('spk', r.spk, s)+'</td>' +
+      score('flash', r, s, e.max.flash, true) + score('self', r, s, e.max.self) + score('inter', r, s, e.max.inter) + score('text', r, s, e.max.text) +
+      score('w1', r, s, e.max.word, true) + score('w2', r, s, e.max.word) + score('w3', r, s, e.max.word) +
+      '<td><input type="checkbox" data-f="wDone"'+(r.wDone?' checked':'')+' aria-label="'+esc(s)+' 단어 완료"></td>' +
+      '<td class="grp keep"><input type="text" data-f="memo" value="'+esc(r.memo)+'" placeholder="기타사항" aria-label="'+esc(s)+' NOTE"></td></tr>';
   }).join('');
   $('dtAll').checked = c.students.every(function(s){ return e.rows[s].on; });
   $('dtMsgCard').hidden = true;
   renderDtSum();
 }
 function renderDtSum(){
-  var c = dtCls(), e = dtEntry(), st = dtStats(e, c.students);
+  var c = dtCls(), e = dtEntry(), st = dtStats(e, c.students), n = st.present;
+  var rate = function(o){ return n ? Math.round(o['완료'] / n * 100) + '%' : '–'; };
   var cards = [
-    [st.taken + ' / ' + c.students.length + '명', '단어 시험 응시'],
-    [one(st.wAvg) + (st.wAvg === null ? '' : ' / ' + e.wordMax), '단어 반 평균'],
-    [one(st.lAvg) + (st.lAvg === null ? '' : ' / ' + e.listenMax), '듣기 반 평균'],
-    [st.hwRate + '%', '숙제 완료율'],
-    [st.retest.length + '명', '단어 재시험 대상 (70% 미만)']
+    [st.att['출석'] + ' / ' + c.students.length + '명', '출석', ['지각','결석','조퇴','기타'].filter(function(o){ return st.att[o]; }).map(function(o){ return o + ' ' + st.att[o]; }).join(' · ') || '모두 출석', false],
+    [st.noBook.length + '명', '교재 미지참', st.noBook.join(', ') || '모두 지참', st.noBook.length > 0],
+    [rate(st.hw), '숙제 완료율', st.hwMiss.length ? st.hwMiss.join(', ') : '모두 완료', st.hwMiss.length > 0],
+    [rate(st.spk), 'Speaking 완료율', st.spk['미완료'] ? '미완료 ' + st.spk['미완료'] + '명' : '모두 완료', st.spk['미완료'] > 0],
+    [DT_SCORES.map(function(f){ return one(avg(st.avg[f])); }).join(' · '), 'flash · self · inter · 본문 평균', DT_SCORES.map(function(f){ return DT_LABEL[f] + '/' + e.max[f]; }).join(' · '), false],
+    [st.wordDone + ' / ' + n + '명', '단어 완료 (1회 평균 ' + one(avg(st.w1)) + ')', st.wordTodo.length ? '재시험: ' + st.wordTodo.join(', ') : '재시험 대상 없음', st.wordTodo.length > 0]
   ];
-  $('dtSum').innerHTML = cards.map(function(k, i){
-    var warn = i === 4 && st.retest.length;
-    return '<div class="card"><b'+(warn?' style="color:var(--warn)"':'')+'>'+k[0]+'</b><span>'+k[1]+'</span>'+(warn?'<span style="display:block;margin-top:4px">'+esc(st.retest.join(', '))+'</span>':'')+'</div>';
+  $('dtSum').innerHTML = cards.map(function(k){
+    return '<div class="card"><b>'+k[0]+'</b><span>'+k[1]+'</span><small'+(k[3]?' class="warn"':'')+'>'+esc(k[2])+'</small></div>';
   }).join('');
-  $('dtSaved').textContent = e.sent ? '저장됨 · 오늘 ' + e.sent + '명에게 발송했어요' : '입력하면 바로 저장돼요';
+  $('dtSaved').textContent = e.sent ? '저장됨 · 오늘 ' + e.sent + '명에게 리포트를 보냈어요' : '입력하면 바로 저장돼요';
 }
 
-function dtMessage(s, e, st){
-  var r = e.rows[s], wv = num(r.word), lv = num(r.listen), lines = [];
-  lines.push('[비욘드 잉글리쉬 사직] ' + (dtDay.getMonth()+1) + '월 ' + dtDay.getDate() + '일 (' + DAYS[dtDay.getDay()] + ') 데일리 테스트');
-  lines.push(s + ' 학생의 오늘 결과를 알려 드려요.');
-  lines.push('');
-  if(wv !== null) lines.push('· 단어: ' + wv + ' / ' + e.wordMax + '점' + (st.wAvg !== null ? ' (반 평균 ' + one(st.wAvg) + '점)' : ''));
-  if(lv !== null) lines.push('· 듣기: ' + lv + ' / ' + e.listenMax + '점');
-  if(r.speak || r.write) lines.push('· ' + [r.speak ? '말하기: ' + r.speak : '', r.write ? '쓰기: ' + r.write : ''].filter(Boolean).join(' / '));
-  lines.push('· 숙제: ' + r.hw);
-  var notes = [];
-  if(wv !== null){
-    var p = wv / e.wordMax;
-    if(p >= 0.9) notes.push('단어를 아주 꼼꼼하게 외워 왔어요.');
-    else if(p >= 0.7) notes.push('단어를 잘 준비해 왔어요. 틀린 단어만 한 번 더 복습하면 좋겠어요.');
-    else notes.push('오늘 틀린 단어는 다음 수업 때 재시험을 볼 예정이에요. 집에서 한 번 더 외워 오도록 함께 챙겨 주세요.');
+/* 개인 리포트 (원장님 리포트 양식) */
+function dtDateText(){ return (dtDay.getMonth()+1) + '월 ' + dtDay.getDate() + '일'; }
+function attText(r){ return r.att + (r.attNote && (r.att === '지각' || r.att === '기타') ? '(' + r.attNote + (r.att === '지각' && /^\d+$/.test(r.attNote) ? '분' : '') + ')' : ''); }
+function wordText(r, e){
+  var parts = [r.w1, r.w2, r.w3].map(function(v, i){ return num(v) === null ? null : (i+1) + '회 ' + v + '/' + e.max.word; }).filter(Boolean);
+  return (parts.join(', ') || '응시 전') + (r.wDone ? ' → 완료' : parts.length ? ' → 재시험 예정' : '');
+}
+function hwRange(e){ return [e.sb ? 'SB: ' + e.sb : '', e.pb ? 'PB: ' + e.pb : ''].filter(Boolean).join('  '); }
+function opts(f, v){ return DT_OPT[f].map(function(o){ return '<span class="opt'+(o===v?' on':'')+'">'+o+'</span>'; }).join(', '); }
+function dtCard(s, e){
+  var c = dtCls(), r = e.rows[s];
+  var attLine = DT_OPT.att.map(function(o){ var on = o === r.att; return '<span class="opt'+(on?' on':'')+'">'+(on ? esc(attText(r)) : o)+'</span>'; }).join(', ');
+  var rows = r.att === '결석' ? [['출결', attLine], ['진도', esc(e.unit || '–')], ['숙제', esc(hwRange(e) || '–')], ['기타<br>사항', esc(r.memo || '')]] : [
+    ['출결', attLine],
+    ['교재', opts('book', r.book)],
+    ['숙제', opts('hw', r.hw) + ' // Speaking (' + opts('spk', r.spk) + ')'],
+    ['단어', esc(wordText(r, e))],
+    ['진도', esc(e.unit || '–')],
+    ['숙제', esc(hwRange(e) || '–')],
+    ['기타<br>사항', esc(r.memo || '')]
+  ];
+  return '<div class="rc" data-name="'+esc(s)+'"><table>' +
+    '<tr class="top"><th>이름</th><td>'+esc(s)+'</td></tr>' +
+    '<tr><th>반/담임</th><td>'+esc(c.name)+' · '+esc(c.teacher)+' 선생님</td></tr>' +
+    '<tr><th>날짜</th><td>'+dtDateText()+' ('+DAYS[dtDay.getDay()]+')</td></tr>' +
+    rows.map(function(x){ return '<tr><th>'+x[0]+'</th><td>'+x[1]+'</td></tr>'; }).join('') +
+    '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button></div></div>';
+}
+function dtText(s, e){
+  var c = dtCls(), r = e.rows[s], L = [];
+  L.push('[비욘드 잉글리쉬 사직] ' + dtDateText() + ' (' + DAYS[dtDay.getDay()] + ') 데일리 리포트');
+  L.push('이름: ' + s + ' (' + c.name + ' · ' + c.teacher + ' 선생님)');
+  L.push('출결: ' + attText(r));
+  if(r.att !== '결석'){
+    L.push('교재: ' + r.book);
+    L.push('숙제: ' + r.hw + ' / Speaking: ' + r.spk);
+    L.push('단어: ' + wordText(r, e));
   }
-  if(r.hw === '미완료') notes.push('숙제를 아직 하지 못했어요. 다음 수업 전까지 마무리할 수 있도록 확인 부탁드려요.');
-  else if(r.hw === '일부') notes.push('숙제를 일부만 해 왔어요. 남은 부분을 마무리할 수 있도록 확인 부탁드려요.');
-  if(r.memo.trim()) notes.push(r.memo.trim());
-  if(notes.length){ lines.push(''); lines.push(notes.join(' ')); }
-  lines.push('');
-  lines.push('감사합니다. — ' + dtCls().teacher + ' 선생님');
-  return lines.join('\n');
+  if(e.unit) L.push('진도: ' + e.unit);
+  if(hwRange(e)) L.push('숙제: ' + hwRange(e));
+  if(r.memo.trim()) L.push('기타사항: ' + r.memo.trim());
+  return L.join('\n');
 }
 
 $('dtRows').addEventListener('input', function(ev){
   var el = ev.target, f = el.dataset.f; if(!f) return;
   var tr = el.closest('tr'), e = dtEntry(), r = e.rows[tr.dataset.name];
-  r[f] = f === 'on' ? el.checked : el.value;
-  if(f === 'word'){ var wv = num(el.value); el.parentNode.className = wv !== null && wv / e.wordMax < 0.7 ? 'low' : ''; }
-  if(f === 'speak' || f === 'write') el.className = 'lv-' + el.value;
-  if(f === 'hw') el.className = hwClass(el.value);
+  r[f] = el.type === 'checkbox' ? el.checked : el.value;
+  if(DT_OPT[f]) el.className = tone(el.value);
+  if(f === 'att'){ dtSave(); renderDaily(); return; }
+  if(/^w[123]$/.test(f) || DT_SCORES.indexOf(f) !== -1){
+    var v = num(el.value), max = /^w/.test(f) ? e.max.word : e.max[f];
+    el.parentNode.classList.toggle('low', v !== null && v / max < 0.7);
+  }
+  if(/^w[123]$/.test(f)){
+    r.wDone = wordTries(r).some(function(v){ return v >= e.pass; });
+    tr.querySelector('[data-f=wDone]').checked = r.wDone;
+  }
   if(f === 'on') $('dtAll').checked = dtCls().students.every(function(s){ return e.rows[s].on; });
   dtSave(); renderDtSum();
 });
@@ -1352,38 +1443,48 @@ $('dtAll').addEventListener('change', function(){
   dtCls().students.forEach(function(s){ e.rows[s].on = on; });
   dtSave(); renderDaily();
 });
-$('dtHwAll').addEventListener('click', function(){
-  var e = dtEntry();
-  dtCls().students.forEach(function(s){ e.rows[s].hw = '완료'; });
-  dtSave(); renderDaily(); toast('숙제를 모두 완료로 바꿨어요.');
+document.querySelectorAll('#view-daily [data-bulk]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var f = b.dataset.bulk, e = dtEntry();
+    dtCls().students.forEach(function(s){ var r = e.rows[s]; if(f === 'att' || r.att !== '결석') r[f] = DT_OPT[f][0]; });
+    dtSave(); renderDaily(); toast({ att:'모두 출석으로', book:'교재를 모두 지참으로', hw:'숙제를 모두 완료로', spk:'Speaking을 모두 완료로' }[f] + ' 바꿨어요.' + (f !== 'att' ? ' 결석한 학생은 그대로 둬요.' : ''));
+  });
 });
-['dtWordMax', 'dtListenMax'].forEach(function(id){
-  $(id).addEventListener('change', function(){
-    var v = Math.max(1, Math.min(200, parseInt(this.value, 10) || 1));
-    dtEntry()[id === 'dtWordMax' ? 'wordMax' : 'listenMax'] = v;
+document.querySelectorAll('#view-daily [data-max]').forEach(function(i){
+  i.addEventListener('change', function(){
+    var e = dtEntry(), v = Math.max(1, Math.min(200, parseInt(this.value, 10) || 1));
+    e.max[this.dataset.max] = v;
+    if(this.dataset.max === 'word' && e.pass > v) e.pass = v;
     dtSave(); renderDaily();
   });
+});
+$('dtPass').addEventListener('change', function(){
+  var e = dtEntry();
+  e.pass = Math.max(0, Math.min(e.max.word, parseInt(this.value, 10) || 0));
+  dtCls().students.forEach(function(s){ var r = e.rows[s]; if(wordTries(r).length) r.wDone = wordTries(r).some(function(v){ return v >= e.pass; }); });
+  dtSave(); renderDaily();
+});
+[['dtUnit','unit'],['dtSb','sb'],['dtPb','pb']].forEach(function(x){
+  $(x[0]).addEventListener('input', function(){ dtEntry()[x[1]] = this.value; dtSave(); });
 });
 $('dtClass').addEventListener('change', function(){ dtClassId = this.value; renderDaily(); });
 $('dtPrev').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() - 1); renderDaily(); });
 $('dtNext').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() + 1); renderDaily(); });
 $('dtMake').addEventListener('click', function(){
-  var c = dtCls(), e = dtEntry(), st = dtStats(e, c.students);
+  var c = dtCls(), e = dtEntry();
   var picked = c.students.filter(function(s){ return e.rows[s].on; });
-  if(!picked.length){ toast('알림을 보낼 학생을 먼저 체크해 주세요.'); return; }
-  $('dtMsgs').innerHTML = picked.map(function(s){
-    return '<div class="dt-msg" data-name="'+esc(s)+'"><div class="row"><b>'+esc(s)+' 학부모님</b><button class="btn soft" type="button" data-copy>복사</button></div><textarea aria-label="'+esc(s)+' 알림 문구">'+esc(dtMessage(s, e, st))+'</textarea></div>';
-  }).join('');
-  $('dtSend').textContent = picked.length + '명에게 문구 발송';
+  if(!picked.length){ toast('리포트를 만들 학생을 먼저 체크해 주세요.'); return; }
+  $('dtMsgs').innerHTML = picked.map(function(s){ return dtCard(s, e); }).join('');
+  $('dtSend').textContent = picked.length + '명에게 리포트 발송';
   $('dtMsgCard').hidden = false;
   $('dtMsgCard').scrollIntoView({ behavior:'smooth', block:'start' });
 });
 $('dtMsgs').addEventListener('click', function(ev){
   var b = ev.target.closest('[data-copy]'); if(!b) return;
-  var ta = b.closest('.dt-msg').querySelector('textarea');
-  var done = function(){ toast('문구를 복사했어요. 문자나 카톡에 붙여 넣으면 돼요.'); };
-  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function(){ ta.select(); document.execCommand('copy'); done(); });
-  else { ta.select(); document.execCommand('copy'); done(); }
+  var text = dtText(b.closest('.rc').dataset.name, dtEntry());
+  var done = function(){ toast('리포트를 글로 복사했어요. 문자나 카톡에 붙여 넣으면 돼요.'); };
+  var fallback = function(){ var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); }catch(err){} t.remove(); done(); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
 });
 $('dtSend').addEventListener('click', function(){
   var n = $('dtMsgs').children.length, e = dtEntry();
