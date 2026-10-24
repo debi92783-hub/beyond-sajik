@@ -194,6 +194,9 @@
   .ev.common{ background:var(--accent-soft); color:var(--accent); }
   .ev.mine{ background:var(--good-soft); color:var(--good); }
   .ev.consult{ background:var(--warn-soft); color:var(--warn); }
+  .ev.cont-l{ border-top-left-radius:0; border-bottom-left-radius:0; margin-left:-7px; padding-left:13px; }
+  .ev.cont-r{ border-top-right-radius:0; border-bottom-right-radius:0; margin-right:-7px; }
+  .ev.gap{ visibility:hidden; }
   .ev-more{ font-size:11px; color:var(--ink-soft); padding-left:4px; }
   .day-panel{ flex:1 1 260px; position:sticky; top:93px; }
   .day-panel h2{ margin-bottom:4px; }
@@ -238,6 +241,8 @@
     .sched .r{ grid-column:2; }
     .cell{ min-height:64px; padding:4px 3px; }
     .cell .ev{ font-size:0; padding:0; height:6px; border-radius:3px; }
+    .cell .ev.cont-l{ margin-left:-4px; padding-left:0; }
+    .cell .ev.cont-r{ margin-right:-4px; }
     .cell .ev.common{ background:var(--accent); }
     .cell .ev.mine{ background:var(--good); }
     .cell .ev.consult{ background:var(--warn); }
@@ -426,9 +431,10 @@
     </div>
     <label>제목<input type="text" id="evTitle" placeholder="예: 학부모 설명회" maxlength="40"></label>
     <div class="row2">
-      <label>날짜<input type="date" id="evDate"></label>
-      <label>시간 (선택)<input type="time" id="evTime"></label>
+      <label>날짜 (부터)<input type="date" id="evDate"></label>
+      <label>날짜 (까지)<input type="date" id="evEnd"></label>
     </div>
+    <label>시간 (선택)<input type="time" id="evTime"></label>
     <label>메모 (선택)<textarea id="evMemo" placeholder="장소, 준비물 등"></textarea></label>
     <p class="form-err" id="evErr"></p>
     <div class="modal-actions">
@@ -804,6 +810,7 @@ function sampleEvents(){
     { kind:'common', title:'학부모 설명회', date:shift(8), time:'11:00', memo:'2층 세미나실', owner:'원장님' },
     { kind:'common', title:'월말 리포트 마감', date:shift(7), time:'', memo:'', owner:'원장님' },
     { kind:'common', title:'TTC 교육', date:shift(-4), time:'10:00', memo:'', owner:'원장님' },
+    { kind:'common', title:'중간 레벨테스트 주간', date:shift(9), end:shift(13), time:'', memo:'전 학년 반별 레벨테스트', owner:'원장님' },
     { kind:'common', title:'중등 내신 대비 보강', date:shift(12), time:'14:00', memo:'중등 내신 A·B', owner:'김민아 선생님' },
     { kind:'mine', title:'교재 주문 확인', date:shift(1), time:'', memo:'', owner:'원장님' },
     { kind:'mine', title:'신규 상담 (초3)', date:shift(2), time:'15:30', memo:'', owner:'원장님' },
@@ -846,11 +853,18 @@ function loadSheetConsults(){
 var calMonth = new Date(day.getFullYear(), day.getMonth(), 1);
 var selDate = ymd(day);
 
+function endOf(e){ return e.end && e.end > e.date ? e.end : e.date; }
+function spanDays(e){ return Math.round((parseYmd(endOf(e)) - parseYmd(e.date)) / 864e5) + 1; }
+function rangeText(e){
+  var a = parseYmd(e.date), b = parseYmd(endOf(e));
+  return (a.getMonth()+1)+'/'+a.getDate()+'('+DAYS[a.getDay()]+') ~ '+(b.getMonth()+1)+'/'+b.getDate()+'('+DAYS[b.getDay()]+') · '+spanDays(e)+'일';
+}
+
 function visibleEvents(dateStr){
   var showC = $('showCommon').checked, showM = $('showMine').checked, showS = $('showConsult').checked, who = me();
   var order = { consult:0, common:1, mine:2 };
   return EVENTS.concat(showS ? consultEvents() : []).filter(function(e){
-    if(e.date !== dateStr) return false;
+    if(dateStr && (dateStr < e.date || dateStr > endOf(e))) return false;
     if(e.kind === 'consult') return true;
     if(e.kind === 'common') return showC;
     return showM && e.owner === who;
@@ -871,19 +885,56 @@ function renderCalendar(){
   var last = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 0);
   var weeks = Math.ceil((calMonth.getDay() + last.getDate()) / 7);
   var todayStr = ymd(day);
+  var all = visibleEvents(null), MAX_LANES = 3;
+  var lanesByDay = {};   // 날짜 -> [줄0, 줄1, 줄2] (같은 일정은 한 주 안에서 같은 줄에 이어서 그려요)
+  for(var w = 0; w < weeks; w++){
+    var ws = new Date(start); ws.setDate(start.getDate() + w * 7);
+    var wDays = [];
+    for(var k = 0; k < 7; k++){ var dd = new Date(ws); dd.setDate(ws.getDate() + k); wDays.push(ymd(dd)); lanesByDay[ymd(dd)] = []; }
+    var inWeek = all.filter(function(e){ return e.date <= wDays[6] && endOf(e) >= wDays[0]; })
+      .sort(function(a, b){
+        var la = spanDays(a), lb = spanDays(b);
+        if((la > 1) !== (lb > 1)) return la > 1 ? -1 : 1;
+        if(a.date !== b.date) return a.date < b.date ? -1 : 1;
+        return lb - la;
+      });
+    var used = [[],[],[],[],[],[],[]];
+    inWeek.forEach(function(e){
+      var a = Math.max(0, wDays.indexOf(e.date < wDays[0] ? wDays[0] : e.date));
+      var b = wDays.indexOf(endOf(e) > wDays[6] ? wDays[6] : endOf(e));
+      for(var lane = 0; ; lane++){
+        var free = true;
+        for(var c = a; c <= b; c++) if(used[c][lane]) { free = false; break; }
+        if(free) break;
+      }
+      for(var c2 = a; c2 <= b; c2++){
+        used[c2][lane] = e;
+        lanesByDay[wDays[c2]][lane] = { e:e, first:c2 === a, l:c2 > a || e.date < wDays[0], r:c2 < b || endOf(e) > wDays[6] };
+      }
+    });
+  }
   for(var i = 0; i < weeks * 7; i++){
     var d = new Date(start); d.setDate(start.getDate() + i);
-    var ds = ymd(d), evs = visibleEvents(ds);
+    var ds = ymd(d), lanes = lanesByDay[ds];
+    var total = lanes.filter(Boolean).length;
     var cls = ['cell'];
     if(d.getMonth() !== calMonth.getMonth()) cls.push('other');
     if(d.getDay() === 0) cls.push('sun');
     if(d.getDay() === 6) cls.push('sat');
     if(ds === todayStr) cls.push('today');
     if(ds === selDate) cls.push('sel');
-    var label = (d.getMonth()+1) + '월 ' + d.getDate() + '일, 일정 ' + evs.length + '개';
+    var label = (d.getMonth()+1) + '월 ' + d.getDate() + '일, 일정 ' + total + '개';
+    var chips = '', hidden = 0;
+    for(var ln = 0; ln < lanes.length; ln++){
+      var it = lanes[ln];
+      if(ln >= MAX_LANES){ if(it) hidden++; continue; }
+      if(!it){ chips += '<span class="ev gap" aria-hidden="true">&nbsp;</span>'; continue; }
+      var multi = spanDays(it.e) > 1;
+      var text = it.first ? (multi ? '' : (it.e.time ? it.e.time + ' ' : '')) + esc(it.e.title) : '&nbsp;';
+      chips += '<span class="ev '+it.e.kind+(it.l?' cont-l':'')+(it.r?' cont-r':'')+'">'+text+'</span>';
+    }
     html += '<button type="button" class="'+cls.join(' ')+'" data-date="'+ds+'" aria-label="'+label+'"><span class="num">'+d.getDate()+'</span>' +
-      evs.slice(0, 3).map(function(e){ return '<span class="ev '+e.kind+'">'+(e.time ? e.time + ' ' : '')+esc(e.title)+'</span>'; }).join('') +
-      (evs.length > 3 ? '<span class="ev-more">+'+(evs.length-3)+'개 더</span>' : '') + '</button>';
+      chips + (hidden ? '<span class="ev-more">+'+hidden+'개 더</span>' : '') + '</button>';
   }
   $('calGrid').innerHTML = html;
   renderDay();
@@ -897,7 +948,7 @@ function renderDay(){
     var color = { common:'--accent', mine:'--good', consult:'--warn' }[e.kind];
     var label = { common:'공통일정', mine:'개인일정', consult:'상담 예약' }[e.kind];
     return '<div class="day-item"><span class="bar-v" style="background:var('+color+')"></span><div class="body">' +
-      '<b>'+esc(e.title)+'</b><small>'+label+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
+      '<b>'+esc(e.title)+'</b><small>'+label+(spanDays(e)>1?' · '+rangeText(e):'')+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
       (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') + '</div>' +
       (e.kind === 'consult' ? '' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">삭제</button>') + '</div>';
   }).join('') : '<div class="empty">이 날은 일정이 없어요.</div>';
@@ -937,27 +988,33 @@ $('dayList').addEventListener('click', function(e){
 function openEvForm(dateStr){
   $('evForm').reset();
   $('evDate').value = dateStr || ymd(day);
+  $('evEnd').value = $('evDate').value;
+  $('evEnd').min = $('evDate').value;
   $('evErr').textContent = '';
   $('evOverlay').hidden = false;
   $('evTitle').focus();
 }
 function closeEvForm(){ $('evOverlay').hidden = true; }
 $('evCancel').addEventListener('click', closeEvForm);
+$('evDate').addEventListener('change', function(){ if(!$('evEnd').value || $('evEnd').value < this.value) $('evEnd').value = this.value; $('evEnd').min = this.value; });
 $('evOverlay').addEventListener('click', function(e){ if(e.target === this) closeEvForm(); });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !$('evOverlay').hidden) closeEvForm(); });
 $('evForm').addEventListener('submit', function(e){
   e.preventDefault();
-  var title = $('evTitle').value.trim(), date = $('evDate').value;
+  var title = $('evTitle').value.trim(), date = $('evDate').value, end = $('evEnd').value || date;
   if(!title){ $('evErr').textContent = '제목을 입력해 주세요.'; $('evTitle').focus(); return; }
-  if(!date){ $('evErr').textContent = '날짜를 골라 주세요.'; $('evDate').focus(); return; }
+  if(!date){ $('evErr').textContent = '시작 날짜를 골라 주세요.'; $('evDate').focus(); return; }
+  if(end < date){ $('evErr').textContent = '끝나는 날짜가 시작 날짜보다 빨라요. 다시 골라 주세요.'; $('evEnd').focus(); return; }
   var kind = $('kindMine').checked ? 'mine' : 'common';
-  EVENTS.push({ id:'e' + Date.now(), kind:kind, title:title, date:date, time:$('evTime').value, memo:$('evMemo').value.trim(), owner:me() });
+  var ev = { id:'e' + Date.now(), kind:kind, title:title, date:date, time:$('evTime').value, memo:$('evMemo').value.trim(), owner:me() };
+  if(end > date) ev.end = end;
+  EVENTS.push(ev);
   saveEvents();
   if(kind === 'common') $('showCommon').checked = true; else $('showMine').checked = true;
   selDate = date;
   var d = parseYmd(date); calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
   closeEvForm(); renderCalendar();
-  toast((kind === 'common' ? '공통일정' : '개인일정') + '을 저장했어요.');
+  toast((kind === 'common' ? '공통일정' : '개인일정') + '을 저장했어요.' + (ev.end ? ' (' + spanDays(ev) + '일 연속)' : ''));
 });
 
 /* ===== 시작 ===== */
