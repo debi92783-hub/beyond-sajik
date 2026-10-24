@@ -226,6 +226,38 @@
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .modal-actions{ display:flex; justify-content:flex-end; gap:8px; }
   .form-err{ font-size:12.5px; color:var(--warn); min-height:1em; margin:0; }
+  /* 데일리 테스트 */
+  .dt-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; margin-bottom:20px; }
+  .dt-head .nav{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:700; }
+  .dt-head .tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .dt-head select, .dt-head input{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); }
+  .dt-head input{ width:56px; text-align:center; }
+  .dt-sum{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px; margin-bottom:20px; }
+  .dt-sum .card{ padding:16px 18px; }
+  .dt-sum b{ display:block; font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .dt-sum span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .dt-table{ font-size:13px; min-width:760px; }
+  .dt-table th{ padding:9px 8px; color:var(--ink-soft); font-weight:600; font-size:12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  .dt-table td{ padding:7px 8px; border-bottom:1px solid var(--border); }
+  .dt-table tr:last-child td{ border-bottom:0; }
+  .dt-table .nm{ font-weight:700; white-space:nowrap; }
+  .dt-table input[type=number]{ width:58px; font-size:13px; border:1px solid var(--border); border-radius:7px; padding:6px 6px; text-align:center; background:var(--surface); font-variant-numeric:tabular-nums; }
+  .dt-table input[type=text]{ width:100%; min-width:140px; font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface); }
+  .dt-table select{ font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 6px; background:var(--surface); font-weight:700; }
+  .dt-table select.s-done{ background:var(--good-soft); color:var(--good); }
+  .dt-table select.s-todo{ background:var(--warn-soft); color:var(--warn); }
+  .dt-table select.s-hold{ background:var(--hold-soft); color:var(--hold); }
+  .dt-table .of{ color:var(--ink-faint); font-size:12px; margin-left:3px; }
+  .dt-table .low input{ border-color:var(--warn); color:var(--warn); font-weight:700; }
+  .dt-table select.lv-상{ color:var(--good); } .dt-table select.lv-하{ color:var(--warn); }
+  .dt-table input[type=checkbox]{ width:16px; height:16px; accent-color:var(--accent); }
+  .dt-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .dt-msgs{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px; margin-top:14px; }
+  .dt-msg{ background:var(--surface-soft); border:1px solid var(--border); border-radius:12px; padding:14px 16px; font-size:12.5px; line-height:1.65; display:flex; flex-direction:column; gap:10px; }
+  .dt-msg textarea{ width:100%; min-height:230px; border:1px solid var(--border); border-radius:8px; padding:10px; font:inherit; font-size:12.5px; line-height:1.6; background:var(--surface); color:var(--ink); resize:vertical; }
+  .dt-msg .row{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .dt-msg b{ font-size:13px; }
+
   /* 로그인 */
   .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
   .login-card{ width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 26px; box-shadow:0 8px 30px rgba(32,36,43,0.06); display:flex; flex-direction:column; gap:14px; }
@@ -463,6 +495,46 @@
       </div>
     </section>
 
+    <!-- 데일리 테스트 -->
+    <section id="view-daily" hidden>
+      <div class="greet"><div><h1>데일리 테스트</h1><p>반별로 오늘 단어·듣기 점수와 말하기·쓰기·숙제를 입력하고, 학부모 알림 문구를 만들어요.</p></div></div>
+      <div class="card dt-head">
+        <div class="nav">
+          <button class="sq" type="button" id="dtPrev" aria-label="이전 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button>
+          <span id="dtDay"></span>
+          <button class="sq" type="button" id="dtNext" aria-label="다음 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
+        </div>
+        <div class="tools">
+          <label>반 <select id="dtClass" aria-label="반 선택"></select></label>
+          <label>단어 만점 <input type="number" id="dtWordMax" min="1" max="200" inputmode="numeric"></label>
+          <label>듣기 만점 <input type="number" id="dtListenMax" min="1" max="200" inputmode="numeric"></label>
+        </div>
+      </div>
+      <div class="card" id="dtEmpty" hidden><h2>담당 반이 없어요</h2><p class="muted" style="margin:8px 0 0">원장님이 담당 반을 정해 주면 여기에서 입력할 수 있어요.</p></div>
+      <div id="dtBody">
+        <div class="dt-sum" id="dtSum"></div>
+        <div class="card">
+          <div class="card-head"><h2>학생별 입력 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved">입력하면 바로 저장돼요</span></div>
+          <div class="table-wrap">
+            <table class="dt-table">
+              <thead><tr><th><input type="checkbox" id="dtAll" checked aria-label="전체 선택"></th><th>이름</th><th>단어</th><th>듣기</th><th>말하기</th><th>쓰기</th><th>숙제</th><th>선생님 메모 (알림에 들어가요)</th></tr></thead>
+              <tbody id="dtRows"></tbody>
+            </table>
+          </div>
+          <div class="dt-actions">
+            <button class="btn soft" type="button" id="dtHwAll">숙제 모두 완료로</button>
+            <button class="btn" type="button" id="dtMake">체크한 학생 알림 문구 만들기</button>
+          </div>
+        </div>
+        <div class="card" id="dtMsgCard" hidden style="margin-top:20px">
+          <div class="card-head"><h2>학부모 알림 문구</h2><span class="muted">보내기 전에 고칠 수 있어요</span></div>
+          <p class="muted" style="margin:0">점수와 메모로 자동으로 만든 문구예요. 나중에 AI를 연결하면 학생마다 더 자연스러운 문장으로 바꿔 줄 거예요.</p>
+          <div class="dt-msgs" id="dtMsgs"></div>
+          <div class="dt-actions"><button class="btn" type="button" id="dtSend">문구 전체 발송</button></div>
+        </div>
+      </div>
+    </section>
+
     <!-- 선생님·설정 (원장님 전용) -->
     <section id="view-settings" hidden>
       <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
@@ -635,12 +707,12 @@ var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리'],['bell','전체 공지']]],
-    ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트'],['check','출결·지각'],['doc','월말 리포트']]],
+    ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각'],['doc','월말 리포트']]],
     ['소통·자료', [['bell','전달사항'],['users','주간회의'],['video','TTC 교육자료'],['box','교재 출고 요청'],['dict','영어 뉘앙스 사전']]],
     ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
   ],
   teacher: [
-    ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트'],['check','출결·지각'],['doc','월말 리포트'],['cal','일정','calendar']]],
+    ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각'],['doc','월말 리포트'],['cal','일정','calendar']]],
     ['소통·자료', [['bell','전달사항'],['users','주간회의'],['video','TTC 교육자료'],['box','교재 출고 요청'],['dict','영어 뉘앙스 사전']]],
     ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
   ]
@@ -670,23 +742,27 @@ function setView(v, page){
   state.view = v;
   state.page = page || 'main';
   if(state.page === 'settings' && v !== 'director') state.page = 'main';
-  var cal = state.page === 'calendar', set = state.page === 'settings';
+  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  $('view-director').hidden = cal || set || v !== 'director';
-  $('view-teacher').hidden = cal || set || v !== 'teacher';
+  var sub = cal || set || daily;
+  $('view-director').hidden = sub || v !== 'director';
+  $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
   $('view-settings').hidden = !set;
+  $('view-daily').hidden = !daily;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
+  else if(daily) renderDaily();
   else if(v === 'teacher') renderTeacher();
-  try{ history.replaceState(null, '', '#' + (set ? 'settings' : cal ? (v === 'teacher' ? 'teacher-calendar' : 'calendar') : v)); }catch(e){}
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : '';
+  try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
 
 function renderSide(){
-  var current = state.page === 'calendar' ? 'calendar' : state.page === 'settings' ? 'settings' : state.view === 'director' ? 'dashboard' : 'journal';
+  var current = state.page !== 'main' ? state.page : state.view === 'director' ? 'dashboard' : 'journal';
   var html = '';
   MENU[state.view].forEach(function(group){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
@@ -711,6 +787,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
+    if(a.dataset.key === 'daily') return setView(state.view, 'daily');
     if(!a.dataset.key) soon(a.dataset.name);
     return;
   }
@@ -917,6 +994,7 @@ $('classPick').addEventListener('change', function(){ state.classId = this.value
 $('teacherPick').addEventListener('change', function(){
   state.teacher = this.value;
   if(state.page === 'calendar'){ fillTeacherPick(); renderCalendar(); }
+  else if(state.page === 'daily'){ renderDaily(); }
   else renderTeacher();
 });
 $('myClasses').addEventListener('click', function(e){
@@ -1152,6 +1230,167 @@ $('evForm').addEventListener('submit', function(e){
   toast((kind === 'common' ? '공통일정' : '개인일정') + '을 저장했어요.' + (ev.end ? ' (' + spanDays(ev) + '일 연속)' : ''));
 });
 
+/* ===== 데일리 테스트 =====
+   시안용: 이 브라우저(localStorage)에 반|날짜별로 저장해요. */
+var DT_KEY = 'beyond-daily-v1';
+var dtStore = (function(){ try{ return JSON.parse(localStorage.getItem(DT_KEY) || '{}'); }catch(e){ return {}; } })();
+var dtDay = new Date(); dtDay.setHours(0,0,0,0);
+var dtClassId = null;
+function dtSave(){ try{ localStorage.setItem(DT_KEY, JSON.stringify(dtStore)); }catch(e){} }
+function dtClasses(){ return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher; }); }
+function dtCls(){ return CLASSES.find(function(c){ return c.id === dtClassId; }); }
+function dtEntry(){
+  var c = dtCls(), k = c.id + '|' + ymd(dtDay);
+  if(!dtStore[k]){
+    var rows = {};
+    c.students.forEach(function(s){ rows[s] = { on:true, word:'', listen:'', speak:'', write:'', hw:'완료', memo:'' }; });
+    dtStore[k] = { wordMax:20, listenMax:10, rows:rows, sent:0 };
+  }
+  var e = dtStore[k];
+  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = { on:true, word:'', listen:'', speak:'', write:'', hw:'완료', memo:'' }; });
+  return e;
+}
+function num(v){ return v === '' || v == null || isNaN(+v) ? null : +v; }
+function avg(list){ return list.length ? list.reduce(function(a, b){ return a + b; }, 0) / list.length : null; }
+function dtStats(e, names){
+  var w = [], l = [], hw = 0, retest = [];
+  names.forEach(function(s){
+    var r = e.rows[s], wv = num(r.word), lv = num(r.listen);
+    if(wv !== null){ w.push(wv); if(wv / e.wordMax < 0.7) retest.push(s); }
+    if(lv !== null) l.push(lv);
+    if(r.hw === '완료') hw++;
+  });
+  return { taken:w.length, wAvg:avg(w), lAvg:avg(l), hwRate: names.length ? Math.round(hw / names.length * 100) : 0, retest:retest };
+}
+function one(n){ return n === null ? '–' : (Math.round(n * 10) / 10).toString(); }
+
+function renderDaily(){
+  fillTeacherPick();
+  var list = dtClasses();
+  $('dtEmpty').hidden = list.length > 0;
+  $('dtBody').hidden = list.length === 0;
+  $('dtDay').textContent = fmtDate(dtDay);
+  if(!list.length) return;
+  if(!list.some(function(c){ return c.id === dtClassId; })){
+    dtClassId = list.some(function(c){ return c.id === state.classId; }) ? state.classId : list[0].id;
+  }
+  $('dtClass').innerHTML = list.map(function(c){ return '<option value="'+c.id+'"'+(c.id===dtClassId?' selected':'')+'>'+esc(c.name)+(state.view==='director'?' · '+esc(c.teacher):'')+'</option>'; }).join('');
+  var c = dtCls(), e = dtEntry();
+  $('dtClassName').textContent = c.name + ' · ' + c.students.length + '명';
+  $('dtWordMax').value = e.wordMax;
+  $('dtListenMax').value = e.listenMax;
+  var lvOpt = function(v){ return ['','상','중','하'].map(function(o){ return '<option value="'+o+'"'+(o===v?' selected':'')+'>'+(o||'–')+'</option>'; }).join(''); };
+  $('dtRows').innerHTML = c.students.map(function(s){
+    var r = e.rows[s], wv = num(r.word), low = wv !== null && wv / e.wordMax < 0.7;
+    return '<tr data-name="'+esc(s)+'">' +
+      '<td><input type="checkbox" data-f="on"'+(r.on?' checked':'')+' aria-label="'+esc(s)+' 선택"></td>' +
+      '<td class="nm">'+esc(s)+'</td>' +
+      '<td'+(low?' class="low"':'')+'><input type="number" data-f="word" min="0" max="'+e.wordMax+'" inputmode="numeric" value="'+esc(r.word)+'" aria-label="'+esc(s)+' 단어 점수"><span class="of">/'+e.wordMax+'</span></td>' +
+      '<td><input type="number" data-f="listen" min="0" max="'+e.listenMax+'" inputmode="numeric" value="'+esc(r.listen)+'" aria-label="'+esc(s)+' 듣기 점수"><span class="of">/'+e.listenMax+'</span></td>' +
+      '<td><select data-f="speak" class="lv-'+r.speak+'" aria-label="'+esc(s)+' 말하기">'+lvOpt(r.speak)+'</select></td>' +
+      '<td><select data-f="write" class="lv-'+r.write+'" aria-label="'+esc(s)+' 쓰기">'+lvOpt(r.write)+'</select></td>' +
+      '<td><select data-f="hw" class="'+hwClass(r.hw)+'" aria-label="'+esc(s)+' 숙제">'+['완료','일부','미완료'].map(function(o){ return '<option'+(o===r.hw?' selected':'')+'>'+o+'</option>'; }).join('')+'</select></td>' +
+      '<td><input type="text" data-f="memo" value="'+esc(r.memo)+'" placeholder="예: 발음이 많이 좋아졌어요" aria-label="'+esc(s)+' 메모"></td></tr>';
+  }).join('');
+  $('dtAll').checked = c.students.every(function(s){ return e.rows[s].on; });
+  $('dtMsgCard').hidden = true;
+  renderDtSum();
+}
+function renderDtSum(){
+  var c = dtCls(), e = dtEntry(), st = dtStats(e, c.students);
+  var cards = [
+    [st.taken + ' / ' + c.students.length + '명', '단어 시험 응시'],
+    [one(st.wAvg) + (st.wAvg === null ? '' : ' / ' + e.wordMax), '단어 반 평균'],
+    [one(st.lAvg) + (st.lAvg === null ? '' : ' / ' + e.listenMax), '듣기 반 평균'],
+    [st.hwRate + '%', '숙제 완료율'],
+    [st.retest.length + '명', '단어 재시험 대상 (70% 미만)']
+  ];
+  $('dtSum').innerHTML = cards.map(function(k, i){
+    var warn = i === 4 && st.retest.length;
+    return '<div class="card"><b'+(warn?' style="color:var(--warn)"':'')+'>'+k[0]+'</b><span>'+k[1]+'</span>'+(warn?'<span style="display:block;margin-top:4px">'+esc(st.retest.join(', '))+'</span>':'')+'</div>';
+  }).join('');
+  $('dtSaved').textContent = e.sent ? '저장됨 · 오늘 ' + e.sent + '명에게 발송했어요' : '입력하면 바로 저장돼요';
+}
+
+function dtMessage(s, e, st){
+  var r = e.rows[s], wv = num(r.word), lv = num(r.listen), lines = [];
+  lines.push('[비욘드 잉글리쉬 사직] ' + (dtDay.getMonth()+1) + '월 ' + dtDay.getDate() + '일 (' + DAYS[dtDay.getDay()] + ') 데일리 테스트');
+  lines.push(s + ' 학생의 오늘 결과를 알려 드려요.');
+  lines.push('');
+  if(wv !== null) lines.push('· 단어: ' + wv + ' / ' + e.wordMax + '점' + (st.wAvg !== null ? ' (반 평균 ' + one(st.wAvg) + '점)' : ''));
+  if(lv !== null) lines.push('· 듣기: ' + lv + ' / ' + e.listenMax + '점');
+  if(r.speak || r.write) lines.push('· ' + [r.speak ? '말하기: ' + r.speak : '', r.write ? '쓰기: ' + r.write : ''].filter(Boolean).join(' / '));
+  lines.push('· 숙제: ' + r.hw);
+  var notes = [];
+  if(wv !== null){
+    var p = wv / e.wordMax;
+    if(p >= 0.9) notes.push('단어를 아주 꼼꼼하게 외워 왔어요.');
+    else if(p >= 0.7) notes.push('단어를 잘 준비해 왔어요. 틀린 단어만 한 번 더 복습하면 좋겠어요.');
+    else notes.push('오늘 틀린 단어는 다음 수업 때 재시험을 볼 예정이에요. 집에서 한 번 더 외워 오도록 함께 챙겨 주세요.');
+  }
+  if(r.hw === '미완료') notes.push('숙제를 아직 하지 못했어요. 다음 수업 전까지 마무리할 수 있도록 확인 부탁드려요.');
+  else if(r.hw === '일부') notes.push('숙제를 일부만 해 왔어요. 남은 부분을 마무리할 수 있도록 확인 부탁드려요.');
+  if(r.memo.trim()) notes.push(r.memo.trim());
+  if(notes.length){ lines.push(''); lines.push(notes.join(' ')); }
+  lines.push('');
+  lines.push('감사합니다. — ' + dtCls().teacher + ' 선생님');
+  return lines.join('\n');
+}
+
+$('dtRows').addEventListener('input', function(ev){
+  var el = ev.target, f = el.dataset.f; if(!f) return;
+  var tr = el.closest('tr'), e = dtEntry(), r = e.rows[tr.dataset.name];
+  r[f] = f === 'on' ? el.checked : el.value;
+  if(f === 'word'){ var wv = num(el.value); el.parentNode.className = wv !== null && wv / e.wordMax < 0.7 ? 'low' : ''; }
+  if(f === 'speak' || f === 'write') el.className = 'lv-' + el.value;
+  if(f === 'hw') el.className = hwClass(el.value);
+  if(f === 'on') $('dtAll').checked = dtCls().students.every(function(s){ return e.rows[s].on; });
+  dtSave(); renderDtSum();
+});
+$('dtAll').addEventListener('change', function(){
+  var e = dtEntry(), on = this.checked;
+  dtCls().students.forEach(function(s){ e.rows[s].on = on; });
+  dtSave(); renderDaily();
+});
+$('dtHwAll').addEventListener('click', function(){
+  var e = dtEntry();
+  dtCls().students.forEach(function(s){ e.rows[s].hw = '완료'; });
+  dtSave(); renderDaily(); toast('숙제를 모두 완료로 바꿨어요.');
+});
+['dtWordMax', 'dtListenMax'].forEach(function(id){
+  $(id).addEventListener('change', function(){
+    var v = Math.max(1, Math.min(200, parseInt(this.value, 10) || 1));
+    dtEntry()[id === 'dtWordMax' ? 'wordMax' : 'listenMax'] = v;
+    dtSave(); renderDaily();
+  });
+});
+$('dtClass').addEventListener('change', function(){ dtClassId = this.value; renderDaily(); });
+$('dtPrev').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() - 1); renderDaily(); });
+$('dtNext').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() + 1); renderDaily(); });
+$('dtMake').addEventListener('click', function(){
+  var c = dtCls(), e = dtEntry(), st = dtStats(e, c.students);
+  var picked = c.students.filter(function(s){ return e.rows[s].on; });
+  if(!picked.length){ toast('알림을 보낼 학생을 먼저 체크해 주세요.'); return; }
+  $('dtMsgs').innerHTML = picked.map(function(s){
+    return '<div class="dt-msg" data-name="'+esc(s)+'"><div class="row"><b>'+esc(s)+' 학부모님</b><button class="btn soft" type="button" data-copy>복사</button></div><textarea aria-label="'+esc(s)+' 알림 문구">'+esc(dtMessage(s, e, st))+'</textarea></div>';
+  }).join('');
+  $('dtSend').textContent = picked.length + '명에게 문구 발송';
+  $('dtMsgCard').hidden = false;
+  $('dtMsgCard').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+$('dtMsgs').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-copy]'); if(!b) return;
+  var ta = b.closest('.dt-msg').querySelector('textarea');
+  var done = function(){ toast('문구를 복사했어요. 문자나 카톡에 붙여 넣으면 돼요.'); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function(){ ta.select(); document.execCommand('copy'); done(); });
+  else { ta.select(); document.execCommand('copy'); done(); }
+});
+$('dtSend').addEventListener('click', function(){
+  var n = $('dtMsgs').children.length, e = dtEntry();
+  e.sent = n; dtSave(); renderDtSum();
+  toast('시안이라 실제 문자는 가지 않아요. ' + n + '명에게 보낸 것으로 기록했어요.');
+});
+
 /* ===== 계정 · 로그인 =====
    시안용: 계정은 이 브라우저(localStorage)에만 저장하고 비밀번호는 SHA-256 해시로만 보관해요.
    정적 페이지라 진짜 보안은 아니에요. 실제 운영 전에는 구글 로그인 등 서버 인증으로 바꿔야 해요. */
@@ -1214,12 +1453,15 @@ function enter(acc){
   renderDirector();
   if(acc.role === 'teacher'){
     state.teacher = acc.name;
-    setView('teacher', location.hash === '#teacher-calendar' ? 'calendar' : 'main');
+    var th = location.hash.replace('#teacher-', '').replace('#', '');
+    setView('teacher', th === 'calendar' || th === 'daily' ? th : 'main');
   } else {
     var h = location.hash;
     if(h === '#calendar') setView('director', 'calendar');
     else if(h === '#teacher-calendar') setView('teacher', 'calendar');
     else if(h === '#settings') setView('director', 'settings');
+    else if(h === '#daily') setView('director', 'daily');
+    else if(h === '#teacher-daily') setView('teacher', 'daily');
     else setView(h === '#teacher' ? 'teacher' : 'director');
   }
 }
