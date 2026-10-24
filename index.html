@@ -1063,13 +1063,11 @@ var CONFIG = {
   // 비워 두면 예전처럼 메일 앱이 열리는 방식으로 동작해요.
   SHEET_URL: '',
   CONTACT_EMAIL: 'debi92@naver.com',
-  // 요일별 상담 가능 시간 (0=일 ~ 6=토). [시작, 끝] 24시간 'HH:MM'
-  HOURS: {
-    1: ['13:00', '21:00'], 2: ['13:00', '20:00'], 3: ['13:00', '21:00'],
-    4: ['13:00', '20:00'], 5: ['13:00', '21:00'], 6: ['09:30', '12:00']
+  // 요일별 상담 가능 시간 (0=일 ~ 6=토). 24시간 'HH:MM', 적힌 시간만 고를 수 있어요
+  SLOTS: {
+    1: ['12:00', '19:00'], 2: ['12:00', '19:00'], 3: ['12:00', '19:00'],
+    4: ['12:00', '19:00'], 5: ['12:00', '19:00'], 6: ['11:00']
   },
-  SLOT_STEP_MIN: 60,     // 상담 시작 시간 간격(분)
-  SLOT_LENGTH_MIN: 30,   // 상담 1회 길이(분) - 마감 시간 전에 끝나는 슬롯만 보여요
   DAYS_AHEAD: 30,        // 오늘부터 며칠 뒤까지 예약 가능
   MIN_NOTICE_HOURS: 3,   // 지금으로부터 최소 몇 시간 뒤부터 예약 가능
   CLOSED_DATES: []       // 임시 휴무일 예: ['2026-10-09', '2026-12-25']
@@ -1101,8 +1099,6 @@ var CONFIG = {
 
   function pad(n){ return (n < 10 ? '0' : '') + n; }
   function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-  function toMin(hhmm){ var p = hhmm.split(':'); return +p[0] * 60 + +p[1]; }
-  function fromMin(m){ return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
 
   var today = new Date(); today.setHours(0,0,0,0);
   var lastDay = new Date(today); lastDay.setDate(lastDay.getDate() + CONFIG.DAYS_AHEAD);
@@ -1119,12 +1115,11 @@ var CONFIG = {
 
   function slotsFor(dateStr){
     var d = new Date(dateStr + 'T00:00:00');
-    var h = CONFIG.HOURS[d.getDay()];
-    if(!h) return [];
-    var out = [], start = toMin(h[0]), end = toMin(h[1]);
+    var list = CONFIG.SLOTS[d.getDay()] || [];
+    var out = [];
     var earliest = Date.now() + CONFIG.MIN_NOTICE_HOURS * 3600 * 1000;
-    for(var m = start; m + CONFIG.SLOT_LENGTH_MIN <= end; m += CONFIG.SLOT_STEP_MIN){
-      var t = fromMin(m);
+    for(var i = 0; i < list.length; i++){
+      var t = list[i];
       var when = new Date(dateStr + 'T' + t + ':00').getTime();
       if(when < earliest) continue;
       out.push(t);
