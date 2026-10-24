@@ -1321,7 +1321,8 @@ var DT_BOOKS = (function(){
   var units = function(vols, per){ var out = []; for(var v = 1; v <= vols; v++){ var g = []; for(var i = 1; i <= per; i++) g.push('(' + v + '-unit' + i + ')'); out.push([v + '권', g]); } return out; };
   var story = units(6, 5);
   var fmt = function(v, i){ return '(' + v + '-' + i + ')'; };
-  return [ ['FUN PHONICS', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONICS', ph], ['STORY', story], ['BASIC', units(12, 4)], ['INTERMEDIATE', units(12, 4)] ];
+  return [ ['FUN PHONICS', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONICS', ph], ['STORY', story], ['BASIC', units(12, 4)], ['INTERMEDIATE', units(12, 4)],
+    ['ADVANCED', [['권', [1,2,3,4,5,6,7,8,9].map(function(v){ return v + '권'; })]]] ];
 })();
 function bookItems(name){ var b = DT_BOOKS.find(function(x){ return x[0] === name; }); return b ? [].concat.apply([], b[1].map(function(g){ return g[1]; })) : []; }
 function progText(e){ return e.book && e.prog ? e.book + ' > ' + e.prog : (e.unit || ''); }
