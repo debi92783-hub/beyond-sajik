@@ -231,8 +231,12 @@
   .dt-head .nav{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:700; }
   .dt-head .tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
   .dt-head select{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); }
-  .dt-lesson{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding:16px 18px; margin-bottom:16px; }
-  .dt-lesson label{ display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .dt-lesson{ display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; padding:16px 18px; margin-bottom:16px; }
+  .dt-lesson label{ min-width:0; display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .dt-lesson .prog{ display:flex; gap:8px; }
+  .dt-lesson select{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 8px; background:var(--surface); color:var(--ink); font-weight:600; }
+  .dt-lesson select#dtBook{ flex:0 0 auto; }
+  .dt-lesson select#dtProg{ flex:1; min-width:0; }
   .dt-lesson input{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); }
   .dt-sum{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:16px; }
   .dt-sum .card{ padding:14px 16px; }
@@ -274,7 +278,7 @@
   .rc .opt.on{ color:var(--accent); font-weight:800; }
   .rc .top td{ font-weight:800; font-size:13.5px; }
   .rc .foot{ display:flex; justify-content:flex-end; padding:8px 10px; background:var(--surface-soft); border-top:1px solid var(--border); }
-  @media (max-width: 720px){ .dt-lesson{ grid-template-columns:1fr; } }
+  @media (max-width: 720px){ .dt-lesson{ grid-template-columns:minmax(0,1fr); } .dt-lesson .prog{ flex-direction:column; } }
 
   /* 로그인 */
   .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
@@ -527,7 +531,7 @@
       <div class="card" id="dtEmpty" hidden><h2>담당 반이 없어요</h2><p class="muted" style="margin:8px 0 0">원장님이 담당 반을 정해 주면 여기에서 입력할 수 있어요.</p></div>
       <div id="dtBody">
         <div class="card dt-lesson">
-          <label>진도 <input type="text" id="dtUnit" placeholder="예: UNIT 1"></label>
+          <label>진도 (교재명 &gt; 책진도)<span class="prog"><select id="dtBook" aria-label="교재명"></select><select id="dtProg" aria-label="책진도"></select></span></label>
           <label>숙제 · SB <input type="text" id="dtSb" placeholder="예: P15-16"></label>
           <label>숙제 · PB <input type="text" id="dtPb" placeholder="예: P11-13"></label>
         </div>
@@ -1278,6 +1282,26 @@ var DT_OPT = {
 };
 var DT_TONE = { '출석':'good','지참':'good','완료':'good', '지각':'mid','조퇴':'mid','기타':'mid','일부지참':'mid','일부완료':'mid', '결석':'bad','미지참':'bad','미완료':'bad' };
 var DT_SCORES = ['flash','self','inter','text'];
+/* 진도: 교재명 > 책진도. PHONIC은 BEYOND PHONICS 1~6 월간 수업계획표의 [단원]이에요. */
+var DT_BOOKS = (function(){
+  var range = function(prefix, fmt){ var out = []; for(var v = 1; v <= 3; v++){ var g = []; for(var i = 1; i <= 10; i++) g.push(fmt(v, i)); out.push([v + '권', g]); } return out; };
+  var ph = [
+    ['Initials A/a, B/b, C/c','Initials D/d, E/e, F/f','Initials G/g, H/h, I/i','Initials J/j, K/k, L/l, M/m'],
+    ['Initials N/n, O/o, P/p','Initials Q/q, R/r, S/s','Initials T/t, U/u, V/v','X/x & Initials W/w, Y/y, Z/z'],
+    ['Consonant Digraphs ch, sh, th','Short Vowel a','Short Vowel e','Short Vowel i','Short Vowel o'],
+    ['Short Vowel u','Long Vowel a','Long Vowel i','Long Vowel o','Long Vowel u'],
+    ['Vowel Digraphs ai, ay','Vowel Digraphs ea, ee','Vowel Digraphs oa, oe, ow','Diphthongs au, aw','Diphthongs oi, oy'],
+    ['Diphthong oo','Diphthongs ou, ow','R-Controlled Vowel ar','R-Controlled Vowel or','R-Controlled Vowels ir, er, ur']
+  ].map(function(units, b){
+    var span = 20 / units.length;
+    return ['BEYOND PHONICS ' + (b+1), units.map(function(u, i){ return (b+1) + '권 ' + (i*span+1) + '~' + ((i+1)*span) + '일차 · ' + u; })];
+  });
+  var story = []; for(var v = 1; v <= 6; v++){ var g = []; for(var i = 1; i <= 5; i++) g.push('(' + v + '-unit' + i + ')'); story.push([v + '권', g]); }
+  var fmt = function(v, i){ return '(' + v + '-' + i + ')'; };
+  return [ ['FUN PHONIC', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONIC', ph], ['STORY', story] ];
+})();
+function bookItems(name){ var b = DT_BOOKS.find(function(x){ return x[0] === name; }); return b ? [].concat.apply([], b[1].map(function(g){ return g[1]; })) : []; }
+function progText(e){ return e.book && e.prog ? e.book + ' > ' + e.prog : (e.unit || ''); }
 var DT_LABEL = { flash:'flash', self:'self', inter:'inter', text:'본문' };
 var dtStore = (function(){ try{ return JSON.parse(localStorage.getItem(DT_KEY) || '{}'); }catch(e){ return {}; } })();
 var dtDay = new Date(); dtDay.setHours(0,0,0,0);
@@ -1292,7 +1316,9 @@ function dtEntry(){
     // 반 설정(만점·통과 점수)은 그 반의 가장 최근 기록을 이어 받아요.
     var last = Object.keys(dtStore).filter(function(x){ return x.indexOf(c.id + '|') === 0; }).sort().pop();
     var prev = last ? dtStore[last] : null;
-    dtStore[k] = { unit:'', sb:'', pb:'', sent:0,
+    // 교재는 이어 받고, 책진도는 지난 기록의 다음 차시로 미리 골라 둬요.
+    var book = prev ? prev.book || '' : '', items = bookItems(book), at = prev ? items.indexOf(prev.prog) : -1;
+    dtStore[k] = { book:book, prog: at >= 0 ? (items[at+1] || items[at]) : (items[0] || ''), unit:'', sb:'', pb:'', sent:0,
       max: prev ? JSON.parse(JSON.stringify(prev.max)) : { flash:10, self:10, inter:10, text:10, word:20 },
       pass: prev ? prev.pass : 18, rows:{} };
   }
@@ -1338,7 +1364,9 @@ function renderDaily(){
   $('dtClass').innerHTML = list.map(function(c){ return '<option value="'+c.id+'"'+(c.id===dtClassId?' selected':'')+'>'+esc(c.name)+(state.view==='director'?' · '+esc(c.teacher):'')+'</option>'; }).join('');
   var c = dtCls(), e = dtEntry();
   $('dtClassName').textContent = c.name + ' · ' + c.students.length + '명';
-  $('dtUnit').value = e.unit; $('dtSb').value = e.sb; $('dtPb').value = e.pb;
+  $('dtBook').innerHTML = '<option value="">교재 선택</option>' + DT_BOOKS.map(function(b){ return '<option'+(b[0]===e.book?' selected':'')+'>'+b[0]+'</option>'; }).join('');
+  fillProg(e);
+  $('dtSb').value = e.sb; $('dtPb').value = e.pb;
   document.querySelectorAll('#view-daily [data-max]').forEach(function(i){ i.value = e.max[i.dataset.max]; });
   $('dtPass').value = e.pass;
   var sel = function(f, v, s){ return '<select data-f="'+f+'" class="'+tone(v)+'" aria-label="'+esc(s)+' '+f+'">'+DT_OPT[f].map(function(o){ return '<option'+(o===v?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'; };
@@ -1361,6 +1389,11 @@ function renderDaily(){
   $('dtAll').checked = c.students.every(function(s){ return e.rows[s].on; });
   $('dtMsgCard').hidden = true;
   renderDtSum();
+}
+function fillProg(e){
+  var b = DT_BOOKS.find(function(x){ return x[0] === e.book; });
+  $('dtProg').disabled = !b;
+  $('dtProg').innerHTML = b ? b[1].map(function(g){ return '<optgroup label="'+esc(g[0])+'">' + g[1].map(function(it){ return '<option'+(it===e.prog?' selected':'')+'>'+esc(it)+'</option>'; }).join('') + '</optgroup>'; }).join('') : '<option>교재를 먼저 골라 주세요</option>';
 }
 function renderDtSum(){
   var c = dtCls(), e = dtEntry(), st = dtStats(e, c.students), n = st.present;
@@ -1391,12 +1424,12 @@ function opts(f, v){ return DT_OPT[f].map(function(o){ return '<span class="opt'
 function dtCard(s, e){
   var c = dtCls(), r = e.rows[s];
   var attLine = DT_OPT.att.map(function(o){ var on = o === r.att; return '<span class="opt'+(on?' on':'')+'">'+(on ? esc(attText(r)) : o)+'</span>'; }).join(', ');
-  var rows = r.att === '결석' ? [['출결', attLine], ['진도', esc(e.unit || '–')], ['숙제', esc(hwRange(e) || '–')], ['기타<br>사항', esc(r.memo || '')]] : [
+  var rows = r.att === '결석' ? [['출결', attLine], ['진도', esc(progText(e) || '–')], ['숙제', esc(hwRange(e) || '–')], ['기타<br>사항', esc(r.memo || '')]] : [
     ['출결', attLine],
     ['교재', opts('book', r.book)],
     ['숙제', opts('hw', r.hw) + ' // Speaking (' + opts('spk', r.spk) + ')'],
     ['단어', esc(wordText(r, e))],
-    ['진도', esc(e.unit || '–')],
+    ['진도', esc(progText(e) || '–')],
     ['숙제', esc(hwRange(e) || '–')],
     ['기타<br>사항', esc(r.memo || '')]
   ];
@@ -1417,7 +1450,7 @@ function dtText(s, e){
     L.push('숙제: ' + r.hw + ' / Speaking: ' + r.spk);
     L.push('단어: ' + wordText(r, e));
   }
-  if(e.unit) L.push('진도: ' + e.unit);
+  if(progText(e)) L.push('진도: ' + progText(e));
   if(hwRange(e)) L.push('숙제: ' + hwRange(e));
   if(r.memo.trim()) L.push('기타사항: ' + r.memo.trim());
   return L.join('\n');
@@ -1466,7 +1499,9 @@ $('dtPass').addEventListener('change', function(){
   dtCls().students.forEach(function(s){ var r = e.rows[s]; if(wordTries(r).length) r.wDone = wordTries(r).some(function(v){ return v >= e.pass; }); });
   dtSave(); renderDaily();
 });
-[['dtUnit','unit'],['dtSb','sb'],['dtPb','pb']].forEach(function(x){
+$('dtBook').addEventListener('change', function(){ var e = dtEntry(); e.book = this.value; e.prog = bookItems(e.book)[0] || ''; fillProg(e); dtSave(); });
+$('dtProg').addEventListener('change', function(){ dtEntry().prog = this.value; dtSave(); });
+[['dtSb','sb'],['dtPb','pb']].forEach(function(x){
   $(x[0]).addEventListener('input', function(){ dtEntry()[x[1]] = this.value; dtSave(); });
 });
 $('dtClass').addEventListener('change', function(){ dtClassId = this.value; renderDaily(); });
