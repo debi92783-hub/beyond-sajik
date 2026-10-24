@@ -240,21 +240,23 @@
   .dt-sum span{ display:block; font-size:12px; color:var(--ink-soft); font-weight:600; }
   .dt-sum small{ display:block; margin-top:4px; font-size:11.5px; color:var(--ink-soft); line-height:1.5; }
   .dt-sum small.warn{ color:var(--warn); font-weight:700; }
-  .dt-table{ font-size:12.5px; min-width:1080px; border-collapse:separate; border-spacing:0; }
+  .dt-table{ font-size:12.5px; min-width:1100px; border-collapse:separate; border-spacing:0; }
   .dt-table th{ padding:7px 5px; color:var(--ink-soft); font-weight:700; font-size:12px; border-bottom:1px solid var(--border); white-space:nowrap; text-align:center; background:var(--surface); }
   .dt-table thead tr:first-child th{ border-bottom-color:transparent; }
   .dt-table thead tr:first-child th[rowspan]{ border-bottom-color:var(--border); }
-  .dt-table th input{ width:40px; font-size:12px; border:1px solid var(--border); border-radius:6px; padding:3px 4px; text-align:center; background:var(--surface-soft); color:var(--ink); font-weight:700; }
+  .dt-table th input[type=number]{ width:40px; padding:3px 2px; font-size:12px; border:1px solid var(--border); border-radius:6px; padding:3px 4px; text-align:center; background:var(--surface-soft); color:var(--ink); font-weight:700; }
   .dt-table td{ padding:5px 4px; border-bottom:1px solid var(--border); text-align:center; background:var(--surface); }
   .dt-table tbody tr:last-child td{ border-bottom:0; }
   .dt-table .stick{ position:sticky; left:0; z-index:1; }
   .dt-table .stick2{ position:sticky; left:34px; z-index:1; box-shadow:1px 0 0 var(--border); }
   .dt-table .nm{ font-weight:700; white-space:nowrap; text-align:left; padding-left:8px; padding-right:10px; }
   .dt-table .grp{ border-left:1px solid var(--border); }
-  .dt-table input[type=number]{ width:48px; font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; text-align:center; background:var(--surface); color:var(--ink); font-variant-numeric:tabular-nums; }
+  .dt-table input[type=number]{ width:42px; font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; text-align:center; background:var(--surface); color:var(--ink); font-variant-numeric:tabular-nums; }
   .dt-table input[type=text]{ width:100%; min-width:120px; font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface); color:var(--ink); }
   .dt-table input.att-note{ min-width:0; width:46px; margin-top:4px; padding:4px; text-align:center; }
   .dt-table select{ font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; background:var(--surface); color:var(--ink); font-weight:700; }
+  .dt-table .of{ color:var(--ink-faint); font-size:11.5px; margin-left:2px; font-variant-numeric:tabular-nums; }
+  .dt-table td:has(> .of){ white-space:nowrap; }
   .dt-table .low input{ border-color:var(--warn); color:var(--warn); font-weight:700; }
   .dt-table select.v-good{ background:var(--good-soft); color:var(--good); }
   .dt-table select.v-mid{ background:var(--hold-soft); color:var(--hold); }
@@ -532,7 +534,7 @@
         <div class="dt-sum" id="dtSum"></div>
         <div class="card">
           <div class="card-head"><h2>학생별 점검표 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved">입력하면 바로 저장돼요</span></div>
-          <p class="muted" style="margin:0 0 10px">괄호 안 숫자는 만점이에요. 단어는 통과 점수 이상이면 '완료'가 자동으로 체크돼요.</p>
+          <p class="muted" style="margin:0 0 10px">점수는 '획득점수 / 만점'으로 적어요. 만점은 맨 윗줄에서 바꿀 수 있고, 단어는 통과 점수 이상이면 '완료'가 자동으로 체크돼요.</p>
           <div class="table-wrap">
             <table class="dt-table">
               <thead>
@@ -540,11 +542,11 @@
                   <th rowspan="2" class="stick"><input type="checkbox" id="dtAll" checked aria-label="전체 선택"></th>
                   <th rowspan="2" class="stick2" style="text-align:left;padding-left:8px">이름</th>
                   <th rowspan="2" class="grp">출결</th><th rowspan="2">교재</th><th rowspan="2">숙제</th><th rowspan="2">Speaking</th>
-                  <th rowspan="2" class="grp">flash (<input type="number" data-max="flash" aria-label="flash 만점">)</th>
-                  <th rowspan="2">self (<input type="number" data-max="self" aria-label="self 만점">)</th>
-                  <th rowspan="2">inter (<input type="number" data-max="inter" aria-label="inter 만점">)</th>
-                  <th rowspan="2">본문 (<input type="number" data-max="text" aria-label="본문 만점">)</th>
-                  <th colspan="4" class="grp">단어 (<input type="number" data-max="word" aria-label="단어 만점">) · 통과 <input type="number" id="dtPass" aria-label="단어 통과 점수"></th>
+                  <th rowspan="2" class="grp">flash<br><small>만점 <input type="number" data-max="flash" aria-label="flash 만점"></small></th>
+                  <th rowspan="2">self<br><small>만점 <input type="number" data-max="self" aria-label="self 만점"></small></th>
+                  <th rowspan="2">inter<br><small>만점 <input type="number" data-max="inter" aria-label="inter 만점"></small></th>
+                  <th rowspan="2">본문<br><small>만점 <input type="number" data-max="text" aria-label="본문 만점"></small></th>
+                  <th colspan="4" class="grp">단어 <small>만점 <input type="number" data-max="word" aria-label="단어 만점"> · 통과 <input type="number" id="dtPass" aria-label="단어 통과 점수"></small></th>
                   <th rowspan="2" class="grp">NOTE (기타사항)</th>
                 </tr>
                 <tr><th class="grp">1회</th><th>2회</th><th>3회</th><th>완료</th></tr>
@@ -1342,7 +1344,7 @@ function renderDaily(){
   var sel = function(f, v, s){ return '<select data-f="'+f+'" class="'+tone(v)+'" aria-label="'+esc(s)+' '+f+'">'+DT_OPT[f].map(function(o){ return '<option'+(o===v?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'; };
   var score = function(f, r, s, max, first){
     var v = num(r[f]), low = v !== null && v / max < 0.7;
-    return '<td class="'+(first?'grp':'')+(low?' low':'')+'"><input type="number" data-f="'+f+'" min="0" max="'+max+'" inputmode="numeric" value="'+esc(r[f])+'" aria-label="'+esc(s)+' '+(DT_LABEL[f]||f)+'"></td>';
+    return '<td class="'+(first?'grp':'')+(low?' low':'')+'"><input type="number" data-f="'+f+'" min="0" max="'+max+'" inputmode="numeric" value="'+esc(r[f])+'" aria-label="'+esc(s)+' '+(DT_LABEL[f]||f)+'"><span class="of">/'+max+'</span></td>';
   };
   $('dtRows').innerHTML = c.students.map(function(s){
     var r = e.rows[s], note = r.att === '지각' || r.att === '기타';
@@ -1368,8 +1370,8 @@ function renderDtSum(){
     [st.noBook.length + '명', '교재 미지참', st.noBook.join(', ') || '모두 지참', st.noBook.length > 0],
     [rate(st.hw), '숙제 완료율', st.hwMiss.length ? st.hwMiss.join(', ') : '모두 완료', st.hwMiss.length > 0],
     [rate(st.spk), 'Speaking 완료율', st.spk['미완료'] ? '미완료 ' + st.spk['미완료'] + '명' : '모두 완료', st.spk['미완료'] > 0],
-    [DT_SCORES.map(function(f){ return one(avg(st.avg[f])); }).join(' · '), 'flash · self · inter · 본문 평균', DT_SCORES.map(function(f){ return DT_LABEL[f] + '/' + e.max[f]; }).join(' · '), false],
-    [st.wordDone + ' / ' + n + '명', '단어 완료 (1회 평균 ' + one(avg(st.w1)) + ')', st.wordTodo.length ? '재시험: ' + st.wordTodo.join(', ') : '재시험 대상 없음', st.wordTodo.length > 0]
+    [DT_SCORES.map(function(f){ return one(avg(st.avg[f])); }).join(' · '), 'flash · self · inter · 본문 평균', DT_SCORES.map(function(f){ var a = avg(st.avg[f]); return DT_LABEL[f] + ' ' + one(a) + '/' + e.max[f]; }).join(' · '), false],
+    [st.wordDone + ' / ' + n + '명', '단어 완료 (1회 평균 ' + one(avg(st.w1)) + '/' + e.max.word + ')', st.wordTodo.length ? '재시험: ' + st.wordTodo.join(', ') : '재시험 대상 없음', st.wordTodo.length > 0]
   ];
   $('dtSum').innerHTML = cards.map(function(k){
     return '<div class="card"><b>'+k[0]+'</b><span>'+k[1]+'</span><small'+(k[3]?' class="warn"':'')+'>'+esc(k[2])+'</small></div>';
