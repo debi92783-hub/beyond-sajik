@@ -402,6 +402,11 @@
   table.hours td:first-child{ color: var(--ink); font-weight: 600; width: 48px; }
   table.hours tr:last-child td{ border-bottom: none; }
   table.hours tr.closed td{ color: var(--ink-faint); }
+  table.hours th{ text-align:left; font-size: 0.8rem; font-weight: 600; color: var(--ink-faint); padding: 0 0 6px; border-bottom: 1px solid var(--line); }
+  table.hours td.consult{ color: var(--accent-deep); font-weight: 600; }
+  table.hours tr.closed td.consult{ color: var(--ink-faint); }
+  .hours-note{ margin: 10px 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 
   .parking-note{
     margin-top: 18px;
@@ -995,16 +1000,20 @@
     </div>
 
     <div class="info-block">
-      <h3>운영시간</h3>
+      <h3>운영시간 · 상담 시간</h3>
       <table class="hours">
-        <tr><td>월</td><td>13:00 – 21:00</td></tr>
-        <tr><td>화</td><td>13:00 – 20:00</td></tr>
-        <tr><td>수</td><td>13:00 – 21:00</td></tr>
-        <tr><td>목</td><td>13:00 – 20:00</td></tr>
-        <tr><td>금</td><td>13:00 – 21:00</td></tr>
-        <tr><td>토</td><td>09:30 – 12:00</td></tr>
-        <tr class="closed"><td>일</td><td>정기휴무</td></tr>
+        <thead><tr><th scope="col"><span class="sr-only">요일</span></th><th scope="col">운영시간</th><th scope="col">상담 시간</th></tr></thead>
+        <tbody>
+        <tr><td>월</td><td>13:00 – 21:00</td><td class="consult">12:00 · 19:00</td></tr>
+        <tr><td>화</td><td>13:00 – 20:00</td><td class="consult">12:00 · 19:00</td></tr>
+        <tr><td>수</td><td>13:00 – 21:00</td><td class="consult">12:00 · 19:00</td></tr>
+        <tr><td>목</td><td>13:00 – 20:00</td><td class="consult">12:00 · 19:00</td></tr>
+        <tr><td>금</td><td>13:00 – 21:00</td><td class="consult">12:00 · 19:00</td></tr>
+        <tr><td>토</td><td>09:30 – 12:00</td><td class="consult">11:00</td></tr>
+        <tr class="closed"><td>일</td><td>정기휴무</td><td>–</td></tr>
+        </tbody>
       </table>
+      <p class="hours-note">상담은 위 시간 중에서 <a href="#reserve">상담 예약</a>으로 골라 주세요.</p>
     </div>
   </div>
 </section>
