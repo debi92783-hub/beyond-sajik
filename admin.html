@@ -562,10 +562,10 @@
             </table>
           </div>
           <div class="dt-actions">
-            <button class="btn soft" type="button" data-bulk="att">모두 출석</button>
-            <button class="btn soft" type="button" data-bulk="book">교재 모두 지참</button>
-            <button class="btn soft" type="button" data-bulk="hw">숙제 모두 완료</button>
-            <button class="btn soft" type="button" data-bulk="spk">Speaking 모두 완료</button>
+            <button class="btn soft" type="button" data-bulk="att">체크한 학생 출석</button>
+            <button class="btn soft" type="button" data-bulk="book">체크한 학생 교재 지참</button>
+            <button class="btn soft" type="button" data-bulk="hw">체크한 학생 숙제 완료</button>
+            <button class="btn soft" type="button" data-bulk="spk">체크한 학생 Speaking 완료</button>
             <button class="btn" type="button" id="dtMake">체크한 학생 개인 리포트 만들기</button>
           </div>
         </div>
@@ -1484,8 +1484,12 @@ $('dtAll').addEventListener('change', function(){
 document.querySelectorAll('#view-daily [data-bulk]').forEach(function(b){
   b.addEventListener('click', function(){
     var f = b.dataset.bulk, e = dtEntry();
-    dtCls().students.forEach(function(s){ var r = e.rows[s]; if(f === 'att' || r.att !== '결석') r[f] = DT_OPT[f][0]; });
-    dtSave(); renderDaily(); toast({ att:'모두 출석으로', book:'교재를 모두 지참으로', hw:'숙제를 모두 완료로', spk:'Speaking을 모두 완료로' }[f] + ' 바꿨어요.' + (f !== 'att' ? ' 결석한 학생은 그대로 둬요.' : ''));
+    var picked = dtCls().students.filter(function(s){ return e.rows[s].on; });
+    if(!picked.length){ toast('먼저 학생을 체크해 주세요.'); return; }
+    var n = 0;
+    picked.forEach(function(s){ var r = e.rows[s]; if(f === 'att' || r.att !== '결석'){ r[f] = DT_OPT[f][0]; n++; } });
+    dtSave(); renderDaily();
+    toast('체크한 학생 ' + n + '명을 ' + { att:'출석으로', book:'교재 지참으로', hw:'숙제 완료로', spk:'Speaking 완료로' }[f] + ' 바꿨어요.' + (n < picked.length ? ' 결석한 학생은 그대로 둬요.' : ''));
   });
 });
 document.querySelectorAll('#view-daily [data-max]').forEach(function(i){
