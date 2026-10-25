@@ -321,6 +321,11 @@
   .login-card input, .reg input[type=text], .reg input[type=password]{ border:1px solid var(--border); border-radius:9px; padding:11px 12px; font-size:14px; background:var(--surface-soft); color:var(--ink); font-weight:400; }
   .login-card .btn{ justify-content:center; padding:12px; font-size:14px; }
   .login-note{ font-size:11.5px; color:var(--ink-faint); text-align:center; line-height:1.6; margin:4px 0 0; }
+  .login-opts{ display:flex; gap:16px; margin-top:-2px; }
+  .login-card label.opt{ flex-direction:row; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft); cursor:pointer; }
+  .login-card label.opt input{ width:16px; height:16px; padding:0; accent-color:var(--accent); }
+  .linkish{ display:block; background:none; border:0; padding:4px; font:inherit; font-size:12.5px; color:var(--accent); font-weight:600; cursor:pointer; margin:8px auto 0; }
+  .code-box{ font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:20px; font-weight:800; letter-spacing:2px; background:var(--accent-soft); color:var(--accent); border-radius:10px; padding:10px 14px; text-align:center; }
   .login-card .back{ font-size:12.5px; color:var(--ink-soft); text-align:center; }
 
   /* 선생님 등록 */
@@ -384,9 +389,31 @@
       <form id="loginForm" novalidate style="margin-top:14px">
         <label>아이디<input type="text" id="loginId" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
         <label>비밀번호<input type="password" id="loginPw" autocomplete="current-password"></label>
+        <div class="login-opts">
+          <label class="opt"><input type="checkbox" id="saveId">아이디 저장</label>
+          <label class="opt"><input type="checkbox" id="autoLogin">자동 로그인</label>
+        </div>
         <p class="form-err" id="loginErr"></p>
         <button class="btn" type="submit">입장하기</button>
       </form>
+      <button type="button" class="linkish" id="toReset">비밀번호를 잊으셨나요? 재설정하기</button>
+    </div>
+
+    <div id="resetBox" hidden>
+      <h1>비밀번호 재설정</h1>
+      <p class="sub" id="resetSub">아이디를 입력해 주세요. 선생님은 원장님께 재설정을 요청하고, 원장님은 복구 코드로 새 비밀번호를 정해요.</p>
+      <form id="resetForm" novalidate style="margin-top:14px">
+        <label>아이디<input type="text" id="resetId" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+        <div id="resetDir" hidden style="display:flex; flex-direction:column; gap:12px">
+          <label>복구 코드 <span class="hint">원장님 계정·권한 화면에서 만든 코드</span><input type="text" id="resetCode" autocapitalize="characters" spellcheck="false" placeholder="예: ABCD-2345"></label>
+          <label>새 비밀번호 <span class="hint">6자 이상</span><input type="password" id="resetPw" autocomplete="new-password"></label>
+          <label>새 비밀번호 확인<input type="password" id="resetPw2" autocomplete="new-password"></label>
+        </div>
+        <p class="form-err" id="resetErr"></p>
+        <p class="ok-msg" id="resetOk"></p>
+        <button class="btn" type="submit" id="resetBtn">다음</button>
+      </form>
+      <button type="button" class="linkish" id="toLogin">← 로그인으로 돌아가기</button>
     </div>
 
     <div id="setupBox" hidden>
@@ -401,7 +428,7 @@
       </form>
     </div>
 
-    <p class="login-note">시안 단계라 계정은 이 기기 브라우저에만 저장돼요. 실제로 쓰기 전에 구글 계정 로그인 같은 안전한 방식으로 바꿀 거예요.</p>
+    <p class="login-note">시안 단계라 계정은 이 기기 브라우저에만 저장돼요. 실제로 쓰기 전에 구글 계정 로그인 같은 안전한 방식으로 바꿀 거예요. 학원 공용 컴퓨터에서는 자동 로그인을 켜지 마세요.</p>
     <a class="back" href="./">← 학원 안내 페이지로</a>
   </div>
 </div>
@@ -695,6 +722,12 @@
               <p class="ok-msg" id="myPwOk"></p>
               <button class="btn soft" type="submit" style="align-self:flex-start">비밀번호 바꾸기</button>
             </form>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>원장님 복구 코드</h2><span class="muted" id="codeState"></span></div>
+            <p class="muted" style="margin:0 0 12px">원장님 비밀번호를 잊었을 때 로그인 화면의 '비밀번호 재설정'에서 이 코드로 새 비밀번호를 정해요. 코드는 만들 때 한 번만 보여 드려요. 종이에 적어 안전한 곳에 보관해 주세요.</p>
+            <div class="code-box" id="codeShow" hidden></div>
+            <button class="btn soft" type="button" id="codeMake" style="margin-top:12px">복구 코드 새로 만들기</button>
           </div>
         </div>
       </div>
@@ -1905,7 +1938,7 @@ $('moNext').addEventListener('click', function(){ moMonth.setMonth(moMonth.getMo
 /* ===== 계정 · 로그인 =====
    시안용: 계정은 이 브라우저(localStorage)에만 저장하고 비밀번호는 SHA-256 해시로만 보관해요.
    정적 페이지라 진짜 보안은 아니에요. 실제 운영 전에는 구글 로그인 등 서버 인증으로 바꿔야 해요. */
-var ACC_KEY = 'beyond-accounts-v1', SES_KEY = 'beyond-session-v1';
+var ACC_KEY = 'beyond-accounts-v1', SES_KEY = 'beyond-session-v1', ID_KEY = 'beyond-saved-id', AUTO_KEY = 'beyond-auto-login';
 var store = (function(){
   try{ var raw = localStorage.getItem(ACC_KEY); if(raw) return JSON.parse(raw); }catch(e){}
   return { accounts:[], assign:{} };
@@ -1952,12 +1985,58 @@ function showLogin(){
   var first = !store.accounts.some(function(a){ return a.role === 'director'; });
   $('setupBox').hidden = !first;
   $('loginBox').hidden = first;
-  (first ? $('setupId') : $('loginId')).focus();
+  $('resetBox').hidden = true;
+  var savedId = ''; try{ savedId = localStorage.getItem(ID_KEY) || ''; }catch(e){}
+  $('loginId').value = savedId; $('saveId').checked = !!savedId;
+  try{ $('autoLogin').checked = false; }catch(e){}
+  (first ? $('setupId') : savedId ? $('loginPw') : $('loginId')).focus();
 }
+
+/* 비밀번호 재설정: 선생님은 원장님께 요청, 원장님은 복구 코드로 */
+var CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function newCode(){ var a = new Uint8Array(8); crypto.getRandomValues(a); var c = Array.from(a, function(b){ return CODE_CH[b % CODE_CH.length]; }).join(''); return c.slice(0,4) + '-' + c.slice(4); }
+function normCode(v){ return String(v).toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+$('toReset').addEventListener('click', function(){
+  $('loginBox').hidden = true; $('resetBox').hidden = false;
+  $('resetForm').reset(); $('resetDir').hidden = true; $('resetErr').textContent = ''; $('resetOk').textContent = '';
+  $('resetBtn').textContent = '다음'; $('resetBtn').hidden = false;
+  $('resetId').value = $('loginId').value; $('resetId').focus();
+});
+$('toLogin').addEventListener('click', function(){ showLogin(); });
+$('resetForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  $('resetErr').textContent = ''; $('resetOk').textContent = '';
+  var acc = findAcc($('resetId').value.trim());
+  if(!acc){ $('resetErr').textContent = '등록된 아이디가 아니에요. 다시 확인해 주세요.'; return; }
+  if(acc.role === 'teacher'){
+    store.resetReq = store.resetReq || {};
+    store.resetReq[acc.id] = Date.now(); saveStore();
+    $('resetOk').textContent = acc.name + ' 선생님의 재설정 요청을 원장님께 보냈어요. 원장님이 새 비밀번호를 정해서 알려 주실 거예요.';
+    $('resetBtn').hidden = true;
+    return;
+  }
+  if($('resetDir').hidden){
+    if(!acc.rhash){ $('resetErr').textContent = '복구 코드를 만들어 두지 않아서 여기서는 재설정할 수 없어요. 실제 운영 때는 휴대폰 인증으로 바꿀 예정이에요.'; return; }
+    $('resetDir').hidden = false; $('resetBtn').textContent = '새 비밀번호 저장'; $('resetCode').focus(); return;
+  }
+  var err = checkPw($('resetPw').value, $('resetPw2').value);
+  if(err){ $('resetErr').textContent = err; return; }
+  hashPw(normCode($('resetCode').value), acc.rsalt).then(function(h){
+    if(h !== acc.rhash){ $('resetErr').textContent = '복구 코드가 맞지 않아요. 다시 확인해 주세요.'; return; }
+    var salt = randSalt();
+    return hashPw($('resetPw').value, salt).then(function(h2){
+      acc.salt = salt; acc.hash = h2; saveStore();
+      try{ localStorage.removeItem(AUTO_KEY); }catch(err2){}
+      showLogin(); $('loginId').value = acc.id; $('loginPw').focus();
+      toast('새 비밀번호로 바꿨어요. 새 비밀번호로 들어와 주세요.');
+    });
+  });
+});
 function enter(acc){
   session = { id:acc.id, role:acc.role, name:acc.name };
   try{ sessionStorage.setItem(SES_KEY, JSON.stringify(session)); }catch(e){}
   $('loginScreen').hidden = true;
+  if(acc.role === 'director' && !acc.rhash) setTimeout(function(){ toast('선생님 계정·권한 화면에서 원장님 복구 코드를 만들어 두세요.'); }, 2800);
   document.querySelector('.topbar').hidden = false;
   $('appLayout').hidden = false;
   document.querySelector('.seg').hidden = acc.role === 'teacher';
@@ -1995,13 +2074,21 @@ $('loginForm').addEventListener('submit', function(e){
   var acc = findAcc($('loginId').value.trim()), pw = $('loginPw').value;
   var fail = function(){ $('loginErr').textContent = '아이디 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요.'; $('loginPw').value = ''; $('loginPw').focus(); };
   if(!acc) return fail();
-  hashPw(pw, acc.salt).then(function(h){ if(h !== acc.hash) return fail(); $('loginErr').textContent = ''; $('loginForm').reset(); enter(acc); })
+  hashPw(pw, acc.salt).then(function(h){
+    if(h !== acc.hash) return fail();
+    // 아이디 저장 / 자동 로그인 (이 기기 브라우저에만 기억해요)
+    try{
+      if($('saveId').checked) localStorage.setItem(ID_KEY, acc.id); else localStorage.removeItem(ID_KEY);
+      if($('autoLogin').checked) localStorage.setItem(AUTO_KEY, JSON.stringify({ id:acc.id, hash:acc.hash })); else localStorage.removeItem(AUTO_KEY);
+    }catch(err){}
+    $('loginErr').textContent = ''; $('loginPw').value = ''; enter(acc);
+  })
     .catch(function(){ $('loginErr').textContent = '이 브라우저에서는 로그인할 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
 });
 $('logoutBtn').addEventListener('click', function(e){
   e.preventDefault();
   session = null;
-  try{ sessionStorage.removeItem(SES_KEY); }catch(err){}
+  try{ sessionStorage.removeItem(SES_KEY); localStorage.removeItem(AUTO_KEY); }catch(err){}
   try{ history.replaceState(null, '', location.pathname); }catch(err){}
   showLogin();
 });
@@ -2012,10 +2099,14 @@ function renderSettings(){
     return '<label><input type="checkbox" value="'+c.id+'">'+esc(c.name)+' <small>'+esc(c.teacher)+'</small></label>';
   }).join('');
   var teachers = store.accounts.filter(function(a){ return a.role === 'teacher'; });
-  $('tCount').textContent = teachers.length + '명';
+  var req = store.resetReq || {}, reqN = teachers.filter(function(a){ return req[a.id]; }).length;
+  $('tCount').textContent = teachers.length + '명' + (reqN ? ' · 재설정 요청 ' + reqN + '건' : '');
+  var me0 = session && findAcc(session.id);
+  $('codeState').textContent = me0 && me0.rhash ? '만들어 둠' : '아직 없어요';
+  $('codeShow').hidden = true;
   $('tRows').innerHTML = teachers.length ? teachers.map(function(a){
     var cl = CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; });
-    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b></td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
       '<td class="acts"><button type="button" data-act="pw">비밀번호 바꾸기</button><button type="button" class="danger" data-act="del">삭제</button></td></tr>';
   }).join('') : '<tr><td colspan="4" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 왼쪽에서 첫 선생님을 등록해 주세요.</td></tr>';
 }
@@ -2063,7 +2154,16 @@ $('tRows').addEventListener('submit', function(e){
   var f = e.target, acc = findAcc(f.dataset.id), pw = f.querySelector('input').value;
   if(pw.length < 6){ f.querySelector('.form-err').textContent = '6자 이상으로 정해 주세요.'; return; }
   var salt = randSalt();
-  hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 바꿨어요.'); });
+  hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; if(store.resetReq) delete store.resetReq[acc.id]; saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 바꿨어요. 새 비밀번호를 선생님께 알려 주세요.'); });
+});
+$('codeMake').addEventListener('click', function(){
+  var acc = findAcc(session.id), code = newCode(), salt = randSalt();
+  hashPw(normCode(code), salt).then(function(h){
+    acc.rsalt = salt; acc.rhash = h; saveStore();
+    $('codeShow').textContent = code; $('codeShow').hidden = false;
+    $('codeState').textContent = '만들어 둠';
+    toast('새 복구 코드를 만들었어요. 예전 코드는 이제 쓸 수 없어요.');
+  });
 });
 $('myPwForm').addEventListener('submit', function(e){
   e.preventDefault();
@@ -2082,6 +2182,13 @@ loadSheetConsults();
   var saved = null;
   try{ saved = JSON.parse(sessionStorage.getItem(SES_KEY) || 'null'); }catch(e){}
   var acc = saved && findAcc(saved.id);
+  if(!acc){
+    // 자동 로그인: 비밀번호가 바뀌면 저장해 둔 정보가 맞지 않아 다시 로그인해야 해요.
+    var auto = null; try{ auto = JSON.parse(localStorage.getItem(AUTO_KEY) || 'null'); }catch(e){}
+    var a2 = auto && findAcc(auto.id);
+    if(a2 && a2.hash === auto.hash) acc = a2;
+    else if(auto){ try{ localStorage.removeItem(AUTO_KEY); }catch(e){} }
+  }
   if(acc) enter(acc); else showLogin();
 })();
 </script>
