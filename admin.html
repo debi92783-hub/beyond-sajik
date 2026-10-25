@@ -310,6 +310,57 @@
   .rc .foot{ display:flex; justify-content:flex-end; padding:8px 10px; background:var(--surface-soft); border-top:1px solid var(--border); }
   @media (max-width: 720px){ .dt-lesson{ grid-template-columns:minmax(0,1fr); } .dt-lesson .prog{ flex-direction:column; } }
 
+  /* 출결·지각 */
+  .at-sum{ display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+  .at-sum .card{ padding:12px 10px; text-align:center; }
+  .at-sum b{ display:block; font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .at-sum span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .at-sum .c-good b{ color:var(--good); } .at-sum .c-bad b{ color:var(--warn); } .at-sum .c-mid b{ color:var(--hold); } .at-sum .c-acc b{ color:var(--accent); }
+  .at-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 12px; background:var(--surface-soft); border-radius:12px; }
+  .at-sms{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; cursor:pointer; }
+  .at-sms input{ width:18px; height:18px; accent-color:var(--accent); }
+  .at-sms small{ font-size:11.5px; color:var(--ink-soft); font-weight:600; }
+  .at-bar-btns{ display:flex; gap:8px; }
+  .at-tip{ font-size:12px; color:var(--ink-soft); margin:10px 2px 6px; }
+  .at-list{ display:flex; flex-direction:column; }
+  .at-row{ display:grid; grid-template-columns:110px 1fr; gap:6px 14px; padding:12px 2px; border-bottom:1px solid var(--border); align-items:start; }
+  .at-row:last-child{ border-bottom:0; }
+  .at-row .nm{ font-weight:800; font-size:14px; padding-top:6px; }
+  .at-row .nm small{ display:block; font-size:11px; color:var(--ink-soft); font-weight:600; margin-top:3px; }
+  .at-seg{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .at-seg button{ font:inherit; font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .at-seg button[aria-pressed="true"].s-출석, .at-seg button[aria-pressed="true"].s-보강{ background:var(--good); border-color:var(--good); color:#fff; }
+  .at-seg button[aria-pressed="true"].s-결석{ background:var(--warn); border-color:var(--warn); color:#fff; }
+  .at-seg button[aria-pressed="true"].s-지각, .at-seg button[aria-pressed="true"].s-조퇴{ background:#E2A33B; border-color:#E2A33B; color:#fff; }
+  .at-seg .time{ font-size:12px; color:var(--ink-soft); font-weight:600; margin-left:4px; display:flex; align-items:center; gap:4px; }
+  .at-seg .time input{ font:inherit; font-size:12px; border:1px solid var(--border); border-radius:7px; padding:4px 6px; background:var(--surface); color:var(--ink); }
+  .at-seg .out{ margin-left:auto; }
+  .at-seg .out button{ background:var(--accent-soft); color:var(--accent); border-color:transparent; }
+  .at-seg .out .done{ font-size:12px; color:var(--good); font-weight:700; }
+  .at-more{ grid-column:2; display:flex; flex-direction:column; gap:8px; }
+  .at-more input[type=text]{ width:100%; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); }
+  .at-more input.need{ border-color:var(--warn); background:var(--warn-soft); }
+  .at-notice{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .at-notice label{ display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--ink); }
+  .at-notice input{ accent-color:var(--accent); }
+  .at-notice .guide{ flex-basis:100%; font-size:11.5px; color:var(--warn); font-weight:600; }
+  .at-out{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px; margin-top:12px; }
+  .at-msg{ border:1px solid var(--border); border-radius:12px; padding:12px; background:var(--surface-soft); display:flex; flex-direction:column; gap:8px; }
+  .at-msg .hd{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; font-weight:800; }
+  .at-msg .hd .tag{ margin-left:6px; }
+  .at-msg textarea{ width:100%; min-height:120px; font:inherit; font-size:12.5px; line-height:1.6; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); resize:vertical; }
+  .at-msg .x{ background:none; border:0; color:var(--ink-faint); font-size:12px; cursor:pointer; font-weight:700; }
+  .at-empty{ font-size:12.5px; color:var(--ink-faint); padding:14px 2px; }
+  .at-log{ margin-top:16px; font-size:12.5px; }
+  .at-log summary{ cursor:pointer; font-weight:700; color:var(--ink-soft); }
+  .at-log div div{ padding:6px 0; border-bottom:1px solid var(--border); color:var(--ink-soft); }
+  @media (max-width: 720px){
+    .at-sum{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+    .at-row{ grid-template-columns:1fr; }
+    .at-more{ grid-column:1; }
+    .at-seg .out{ margin-left:0; }
+  }
+
   /* 로그인 */
   .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
   .login-card{ width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 26px; box-shadow:0 8px 30px rgba(32,36,43,0.06); display:flex; flex-direction:column; gap:14px; }
@@ -679,6 +730,42 @@
       </div>
     </section>
 
+    <!-- 출결·지각 -->
+    <section id="view-attend" hidden>
+      <div class="greet"><div><h1>출결·지각</h1><p>출석을 체크하고 저장하면 등원·결석·조퇴 카톡이 '보낼 카톡'에 쌓여요. 하원할 때는 하원 버튼을 눌러요.</p></div></div>
+      <div class="card dt-head">
+        <div class="nav">
+          <button class="sq" type="button" id="atPrev" aria-label="이전 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button>
+          <span id="atDay"></span>
+          <button class="sq" type="button" id="atNext" aria-label="다음 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
+        </div>
+        <div class="tools"><label>반 <select id="atClass" aria-label="반 선택"></select></label></div>
+      </div>
+      <div class="card" id="atEmpty" hidden><h2>담당 반이 없어요</h2><p class="muted" style="margin:8px 0 0">원장님이 담당 반을 정해 주면 여기에서 출결을 체크할 수 있어요.</p></div>
+      <div id="atBody">
+        <div class="at-sum" id="atSum"></div>
+        <div class="card">
+          <div class="card-head"><h2>출석 체크 — <span id="atClassName"></span></h2><span class="muted" id="atSaved"></span></div>
+          <div class="at-bar">
+            <label class="at-sms"><input type="checkbox" id="atSms" checked><span>문자발송</span><small>출석 체크할 때 꼭 켜 두세요</small></label>
+            <div class="at-bar-btns">
+              <button class="btn soft" type="button" id="atAll">전체출석</button>
+              <button class="btn" type="button" id="atSave">저장하기</button>
+            </div>
+          </div>
+          <p class="at-tip">차량 지연으로 늦는 학생은 체크하지 말고 두었다가, 등원하면 '출석'으로 체크하고 저장해 주세요.</p>
+          <div class="at-list" id="atRows"></div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-head"><h2>보낼 카톡</h2><span class="muted" id="atOutCount"></span></div>
+          <p class="muted" style="margin:0 0 4px">보내기 전에 문구를 고칠 수 있어요. 지금은 시안이라 실제로 전송되지 않고 보낸 것으로만 기록돼요.</p>
+          <div class="at-out" id="atOut"></div>
+          <div class="dt-actions"><button class="btn" type="button" id="atSend">카톡 전체 발송</button></div>
+          <details class="at-log"><summary>오늘 보낸 카톡 <span id="atLogCount"></span></summary><div id="atLog"></div></details>
+        </div>
+      </div>
+    </section>
+
     <!-- 선생님·설정 (원장님 전용) -->
     <section id="view-settings" hidden>
       <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
@@ -857,12 +944,12 @@ var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리'],['bell','전체 공지']]],
-    ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각'],['doc','월말 리포트','monthly']]],
+    ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly']]],
     ['소통·자료', [['bell','전달사항'],['users','주간회의'],['video','TTC 교육자료'],['box','교재 출고 요청'],['dict','영어 뉘앙스 사전']]],
     ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
   ],
   teacher: [
-    ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
+    ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
     ['소통·자료', [['bell','전달사항'],['users','주간회의'],['video','TTC 교육자료'],['box','교재 출고 요청'],['dict','영어 뉘앙스 사전']]],
     ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
   ]
@@ -892,23 +979,25 @@ function setView(v, page){
   state.view = v;
   state.page = page || 'main';
   if(state.page === 'settings' && v !== 'director') state.page = 'main';
-  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly';
+  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly;
+  var sub = cal || set || daily || monthly || attend;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
   $('view-settings').hidden = !set;
   $('view-daily').hidden = !daily;
   $('view-monthly').hidden = !monthly;
+  $('view-attend').hidden = !attend;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
   else if(daily) renderDaily();
   else if(monthly) renderMonthly();
+  else if(attend) renderAttend();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -939,7 +1028,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
-    if(a.dataset.key === 'daily' || a.dataset.key === 'monthly') return setView(state.view, a.dataset.key);
+    if(a.dataset.key === 'daily' || a.dataset.key === 'monthly' || a.dataset.key === 'attend') return setView(state.view, a.dataset.key);
     if(!a.dataset.key) soon(a.dataset.name);
     return;
   }
@@ -1148,6 +1237,7 @@ $('teacherPick').addEventListener('change', function(){
   if(state.page === 'calendar'){ fillTeacherPick(); renderCalendar(); }
   else if(state.page === 'daily'){ renderDaily(); }
   else if(state.page === 'monthly'){ renderMonthly(); }
+  else if(state.page === 'attend'){ renderAttend(); }
   else renderTeacher();
 });
 $('myClasses').addEventListener('click', function(e){
@@ -1438,7 +1528,11 @@ function dtEntry(){
       pass: prev ? prev.pass : 18, rows:{} };
   }
   var e = dtStore[k];
-  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = dtNewRow(); });
+  c.students.forEach(function(s){
+    if(e.rows[s]) return;
+    var row = e.rows[s] = dtNewRow(), a = typeof atFor === 'function' && atFor(c.id, ymd(dtDay), s);
+    if(a){ row.att = a.st === '보강' ? '출석' : a.st; if(a.st === '지각') row.attNote = a.reason; }   // 출결·지각 기록을 이어 받아요
+  });
   return e;
 }
 function num(v){ return v === '' || v == null || isNaN(+v) ? null : +v; }
@@ -1935,6 +2029,208 @@ $('moClass').addEventListener('change', function(){ moClassId = this.value; rend
 $('moPrev').addEventListener('click', function(){ moMonth.setMonth(moMonth.getMonth() - 1); renderMonthly(); });
 $('moNext').addEventListener('click', function(){ moMonth.setMonth(moMonth.getMonth() + 1); renderMonthly(); });
 
+/* ===== 출결·지각 =====
+   출석 체크 → 저장하기 → '보낼 카톡'에 쌓임 → 카톡 전체 발송.
+   등원(출석·지각·보강), 하원, 조퇴, 결석(사전 연락 있음/없음)으로 문구를 나눠요.
+   카톡 전송은 나중에 연결할 자리예요. 지금은 보낸 것으로만 기록해요(시안, localStorage). */
+var AT_KEY = 'beyond-attend-v1';
+var AT_ST = ['출석','결석','지각','조퇴','보강'];
+var atStore = (function(){ try{ return JSON.parse(localStorage.getItem(AT_KEY) || '{}'); }catch(e){ return {}; } })();
+var atDay = new Date(); atDay.setHours(0,0,0,0);
+var atClassId = null;
+function atSave(){ try{ localStorage.setItem(AT_KEY, JSON.stringify(atStore)); }catch(e){} }
+function atCls(){ return CLASSES.find(function(c){ return c.id === atClassId; }); }
+function atEntry(){
+  var c = atCls(), k = c.id + '|' + ymd(atDay);
+  if(!atStore[k]) atStore[k] = { rows:{}, outbox:[], log:[] };
+  var e = atStore[k];
+  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = { st:'', reason:'', notice:'', recheck:false, inAt:'', outAt:'', queued:{}, sent:{} }; });
+  return e;
+}
+function nowHM(){ var d = new Date(); return ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2); }
+function korTime(hm){ if(!hm) return ''; var p = hm.split(':'), h = +p[0]; return (h < 12 ? '오전 ' : '오후 ') + ((h % 12) || 12) + ':' + p[1]; }
+function ro(word){ var w = String(word).trim(), ch = w.charCodeAt(w.length - 1); if(ch < 0xAC00 || ch > 0xD7A3) return '(으)로'; var jong = (ch - 0xAC00) % 28; return jong === 0 || jong === 8 ? '로' : '으로'; }
+var AT_HELLO = '안녕하세요 비욘드잉글리쉬입니다^^';
+function atMsg(type, s, r){
+  var c = atCls(), start = (c.time || '').split(/[–-]/)[0];
+  if(type === 'in'){
+    if(r.st === '보강') return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.inAt) + '에 보강 수업을 위해 등원했습니다.';
+    return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.inAt) + '에 학원에 등원했습니다.' + (r.st === '지각' && r.reason.trim() ? '\n(늦은 사유: ' + r.reason.trim() + ')' : '');
+  }
+  if(type === 'out') return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.outAt) + '에 하원했습니다. 오늘도 수고 많았습니다.';
+  if(type === 'early') return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.outAt) + '에 조퇴했습니다.' + (r.reason.trim() ? '\n사유: ' + r.reason.trim() : '');
+  if(type === 'abs' && r.notice === 'yes'){
+    var why = r.reason.trim();
+    return AT_HELLO + '\n' + s + ' 학생~ ' + (why ? why + ro(why) + ' ' : '') + '결석한다고 전달받아 확인 차 연락드립니다.\n\n' +
+      '보충은 토요일 10, 11시, 12시 중 가능한 일정과\n차량이용여부 말씀해주시면 진행 가능합니다^^\n토요일 차량은 등원10시 또는 하원1시만 이용 가능합니다.';
+  }
+  if(type === 'abs') return AT_HELLO + '\n' + s + ' 학생이 오늘 ' + korTime(start) + ' 수업에 아직 등원하지 않아 연락드립니다.\n결석 여부와 사유를 알려 주시면 보충 일정을 함께 안내해 드리겠습니다.';
+  return '';
+}
+var AT_TYPE = { in:'등원', out:'하원', early:'조퇴', abs:'결석' };
+// 문자를 만들 수 있는지 확인: 사유·사전 연락·재확인
+function atProblem(r){
+  if(r.st === '지각' || r.st === '조퇴' || r.st === '결석'){ if(!r.reason.trim() && !(r.st === '결석' && r.notice === 'no')) return '사유'; }
+  if(r.st === '결석'){
+    if(!r.notice) return '사전 연락';
+    if(r.notice === 'yes' && !r.recheck) return '재확인';
+  }
+  return '';
+}
+
+function renderAttend(){
+  fillTeacherPick();
+  var list = dtClasses();
+  $('atEmpty').hidden = list.length > 0;
+  $('atBody').hidden = list.length === 0;
+  $('atDay').textContent = fmtDate(atDay);
+  if(!list.length) return;
+  if(!list.some(function(c){ return c.id === atClassId; })){
+    atClassId = list.some(function(c){ return c.id === dtClassId; }) ? dtClassId : list.some(function(c){ return c.id === state.classId; }) ? state.classId : list[0].id;
+  }
+  $('atClass').innerHTML = list.map(function(c){ return '<option value="'+c.id+'"'+(c.id===atClassId?' selected':'')+'>'+esc(c.name)+' · '+esc(c.time)+(state.view==='director'?' · '+esc(c.teacher):'')+'</option>'; }).join('');
+  var c = atCls(), e = atEntry();
+  $('atClassName').textContent = c.name + ' · ' + c.students.length + '명';
+  $('atRows').innerHTML = c.students.map(function(s){ return atRowHtml(s, e.rows[s]); }).join('');
+  renderAtSum(); renderAtOut();
+}
+function atRowHtml(s, r){
+  var seg = AT_ST.map(function(o){ return '<button type="button" class="s-'+o+'" data-st="'+o+'" aria-pressed="'+(r.st===o)+'">'+o+'</button>'; }).join('');
+  var inT = r.st === '출석' || r.st === '지각' || r.st === '보강' || r.st === '조퇴';
+  var time = inT ? '<span class="time">등원 <input type="time" data-f="inAt" value="'+esc(r.inAt)+'" aria-label="'+esc(s)+' 등원 시각"></span>' : '';
+  if(r.st === '조퇴') time += '<span class="time">조퇴 <input type="time" data-f="outAt" value="'+esc(r.outAt)+'" aria-label="'+esc(s)+' 조퇴 시각"></span>';
+  var out = '';
+  if(r.st === '출석' || r.st === '지각' || r.st === '보강'){
+    out = '<span class="out">' + (r.outAt ? '<span class="done">하원 ' + korTime(r.outAt) + (r.sent.out ? ' · 카톡 보냄' : r.queued.out ? ' · 보낼 카톡에 있음' : '') + '</span>' : '<button type="button" data-out>하원</button>') + '</span>';
+  }
+  var more = '';
+  if(r.st === '지각' || r.st === '조퇴' || r.st === '결석'){
+    var prob = atProblem(r);
+    more = '<div class="at-more"><input type="text" data-f="reason" class="'+(prob === '사유' && r.tried ? 'need' : '')+'" value="'+esc(r.reason)+'" placeholder="'+(r.st==='지각'?'예: 학교 상담으로 인한 지각':r.st==='조퇴'?'예: 병원 진료로 조퇴':'예: 컨디션 저조로 인한 결석')+'" aria-label="'+esc(s)+' 사유">';
+    if(r.st === '결석'){
+      more += '<div class="at-notice"><span>사전 연락</span>' +
+        '<label><input type="radio" name="nt-'+esc(s)+'" data-f="notice" value="yes"'+(r.notice==='yes'?' checked':'')+'>있음 (학생·타과목)</label>' +
+        '<label><input type="radio" name="nt-'+esc(s)+'" data-f="notice" value="no"'+(r.notice==='no'?' checked':'')+'>없음</label>';
+      if(r.notice === 'yes') more += '<label><input type="checkbox" data-f="recheck"'+(r.recheck?' checked':'')+'>부모님께 재확인했어요</label><span class="guide">사전 연락을 받은 뒤 꼭 재확인해요. 저장하면 보충 일정 안내 카톡이 만들어져요.</span>';
+      if(r.notice === 'no') more += '<span class="guide">저장하면 부모님께 결석 여부를 여쭤보는 카톡이 만들어져요.</span>';
+      more += '</div>';
+    }
+    more += '</div>';
+  }
+  var tag = r.sent.in || r.sent.abs || r.sent.early ? '<small>카톡 보냄</small>' : r.queued.in || r.queued.abs || r.queued.early ? '<small>보낼 카톡에 있음</small>' : '';
+  return '<div class="at-row" data-name="'+esc(s)+'"><div class="nm">'+esc(s)+tag+'</div><div class="at-seg">'+seg+time+out+'</div>'+more+'</div>';
+}
+function renderAtSum(){
+  var c = atCls(), e = atEntry(), n = { '출석':0,'결석':0,'지각':0,'조퇴':0,'보강':0,'':0 };
+  c.students.forEach(function(s){ n[e.rows[s].st]++; });
+  var cards = [['출석','c-good'],['결석','c-bad'],['지각','c-mid'],['조퇴','c-mid'],['보강','c-acc'],['','']];
+  $('atSum').innerHTML = cards.map(function(k){ return '<div class="card '+k[1]+'"><b>'+n[k[0]]+'</b><span>'+(k[0] || '미체크')+'</span></div>'; }).join('');
+  $('atSaved').textContent = e.savedAt ? '저장됨 · ' + hm(e.savedAt) : '아직 저장 전이에요';
+}
+function renderAtOut(){
+  var e = atEntry();
+  $('atOut').innerHTML = e.outbox.length ? e.outbox.map(function(m, i){
+    return '<div class="at-msg" data-i="'+i+'"><div class="hd"><span>'+esc(m.name)+' 학부모님<span class="tag '+(m.type==='abs'?'warn':'')+'">'+AT_TYPE[m.type]+'</span></span><button type="button" class="x" data-x aria-label="빼기">빼기</button></div><textarea aria-label="'+esc(m.name)+' 카톡 문구">'+esc(m.text)+'</textarea></div>';
+  }).join('') : '<div class="at-empty">보낼 카톡이 없어요. 출석을 체크하고 저장하거나, 하원 버튼을 누르면 여기에 생겨요.</div>';
+  $('atOutCount').textContent = e.outbox.length ? e.outbox.length + '건' : '';
+  $('atSend').disabled = !e.outbox.length;
+  $('atLogCount').textContent = '(' + e.log.length + '건)';
+  $('atLog').innerHTML = e.log.slice().reverse().map(function(m){ return '<div>' + hm(m.at) + ' · ' + esc(m.name) + ' · ' + AT_TYPE[m.type] + '</div>'; }).join('') || '<div>아직 없어요</div>';
+}
+function atQueue(e, s, type){
+  var r = e.rows[s];
+  if(r.queued[type] || r.sent[type]) return false;
+  e.outbox.push({ name:s, type:type, text:atMsg(type, s, r) });
+  r.queued[type] = true;
+  return true;
+}
+// 데일리 테스트 점검표의 출결을 출결·지각 기록에 맞춰요 (아직 저장 전인 점검표만)
+function atSyncDaily(){
+  var k = atClassId + '|' + ymd(atDay), d = dtStore[k], e = atEntry();
+  if(!d || (d.stage && d.stage !== 'draft')) return;
+  Object.keys(e.rows).forEach(function(s){
+    var r = e.rows[s], row = d.rows[s]; if(!row || !r.st) return;
+    row.att = r.st === '보강' ? '출석' : r.st;
+    row.attNote = r.st === '지각' || r.st === '기타' ? r.reason : '';
+  });
+  dtSave();
+}
+function atFor(cid, date, s){ var e = atStore[cid + '|' + date]; return e && e.rows[s] && e.rows[s].st ? e.rows[s] : null; }
+
+$('atRows').addEventListener('click', function(ev){
+  var row = ev.target.closest('.at-row'); if(!row) return;
+  var e = atEntry(), s = row.dataset.name, r = e.rows[s];
+  var b = ev.target.closest('[data-st]');
+  if(b){
+    var v = b.dataset.st;
+    r.st = r.st === v ? '' : v;
+    if((r.st === '출석' || r.st === '지각' || r.st === '보강' || r.st === '조퇴') && !r.inAt) r.inAt = nowHM();
+    if(r.st === '조퇴' && !r.outAt) r.outAt = nowHM();
+    if(r.st === '결석' || r.st === ''){ r.inAt = ''; r.outAt = ''; }
+    r.tried = false;
+    atSave(); row.outerHTML = atRowHtml(s, r); renderAtSum();
+    return;
+  }
+  if(ev.target.closest('[data-out]')){
+    r.outAt = nowHM();
+    var q = $('atSms').checked && atQueue(e, s, 'out');
+    atSave(); row.outerHTML = atRowHtml(s, r); renderAtOut();
+    toast(s + ' 학생 하원을 기록했어요.' + (q ? ' 하원 카톡이 보낼 카톡에 들어갔어요.' : ''));
+  }
+});
+$('atRows').addEventListener('input', function(ev){
+  var el = ev.target, f = el.dataset.f; if(!f) return;
+  var row = el.closest('.at-row'), e = atEntry(), s = row.dataset.name, r = e.rows[s];
+  r[f] = el.type === 'checkbox' ? el.checked : el.value;
+  if(f === 'reason') el.classList.remove('need');
+  atSave();
+  if(f === 'notice') row.outerHTML = atRowHtml(s, r);
+});
+$('atAll').addEventListener('click', function(){
+  var e = atEntry(), n = 0, t = nowHM();
+  atCls().students.forEach(function(s){ var r = e.rows[s]; if(!r.st){ r.st = '출석'; r.inAt = t; n++; } });
+  atSave(); renderAttend();
+  toast(n ? '체크 안 된 ' + n + '명을 출석으로 바꿨어요. 차량 지연 학생은 다시 풀어 주세요.' : '모두 이미 체크돼 있어요.');
+});
+$('atSave').addEventListener('click', function(){
+  var c = atCls(), e = atEntry(), sms = $('atSms').checked, made = 0, wait = [];
+  c.students.forEach(function(s){
+    var r = e.rows[s]; if(!r.st) return;
+    var prob = atProblem(r);
+    if(prob){ r.tried = true; wait.push(s + '(' + prob + ')'); return; }
+    if(!sms) return;
+    var type = r.st === '결석' ? 'abs' : r.st === '조퇴' ? 'early' : 'in';
+    if(atQueue(e, s, type)) made++;
+  });
+  e.savedAt = Date.now();
+  atSave(); atSyncDaily(); renderAttend();
+  var msg = '출결을 저장했어요.' + (sms ? (made ? ' 카톡 ' + made + '건이 보낼 카톡에 들어갔어요.' : '') : ' 문자발송이 꺼져 있어서 카톡은 만들지 않았어요.');
+  if(wait.length) msg += ' 확인이 필요한 학생: ' + wait.join(', ');
+  toast(msg);
+});
+$('atOut').addEventListener('input', function(ev){
+  var m = ev.target.closest('.at-msg'); if(!m || ev.target.tagName !== 'TEXTAREA') return;
+  atEntry().outbox[+m.dataset.i].text = ev.target.value; atSave();
+});
+$('atOut').addEventListener('click', function(ev){
+  if(!ev.target.closest('[data-x]')) return;
+  var e = atEntry(), i = +ev.target.closest('.at-msg').dataset.i, m = e.outbox[i];
+  e.outbox.splice(i, 1);
+  if(e.rows[m.name]) delete e.rows[m.name].queued[m.type];   // 다시 저장하면 새로 만들 수 있어요
+  atSave(); renderAttend();
+});
+$('atSend').addEventListener('click', function(){
+  var e = atEntry(), n = e.outbox.length; if(!n) return;
+  var at = Date.now();
+  e.outbox.forEach(function(m){ var r = e.rows[m.name]; if(r){ r.sent[m.type] = true; delete r.queued[m.type]; } e.log.push({ name:m.name, type:m.type, text:m.text, at:at }); });
+  e.outbox = [];
+  atSave(); renderAttend();
+  toast('시안이라 실제 카톡은 가지 않아요. ' + n + '건을 보낸 것으로 기록했어요.');
+});
+$('atClass').addEventListener('change', function(){ atClassId = this.value; renderAttend(); });
+$('atPrev').addEventListener('click', function(){ atDay.setDate(atDay.getDate() - 1); renderAttend(); });
+$('atNext').addEventListener('click', function(){ atDay.setDate(atDay.getDate() + 1); renderAttend(); });
+
 /* ===== 계정 · 로그인 =====
    시안용: 계정은 이 브라우저(localStorage)에만 저장하고 비밀번호는 SHA-256 해시로만 보관해요.
    정적 페이지라 진짜 보안은 아니에요. 실제 운영 전에는 구글 로그인 등 서버 인증으로 바꿔야 해요. */
@@ -2044,7 +2340,7 @@ function enter(acc){
   if(acc.role === 'teacher'){
     state.teacher = acc.name;
     var th = location.hash.replace('#teacher-', '').replace('#', '');
-    setView('teacher', th === 'calendar' || th === 'daily' || th === 'monthly' ? th : 'main');
+    setView('teacher', ['calendar','daily','monthly','attend'].indexOf(th) !== -1 ? th : 'main');
   } else {
     var h = location.hash;
     if(h === '#calendar') setView('director', 'calendar');
@@ -2054,6 +2350,8 @@ function enter(acc){
     else if(h === '#teacher-daily') setView('teacher', 'daily');
     else if(h === '#monthly') setView('director', 'monthly');
     else if(h === '#teacher-monthly') setView('teacher', 'monthly');
+    else if(h === '#attend') setView('director', 'attend');
+    else if(h === '#teacher-attend') setView('teacher', 'attend');
     else setView(h === '#teacher' ? 'teacher' : 'director');
   }
 }
