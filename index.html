@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>비욘드잉글리쉬 사직캠퍼스 | 결과가 다른 영어, 특허받은 영어</title>
+<title>비욘드잉글리쉬 사직어학원 | 결과가 다른 영어, 특허받은 영어</title>
 <meta name="description" content="부산 연제구 초등·중등 영어학원. 파닉스부터 중등 문법까지, 문제풀이가 아니라 이해하고 표현하는 영어.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,6 +41,8 @@
     font-family: var(--sans);
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    word-break: keep-all;          /* 한국어는 낱말 중간에서 줄이 바뀌지 않게 */
+    overflow-wrap: anywhere;
   }
 
   a{ color: inherit; }
@@ -96,11 +98,13 @@
     padding: 96px 0 80px;
     border-bottom: 1px solid var(--line);
     background:
-      linear-gradient(160deg, rgba(20,28,48,0.86) 10%, rgba(20,28,48,0.62) 60%, rgba(20,28,48,0.78) 100%),
-      url('https://images.pexels.com/photos/10638213/pexels-photo-10638213.jpeg?auto=compress&cs=tinysrgb&w=1920')
-      center / cover no-repeat;
+      radial-gradient(circle at 85% 20%, rgba(226,163,59,0.18), transparent 45%),
+      linear-gradient(160deg, #1B2540 0%, #24304F 55%, #1A2238 100%);
     color: #fff;
+    overflow: hidden;
   }
+  .hero-title .nw{ white-space: nowrap; }
+  .hero-art{ display:block; width:100%; max-width:560px; height:auto; margin-left:auto; }
   .hero-grid{
     display: grid;
     grid-template-columns: 1.15fr 0.85fr;
@@ -115,11 +119,10 @@
   h1.hero-title{
     font-family: var(--serif);
     font-weight: 700;
-    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
-    line-height: 1.32;
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    line-height: 1.35;
     letter-spacing: -0.015em;
     margin: 0 0 22px;
-    max-width: 15ch;
     color: #fff;
     text-shadow: 0 2px 18px rgba(0,0,0,0.25);
   }
@@ -178,6 +181,16 @@
     font-size: 0.85rem;
     color: rgba(255,255,255,0.7);
   }
+
+  /* ---------- 한눈에 보기 카드 ---------- */
+  section.quick{ padding: 0; border-bottom: none; position: relative; z-index: 1; }
+  .quick-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: -44px; }
+  .quick-card{ display:flex; flex-direction:column; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 24px; text-decoration: none; color: var(--ink); box-shadow: 0 10px 28px rgba(30,42,68,0.10); transition: transform .15s ease; }
+  .quick-card:hover{ transform: translateY(-3px); }
+  .quick-card svg{ width: 96px; height: 64px; }
+  .quick-card b{ font-family: var(--serif); font-size: 1.08rem; }
+  .quick-card span{ font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
+  .hero{ padding-bottom: 120px; }
 
   /* ---------- Section shell ---------- */
   section{ padding: 72px 0; border-bottom: 1px solid var(--line); }
@@ -444,7 +457,14 @@
     .hero-grid, .philo-grid, .info-grid{
       grid-template-columns: 1fr;
     }
-    .hero{ padding: 56px 0 44px; }
+    .hero{ padding: 48px 0 96px; }
+    .hero-art{ max-width: 420px; margin: 8px auto 0; }
+    .hero-art-caption{ text-align: center; }
+    .quick-grid{ grid-template-columns: 1fr; margin-top: -60px; gap: 12px; }
+    .quick-card{ flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 14px; padding: 16px 18px; }
+    .quick-card svg{ width: 72px; height: 48px; flex: none; }
+    .quick-card b{ flex: 1; }
+    .quick-card span{ flex-basis: 100%; }
     section{ padding: 52px 0; }
     form.reserve-form{ grid-template-columns: 1fr; gap: 22px; }
     .reserve-panel{ padding: 24px 20px; }
@@ -643,7 +663,7 @@
 
 <header class="site">
   <div class="site-bar">
-    <div class="brand">비욘드잉글리쉬 <span>사직캠퍼스</span></div>
+    <div class="brand">비욘드잉글리쉬 <span>사직어학원</span></div>
     <nav class="site-nav" aria-label="주요 메뉴">
       <a href="#curriculum">커리큘럼</a>
       <a href="#director">원장 소개</a>
@@ -661,23 +681,38 @@
   <div class="wrap hero-grid">
     <div>
       <p class="hero-eyebrow">부산 연제구 종합운동장로 · 비욘드잉글리쉬 사직어학원</p>
-      <h1 class="hero-title">아이의 영어가,<br>말이 되고 표현이 될 때까지</h1>
-      <p class="hero-sub">문제풀이가 아니라 이해하고 표현하는 영어. 결과가 다른 영어, 특허받은 영어 — 지금 부모님이 찾고 계신 답, 비욘드잉글리쉬 사직캠퍼스입니다.</p>
+      <h1 class="hero-title">아이의 영어가,<br><span class="nw">말이 되고</span> <span class="nw">표현이 될 때까지</span></h1>
+      <p class="hero-sub">문제풀이가 아니라 이해하고 표현하는 영어. 결과가 다른 영어, 특허받은 영어 — 지금 부모님이 찾고 계신 답, 비욘드잉글리쉬 사직어학원입니다.</p>
       <div class="hero-ctas">
         <a class="btn-primary" href="#reserve">상담 예약하기</a>
         <a class="btn-ghost" href="tel:051-502-3596">051-502-3596</a>
       </div>
     </div>
     <div>
-      <div class="block-art" aria-hidden="true">
-        <span class="blk">I</span>
-        <span class="blk">want</span>
-        <span class="blk">to</span>
-        <span class="blk acc">speak</span>
-        <span class="blk deep">up.</span>
-      </div>
+      <img class="hero-art" src="img/hero-art.svg" width="560" height="460" alt="단어 블록 I, want, to, speak, up.이 계단처럼 쌓여 문장이 되는 그림">
       <p class="hero-art-caption">단어에서 문장으로, Sentence Build Up 학습법</p>
     </div>
+  </div>
+</section>
+
+<!-- 한눈에 보는 비욘드 (그림은 모두 직접 그린 SVG예요) -->
+<section class="quick" aria-label="한눈에 보는 비욘드잉글리쉬">
+  <div class="wrap quick-grid">
+    <a class="quick-card" href="#philosophy">
+      <svg viewBox="0 0 120 80" aria-hidden="true"><rect x="8" y="46" width="22" height="22" rx="4" fill="#fff" stroke="#1E2A44" stroke-width="2"/><rect x="36" y="34" width="28" height="22" rx="4" fill="#fff" stroke="#1E2A44" stroke-width="2"/><rect x="70" y="22" width="22" height="22" rx="4" fill="#E2A33B"/><rect x="96" y="10" width="18" height="22" rx="4" fill="#1E2A44"/></svg>
+      <b>특허받은 Sentence Build 학습법</b>
+      <span>단어 → 구 → 문장으로 쌓아 스스로 말하고 쓰는 영어</span>
+    </a>
+    <a class="quick-card" href="#curriculum">
+      <svg viewBox="0 0 120 80" aria-hidden="true"><rect x="40" y="60" width="40" height="12" rx="2" fill="#1E2A44"/><rect x="44" y="46" width="32" height="12" rx="2" fill="#57607A"/><rect x="48" y="32" width="24" height="12" rx="2" fill="#8B92A6"/><rect x="52" y="18" width="16" height="12" rx="2" fill="#E2A33B"/><path d="M60 6l5 6h-10z" fill="#E2A33B"/></svg>
+      <b>파닉스부터 중등 문법까지 4단계</b>
+      <span>PHONICS · STORY · BASIC · INTERMEDIATE · ADVANCED 교재 구성</span>
+    </a>
+    <a class="quick-card" href="#reserve">
+      <svg viewBox="0 0 120 80" aria-hidden="true"><rect x="22" y="12" width="76" height="60" rx="6" fill="#fff" stroke="#1E2A44" stroke-width="2"/><line x1="22" y1="28" x2="98" y2="28" stroke="#1E2A44" stroke-width="2"/><circle cx="44" cy="46" r="5" fill="#E2A33B"/><circle cx="60" cy="46" r="5" fill="#DCD8C9"/><circle cx="76" cy="46" r="5" fill="#DCD8C9"/><circle cx="44" cy="60" r="5" fill="#DCD8C9"/><circle cx="60" cy="60" r="5" fill="#DCD8C9"/></svg>
+      <b>상담 예약</b>
+      <span>원하시는 날짜·시간을 고르시면 확인 후 연락드려요</span>
+    </a>
   </div>
 </section>
 
@@ -698,7 +733,7 @@
 
     <div class="pull">
       <p>우리 아이의 영어실력 향상으로 가는 가장 정확하고 빠른 길은,<br>
-      <span class="brandline">지금 부모님이 선택하신 비욘드잉글리쉬 사직캠퍼스입니다.</span></p>
+      <span class="brandline">지금 부모님이 선택하신 비욘드잉글리쉬 사직어학원입니다.</span></p>
     </div>
   </div>
 </section>
@@ -771,7 +806,7 @@
       </div>
       <div>
         <h3><span class="todo">○○○</span> 원장</h3>
-        <p class="role">비욘드잉글리쉬 사직캠퍼스</p>
+        <p class="role">비욘드잉글리쉬 사직어학원</p>
         <ul class="career">
           <li><span class="todo">학력 (예: ○○대학교 영어영문학과 졸업)</span></li>
           <li><span class="todo">경력 (예: 초·중등 영어 지도 ○○년)</span></li>
