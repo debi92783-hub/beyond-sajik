@@ -418,6 +418,9 @@
   .man-item .muted{ font-size:12.5px; line-height:1.6; }
   .man-item small{ font-size:11.5px; color:var(--ink-faint); }
   .man-item.soon{ cursor:default; border-style:dashed; }
+  .man-group{ margin:22px 0 10px; font-size:15px; font-weight:900; }
+  .man-group:first-child{ margin-top:0; }
+  .ms-msg{ white-space:pre-line; background:var(--surface-soft); border-radius:10px; padding:9px 11px; font-size:12px; line-height:1.6; }
   .man-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; max-width:980px; }
   .man-top .linkish{ margin:0; }
   .ms{ max-width:980px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; font-size:13px; line-height:1.55; }
@@ -2537,14 +2540,112 @@ var MANUALS = [
         '<div class="ms-box ok"><h4>특강이 끝나면 정규반까지 연결</h4><ul><li>개별 학습 결과 상담</li><li>강점·보완점을 바탕으로 다음 학기 추천 과정 제안</li><li>정규반 등록으로 자연스럽게 연결</li></ul></div>' +
       '</div>' +
       '<div class="ms-ft"><button type="button" class="btn soft" data-go="calendar">일정표 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+    } },
+  { id:'c-new', group:'상담', title:'신규 상담 매뉴얼', tag:'상담 ①', updated:'2026-10-25',
+    summary:'상담 전화 후 반드시 보내는 메시지: 상담 예약한 경우와 예약하지 않은 경우로 나눠 보낼 내용과 예시를 정리했어요.',
+    sheet:function(){
+      return msHead(this, '상담 전화 후 보내는 한 통의 메시지가 등록으로 이어져요. 전화를 끊으면 바로 메시지를 준비해요.') +
+      msRules(['상담 후 1시간 이내에 메시지 발송', '간단하지만 정중하고 따뜻한 말투', '자료는 학년·관심 과목에 맞게 골라서']) +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>상담 예약한 경우 — 약속이 잘 지켜지고, 더 기대되도록</h4><ul><li>'+msB('① 학원 가치를 담은 한 문장')+': 교육 철학과 차별점을 간단하고 명확하게</li><li>'+msB('② 위치 안내')+': 주소, 건물명, 주차, 찾아오는 길(지도 첨부)</li><li>'+msB('③ 상담 시간 안내')+': 날짜, 요일, 시간, 소요 시간, 준비물</li><li>'+msB('④ 학년에 맞는 자료 파일')+': 커리큘럼 요약, 교재 로드맵, 수업 안내</li><li>'+msB('⑤ 추가 안내')+': 방문 시 주의사항, 연락처, 변경 시 연락 방법</li></ul></div>' +
+        '<div class="ms-box"><h4>상담 예약하지 않은 경우 — 관심이 이어지고, 다시 생각나도록</h4><ul><li>'+msB('① 학원 가치를 담은 한 문장 + 사진')+': 학원 분위기, 수업 모습, 학생 결과물</li><li>'+msB('② 학년에 맞는 자료')+': 커리큘럼 요약, 교재 안내, 프로그램 소개</li><li>'+msB('③ 또는 학교 요약 자료')+': 학교알리미로 본 지원 학교의 주요 정보</li><li>'+msB('④ 추가로 전하면 좋은 정보')+': 설명회, 이벤트, 무료 진단, 체험 수업 등 학원 소식</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">예시</span>이렇게 보내요</h3><div class="ms-two">' +
+        '<div class="ms-box"><h4>상담 예약한 경우</h4><div class="ms-msg">안녕하세요, 비욘드잉글리쉬 사직캠퍼스입니다.\n소중한 시간 내주셔서 상담 예약해 주셔서 감사합니다.\n\n[상담 일정] 10월 29일(목) 오후 7시 · 약 40분\n[위치] 부산 연제구 종합운동장로28번길 10 JS빌딩 4층 (지도 첨부)\n\n학년에 맞는 자료를 함께 보내드립니다. 첨부 파일을 미리 확인해 보시면 상담이 더 알차게 진행됩니다.\n궁금한 점은 언제든 편하게 연락 주세요. (051-502-3596)\n좋은 만남이 되도록 준비하겠습니다.</div></div>' +
+        '<div class="ms-box"><h4>상담 예약하지 않은 경우</h4><div class="ms-msg">안녕하세요, 비욘드잉글리쉬 사직캠퍼스입니다.\n오늘 상담 문의 주셔서 감사합니다.\n\n[우리 학원 교육 철학 한 문장]\n\n첨부 파일로 [초5 영어 커리큘럼 안내]와 [학교 요약 자료]를 보내드립니다. 학습 계획을 세우실 때 도움이 되시길 바랍니다.\n\n궁금한 점이 생기시면 언제든 편하게 연락 주세요. 아이의 성장을 진심으로 응원합니다.</div></div>' +
+      '</div><p class="ms-ex">상담 가능 시간: 월~금 12:00·19:00, 토 11:00. 학부모님 연락처와 상담 내용은 외부에 공유하지 않아요.</p></div>' +
+      msFoot([]);
+    } },
+  { id:'c-week', group:'상담', title:'신규 등록 7일 경과 상담 매뉴얼', tag:'상담 ②', updated:'2026-10-25',
+    summary:'첫 등록 후 7일 뒤 담임 선생님이 먼저 연락하는 이유, 연락 순서, 포함할 내용, 피드백 예시를 정리했어요.',
+    sheet:function(){
+      return msHead(this, '첫 7일은 학생의 학습 적응과 학부모님의 신뢰가 만들어지는 시기예요. 등록 7일 뒤에는 담임 선생님이 먼저 연락해요.') +
+      msRules(['등록 7일 뒤 담임이 먼저 연락', '노트 사진과 함께 구체적으로', '앞으로의 지도 방향까지 안내']) +
+      '<div class="ms-sec"><h3><span class="pill">이유</span>왜 7일 뒤에 연락할까요?</h3><div class="ms-who">' +
+        '<div><b>학부모님의 불안 해소</b>첫 1주일은 아이가 잘 적응하는지 가장 궁금한 시기예요. 먼저 연락드리면 마음이 편해져요.</div>' +
+        '<div><b>우리 학원 장점 확인</b>상담 때 안내한 교육 방식, 단어 시험, 데일리 리포트가 잘 적용되는지 확인해요.</div>' +
+        '<div><b>학생의 초기 적응</b>첫 7일의 관심과 피드백은 소속감, 수업 참여, 학습 습관에 도움이 돼요.</div>' +
+        '<div><b>지속 등록과 추천</b>초기 소통이 만족으로 이어지면 오래 다니고 지인에게 소개하는 바탕이 돼요.</div>' +
+      '</div></div>' +
+      '<div class="ms-sec"><h3><span class="pill">순서</span>이렇게 7일 뒤 연락해요</h3><div class="ms-flow three">' +
+        '<div class="ms-step"><b>① 수업·학습 자료 확인</b><span>영어 노트 사진, 과제, 학습 태도를 담임이 정리</span><em>데일리 테스트 기록(단어·숙제·Speaking)을 참고해요</em></div>' +
+        '<div class="ms-step"><b>② 정성 담긴 코멘트 작성</b><span>얼마나 잘 적응하고 수업에 참여하는지 구체적으로</span></div>' +
+        '<div class="ms-step"><b>③ 학부모님께 피드백 발송</b><span>노트 사진과 함께 학습 상황과 앞으로의 지도 방향 안내</span></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>포함되는 내용</h4><ul><li>수업 태도 및 참여도</li><li>노트 정리 상태 (사진 첨부)</li><li>과제 완료 여부</li><li>담임 선생님의 정성 코멘트</li><li>앞으로의 지도 방향</li><li>필요하면 학습 꿀팁</li></ul><p class="ms-ex">등록하는 날 일정표 개인일정에 \'7일 상담 · 학생 이름\'을 넣어 두면 잊지 않아요.</p></div>' +
+        '<div class="ms-box"><h4>피드백 예시</h4><div class="ms-msg">안녕하세요, 비욘드잉글리쉬 사직캠퍼스입니다 :)\n○○○ 학생이 학원에 잘 적응하고 있어 첫 1주일 학습 내용을 공유드립니다.\n\n[수업 태도] 수업에 집중하는 모습이 좋고, 모르는 단어는 먼저 질문합니다.\n[학습 내용] 단어 시험은 3번 모두 통과했고, 문장 쓰기 과제도 성실하게 제출했습니다. (노트 사진 첨부)\n[앞으로의 지도 방향] 지금의 좋은 학습 습관이 이어지도록 지도하고, 다음 주에는 ○○ 단원을 집중적으로 학습할 예정입니다.</div></div>' +
+      '</div>' + msFoot([['calendar','일정표 보기']]);
+    } },
+  { id:'c-cur', group:'상담', title:'재원생 상담 매뉴얼', tag:'상담 ③ · 초안', updated:'2026-10-25',
+    summary:'재원생 상담 시기, 상담 순서(월말 리포트 4단계), 준비와 상담 후 할 일을 정리한 초안이에요. 원장님 기준을 받으면 고칠게요.',
+    sheet:function(){
+      return msHead(this, '정기적으로 학습 상황을 나누고, 변화가 보이면 문제가 커지기 전에 먼저 연락해요.') +
+      msRules(['문제가 생기기 전에 먼저 연락', '기록과 관찰한 사실로 이야기', '상담 내용은 꼭 기록하고 실행']) +
+      '<div class="ms-sec"><h3><span class="pill">시기</span>언제 상담하나요?</h3><div class="ms-who">' +
+        '<div><b>정기</b>월말 리포트 발송 후, 학부모님이 궁금해하실 때</div>' +
+        '<div><b>학습 변화</b>단어 시험 통과나 점수가 눈에 띄게 떨어질 때</div>' +
+        '<div><b>출결·과제</b>잦은 지각·결석, 과제 미수행이 반복될 때</div>' +
+        '<div><b>요청·변경</b>학부모님·학생이 원할 때, 레벨·반이 바뀔 때</div>' +
+      '</div></div>' +
+      '<div class="ms-sec"><h3><span class="pill">순서</span>상담 순서 — 월말 리포트 4단계와 같아요</h3><div class="ms-flow">' +
+        '<div class="ms-step"><b>① 현황</b><span>진도, 출결, 단어 시험 기록을 사실대로</span></div>' +
+        '<div class="ms-step"><b>② 강점</b><span>학습 태도, 이해도, 성실함 중 잘하는 부분</span></div>' +
+        '<div class="ms-step"><b>③ 보완할 점</b><span>관찰한 부족한 부분을 구체적으로</span></div>' +
+        '<div class="ms-step"><b>④ 학원 대응</b><span>학원에서 함께 보완할 계획과 실행 방법</span></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>상담 전 준비</h4><ul><li>데일리 테스트·월말 리포트 기록 확인</li><li>최근 노트·과제 사진</li><li>담임 의견을 강점·보완할 점으로 정리</li><li>민감한 내용은 원장님과 미리 공유</li></ul></div>' +
+        '<div class="ms-box"><h4>상담 후 할 일</h4><ul><li>상담 내용을 짧게 기록</li><li>약속한 지도 내용은 다음 수업부터 실행</li><li>변화가 보이면 학부모님께 다시 알려 드리기</li><li>퇴원 이야기가 나오면 원장님께 바로 공유</li></ul></div>' +
+      '</div>' + msFoot([['monthly','월말 리포트 화면 열기']]);
+    } },
+  { id:'c-exam', group:'상담', title:'시험 전후 상담 매뉴얼', tag:'상담 ④', updated:'2026-10-25',
+    summary:'시험 전 목표·과정 점검 4단계와 시험 후 분석·방향 제시 4단계, 상담 자료와 오답 코멘트 예시를 정리했어요.',
+    sheet:function(){
+      return msHead(this, '시험은 성적만 보는 것이 아니라 성장 과정을 확인하는 것이에요. 시험 전부터 시험 후까지 같은 절차로 상담해요.') +
+      msRules(['시험 전: 목표와 과정 점검', '시험 후: 정확한 분석과 구체적 방향', '결과만 보고 끝내지 않기']) +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>시험 전 — 목표와 과정 점검으로 흔들림 없이</h4><ul><li>'+msB('① 학생과 함께 정한 목표 확인')+': 이전 성적과 현재 수준으로 영역별(문법·독해·서술형) 목표까지</li><li>'+msB('② 시험 대비 중 생긴 문제점 점검')+': 개념 이해, 문제 풀이, 시간 관리, 과제 완성도, 학습 태도</li><li>'+msB('③ 학원과 학생의 노력 공유')+': 추가 자료, 오답 관리, 질의응답, 보충, 자습·과제 수행</li><li>'+msB('④ 예상 결과와 다음 전략 안내')+': 지금까지의 학습으로 예상되는 결과와 다음 시험·학기 전략</li></ul></div>' +
+        '<div class="ms-box"><h4>시험 후 — 정확한 분석과 구체적 방향으로</h4><ul><li>'+msB('① 시험분석지 전송')+': 학교별 문제 분석(총평, 문항별 난이도, 정답률, 오답 분석). 챗GPT 활용 가능</li><li>'+msB('② 시험 총평 설명')+': 출제 경향, 난이도, 학교별 특징, 학생의 성취도 위치</li><li>'+msB('③ 오답 원인 짧은 코멘트')+': 개념 부족, 실수, 문제 이해 부족, 시간 부족 중 원인을 짚기</li><li>'+msB('④ 향후 개선 방향 제시')+': 약점 보완, 학습 습관 개선, 영역별 집중 포인트와 실천 방법</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">예시</span>오답 코멘트와 개선 방향 (중2 영어 예시)</h3><div class="ms-two">' +
+        '<div class="ms-box no"><h4>오답 코멘트</h4><ul><li>4번: 관계대명사 what과 that을 구분하지 못함 (개념 부족)</li><li>9번: 3인칭 단수 주어 뒤 동사에 -s 누락 (실수)</li><li>25번: 시간 부족으로 마지막 서술형 조건을 놓침</li></ul></div>' +
+        '<div class="ms-box ok"><h4>개선 방향</h4><ul><li>관계대명사 개념 1주일 안에 다시 정리</li><li>유사 문제 추가 풀이로 적응 연습</li><li>서술형은 조건 체크하는 습관 강화</li><li>실전 모의고사로 시간 관리 연습</li></ul></div>' +
+      '</div><p class="ms-ex">상담 때 쓰는 자료: 목표 설정표 · 학습 점검표 · 영역별 보완 계획 · 시험분석지. 챗GPT에는 학생 이름 같은 개인정보를 넣지 않아요.</p></div>' +
+      msFoot([]);
+    } },
+  { id:'c-leave', group:'상담', title:'퇴원생 상담 매뉴얼', tag:'상담 ⑤', updated:'2026-10-25',
+    summary:'\'학원 그만둘게요\' 연락을 받았을 때 5가지 순서, 학부모님 메시지 예시, 교재 위 손편지 예시를 정리했어요.',
+    sheet:function(){
+      return msHead(this, '\'학원 그만둘게요\' 연락을 받았을 때, 마지막까지 좋은 인연으로 기억되도록 따뜻하게 마무리해요.') +
+      msRules(['마지막까지 존중하는 태도', '불만에는 먼저 공감하기', '함께한 성장을 구체적으로 전하기']) +
+      '<div class="ms-sec"><h3><span class="pill">순서</span>5가지 순서를 기억해요</h3><div class="ms-flow five">' +
+        '<div class="ms-step"><b>① 인사</b><span>언제나 상냥한 인사로 시작</span></div>' +
+        '<div class="ms-step"><b>② 불만에 대한 공감</b><span>학부모님의 어려움과 마음에 먼저 공감</span></div>' +
+        '<div class="ms-step"><b>③ 함께한 성장 이야기</b><span>학생이 성장했던 구체적인 순간을 진심으로</span></div>' +
+        '<div class="ms-step"><b>④ 마무리 인사</b><span>앞으로의 성장을 응원하며 다시 만날 날을 위해</span></div>' +
+        '<div class="ms-step"><b>⑤ 교재 수령 안내</b><span>함께 공부한 교재 안내, 교재 위에 짧은 손편지</span></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>학부모님께 보내는 메시지 예시</h4><div class="ms-msg">안녕하세요, 학부모님. 비욘드잉글리쉬 사직캠퍼스입니다.\n최근 숙제가 많아져서 ○○이도 집에서 더 힘들어했나 봐요. 속상하셨겠어요.\n\n○○이가 학원에 다니며 영어 문장 쓰기 실력이 많이 좋아지고, 단어 시험을 다 맞았다며 시험지를 흔들고 온 모습이 저에게는 가장 감사하고 뿌듯한 순간이었습니다.\n실력이 오른 만큼 다음 과정은 공부가 더 어려워지는 시기이니 가정에서도 늘 응원해 주세요.\n다시 ○○이를 볼 날까지 저희도 늘 응원하겠습니다.\n\n함께 공부한 교재는 ○○○, ○○○입니다. 다음에도 꼭 이어서 공부할 수 있도록 도와주세요.\n늘 감사했습니다.</div></div>' +
+        '<div class="ms-box"><h4>교재 위에 남기는 짧은 손편지 예시</h4><div class="ms-msg">○○아, 지금까지 정말 수고했어!\n열심히 노력하는 너의 모습이 선생님에게 큰 힘이 되었어.\n앞으로도 하고 싶은 꿈을 향해 계속 멋지게 나아가길 바라!\n언제든 다시 만날 날을 응원할게.\n- ○○○ 선생님 -</div><p class="ms-ex">등록할 때의 친절보다 퇴원할 때의 태도가 학원의 진짜 문화를 보여 줘요. 마지막까지 존중받은 경험이 언제든 다시 찾아오고 싶은 학원을 만들어요.</p></div>' +
+      '</div>' + msFoot([]);
     } }
 ];
+// 한 장 요약 공통 조각
+function msHead(m, lead){ return '<div class="ms-hd"><div><h2>'+esc(m.title)+'</h2><p>'+lead+'</p></div><small>비욘드잉글리쉬 사직캠퍼스 · 최종 수정 '+m.updated+'</small></div>'; }
+function msRules(a){ return '<div class="ms-rules">' + a.map(function(t, i){ return '<div><i>'+(i+1)+'</i>'+t+'</div>'; }).join('') + '</div>'; }
+function msB(t){ return '<b>'+t+'</b>'; }
+function msFoot(gos){ return '<div class="ms-ft">' + gos.map(function(g){ return '<button type="button" class="btn soft" data-go="'+g[0]+'">'+g[1]+' →</button>'; }).join('') + '<button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>'; }
+var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생']];
 var manOpen = null;
 function renderManual(){
   if(!manOpen){
-    $('manBody').innerHTML = '<div class="man-list">' + MANUALS.map(function(m){
-      return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span><b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
-    }).join('') + '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트, 상담 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div></div>';
+    $('manBody').innerHTML = MAN_GROUPS.map(function(g){
+      return '<h3 class="man-group">'+g[1]+'</h3><div class="man-list">' + MANUALS.filter(function(m){ return (m.group || '업무') === g[0]; }).map(function(m){
+        return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span><b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
+      }).join('') + (g[0] === '업무' ? '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div>' : '') + '</div>';
+    }).join('');
     return;
   }
   var m = MANUALS.find(function(x){ return x.id === manOpen; });
