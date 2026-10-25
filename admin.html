@@ -374,13 +374,26 @@
   .kiosk{ position:fixed; inset:0; z-index:40; background:var(--ground); display:flex; flex-direction:column; padding:20px 24px; }
   .k-top{ display:flex; justify-content:space-between; align-items:center; }
   .k-clock{ font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--ink-soft); }
-  .k-main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; text-align:center; }
+  .k-main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; }
+  .k-tag{ font-size:14px; font-weight:700; color:var(--ink-soft); }
+  .k-brand{ display:flex; align-items:center; gap:14px; }
+  .k-brand img{ width:clamp(52px, 8vh, 72px); height:auto; }
+  .k-brand b{ display:block; font-size:clamp(24px, 4.2vh, 34px); font-weight:900; text-align:left; letter-spacing:-0.5px; }
+  .k-brand span{ display:block; font-size:clamp(14px, 2.2vh, 18px); font-weight:700; color:var(--ink-soft); text-align:left; }
+  .k-guide{ margin:0; font-size:clamp(15px, 2.4vh, 19px); color:var(--ink-soft); }
+  .k-guide b{ color:var(--ink); }
+  .k-display{ width:min(340px, 86vw); height:clamp(60px, 9vh, 78px); border-radius:16px; border:2px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; gap:22px; font-size:clamp(34px, 6vh, 46px); font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:2px; }
+  .k-display .ph{ color:var(--border); }
+  .k-display.full{ border-color:var(--accent); }
+  .k-acts{ display:grid; grid-template-columns:1fr 1fr; gap:12px; width:min(340px, 86vw); }
+  .k-act{ height:clamp(60px, 9vh, 80px); border-radius:18px; border:0; font:inherit; font-size:clamp(22px, 3.6vh, 28px); font-weight:900; color:#fff; cursor:pointer; }
+  .k-act.in{ background:var(--good); } .k-act.out{ background:var(--accent); }
+  .k-act:disabled{ opacity:.35; cursor:default; }
+  .k-pad button.bk svg{ width:30px; height:30px; }
+  .k-undo{ font:inherit; font-size:15px; font-weight:700; color:var(--ink-soft); background:none; border:1px solid var(--border); border-radius:12px; padding:10px 18px; cursor:pointer; }
   .k-main h1{ margin:0; font-size:clamp(20px, 3.4vw, 30px); font-weight:800; }
-  .k-dots{ display:flex; gap:16px; }
-  .k-dots i{ width:22px; height:22px; border-radius:50%; border:2px solid var(--ink-faint); }
-  .k-dots i.on{ background:var(--accent); border-color:var(--accent); }
-  .k-pad{ display:grid; grid-template-columns:repeat(3, minmax(76px, 104px)); gap:12px; }
-  .k-pad button{ height:clamp(64px, 11vh, 92px); border-radius:18px; border:1px solid var(--border); background:var(--surface); font:inherit; font-size:30px; font-weight:800; color:var(--ink); cursor:pointer; }
+  .k-pad{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; width:min(340px, 86vw); }
+  .k-pad button{ height:clamp(54px, 8.5vh, 76px); border-radius:18px; border:1px solid var(--border); background:var(--surface); font:inherit; font-size:30px; font-weight:800; color:var(--ink); cursor:pointer; }
   .k-pad button:active{ background:var(--accent-soft); }
   .k-pad button.fn{ font-size:16px; color:var(--ink-soft); }
   .k-list{ display:flex; flex-direction:column; gap:10px; width:min(420px, 100%); }
@@ -914,13 +927,15 @@
 <!-- 태블릿 등원·하원 화면 -->
 <div class="kiosk" id="kiosk" hidden>
   <div class="k-top">
-    <div class="brand"><img class="brand-mark" src="logo.png" alt="" width="34" height="34"><div class="brand-text"><b>비욘드잉글리쉬</b><small>등원 · 하원 체크</small></div></div>
+    <div class="k-tag">등원 · 하원 체크</div>
     <div class="k-clock" id="kClock"></div>
   </div>
   <div class="k-main" id="kMain">
-    <h1>부모님 전화번호 뒷 4자리를 눌러 주세요</h1>
-    <div class="k-dots" id="kDots"><i></i><i></i><i></i><i></i></div>
+    <div class="k-brand"><img src="logo.png" alt="비욘드잉글리쉬 로고" width="72" height="72"><div><b>비욘드잉글리쉬</b><span>사직캠퍼스</span></div></div>
+    <p class="k-guide">부모님 전화번호 뒷 4자리를 누르고 <b>등원</b> 또는 <b>하원</b>을 눌러 주세요</p>
+    <div class="k-display" id="kDisplay" aria-live="polite"></div>
     <div class="k-pad" id="kPad"></div>
+    <div class="k-acts"><button type="button" class="k-act in" data-act="in" disabled>등원</button><button type="button" class="k-act out" data-act="out" disabled>하원</button></div>
   </div>
   <div class="k-main" id="kPick" hidden></div>
   <div class="k-main" id="kDone" hidden></div>
@@ -2375,7 +2390,12 @@ function kMatches(code){
 }
 function kShow(which){ ['kMain','kPick','kDone'].forEach(function(id){ $(id).hidden = id !== which; }); }
 function kReset(){ kCode = ''; kDots(); kShow('kMain'); clearTimeout(kTimer); }
-function kDots(){ Array.from($('kDots').children).forEach(function(d, i){ d.classList.toggle('on', i < kCode.length); }); }
+var kAct = 'in', kLast = null;
+function kDots(){
+  var html = ''; for(var i = 0; i < 4; i++) html += kCode[i] ? '<span>' + kCode[i] + '</span>' : '<span class="ph">–</span>';
+  $('kDisplay').innerHTML = html; $('kDisplay').classList.toggle('full', kCode.length === 4);
+  document.querySelectorAll('#kMain .k-act').forEach(function(b){ b.disabled = kCode.length !== 4; });
+}
 function kRec(m){
   var k = m.cid + '|' + ymd(new Date()), c = CLASSES.find(function(x){ return x.id === m.cid; });
   if(!atStore[k]) atStore[k] = { rows:{}, outbox:[], log:[] };
@@ -2383,29 +2403,23 @@ function kRec(m){
   c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = { st:'', reason:'', notice:'', recheck:false, inAt:'', outAt:'', queued:{}, sent:{} }; });
   return e;
 }
-function kOpenStudent(m){
-  var e = kRec(m), r = e.rows[m.s];
-  var next = !r.inAt ? 'in' : !r.outAt ? 'out' : 'done';
-  if(next === 'done'){ kDoneScreen(m, 'done', r); return; }
-  $('kPick').innerHTML = '<h1>' + esc(maskName(m.s)) + ' 학생</h1><p class="k-sub">' + esc(m.cname) + '</p>' +
-    '<button type="button" class="k-big ' + next + '" data-k="go">' + (next === 'in' ? '등원했어요' : '하원할게요') + '</button>' +
-    '<button type="button" class="k-big" data-k="back">내가 아니에요</button>';
-  $('kPick').dataset.cid = m.cid; $('kPick').dataset.s = m.s; $('kPick').dataset.cname = m.cname;
-  kShow('kPick');
-  clearTimeout(kTimer); kTimer = setTimeout(kReset, 15000);
-}
-function kDoneScreen(m, type, r){
-  $('kDone').innerHTML = type === 'done'
-    ? '<div class="k-ok">오늘은 이미 하원했어요</div><p class="k-sub">' + esc(maskName(m.s)) + ' 학생 · 하원 ' + korTime(r.outAt) + '</p>'
-    : '<div class="k-ok ' + type + '">' + (type === 'in' ? '등원 완료!' : '하원 완료!') + '</div><p class="k-sub">' + esc(maskName(m.s)) + ' 학생 · ' + korTime(type === 'in' ? r.inAt : r.outAt) + (type === 'in' ? ' · 오늘도 화이팅!' : ' · 조심히 가요!') + '</p>';
+function kDoneScreen(m, kind, r){
+  var t = kind === 'in' || kind === 'again-in' ? r.inAt : r.outAt;
+  var title = { in:'등원 완료!', out:'하원 완료!', 'again-in':'이미 등원했어요', 'again-out':'이미 하원했어요' }[kind];
+  var cls = kind.indexOf('in') !== -1 ? 'in' : 'out';
+  var tail = kind === 'in' ? ' · 오늘도 화이팅!' : kind === 'out' ? ' · 조심히 가요!' : '';
+  $('kDone').innerHTML = '<img src="logo.png" alt="" width="56" height="56"><div class="k-ok ' + cls + '">' + title + '</div><p class="k-sub">' + esc(maskName(m.s)) + ' 학생 · ' + esc(m.cname) + ' · ' + korTime(t) + tail + '</p>' +
+    (kind === 'in' || kind === 'out' ? '<button type="button" class="k-undo" data-k="undo">내가 아니에요 (취소)</button>' : '');
   kShow('kDone');
-  clearTimeout(kTimer); kTimer = setTimeout(kReset, 3500);
+  clearTimeout(kTimer); kTimer = setTimeout(kReset, kind === 'in' || kind === 'out' ? 5000 : 3500);
 }
-function kGo(m){
-  var e = kRec(m), r = e.rows[m.s], t = nowHM(), type;
-  if(!r.inAt){
-    r.inAt = t; if(!r.st || r.st === '결석') r.st = '출석'; type = 'in';
-  } else { r.outAt = t; type = 'out'; }
+function kGo(m, type){
+  var e = kRec(m), r = e.rows[m.s], t = nowHM();
+  if(type === 'in' && r.inAt) return kDoneScreen(m, 'again-in', r);
+  if(type === 'out' && r.outAt) return kDoneScreen(m, 'again-out', r);
+  kLast = { m:m, type:type, prevSt:r.st };
+  if(type === 'in'){ r.inAt = t; if(!r.st || r.st === '결석') r.st = '출석'; }
+  else { r.outAt = t; if(!r.st) r.st = '출석'; }
   if(!r.queued[type] && !r.sent[type]){
     // 카톡 문구는 출결·지각 화면과 같은 문구를 써요
     var keep = atClassId; atClassId = m.cid;
@@ -2416,30 +2430,47 @@ function kGo(m){
   atSave();
   kDoneScreen(m, type, r);
 }
-$('kPad').innerHTML = ['1','2','3','4','5','6','7','8','9','지우기','0','처음'].map(function(k){ return '<button type="button" data-key="'+k+'"'+(k.length > 1 ? ' class="fn"' : '')+'>'+k+'</button>'; }).join('');
+function kUndo(){
+  if(!kLast) return kReset();
+  var m = kLast.m, e = kRec(m), r = e.rows[m.s], type = kLast.type;
+  if(type === 'in') r.inAt = ''; else r.outAt = '';
+  r.st = kLast.prevSt;
+  e.outbox = e.outbox.filter(function(x){ return !(x.name === m.s && x.type === type && x.from === '태블릿'); });
+  delete r.queued[type];
+  atSave(); kLast = null; kReset();
+  toast('취소했어요. 번호를 다시 눌러 주세요.');
+}
+var K_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><line x1="16" y1="9.5" x2="11" y2="14.5"/><line x1="11" y1="9.5" x2="16" y2="14.5"/></svg>';
+$('kPad').innerHTML = ['1','2','3','4','5','6','7','8','9','처음','0','back'].map(function(k){
+  if(k === 'back') return '<button type="button" class="fn bk" data-key="back" aria-label="한 자리 지우기">' + K_BACK + '</button>';
+  return '<button type="button" data-key="'+k+'"'+(k.length > 1 ? ' class="fn"' : '')+'>'+k+'</button>';
+}).join('');
 $('kPad').addEventListener('click', function(ev){
   var b = ev.target.closest('[data-key]'); if(!b) return;
   var k = b.dataset.key;
-  if(k === '지우기') kCode = kCode.slice(0, -1);
+  if(k === 'back') kCode = kCode.slice(0, -1);
   else if(k === '처음') kCode = '';
   else if(kCode.length < 4) kCode += k;
   kDots();
-  if(kCode.length === 4){
+});
+document.querySelectorAll('#kMain .k-act').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    if(kCode.length !== 4) return;
+    kAct = btn.dataset.act;
     var list = kMatches(kCode);
-    if(!list.length){ toast('등록된 번호가 아니에요. 다시 눌러 주세요.'); setTimeout(function(){ kCode = ''; kDots(); }, 400); return; }
-    if(list.length === 1) return kOpenStudent(list[0]);
-    $('kPick').innerHTML = '<h1>누구인가요?</h1><div class="k-list">' + list.map(function(m, i){ return '<button type="button" data-pick="'+i+'">' + esc(maskName(m.s)) + ' · ' + esc(m.cname) + '</button>'; }).join('') + '</div><button type="button" class="k-big" data-k="back">처음으로</button>';
+    if(!list.length){ toast('등록된 번호가 아니에요. 다시 눌러 주세요.'); kCode = ''; kDots(); return; }
+    if(list.length === 1) return kGo(list[0], kAct);
+    $('kPick').innerHTML = '<h1>누구인가요?</h1><p class="k-sub">' + (kAct === 'in' ? '등원' : '하원') + '할 학생을 골라 주세요</p><div class="k-list">' + list.map(function(m, i){ return '<button type="button" data-pick="'+i+'">' + esc(maskName(m.s)) + ' · ' + esc(m.cname) + '</button>'; }).join('') + '</div><button type="button" class="k-big" data-k="back">처음으로</button>';
     $('kPick')._list = list;
     kShow('kPick');
     clearTimeout(kTimer); kTimer = setTimeout(kReset, 15000);
-  }
+  });
 });
 $('kPick').addEventListener('click', function(ev){
-  var p = ev.target.closest('[data-pick]'); if(p) return kOpenStudent($('kPick')._list[+p.dataset.pick]);
-  var b = ev.target.closest('[data-k]'); if(!b) return;
-  if(b.dataset.k === 'back') return kReset();
-  if(b.dataset.k === 'go') kGo({ cid:$('kPick').dataset.cid, s:$('kPick').dataset.s, cname:$('kPick').dataset.cname });
+  var p = ev.target.closest('[data-pick]'); if(p) return kGo($('kPick')._list[+p.dataset.pick], kAct);
+  var b = ev.target.closest('[data-k]'); if(b && b.dataset.k === 'back') kReset();
 });
+$('kDone').addEventListener('click', function(ev){ if(ev.target.closest('[data-k="undo"]')) kUndo(); });
 function kClock(){ var d = new Date(); $('kClock').textContent = (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + DAYS[d.getDay()] + ') ' + korTime(nowHM()); }
 $('atKiosk').addEventListener('click', function(){
   $('kiosk').hidden = false; kReset(); kClock(); clearInterval(kClockT); kClockT = setInterval(kClock, 15000);
