@@ -344,6 +344,15 @@
   .at-notice label{ display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--ink); }
   .at-notice input{ accent-color:var(--accent); }
   .at-notice .guide{ flex-basis:100%; font-size:11.5px; color:var(--warn); font-weight:600; }
+  .at-mk{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:12.5px; }
+  .at-mk.done{ background:var(--good-soft); color:var(--good); border-radius:8px; padding:8px 10px; font-weight:600; }
+  .at-mk.done button{ background:none; border:0; font:inherit; font-size:12px; font-weight:700; color:var(--accent); cursor:pointer; padding:2px 4px; }
+  .at-mk.done button.danger{ color:var(--warn); }
+  .at-mk.form{ display:grid; grid-template-columns:auto auto 1fr; gap:8px 10px; align-items:end; background:var(--surface-soft); border-radius:10px; padding:10px; }
+  .at-mk.form label{ display:flex; flex-direction:column; gap:4px; font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .at-mk.form input, .at-mk.form select{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 8px; background:var(--surface); color:var(--ink); }
+  .at-mk.form .btns{ grid-column:1 / -1; display:flex; gap:8px; }
+  @media (max-width: 720px){ .at-mk.form{ grid-template-columns:1fr 1fr; } .at-mk.form .wide{ grid-column:1 / -1; } }
   .at-out{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px; margin-top:12px; }
   .at-msg{ border:1px solid var(--border); border-radius:12px; padding:12px; background:var(--surface-soft); display:flex; flex-direction:column; gap:8px; }
   .at-msg .hd{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; font-weight:800; }
@@ -753,7 +762,7 @@
               <button class="btn" type="button" id="atSave">저장하기</button>
             </div>
           </div>
-          <p class="at-tip">차량 지연으로 늦는 학생은 체크하지 말고 두었다가, 등원하면 '출석'으로 체크하고 저장해 주세요.</p>
+          <p class="at-tip">늦게 오는 학생은 체크하지 말고 두었다가, 등원하면 그때 '출석'이나 '지각'으로 체크하고 저장해 주세요.</p>
           <div class="at-list" id="atRows"></div>
         </div>
         <div class="card" style="margin-top:20px">
@@ -2062,12 +2071,17 @@ function atMsg(type, s, r){
   if(type === 'abs' && r.notice === 'yes'){
     var why = r.reason.trim();
     return AT_HELLO + '\n' + s + ' 학생~ ' + (why ? why + ro(why) + ' ' : '') + '결석한다고 전달받아 확인 차 연락드립니다.\n\n' +
-      '보충은 토요일 10, 11시, 12시 중 가능한 일정과\n차량이용여부 말씀해주시면 진행 가능합니다^^\n토요일 차량은 등원10시 또는 하원1시만 이용 가능합니다.';
+      '보충은 토요일 10, 11시, 12시 중 가능한 일정 말씀해주시면 진행 가능합니다^^';
+  }
+  if(type === 'makeup'){
+    var m = r.makeup, d = parseYmd(m.date);
+    return AT_HELLO + '\n' + s + ' 학생 보충 수업 일정 안내드립니다.\n\n· 일시: ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + DAYS[d.getDay()] + ') ' + korTime(m.time) +
+      (m.content ? '\n· 내용: ' + m.content : '') + '\n\n보충 당일 시간에 맞춰 등원할 수 있도록 부탁드립니다^^';
   }
   if(type === 'abs') return AT_HELLO + '\n' + s + ' 학생이 오늘 ' + korTime(start) + ' 수업에 아직 등원하지 않아 연락드립니다.\n결석 여부와 사유를 알려 주시면 보충 일정을 함께 안내해 드리겠습니다.';
   return '';
 }
-var AT_TYPE = { in:'등원', out:'하원', early:'조퇴', abs:'결석' };
+var AT_TYPE = { in:'등원', out:'하원', early:'조퇴', abs:'결석', makeup:'보충' };
 // 문자를 만들 수 있는지 확인: 사유·사전 연락·재확인
 function atProblem(r){
   if(r.st === '지각' || r.st === '조퇴' || r.st === '결석'){ if(!r.reason.trim() && !(r.st === '결석' && r.notice === 'no')) return '사유'; }
@@ -2113,12 +2127,40 @@ function atRowHtml(s, r){
         '<label><input type="radio" name="nt-'+esc(s)+'" data-f="notice" value="no"'+(r.notice==='no'?' checked':'')+'>없음</label>';
       if(r.notice === 'yes') more += '<label><input type="checkbox" data-f="recheck"'+(r.recheck?' checked':'')+'>부모님께 재확인했어요</label><span class="guide">사전 연락을 받은 뒤 꼭 재확인해요. 저장하면 보충 일정 안내 카톡이 만들어져요.</span>';
       if(r.notice === 'no') more += '<span class="guide">저장하면 부모님께 결석 여부를 여쭤보는 카톡이 만들어져요.</span>';
-      more += '</div>';
+      more += '</div>' + atMakeupHtml(s, r);
     }
     more += '</div>';
   }
   var tag = r.sent.in || r.sent.abs || r.sent.early ? '<small>카톡 보냄</small>' : r.queued.in || r.queued.abs || r.queued.early ? '<small>보낼 카톡에 있음</small>' : '';
   return '<div class="at-row" data-name="'+esc(s)+'"><div class="nm">'+esc(s)+tag+'</div><div class="at-seg">'+seg+time+out+'</div>'+more+'</div>';
+}
+/* 보충 일정: 결석한 학생의 보충을 잡으면 공통 일정표에 [시간 보충] 반 · 이름 으로 올리고 카톡을 만들어요 */
+function nextSat(from){ var d = new Date(from); d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7)); return ymd(d); }
+function atMakeupHtml(s, r){
+  var m = r.makeup;
+  if(m && !r.mkEdit){
+    var d = parseYmd(m.date);
+    return '<div class="at-mk done"><b>보충</b> ' + (d.getMonth()+1) + '/' + d.getDate() + '(' + DAYS[d.getDay()] + ') ' + korTime(m.time) + (m.content ? ' · ' + esc(m.content) : '') +
+      ' <span class="muted">· 일정표에 올림</span><button type="button" data-mk="edit">바꾸기</button><button type="button" data-mk="cancel" class="danger">보충 취소</button></div>';
+  }
+  if(!r.mkEdit) return '<div class="at-mk"><button type="button" class="btn soft" data-mk="open">보충 일정 잡기</button></div>';
+  var v = m || { date:nextSat(atDay), time:'10:00', content:atProgHint() };
+  var times = ['10:00','11:00','12:00'];
+  if(times.indexOf(v.time) === -1) times.push(v.time);
+  return '<div class="at-mk form"><label>날짜<input type="date" data-mkf="date" value="'+esc(v.date)+'"></label>' +
+    '<label>시간<select data-mkf="time">' + times.map(function(t){ return '<option value="'+t+'"'+(t===v.time?' selected':'')+'>'+korTime(t)+'</option>'; }).join('') + '</select></label>' +
+    '<label class="wide">보충 내용 (교재·진도)<input type="text" data-mkf="content" value="'+esc(v.content)+'" placeholder="예: FUN PHONICS (1-5), 교재 11~25p"></label>' +
+    '<div class="btns"><button type="button" class="btn" data-mk="save">보충 확정</button><button type="button" class="btn soft" data-mk="close">닫기</button></div></div>';
+}
+function atProgHint(){ var d = dtStore[atClassId + '|' + ymd(atDay)]; return d ? progText(d) : ''; }
+function atMakeupEvent(s, r){
+  var c = atCls(), m = r.makeup, h = +m.time.split(':')[0];
+  var ab = parseYmd(ymd(atDay));
+  EVENTS = EVENTS.filter(function(x){ return x.id !== m.evId; });
+  m.evId = 'mk-' + Date.now();
+  EVENTS.push({ id:m.evId, kind:'common', makeup:true, title:'[' + (h > 12 ? h - 12 : h) + '시 보충] ' + c.name + ' · ' + s, date:m.date, time:m.time,
+    memo:(m.content ? '보충 내용: ' + m.content + '\n' : '') + '결석일: ' + (ab.getMonth()+1) + '/' + ab.getDate() + '(' + DAYS[ab.getDay()] + ') · 담당 ' + c.teacher + ' 선생님', owner:me() });
+  saveEvents();
 }
 function renderAtSum(){
   var c = atCls(), e = atEntry(), n = { '출석':0,'결석':0,'지각':0,'조퇴':0,'보강':0,'':0 };
@@ -2140,7 +2182,10 @@ function renderAtOut(){
 function atQueue(e, s, type){
   var r = e.rows[s];
   if(r.queued[type] || r.sent[type]) return false;
-  e.outbox.push({ name:s, type:type, text:atMsg(type, s, r) });
+  var item = { name:s, type:type, text:atMsg(type, s, r) };
+  // 결석 안내가 보충 안내보다 먼저 가도록 순서를 맞춰요
+  var mi = type === 'abs' ? e.outbox.findIndex(function(m){ return m.name === s && m.type === 'makeup'; }) : -1;
+  if(mi >= 0) e.outbox.splice(mi, 0, item); else e.outbox.push(item);
   r.queued[type] = true;
   return true;
 }
@@ -2171,6 +2216,32 @@ $('atRows').addEventListener('click', function(ev){
     atSave(); row.outerHTML = atRowHtml(s, r); renderAtSum();
     return;
   }
+  var mk = ev.target.closest('[data-mk]');
+  if(mk){
+    var act = mk.dataset.mk;
+    if(act === 'open' || act === 'edit'){ r.mkEdit = true; }
+    else if(act === 'close'){ r.mkEdit = false; }
+    else if(act === 'cancel'){
+      EVENTS = EVENTS.filter(function(x){ return x.id !== r.makeup.evId; }); saveEvents();
+      e.outbox = e.outbox.filter(function(m){ return !(m.name === s && m.type === 'makeup'); });
+      delete r.makeup; delete r.queued.makeup; delete r.sent.makeup;
+      toast(s + ' 학생 보충을 취소하고 일정표에서도 지웠어요.');
+    }
+    else if(act === 'save'){
+      var get = function(k){ return row.querySelector('[data-mkf="'+k+'"]').value; };
+      if(!get('date')){ toast('보충 날짜를 골라 주세요.'); return; }
+      r.makeup = { date:get('date'), time:get('time'), content:get('content').trim(), evId:r.makeup && r.makeup.evId };
+      r.mkEdit = false;
+      atMakeupEvent(s, r);
+      // 바뀐 일정이면 카톡을 새로 만들어요
+      e.outbox = e.outbox.filter(function(m){ return !(m.name === s && m.type === 'makeup'); });
+      delete r.queued.makeup; delete r.sent.makeup;
+      var q = $('atSms').checked && atQueue(e, s, 'makeup');
+      toast(s + ' 학생 보충을 일정표에 올렸어요.' + (q ? ' 보충 안내 카톡이 보낼 카톡에 들어갔어요.' : ''));
+    }
+    atSave(); row.outerHTML = atRowHtml(s, r); renderAtOut();
+    return;
+  }
   if(ev.target.closest('[data-out]')){
     r.outAt = nowHM();
     var q = $('atSms').checked && atQueue(e, s, 'out');
@@ -2190,7 +2261,7 @@ $('atAll').addEventListener('click', function(){
   var e = atEntry(), n = 0, t = nowHM();
   atCls().students.forEach(function(s){ var r = e.rows[s]; if(!r.st){ r.st = '출석'; r.inAt = t; n++; } });
   atSave(); renderAttend();
-  toast(n ? '체크 안 된 ' + n + '명을 출석으로 바꿨어요. 차량 지연 학생은 다시 풀어 주세요.' : '모두 이미 체크돼 있어요.');
+  toast(n ? '체크 안 된 ' + n + '명을 출석으로 바꿨어요. 아직 안 온 학생은 다시 풀어 주세요.' : '모두 이미 체크돼 있어요.');
 });
 $('atSave').addEventListener('click', function(){
   var c = atCls(), e = atEntry(), sms = $('atSms').checked, made = 0, wait = [];
