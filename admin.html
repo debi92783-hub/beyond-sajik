@@ -432,6 +432,8 @@
   .ms-sec h3 .pill{ font-size:11.5px; font-weight:800; padding:2px 9px; border-radius:99px; background:var(--accent); color:#fff; }
   .ms-flow{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:22px; }
   .ms-flow.three{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+  .ms-flow.five{ grid-template-columns:repeat(5, minmax(0,1fr)); gap:18px; }
+  .ms-flow.five .ms-step:not(:last-child)::after{ right:-14px; }
   .ms-step{ position:relative; background:var(--accent-soft); border-radius:12px; padding:11px 12px; }
   .ms-step:not(:last-child)::after{ content:'▶'; position:absolute; right:-17px; top:50%; transform:translateY(-50%); color:var(--accent); font-size:12px; }
   .ms-step b{ display:block; font-size:14px; font-weight:900; color:var(--accent); margin-bottom:3px; }
@@ -453,13 +455,15 @@
   .ms-who div{ background:var(--hold-soft); border-radius:10px; padding:8px 10px; font-size:12.5px; }
   .ms-who b{ display:block; font-weight:900; color:var(--hold); font-size:13px; }
   .ms-ft{ display:flex; flex-wrap:wrap; gap:8px; border-top:1px dashed var(--border); padding-top:12px; }
-  @media (max-width: 720px){
+  @media screen and (max-width: 720px){
     .ms{ padding:16px; }
-    .ms-rules, .ms-two, .ms-flow, .ms-flow.three{ grid-template-columns:1fr; gap:18px; }
-    .ms-flow, .ms-flow.three{ gap:22px; }
+    .ms-rules, .ms-two, .ms-flow, .ms-flow.three, .ms-flow.five{ grid-template-columns:1fr; gap:18px; }
+    .ms-flow, .ms-flow.three, .ms-flow.five{ gap:22px; }
+    .ms-flow.five .ms-step:not(:last-child)::after{ right:auto; }
     .ms-step:not(:last-child)::after{ content:'▼'; right:auto; left:50%; top:auto; bottom:-18px; transform:translateX(-50%); }
     .ms-who{ grid-template-columns:repeat(2, minmax(0,1fr)); }
   }
+  @media screen and (max-width: 480px){ .ms-who{ grid-template-columns:1fr; } }
   @media print{
     @page{ size:A4; margin:10mm; }
     body{ background:#fff !important; }
@@ -2469,6 +2473,36 @@ var MANUALS = [
         '<div class="ms-step"><b>③ 보충 실시</b><span>일정표 확인 후 담당 선생님이 준비 및 수업</span><em>복도 책꽂이 노란색 플라스틱 통(보충자료통)에 넣어 둬요</em></div>' +
       '</div></div>' +
       '<div class="ms-ft"><button type="button" class="btn soft" data-go="attend">출결·지각 화면 열기 →</button><button type="button" class="btn soft" data-go="calendar">일정표 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+    } },
+  { id:'monthly', title:'월말 리포트 업무 매뉴얼', tag:'리포트', updated:'2026-10-25',
+    summary:'학부모가 신뢰하는 피드백 공식 4단계(현황·강점·보완할 점·학원 대응 방법), 작성 방법, 예시, 저장부터 발송까지 순서를 한 장으로 정리했어요.',
+    sheet:function(){
+      return '<div class="ms-hd"><div><h2>월말 리포트 업무 매뉴얼</h2><p>피드백은 느낌으로 쓰지 않아요. 아래 4단계 순서대로, 사실을 바탕으로 써요.</p></div><small>비욘드잉글리쉬 사직캠퍼스 · 최종 수정 '+this.updated+'</small></div>' +
+      '<div class="ms-rules"><div><i>1</i>사실과 관찰한 내용으로 쓰기</div><div><i>2</i>항목을 나눠 순서대로 쓰기</div><div><i>3</i>짧게, 핵심만 쓰기</div></div>' +
+      '<div class="ms-sec"><h3><span class="pill">공식</span>피드백 4단계</h3><div class="ms-flow">' +
+        '<div class="ms-step"><b>① 학생의 현황(진도)</b><span>지금 어디까지, 어떤 수준으로 진행되고 있는지</span><em>진도·출결·단어 통과는 데일리 테스트 기록에서 자동으로 모여요 → 숫자만 확인</em></div>' +
+        '<div class="ms-step"><b>② 강점</b><span>학습 태도, 사고력, 이해도, 성실함 중 잘하는 부분을 구체적으로</span><em>리포트 \'강점\' 칸</em></div>' +
+        '<div class="ms-step"><b>③ 보완해야 할 점</b><span>이번 달에 부족하게 나타난 부분, 개선이 필요한 관찰 내용</span><em>리포트 \'개선할 점\' 칸</em></div>' +
+        '<div class="ms-step"><b>④ 학원에서 함께 보완할 방법</b><span>어떻게 개선할지 학원의 지도 계획과 실행 방법</span><em>리포트 \'학원과 함께 보완할 내용\' 칸</em></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box ok"><h4>✓ 이렇게 써요</h4><ul><li>본 것, 기록에 있는 것을 그대로</li><li>강점과 보완할 점을 함께</li><li>보완할 점에는 꼭 학원의 계획을 이어서</li><li>항목마다 2~3문장</li></ul></div>' +
+        '<div class="ms-box no"><h4>✕ 이렇게 쓰지 않아요</h4><ul><li>"열심히 하고 있어요" 같은 막연한 칭찬</li><li>"걱정이에요" 같은 감정적인 표현</li><li>보완할 점만 쓰고 계획이 없는 글</li><li>길게 늘어진 글</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">예시</span>이렇게 쓰면 돼요 (초등 BASIC반 예시)</h3><div class="ms-who">' +
+        '<div><b>① 현황</b>이번 달은 BASIC 3권 unit 1~4를 진행했습니다. 단어 시험은 16회 중 14회 통과했고, 숙제는 모두 완료했습니다.</div>' +
+        '<div><b>② 강점</b>수업 집중도가 높고, 모르는 단어를 먼저 질문합니다. 본문을 소리 내어 읽을 때 끊어 읽기가 정확합니다.</div>' +
+        '<div><b>③ 보완할 점</b>본문 해석은 잘하지만, 3인칭 단수 주어 뒤 동사에 -s를 빠뜨리는 실수가 반복됩니다.</div>' +
+        '<div><b>④ 학원 대응</b>매 수업 문장 쓰기 3개로 동사 형태를 점검하고, 틀린 단어는 다음 수업 시작 전에 재시험하겠습니다.</div>' +
+      '</div><p class="ms-ex">노트·과제 사진처럼 실제 자료가 있으면 함께 보내면 더 믿음을 줘요.</p></div>' +
+      '<div class="ms-sec"><h3><span class="pill">순서</span>저장부터 발송까지</h3><div class="ms-flow five">' +
+        '<div class="ms-step"><b>① 저장</b><span>코멘트 3칸 작성 후 저장</span><em>그달 데일리 테스트가 \'저장\'돼 있어야 집계돼요</em></div>' +
+        '<div class="ms-step"><b>② 리포트 만들기</b><span>학생별 리포트 카드가 만들어져요</span></div>' +
+        '<div class="ms-step"><b>③ 선생님 확인</b><span>담당 선생님이 내용 확인</span><em>선생님 화면에서만</em></div>' +
+        '<div class="ms-step"><b>④ 원장님 확인</b><span>원장님이 코멘트를 다듬고 원장님 코멘트 작성</span><em>고친 칸은 \'원장님 수정\' 표시</em></div>' +
+        '<div class="ms-step"><b>⑤ 발송</b><span>두 분 모두 확인한 리포트만 발송돼요</span></div>' +
+      '</div></div>' +
+      '<div class="ms-ft"><button type="button" class="btn soft" data-go="monthly">월말 리포트 화면 열기 →</button><button type="button" class="btn soft" data-go="daily">데일리 테스트 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
     } }
 ];
 var manOpen = null;
@@ -2476,7 +2510,7 @@ function renderManual(){
   if(!manOpen){
     $('manBody').innerHTML = '<div class="man-list">' + MANUALS.map(function(m){
       return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span><b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
-    }).join('') + '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트, 월말 리포트, 상담 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div></div>';
+    }).join('') + '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트, 상담 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div></div>';
     return;
   }
   var m = MANUALS.find(function(x){ return x.id === manOpen; });
