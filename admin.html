@@ -411,6 +411,63 @@
   .k-exit{ position:absolute; inset:0; background:rgba(20,22,26,.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#fff; }
   .k-exit input{ font-size:18px; padding:12px; border-radius:10px; border:0; width:min(320px, 80%); }
 
+  /* 업무 매뉴얼 */
+  .man-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
+  .man-item{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; text-align:left; font:inherit; color:var(--ink); cursor:pointer; padding:18px 20px; }
+  .man-item b{ font-size:16px; }
+  .man-item .muted{ font-size:12.5px; line-height:1.6; }
+  .man-item small{ font-size:11.5px; color:var(--ink-faint); }
+  .man-item.soon{ cursor:default; border-style:dashed; }
+  .man-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; max-width:980px; }
+  .man-top .linkish{ margin:0; }
+  .ms{ max-width:980px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; font-size:13px; line-height:1.55; }
+  .ms-hd{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; border-bottom:3px solid var(--ink); padding-bottom:10px; }
+  .ms-hd h2{ margin:0; font-size:23px; font-weight:900; letter-spacing:-0.02em; }
+  .ms-hd p{ margin:2px 0 0; color:var(--ink-soft); font-size:12.5px; }
+  .ms-hd small{ color:var(--ink-faint); font-size:11.5px; }
+  .ms-rules{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+  .ms-rules div{ background:var(--warn-soft); border-radius:10px; padding:10px 12px; font-weight:800; font-size:13.5px; display:flex; gap:8px; align-items:center; }
+  .ms-rules i{ font-style:normal; flex:none; width:24px; height:24px; border-radius:50%; background:var(--warn); color:#fff; display:grid; place-items:center; font-size:13px; }
+  .ms-sec h3{ margin:0 0 8px; font-size:15px; font-weight:900; display:flex; align-items:center; gap:8px; }
+  .ms-sec h3 .pill{ font-size:11.5px; font-weight:800; padding:2px 9px; border-radius:99px; background:var(--accent); color:#fff; }
+  .ms-flow{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:22px; }
+  .ms-flow.three{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+  .ms-step{ position:relative; background:var(--accent-soft); border-radius:12px; padding:11px 12px; }
+  .ms-step:not(:last-child)::after{ content:'▶'; position:absolute; right:-17px; top:50%; transform:translateY(-50%); color:var(--accent); font-size:12px; }
+  .ms-step b{ display:block; font-size:14px; font-weight:900; color:var(--accent); margin-bottom:3px; }
+  .ms-step span{ display:block; font-size:12.5px; color:var(--ink); }
+  .ms-step em{ font-style:normal; display:block; margin-top:5px; font-size:11.5px; color:var(--ink-soft); }
+  .ms-two{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+  .ms-box{ border:1px solid var(--border); border-radius:12px; padding:11px 13px; }
+  .ms-box h4{ margin:0 0 6px; font-size:13.5px; font-weight:900; }
+  .ms-box ul{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:3px; font-size:12.5px; }
+  .ms-box.ok{ background:var(--good-soft); border-color:transparent; } .ms-box.ok h4{ color:var(--good); }
+  .ms-box.no{ background:var(--warn-soft); border-color:transparent; } .ms-box.no h4{ color:var(--warn); }
+  .ms-path{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:12.5px; }
+  .ms-path span{ background:var(--surface-soft); border-radius:8px; padding:4px 9px; font-weight:700; }
+  .ms-path span.key{ background:var(--warn); color:#fff; }
+  .ms-path b{ color:var(--ink-faint); font-weight:700; }
+  .ms-ex{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); }
+  .ms-ex code{ font-family:inherit; background:var(--surface-soft); border-radius:6px; padding:1px 6px; color:var(--ink); }
+  .ms-who{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; margin-bottom:10px; }
+  .ms-who div{ background:var(--hold-soft); border-radius:10px; padding:8px 10px; font-size:12.5px; }
+  .ms-who b{ display:block; font-weight:900; color:var(--hold); font-size:13px; }
+  .ms-ft{ display:flex; flex-wrap:wrap; gap:8px; border-top:1px dashed var(--border); padding-top:12px; }
+  @media (max-width: 720px){
+    .ms{ padding:16px; }
+    .ms-rules, .ms-two, .ms-flow, .ms-flow.three{ grid-template-columns:1fr; gap:18px; }
+    .ms-flow, .ms-flow.three{ gap:22px; }
+    .ms-step:not(:last-child)::after{ content:'▼'; right:auto; left:50%; top:auto; bottom:-18px; transform:translateX(-50%); }
+    .ms-who{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  }
+  @media print{
+    @page{ size:A4; margin:10mm; }
+    body{ background:#fff !important; }
+    .side, .topbar, .greet, .man-top, .ms-ft{ display:none !important; }
+    .ms{ border:0 !important; box-shadow:none !important; padding:0; max-width:none; gap:10px; font-size:11.5px; }
+    .ms *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+
   /* 로그인 */
   .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
   .login-card{ width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 26px; box-shadow:0 8px 30px rgba(32,36,43,0.06); display:flex; flex-direction:column; gap:14px; }
@@ -817,6 +874,12 @@
       </div>
     </section>
 
+    <!-- 업무 매뉴얼 -->
+    <section id="view-manual" hidden>
+      <div class="greet"><div><h1>업무 매뉴얼</h1><p>비욘드잉글리쉬 사직캠퍼스만의 업무 규칙이에요. 처음 오신 선생님도 이 순서대로 하면 돼요.</p></div></div>
+      <div id="manBody"></div>
+    </section>
+
     <!-- 선생님·설정 (원장님 전용) -->
     <section id="view-settings" hidden>
       <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
@@ -1025,12 +1088,12 @@ var MENU = {
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리'],['bell','전체 공지']]],
     ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
     ['소통·자료', [['bell','전달사항'],['users','주간회의'],['video','TTC 교육자료'],['box','교재 출고 요청'],['dict','영어 뉘앙스 사전']]],
-    ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
+    ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼','manual']]]
   ],
   teacher: [
     ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
     ['소통·자료', [['bell','전달사항'],['users','주간회의'],['video','TTC 교육자료'],['box','교재 출고 요청'],['dict','영어 뉘앙스 사전']]],
-    ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼']]]
+    ['커뮤니티', [['board','게시판'],['bulb','건의사항'],['talk','교재연구 소통방'],['manual','업무 매뉴얼','manual']]]
   ]
 };
 
@@ -1058,10 +1121,10 @@ function setView(v, page){
   state.view = v;
   state.page = page || 'main';
   if(state.page === 'settings' && v !== 'director') state.page = 'main';
-  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend';
+  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend;
+  var sub = cal || set || daily || monthly || attend || manual;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1069,14 +1132,16 @@ function setView(v, page){
   $('view-daily').hidden = !daily;
   $('view-monthly').hidden = !monthly;
   $('view-attend').hidden = !attend;
+  $('view-manual').hidden = !manual;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
   else if(daily) renderDaily();
   else if(monthly) renderMonthly();
   else if(attend) renderAttend();
+  else if(manual) renderManual();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -1108,7 +1173,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
     if(a.dataset.key === 'kiosk') return $('atKiosk').click();
-    if(a.dataset.key === 'daily' || a.dataset.key === 'monthly' || a.dataset.key === 'attend') return setView(state.view, a.dataset.key);
+    if(a.dataset.key === 'daily' || a.dataset.key === 'monthly' || a.dataset.key === 'attend' || a.dataset.key === 'manual'){ if(a.dataset.key === 'manual') manOpen = null; return setView(state.view, a.dataset.key); }
     if(!a.dataset.key) soon(a.dataset.name);
     return;
   }
@@ -2373,6 +2438,56 @@ $('atClass').addEventListener('change', function(){ atClassId = this.value; rend
 $('atPrev').addEventListener('click', function(){ atDay.setDate(atDay.getDate() - 1); renderAttend(); });
 $('atNext').addEventListener('click', function(){ atDay.setDate(atDay.getDate() + 1); renderAttend(); });
 
+/* ===== 업무 매뉴얼 =====
+   학원 고유 업무 규칙. 새 선생님도 한눈에 볼 수 있도록 매뉴얼마다 한 장짜리 요약으로 보여 줘요. */
+var MANUALS = [
+  { id:'attend', title:'출결·보충수업 업무 매뉴얼', tag:'출결', updated:'2026-10-25',
+    summary:'등원·하원 체크, 지각·결석·조퇴 사유, 카톡 발송, 보충 기준, 보충 일정 잡기·공유, 보충 자료 준비를 한 장으로 정리했어요.',
+    sheet:function(){
+      return '<div class="ms-hd"><div><h2>출결·보충수업 업무 매뉴얼</h2><p>새로 오신 선생님은 이 한 장만 보고 그대로 따라 하면 돼요.</p></div><small>비욘드잉글리쉬 사직캠퍼스 · 최종 수정 '+this.updated+'</small></div>' +
+      '<div class="ms-rules"><div><i>1</i>출석 체크 때 \'문자발송\' 체크 필수</div><div><i>2</i>지각·결석·조퇴는 사유 필수</div><div><i>3</i>결석 연락 받으면 부모님께 재확인</div></div>' +
+      '<div class="ms-sec"><h3><span class="pill">매일</span>출결 체크 순서</h3><div class="ms-flow">' +
+        '<div class="ms-step"><b>① 등원</b><span>입구 태블릿에서 부모님 번호 뒷 4자리 → 등원</span><em>태블릿을 못 쓴 학생은 선생님이 직접 체크</em></div>' +
+        '<div class="ms-step"><b>② 출석 체크</b><span>\'문자발송\' 체크 → 전체출석 → 상태 고치기</span><em>늦는 학생은 보류 → 오면 출석(지각)</em></div>' +
+        '<div class="ms-step"><b>③ 저장하기</b><span>저장하면 \'보낼 카톡\'에 문자가 쌓여요</span><em>사유 빠진 학생은 저장할 때 알려 줘요</em></div>' +
+        '<div class="ms-step"><b>④ 카톡 발송</b><span>문구 확인 → 카톡 전체 발송</span><em>하원은 태블릿 하원 또는 하원 버튼</em></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>지각·결석·조퇴 사유 쓰는 법</h4><ul><li>지각: <b>학교 상담으로 인한 지각</b></li><li>결석: <b>컨디션 저조로 인한 결석</b></li><li>조퇴: <b>병원 진료로 조퇴</b></li></ul><p class="ms-ex">무엇 때문에 + 지각/결석/조퇴 형식으로 짧게 써요.</p></div>' +
+        '<div class="ms-box"><h4>결석했을 때</h4>' +
+          '<div class="ms-path"><b>사전 연락 없음</b><span>부모님께 연락</span><b>→</b><span>결석 확인 카톡</span></div>' +
+          '<div class="ms-path" style="margin-top:6px"><b>사전 연락 있음</b><span class="key">부모님 재확인</span><b>→</b><span>\'재확인했어요\' 체크</span><b>→</b><span>보충 안내 카톡</span></div>' +
+          '<p class="ms-ex">학생이나 타과목 선생님께 들은 연락은 꼭 부모님께 다시 확인해요. 수업 후 사유 확인 → 보충 일정 잡기.</p></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">판단</span>보충 할까요?</h3>' +
+        '<div class="ms-who"><div><b>결석</b>사유를 보고 판단</div><div><b>과제 미수행</b>영상·교재</div><div><b>잦은 지각</b>단어 시험 수행도가 떨어질 때</div><div><b>교재 마무리</b>틀린 부분이 많아 혼자 어려울 때</div></div>' +
+        '<div class="ms-two"><div class="ms-box ok"><h4>✓ 결석 보충 가능</h4><ul><li>가족행사</li><li>병결</li><li>학교행사</li></ul></div><div class="ms-box no"><h4>✕ 결석 보충 불가</h4><ul><li>컨디션 난조</li><li>친구 약속</li></ul></div></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">보충</span>보충 진행 순서</h3><div class="ms-flow three">' +
+        '<div class="ms-step"><b>① 일정 잡기</b><span><b style="display:inline;color:inherit;font-size:inherit">토요일 10시·11시·12시</b> 중 선택</span><em>출결·지각 → \'보충 일정 잡기\' → 확정 → 보충 안내 카톡 발송 · 학생에게도 말로 안내</em></div>' +
+        '<div class="ms-step"><b>② 일정 공유</b><span>확정하면 공통 일정표에 자동으로 올라가요</span><em>예) [10시 보충] 초등 리딩 2 · 최유나 / FUN PHONICS (1-5), 교재 11~25p</em></div>' +
+        '<div class="ms-step"><b>③ 자료 준비</b><span><b style="display:inline;color:inherit;font-size:inherit">1시간 분량</b> · 학생 이름 적기</span><em>복도 책꽂이 노란색 플라스틱 통(보충자료통)에 넣어 둬요</em></div>' +
+      '</div></div>' +
+      '<div class="ms-ft"><button type="button" class="btn soft" data-go="attend">출결·지각 화면 열기 →</button><button type="button" class="btn soft" data-go="calendar">일정표 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+    } }
+];
+var manOpen = null;
+function renderManual(){
+  if(!manOpen){
+    $('manBody').innerHTML = '<div class="man-list">' + MANUALS.map(function(m){
+      return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span><b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
+    }).join('') + '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트, 월말 리포트, 상담 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div></div>';
+    return;
+  }
+  var m = MANUALS.find(function(x){ return x.id === manOpen; });
+  $('manBody').innerHTML = '<div class="man-top"><button type="button" class="linkish" data-man-back>← 매뉴얼 목록</button></div><article class="card ms">' + m.sheet() + '</article>';
+}
+$('manBody').addEventListener('click', function(ev){
+  var it = ev.target.closest('[data-man]'); if(it){ manOpen = it.dataset.man; renderManual(); window.scrollTo(0, 0); return; }
+  if(ev.target.closest('[data-man-back]')){ manOpen = null; renderManual(); return; }
+  var go = ev.target.closest('[data-go]'); if(go) setView(state.view, go.dataset.go);
+});
+
 /* ===== 태블릿 등원·하원 =====
    부모님 전화번호 뒷 4자리 → (같은 번호가 여럿이면 이름 고르기) → 오늘 처음이면 등원, 두 번째면 하원.
    기록은 출결·지각에 그대로 들어가고, 등원·하원 카톡이 '보낼 카톡'에 쌓여요.
@@ -2607,7 +2722,7 @@ function enter(acc){
   if(acc.role === 'teacher'){
     state.teacher = acc.name;
     var th = location.hash.replace('#teacher-', '').replace('#', '');
-    setView('teacher', ['calendar','daily','monthly','attend'].indexOf(th) !== -1 ? th : 'main');
+    setView('teacher', ['calendar','daily','monthly','attend','manual'].indexOf(th) !== -1 ? th : 'main');
   } else {
     var h = location.hash;
     if(h === '#calendar') setView('director', 'calendar');
@@ -2619,6 +2734,8 @@ function enter(acc){
     else if(h === '#teacher-monthly') setView('teacher', 'monthly');
     else if(h === '#attend') setView('director', 'attend');
     else if(h === '#teacher-attend') setView('teacher', 'attend');
+    else if(h === '#manual') setView('director', 'manual');
+    else if(h === '#teacher-manual') setView('teacher', 'manual');
     else setView(h === '#teacher' ? 'teacher' : 'director');
   }
 }
