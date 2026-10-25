@@ -422,6 +422,52 @@
   .k-exit-btns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .k-exit-btns .btn{ justify-content:center; padding:12px; font-size:15px; }
 
+  /* 게시판 · 자료실 */
+  .bd-tabs{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:22px; background:var(--surface); max-width:900px; }
+  .bd-tabs button{ font:inherit; font-size:14px; font-weight:700; padding:14px 6px; border:0; border-left:1px solid var(--border); background:transparent; color:var(--ink-soft); cursor:pointer; }
+  .bd-tabs button:first-child{ border-left:0; }
+  .bd-tabs button[aria-selected="true"]{ background:var(--accent); color:#fff; }
+  .bd-table-wrap{ overflow-x:auto; }
+  .bd-table{ width:100%; border-collapse:collapse; font-size:14px; border-top:2px solid var(--ink); }
+  .bd-table th{ background:var(--surface-soft); font-weight:800; padding:12px 8px; font-size:13px; }
+  .bd-table td{ padding:13px 8px; border-bottom:1px solid var(--border); text-align:center; color:var(--ink-soft); }
+  .bd-table td.t{ text-align:left; color:var(--ink); }
+  .bd-table th.n, .bd-table td.n{ width:64px; } .bd-table th.a, .bd-table td.a{ width:110px; } .bd-table th.d, .bd-table td.d{ width:110px; font-variant-numeric:tabular-nums; } .bd-table th.v, .bd-table td.v{ width:70px; }
+  .bd-link{ font:inherit; background:none; border:0; padding:0; color:inherit; cursor:pointer; text-align:left; }
+  .bd-link:hover{ text-decoration:underline; }
+  .bd-cat{ display:inline-block; font-size:11.5px; font-weight:800; color:var(--accent); background:var(--accent-soft); border-radius:6px; padding:1px 7px; margin-right:7px; }
+  .bd-new{ display:inline-block; font-size:10.5px; font-weight:800; color:var(--good); border:1px solid var(--good); border-radius:4px; padding:0 5px; margin-left:7px; }
+  .bd-clip{ margin-left:6px; font-size:12px; }
+  .bd-empty{ padding:40px 8px !important; }
+  .bd-pages{ display:flex; justify-content:center; gap:6px; margin:18px 0 4px; }
+  .bd-pages button{ font:inherit; min-width:32px; height:32px; border:1px solid transparent; border-radius:6px; background:none; color:var(--ink-soft); cursor:pointer; }
+  .bd-pages button[aria-current="page"]{ border-color:var(--accent); color:var(--accent); font-weight:800; }
+  .bd-foot{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px; }
+  .bd-search{ display:flex; gap:6px; flex-wrap:wrap; }
+  .bd-search select, .bd-search input{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); }
+  .bd-search input{ width:220px; max-width:100%; }
+  .bd-view{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 24px; }
+  .bd-view header{ border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:16px; }
+  .bd-view h2{ margin:8px 0 6px; font-size:20px; }
+  .bd-meta{ margin:0; font-size:12.5px; color:var(--ink-faint); }
+  .bd-content{ white-space:pre-wrap; font-size:14.5px; line-height:1.75; min-height:120px; }
+  .bd-linkline{ font-size:13.5px; word-break:break-all; }
+  .bd-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:20px; flex-wrap:wrap; }
+  .bd-del{ color:var(--warn) !important; }
+  .bd-form{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; max-width:900px; }
+  .bd-form h2{ margin:0; font-size:18px; }
+  .bd-form label{ display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:700; }
+  .bd-form small{ font-weight:500; color:var(--ink-faint); }
+  .bd-form input, .bd-form select, .bd-form textarea{ font:inherit; font-size:14px; font-weight:400; border:1px solid var(--border); border-radius:8px; padding:10px 12px; background:var(--surface); color:var(--ink); }
+  .bd-form textarea{ resize:vertical; line-height:1.65; }
+  @media (max-width: 720px){
+    .bd-tabs{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+    .bd-tabs button{ border-top:1px solid var(--border); padding:11px 4px; font-size:13px; }
+    .bd-table th.a, .bd-table td.a, .bd-table th.v, .bd-table td.v{ display:none; }
+    .bd-table th.n, .bd-table td.n{ width:40px; } .bd-table th.d, .bd-table td.d{ width:88px; font-size:12px; }
+    .bd-view, .bd-form{ padding:18px 16px; }
+  }
+
   /* 업무 매뉴얼 */
   .man-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
   .man-item{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; text-align:left; font:inherit; color:var(--ink); cursor:pointer; padding:18px 20px; }
@@ -898,6 +944,12 @@
       <div id="manBody"></div>
     </section>
 
+    <!-- 게시판 · 자료실 (탭으로 분류) -->
+    <section id="view-board" hidden>
+      <div class="greet"><div><h1 id="bdTitle">게시판</h1><p id="bdDesc"></p></div></div>
+      <div id="bdBody"></div>
+    </section>
+
     <!-- 선생님·설정 (원장님 전용) -->
     <section id="view-settings" hidden>
       <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
@@ -1115,13 +1167,13 @@ var MENU = {
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리'],['bell','전체 공지']]],
     ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
-    ['소통', [['board','게시판 (전달사항)'],['box','교재 출고 요청'],['bulb','건의사항'],['users','주간회의']]],
-    ['자료', [['video','TTC 교육'],['talk','교재 연구'],['doc','시험 대비 자료'],['dict','뉘앙스 사전'],['manual','업무 매뉴얼','manual']]]
+    ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
+    ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
   ],
   teacher: [
     ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
-    ['소통', [['board','게시판 (전달사항)'],['box','교재 출고 요청'],['bulb','건의사항'],['users','주간회의']]],
-    ['자료', [['video','TTC 교육'],['talk','교재 연구'],['doc','시험 대비 자료'],['dict','뉘앙스 사전'],['manual','업무 매뉴얼','manual']]]
+    ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
+    ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
   ]
 };
 
@@ -1149,10 +1201,10 @@ function setView(v, page){
   state.view = v;
   state.page = page || 'main';
   if(state.page === 'settings' && v !== 'director') state.page = 'main';
-  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual';
+  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual;
+  var sub = cal || set || daily || monthly || attend || manual || board;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1161,6 +1213,7 @@ function setView(v, page){
   $('view-monthly').hidden = !monthly;
   $('view-attend').hidden = !attend;
   $('view-manual').hidden = !manual;
+  $('view-board').hidden = !board;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -1168,14 +1221,15 @@ function setView(v, page){
   else if(monthly) renderMonthly();
   else if(attend) renderAttend();
   else if(manual) renderManual();
+  else if(board) renderBoard();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
 
 function renderSide(){
-  var current = state.page !== 'main' ? state.page : state.view === 'director' ? 'dashboard' : 'journal';
+  var current = state.page === 'board' ? 'board:' + bd.board + ':' + bd.tab : state.page !== 'main' ? state.page : state.view === 'director' ? 'dashboard' : 'journal';
   var html = '';
   MENU[state.view].forEach(function(group){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
@@ -1201,6 +1255,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
     if(a.dataset.key === 'kiosk') return $('atKiosk').click();
+    if(a.dataset.key.indexOf('board:') === 0){ var bk = a.dataset.key.split(':'); return openBoard(bk[1], bk[2]); }
     if(a.dataset.key === 'daily' || a.dataset.key === 'monthly' || a.dataset.key === 'attend' || a.dataset.key === 'manual'){ if(a.dataset.key === 'manual') manOpen = null; return setView(state.view, a.dataset.key); }
     if(!a.dataset.key) soon(a.dataset.name);
     return;
@@ -2466,6 +2521,129 @@ $('atClass').addEventListener('change', function(){ atClassId = this.value; rend
 $('atPrev').addEventListener('click', function(){ atDay.setDate(atDay.getDate() - 1); renderAttend(); });
 $('atNext').addEventListener('click', function(){ atDay.setDate(atDay.getDate() + 1); renderAttend(); });
 
+/* ===== 게시판 · 자료실 =====
+   한 화면에 탭을 두고 분류별로 글을 모아 봐요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
+   파일은 브라우저에 담기엔 커서, 자료는 구글 드라이브 같은 공유 링크를 붙이는 방식으로 해요. */
+var BOARDS = {
+  comm: { title:'게시판', desc:'전달사항, 교재 출고 요청, 건의사항, 주간회의를 한곳에서 확인해요.',
+    tabs:[['notice','전달사항'], ['book','교재 출고 요청'], ['idea','건의사항'], ['meet','주간회의']] },
+  data: { title:'자료실', desc:'TTC 교육, 교재 연구, 시험 대비 자료, 뉘앙스 사전을 함께 모아 둬요.',
+    tabs:[['ttc','TTC 교육'], ['study','교재 연구'], ['exam','시험 대비 자료'], ['nuance','뉘앙스 사전']] }
+};
+var BD_KEY = 'beyond-board-v1', BD_PER = 10, BD_NEW_DAYS = 7;
+var bdStore = (function(){
+  try{ var raw = localStorage.getItem(BD_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  var now = Date.now(), day = 86400000;
+  return { seq:4, posts:[
+    { id:1, board:'comm', cat:'notice', title:'(예시) 11월 학부모 상담 주간 안내', body:'11월 둘째 주는 학부모 상담 주간이에요.\n반별 상담 일정은 일정표에서 확인해 주세요.', author:'원장님', authorId:'', date:now - 2*day, views:0 },
+    { id:2, board:'comm', cat:'book', title:'(예시) BASIC 5권 SB 3권 요청', body:'초등 BASIC반 신규 학생 3명분이에요.', author:'원장님', authorId:'', date:now - 5*day, views:0 },
+    { id:3, board:'data', cat:'exam', title:'(예시) 중2 2학기 기말 대비 문법 정리', body:'관계대명사, to부정사 단원 정리 자료예요.', link:'', author:'원장님', authorId:'', date:now - 1*day, views:0 },
+    { id:4, board:'data', cat:'nuance', title:'(예시) make / let / have 차이', body:'[spoken] My mom made me clean my room.\n엄마가 나에게 내 방을 청소하게 시키셨다. (억지로 시킴)\n\n[spoken] My mom let me play games.\n엄마가 내가 게임하는 것을 허락하셨다. (허락)', link:'', author:'원장님', authorId:'', date:now - 9*day, views:0 }
+  ] };
+})();
+function saveBd(){ try{ localStorage.setItem(BD_KEY, JSON.stringify(bdStore)); }catch(e){} }
+var bd = { board:'comm', tab:'all', page:1, mode:'list', id:null, q:'', qf:'tb' };
+function bdCatName(b, c){ var t = BOARDS[b].tabs.find(function(x){ return x[0] === c; }); return t ? t[1] : ''; }
+function bdDate(ts){ return ymd(new Date(ts)); }
+function bdCanEdit(p){ return session && (session.role === 'director' || p.authorId === session.id); }
+function bdList(){
+  var q = bd.q.trim().toLowerCase();
+  return bdStore.posts.filter(function(p){
+    if(p.board !== bd.board) return false;
+    if(bd.tab !== 'all' && p.cat !== bd.tab) return false;
+    if(!q) return true;
+    var hay = bd.qf === 't' ? p.title : bd.qf === 'a' ? p.author : p.title + ' ' + p.body;
+    return hay.toLowerCase().indexOf(q) !== -1;
+  }).sort(function(a, b){ return b.id - a.id; });
+}
+function openBoard(board, tab){ bd.board = board; bd.tab = tab || 'all'; bd.page = 1; bd.mode = 'list'; bd.q = ''; setView(state.view, 'board'); }
+function renderBoard(){
+  var B = BOARDS[bd.board];
+  $('bdTitle').textContent = B.title; $('bdDesc').textContent = B.desc;
+  var tabs = [['all','전체보기']].concat(B.tabs);
+  var html = '<div class="bd-tabs" role="tablist">' + tabs.map(function(t){
+    return '<button type="button" role="tab" data-bdtab="'+t[0]+'" aria-selected="'+(bd.tab === t[0])+'">'+esc(t[1])+'</button>';
+  }).join('') + '</div>';
+  if(bd.mode === 'view') html += bdViewHtml();
+  else if(bd.mode === 'write') html += bdFormHtml();
+  else html += bdListHtml();
+  $('bdBody').innerHTML = html;
+  renderSide();
+}
+function bdListHtml(){
+  var list = bdList(), pages = Math.max(1, Math.ceil(list.length / BD_PER));
+  if(bd.page > pages) bd.page = pages;
+  var rows = list.slice((bd.page - 1) * BD_PER, bd.page * BD_PER), fresh = Date.now() - BD_NEW_DAYS * 86400000;
+  var html = '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="n">번호</th><th class="t">제목</th><th class="a">작성자</th><th class="d">작성일</th><th class="v">조회수</th></tr></thead><tbody>';
+  if(!rows.length) html += '<tr><td colspan="5" class="bd-empty">' + (bd.q ? '찾는 글이 없어요.' : '아직 글이 없어요. 아래 글쓰기로 첫 글을 남겨 주세요.') + '</td></tr>';
+  rows.forEach(function(p){
+    html += '<tr><td class="n">'+p.id+'</td><td class="t"><button type="button" class="bd-link" data-bdopen="'+p.id+'">' +
+      (bd.tab === 'all' ? '<span class="bd-cat">'+esc(bdCatName(p.board, p.cat))+'</span>' : '') + esc(p.title) + '</button>' +
+      (p.link ? '<span class="bd-clip" title="링크 있음">🔗</span>' : '') + (p.date > fresh ? '<span class="bd-new">NEW</span>' : '') +
+      '</td><td class="a">'+esc(p.author)+'</td><td class="d">'+bdDate(p.date)+'</td><td class="v">'+p.views+'</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  if(pages > 1){
+    html += '<div class="bd-pages">';
+    for(var i = 1; i <= pages; i++) html += '<button type="button" data-bdpage="'+i+'"'+(i === bd.page ? ' aria-current="page"' : '')+'>'+i+'</button>';
+    html += '</div>';
+  }
+  html += '<div class="bd-foot"><form class="bd-search" id="bdSearch"><select id="bdQf" aria-label="검색 범위"><option value="tb"'+(bd.qf==='tb'?' selected':'')+'>제목+내용</option><option value="t"'+(bd.qf==='t'?' selected':'')+'>제목</option><option value="a"'+(bd.qf==='a'?' selected':'')+'>작성자</option></select>' +
+    '<input type="search" id="bdQ" value="'+esc(bd.q)+'" aria-label="검색어"><button type="submit" class="btn soft">검색</button></form>' +
+    '<button type="button" class="btn" data-bdwrite>글쓰기</button></div>';
+  return html;
+}
+function bdViewHtml(){
+  var p = bdStore.posts.find(function(x){ return x.id === bd.id; });
+  if(!p){ bd.mode = 'list'; return bdListHtml(); }
+  return '<article class="bd-view"><header><span class="bd-cat">'+esc(bdCatName(p.board, p.cat))+'</span><h2>'+esc(p.title)+'</h2>' +
+    '<p class="bd-meta">'+esc(p.author)+' · '+bdDate(p.date)+(p.edited ? ' (수정 '+bdDate(p.edited)+')' : '')+' · 조회 '+p.views+'</p></header>' +
+    '<div class="bd-content">'+esc(p.body)+'</div>' +
+    (p.link ? '<p class="bd-linkline">🔗 <a href="'+esc(p.link)+'" target="_blank" rel="noopener">'+esc(p.link)+'</a></p>' : '') +
+    '<div class="bd-actions"><button type="button" class="btn soft" data-bdback>목록</button>' +
+    (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">삭제</button></span>' : '') + '</div></article>';
+}
+function bdFormHtml(){
+  var p = bd.id ? bdStore.posts.find(function(x){ return x.id === bd.id; }) : null;
+  var B = BOARDS[bd.board], cat = p ? p.cat : (bd.tab !== 'all' ? bd.tab : B.tabs[0][0]);
+  return '<form class="bd-form" id="bdForm" novalidate><h2>'+(p ? '글 수정' : '글쓰기')+'</h2>' +
+    '<label>분류<select id="bdCat">'+B.tabs.map(function(t){ return '<option value="'+t[0]+'"'+(t[0] === cat ? ' selected' : '')+'>'+esc(t[1])+'</option>'; }).join('')+'</select></label>' +
+    '<label>제목<input type="text" id="bdT" maxlength="80" value="'+esc(p ? p.title : '')+'"></label>' +
+    '<label>내용<textarea id="bdB" rows="10">'+esc(p ? p.body : '')+'</textarea></label>' +
+    (bd.board === 'data' ? '<label>자료 링크 <small>구글 드라이브·유튜브 등 공유 주소 (선택)</small><input type="url" id="bdL" placeholder="https://" value="'+esc(p && p.link ? p.link : '')+'"></label>' : '') +
+    '<p class="form-err" id="bdErr"></p>' +
+    '<div class="bd-actions"><button type="button" class="btn soft" data-bdcancel>취소</button><button type="submit" class="btn">'+(p ? '수정 완료' : '등록')+'</button></div></form>';
+}
+$('bdBody').addEventListener('click', function(ev){
+  var t = ev.target.closest('[data-bdtab]'); if(t){ bd.tab = t.dataset.bdtab; bd.page = 1; bd.mode = 'list'; return renderBoard(); }
+  var o = ev.target.closest('[data-bdopen]');
+  if(o){ var p = bdStore.posts.find(function(x){ return x.id === +o.dataset.bdopen; }); if(p){ p.views++; saveBd(); } bd.id = +o.dataset.bdopen; bd.mode = 'view'; renderBoard(); return window.scrollTo(0, 0); }
+  var pg = ev.target.closest('[data-bdpage]'); if(pg){ bd.page = +pg.dataset.bdpage; return renderBoard(); }
+  if(ev.target.closest('[data-bdwrite]')){ bd.id = null; bd.mode = 'write'; renderBoard(); return $('bdT').focus(); }
+  var ed = ev.target.closest('[data-bdedit]'); if(ed){ bd.id = +ed.dataset.bdedit; bd.mode = 'write'; return renderBoard(); }
+  var dl = ev.target.closest('[data-bddel]');
+  if(dl){
+    if(!confirm('이 글을 삭제할까요? 삭제하면 되돌릴 수 없어요.')) return;
+    bdStore.posts = bdStore.posts.filter(function(x){ return x.id !== +dl.dataset.bddel; }); saveBd();
+    bd.mode = 'list'; toast('글을 삭제했어요.'); return renderBoard();
+  }
+  if(ev.target.closest('[data-bdback]')){ bd.mode = 'list'; return renderBoard(); }
+  if(ev.target.closest('[data-bdcancel]')){ bd.mode = bd.id ? 'view' : 'list'; return renderBoard(); }
+});
+$('bdBody').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  if(ev.target.id === 'bdSearch'){ bd.q = $('bdQ').value; bd.qf = $('bdQf').value; bd.page = 1; return renderBoard(); }
+  if(ev.target.id !== 'bdForm') return;
+  var title = $('bdT').value.trim(), body = $('bdB').value.trim(), link = $('bdL') ? $('bdL').value.trim() : '';
+  if(!title){ $('bdErr').textContent = '제목을 적어 주세요.'; return $('bdT').focus(); }
+  if(!body){ $('bdErr').textContent = '내용을 적어 주세요.'; return $('bdB').focus(); }
+  if(link && !/^https?:\/\//i.test(link)){ $('bdErr').textContent = '링크는 http:// 또는 https:// 로 시작하는 주소로 넣어 주세요.'; return $('bdL').focus(); }
+  var p = bd.id ? bdStore.posts.find(function(x){ return x.id === bd.id; }) : null;
+  if(p){ p.cat = $('bdCat').value; p.title = title; p.body = body; p.link = link; p.edited = Date.now(); }
+  else { p = { id:++bdStore.seq, board:bd.board, cat:$('bdCat').value, title:title, body:body, link:link, author:session ? session.name : '', authorId:session ? session.id : '', date:Date.now(), views:0 }; bdStore.posts.push(p); }
+  saveBd(); bd.id = p.id; bd.mode = 'view'; toast(bd.id && p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
+});
+
 /* ===== 업무 매뉴얼 =====
    학원 고유 업무 규칙. 새 선생님도 한눈에 볼 수 있도록 매뉴얼마다 한 장짜리 요약으로 보여 줘요. */
 var MANUALS = [
@@ -2919,7 +3097,8 @@ function enter(acc){
   if(acc.role === 'teacher'){
     state.teacher = acc.name;
     var th = location.hash.replace('#teacher-', '').replace('#', '');
-    setView('teacher', ['calendar','daily','monthly','attend','manual'].indexOf(th) !== -1 ? th : 'main');
+    if(/^board-(comm|data)$/.test(th)){ bd.board = th.slice(-4); setView('teacher', 'board'); }
+    else setView('teacher', ['calendar','daily','monthly','attend','manual'].indexOf(th) !== -1 ? th : 'main');
   } else {
     var h = location.hash;
     if(h === '#calendar') setView('director', 'calendar');
@@ -2932,6 +3111,7 @@ function enter(acc){
     else if(h === '#attend') setView('director', 'attend');
     else if(h === '#teacher-attend') setView('teacher', 'attend');
     else if(h === '#manual') setView('director', 'manual');
+    else if(/^#(teacher-)?board-(comm|data)$/.test(h)){ bd.board = h.slice(-4); setView(h.indexOf('teacher') !== -1 ? 'teacher' : 'director', 'board'); }
     else if(h === '#teacher-manual') setView('teacher', 'manual');
     else setView(h === '#teacher' ? 'teacher' : 'director');
   }
