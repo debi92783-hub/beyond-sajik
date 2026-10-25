@@ -2503,6 +2503,40 @@ var MANUALS = [
         '<div class="ms-step"><b>⑤ 발송</b><span>두 분 모두 확인한 리포트만 발송돼요</span></div>' +
       '</div></div>' +
       '<div class="ms-ft"><button type="button" class="btn soft" data-go="monthly">월말 리포트 화면 열기 →</button><button type="button" class="btn soft" data-go="daily">데일리 테스트 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+    } },
+  { id:'vacation', title:'방학특강 준비·실시 매뉴얼', tag:'특강', updated:'2026-10-25',
+    summary:'3개월 전 기획, 2개월 전 얼리버드 모집, 타깃·클래스 설계, 특강 진행 순서, 특강 피드백, 정규반 연결까지 한 장으로 정리했어요.',
+    sheet:function(){
+      var b = function(t){ return '<b style="display:inline;color:inherit;font-size:inherit">'+t+'</b>'; };
+      return '<div class="ms-hd"><div><h2>방학특강 준비·실시 매뉴얼</h2><p>방학특강은 방학에 모집하는 것이 아니에요. 3개월 전부터 기획하고, 2개월 전부터 얼리버드로 모집해요.</p></div><small>비욘드잉글리쉬 사직캠퍼스 · 최종 수정 '+this.updated+'</small></div>' +
+      '<div class="ms-rules"><div><i>1</i>기획은 방학 3개월 전부터</div><div><i>2</i>얼리버드 모집은 2개월 전부터</div><div><i>3</i>수업 시간이 아니라 결과물로 보여 주기</div></div>' +
+      '<div class="ms-sec"><h3><span class="pill">준비</span>모집 타임라인 (방학 시작일 기준)</h3><div class="ms-flow five">' +
+        '<div class="ms-step"><b>D-90 기획</b><span>타깃 선정 · 수요조사 · 커리큘럼 설계 · 강사·시간표 확정</span></div>' +
+        '<div class="ms-step"><b>D-60 얼리버드</b><span>재원생 우선 안내 → 외부 광고 시작</span></div>' +
+        '<div class="ms-step"><b>D-45 집중 모집</b><span>얼리버드 혜택 집중 안내 · 신청 현황 확인 · 정원 확보</span></div>' +
+        '<div class="ms-step"><b>D-30 일반 모집</b><span>일반 모집으로 전환 · 레벨 진단 · 반 편성</span></div>' +
+        '<div class="ms-step"><b>D-14 수업 준비</b><span>잔여석 안내 · 교재·진단평가 준비 · 수업 준비 완료</span></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>① 기획 체크 (D-90)</h4><ul><li>지역 학교 학사일정(방학·개학일) 확인</li><li>타깃 학년·학습 수준 선정</li><li>수요조사: 재원생·학부모</li><li>커리큘럼, 시간표, 강사 배치</li></ul></div>' +
+        '<div class="ms-box"><h4>② 얼리버드 모집 (D-60)</h4><ul><li>재원생 우선 신청 안내</li><li>당근·블로그·맘카페·플레이스 광고</li><li>사전 진단평가, 맞춤 학습계획서 제공</li><li>선착순으로 정원 확보</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">설계</span>타깃은 학년보다 학습 고민으로 · 수준별 3가지 클래스</h3><div class="ms-two">' +
+        '<div class="ms-box"><h4>타깃 예시 — 누구에게 필요한 특강인가요?</h4><ul><li>'+b('예비중1 중등 영어 브릿지반')+': 초등→중등 전환, 중1 문법·독해 기초</li><li>'+b('예비고1 고등 영어 적응반')+': 고1 영어 기본기, 내신 대비 구문 다지기</li><li>'+b('중2 문법 취약단원 집중반')+': 학교 내신 취약 단원 개념 재정립·실전 연습</li></ul></div>' +
+        '<div class="ms-box"><h4>클래스 구성 — 소수 특별반 + 레벨별 반</h4><ul><li>'+b('최상위 소수 심화반')+': 고난도 문제, 서술형, 심화 학습</li><li>'+b('기초 취약 소수 집중반')+': 학습 결손 보완, 핵심 개념 재정립, 개별 교정</li><li>'+b('일반 레벨별 클래스')+': 기본·유형·응용, 수준별 반 편성, 다음 학기 준비</li></ul></div>' +
+      '</div></div>' +
+      '<div class="ms-sec"><h3><span class="pill">실시</span>특강 진행 순서 — 끝나면 무엇이 달라지는지 보여 줘요</h3><div class="ms-flow five">' +
+        '<div class="ms-step"><b>① 진단평가</b><span>시작 전 현재 수준 확인</span></div>' +
+        '<div class="ms-step"><b>② 개인별 목표</b><span>학생마다 특강 목표 정하기</span></div>' +
+        '<div class="ms-step"><b>③ 집중 학습</b><span>개념 · 유형 · 심화</span></div>' +
+        '<div class="ms-step"><b>④ 종료 평가</b><span>같은 기준으로 다시 평가</span></div>' +
+        '<div class="ms-step"><b>⑤ 성장보고서</b><span>시작·종료 결과 비교해서 제공</span></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>특강 피드백은 정규 수업과 다르게</h4><ul><li>정규: 주간 진도·과제, 학습 태도, 월간 성적 변화</li><li>'+b('특강: 특강 목표 대비 달성률, 시작·종료 진단 결과 비교, 취약 유형 개선 전후, 특강 결과와 다음 학습 제안')+'</li></ul></div>' +
+        '<div class="ms-box ok"><h4>특강이 끝나면 정규반까지 연결</h4><ul><li>개별 학습 결과 상담</li><li>강점·보완점을 바탕으로 다음 학기 추천 과정 제안</li><li>정규반 등록으로 자연스럽게 연결</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-ft"><button type="button" class="btn soft" data-go="calendar">일정표 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
     } }
 ];
 var manOpen = null;
