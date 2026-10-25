@@ -408,8 +408,19 @@
   .k-foot{ display:flex; justify-content:space-between; }
   .k-foot button{ background:none; border:0; font:inherit; font-size:12.5px; color:var(--ink-faint); cursor:pointer; padding:6px; }
   .k-hintbox{ position:absolute; left:24px; bottom:56px; max-width:min(520px, calc(100% - 48px)); max-height:40vh; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; font-size:12.5px; line-height:1.7; box-shadow:0 8px 30px rgba(0,0,0,.08); }
-  .k-exit{ position:absolute; inset:0; background:rgba(20,22,26,.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#fff; }
-  .k-exit input{ font-size:18px; padding:12px; border-radius:10px; border:0; width:min(320px, 80%); }
+  .k-exit{ position:absolute; inset:0; background:rgba(20,22,26,.82); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .k-exit-card{ background:#fff; color:#20242B; border-radius:18px; padding:22px; width:min(380px, 100%); display:flex; flex-direction:column; gap:10px; box-shadow:0 12px 40px rgba(0,0,0,.3); }
+  .k-exit-card > b{ font-size:19px; font-weight:900; }
+  .k-exit-card > p{ margin:0; font-size:13.5px; line-height:1.55; color:#4A505C; }
+  .k-exit-card small{ font-size:11.5px; color:#8A8F99; }
+  .k-exit-card input{ font-size:22px; letter-spacing:.2em; text-align:center; padding:12px; border-radius:10px; border:2px solid #2F5FD1; color:#20242B; background:#fff; }
+  .k-exit-pad{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .k-exit-pad button{ font:inherit; font-size:20px; font-weight:800; padding:12px 0; border-radius:10px; border:1px solid #E6E2D9; background:#F4F2EC; color:#20242B; cursor:pointer; }
+  .k-exit-pad button[data-xk="clear"]{ font-size:13px; }
+  .k-exit-pad button:active{ background:#EAF0FE; }
+  .k-exit-card .form-err{ margin:0; min-height:0; }
+  .k-exit-btns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .k-exit-btns .btn{ justify-content:center; padding:12px; font-size:15px; }
 
   /* 업무 매뉴얼 */
   .man-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
@@ -1017,10 +1028,20 @@
   </div>
   <div class="k-hintbox" id="kHintBox" hidden></div>
   <form class="k-exit" id="kExitForm" hidden novalidate>
-    <b>나가려면 지금 로그인한 계정의 비밀번호를 넣어 주세요</b>
-    <input type="password" id="kExitPw" autocomplete="current-password" aria-label="비밀번호">
-    <p class="form-err" id="kExitErr"></p>
-    <div><button class="btn" type="submit">나가기</button> <button class="btn soft" type="button" id="kExitCancel">취소</button></div>
+    <div class="k-exit-card">
+      <b>태블릿 화면 나가기</b>
+      <p>지금 업무 화면에 로그인한 계정(원장님 또는 선생님)의 <strong>비밀번호</strong>를 넣어 주세요. 학생 번호(뒷 4자리)가 아니에요.</p>
+      <input type="password" id="kExitPw" autocomplete="current-password" aria-label="로그인 비밀번호" placeholder="로그인 비밀번호">
+      <div class="k-exit-pad" id="kExitPad">
+        <button type="button" data-xk="1">1</button><button type="button" data-xk="2">2</button><button type="button" data-xk="3">3</button>
+        <button type="button" data-xk="4">4</button><button type="button" data-xk="5">5</button><button type="button" data-xk="6">6</button>
+        <button type="button" data-xk="7">7</button><button type="button" data-xk="8">8</button><button type="button" data-xk="9">9</button>
+        <button type="button" data-xk="clear">전체 지우기</button><button type="button" data-xk="0">0</button><button type="button" data-xk="back" aria-label="한 글자 지우기">⌫</button>
+      </div>
+      <small>영문이 들어간 비밀번호는 입력 칸을 눌러 화면 키보드로 넣어요.</small>
+      <p class="form-err" id="kExitErr"></p>
+      <div class="k-exit-btns"><button class="btn soft" type="button" id="kExitCancel">취소</button><button class="btn" type="submit">나가기</button></div>
+    </div>
   </form>
 </div>
 
@@ -2769,7 +2790,14 @@ $('kHint').addEventListener('click', function(){
   box.innerHTML = '<b>시안용 예시 번호</b> (실제로는 학부모 번호로 바뀌어요)<br>' + CLASSES.map(function(c){ return esc(c.name) + ': ' + c.students.map(function(s){ return esc(s) + ' ' + PHONE4[c.id + '|' + s]; }).join(', '); }).join('<br>');
   box.hidden = false;
 });
-$('kExit').addEventListener('click', function(){ $('kExitForm').hidden = false; $('kExitPw').value = ''; $('kExitErr').textContent = ''; $('kExitPw').focus(); });
+$('kExit').addEventListener('click', function(){ $('kExitForm').hidden = false; $('kExitPw').value = ''; $('kExitErr').textContent = ''; clearTimeout(kTimer); });
+// 숫자 비밀번호는 화면 숫자판으로도 넣을 수 있어요 (태블릿에서 키보드가 안 뜰 때)
+$('kExitPad').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-xk]'); if(!b) return;
+  var pw = $('kExitPw'), k = b.dataset.xk;
+  pw.value = k === 'clear' ? '' : k === 'back' ? pw.value.slice(0, -1) : pw.value + k;
+  $('kExitErr').textContent = '';
+});
 $('kExitCancel').addEventListener('click', function(){ $('kExitForm').hidden = true; });
 $('kExitForm').addEventListener('submit', function(ev){
   ev.preventDefault();
