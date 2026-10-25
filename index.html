@@ -7,7 +7,7 @@
 <meta name="description" content="부산 연제구 초등·중등 영어학원. 파닉스부터 중등 문법까지, 문제풀이가 아니라 이해하고 표현하는 영어.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <style>
   :root{
@@ -93,50 +93,13 @@
   }
   .site-bar .cta-small:hover{ background: var(--accent-deep); }
 
-  /* ---------- Hero ---------- */
-  .hero{
-    padding: 96px 0 80px;
-    border-bottom: 1px solid var(--line);
-    background:
-      radial-gradient(circle at 85% 20%, rgba(226,163,59,0.18), transparent 45%),
-      linear-gradient(160deg, #1B2540 0%, #24304F 55%, #1A2238 100%);
-    color: #fff;
-    overflow: hidden;
-  }
-  .hero-title .nw{ white-space: nowrap; }
-  .hero-art{ display:block; width:100%; max-width:560px; height:auto; margin-left:auto; }
-  .hero-grid{
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 56px;
-    align-items: center;
-  }
-  .hero-eyebrow{
-    font-size: 0.95rem;
-    color: rgba(255,255,255,0.78);
-    margin: 0 0 18px;
-  }
-  h1.hero-title{
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: clamp(1.9rem, 4vw, 3rem);
-    line-height: 1.35;
-    letter-spacing: -0.015em;
-    margin: 0 0 22px;
-    color: #fff;
-    text-shadow: 0 2px 18px rgba(0,0,0,0.25);
-  }
-  .hero-sub{
-    font-size: 1.05rem;
-    color: rgba(255,255,255,0.88);
-    max-width: 46ch;
-    margin: 0 0 32px;
-  }
-  .hero-ctas{
-    display:flex;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
+  /* ---------- Hero: BEYOND SAJIK 글자 안에 그림이 비치는 첫 화면 ---------- */
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .hero{ padding: 48px 0 84px; border-bottom: none; }
+  .hero-word{ display:block; width:100%; height:auto; }
+  .hero-word text{ font-family: "Anton", "Impact", "Arial Narrow", sans-serif; font-size: 400px; }
+  .hero-word.narrow{ display:none; }
+  .hero-word.narrow text{ font-size: 290px; }
   .btn-primary{
     background: var(--accent);
     color: var(--ink);
@@ -148,15 +111,6 @@
     display: inline-block;
   }
   .btn-primary:hover{ background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; }
-  .btn-ghost{
-    padding: 14px 22px;
-    border-radius: var(--radius);
-    text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.45);
-    color: #fff;
-    font-weight: 600;
-  }
-  .btn-ghost:hover{ border-color: #fff; background: rgba(255,255,255,0.1); }
 
   /* word-block motif */
   .block-art{
@@ -176,11 +130,6 @@
   }
   .block-art .blk.acc{ background: var(--accent); border-color: var(--accent); font-weight: 700; }
   .block-art .blk.deep{ background: var(--ink); color: #fff; border-color: rgba(255,255,255,0.3); }
-  .hero-art-caption{
-    margin-top: 14px;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.7);
-  }
 
   /* ---------- 한눈에 보기 카드 ---------- */
   section.quick{ padding: 0; border-bottom: none; position: relative; z-index: 1; }
@@ -190,7 +139,6 @@
   .quick-card svg{ width: 96px; height: 64px; }
   .quick-card b{ font-family: var(--serif); font-size: 1.08rem; }
   .quick-card span{ font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
-  .hero{ padding-bottom: 120px; }
 
   /* ---------- Section shell ---------- */
   section{ padding: 72px 0; border-bottom: 1px solid var(--line); }
@@ -454,12 +402,12 @@
 
   /* ---------- Responsive ---------- */
   @media (max-width: 860px){
-    .hero-grid, .philo-grid, .info-grid{
+    .philo-grid, .info-grid{
       grid-template-columns: 1fr;
     }
-    .hero{ padding: 48px 0 96px; }
-    .hero-art{ max-width: 420px; margin: 8px auto 0; }
-    .hero-art-caption{ text-align: center; }
+    .hero{ padding: 28px 0 84px; }
+    .hero-word.wide{ display:none; }
+    .hero-word.narrow{ display:block; }
     .quick-grid{ grid-template-columns: 1fr; margin-top: -60px; gap: 12px; }
     .quick-card{ flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 14px; padding: 16px 18px; }
     .quick-card svg{ width: 72px; height: 48px; flex: none; }
@@ -677,21 +625,19 @@
   </div>
 </header>
 
-<section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <p class="hero-eyebrow">부산 연제구 종합운동장로 · 비욘드잉글리쉬 사직어학원</p>
-      <h1 class="hero-title">아이의 영어가,<br><span class="nw">말이 되고</span> <span class="nw">표현이 될 때까지</span></h1>
-      <p class="hero-sub">문제풀이가 아니라 이해하고 표현하는 영어. 결과가 다른 영어, 특허받은 영어 — 지금 부모님이 찾고 계신 답, 비욘드잉글리쉬 사직어학원입니다.</p>
-      <div class="hero-ctas">
-        <a class="btn-primary" href="#reserve">상담 예약하기</a>
-        <a class="btn-ghost" href="tel:051-502-3596">051-502-3596</a>
-      </div>
-    </div>
-    <div>
-      <img class="hero-art" src="img/hero-art.svg" width="560" height="460" alt="단어 블록 I, want, to, speak, up.이 계단처럼 쌓여 문장이 되는 그림">
-      <p class="hero-art-caption">단어에서 문장으로, Sentence Build Up 학습법</p>
-    </div>
+<section class="hero" aria-labelledby="hero-h">
+  <h1 id="hero-h" class="sr-only">비욘드잉글리쉬 사직어학원 — 아이의 영어가, 말이 되고 표현이 될 때까지</h1>
+  <!-- 꿈을 찾는 아이 그림(img/dream-scene.svg, 직접 그림)이 BEYOND SAJIK 글자 안에 비쳐 보여요.
+       실제 사진으로 바꾸려면 두 곳의 href="img/dream-scene.svg" 를 사진 파일 이름으로 바꾸면 돼요. -->
+  <div class="wrap">
+    <svg class="hero-word wide" viewBox="0 0 1600 420" aria-hidden="true">
+      <defs><clipPath id="hw1"><text x="40" y="380" textLength="1520" lengthAdjust="spacingAndGlyphs">BEYOND SAJIK</text></clipPath></defs>
+      <g clip-path="url(#hw1)"><image href="img/dream-scene.svg" x="0" y="-300" width="1600" height="900" preserveAspectRatio="xMidYMid slice"/></g>
+    </svg>
+    <svg class="hero-word narrow" viewBox="0 0 800 600" aria-hidden="true">
+      <defs><clipPath id="hw2"><text x="40" y="275" textLength="720" lengthAdjust="spacingAndGlyphs">BEYOND</text><text x="40" y="575" textLength="720" lengthAdjust="spacingAndGlyphs">SAJIK</text></clipPath></defs>
+      <g clip-path="url(#hw2)"><image href="img/dream-scene.svg" x="-330" y="0" width="1460" height="600" preserveAspectRatio="xMidYMid slice"/></g>
+    </svg>
   </div>
 </section>
 

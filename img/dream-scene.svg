@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- 비욘드잉글리쉬 사직어학원 메인용으로 직접 그린 그림: 언덕 위에서 망원경으로 별을 보는 아이 (외부 저작물 없음) -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16204A"/>
+      <stop offset=".38" stop-color="#3B3F8F"/>
+      <stop offset=".62" stop-color="#C2649A"/>
+      <stop offset=".8" stop-color="#F29E5C"/>
+      <stop offset="1" stop-color="#FFD58A"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFF4C9"/><stop offset=".45" stop-color="#FFD58A" stop-opacity=".8"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="1080" cy="700" r="260" fill="url(#sun)"/>
+  <!-- 별 -->
+  <g fill="#FFFFFF">
+    <circle cx="120" cy="90" r="3"/><circle cx="260" cy="190" r="2"/><circle cx="410" cy="70" r="2.5"/><circle cx="560" cy="160" r="2"/>
+    <circle cx="700" cy="60" r="3"/><circle cx="880" cy="140" r="2"/><circle cx="1010" cy="50" r="2.5"/><circle cx="1180" cy="120" r="2"/>
+    <circle cx="1320" cy="70" r="3"/><circle cx="1480" cy="170" r="2"/><circle cx="1540" cy="60" r="2"/><circle cx="330" cy="300" r="1.8"/>
+    <circle cx="760" cy="260" r="1.8"/><circle cx="1250" cy="280" r="1.8"/><circle cx="60" cy="330" r="1.8"/>
+  </g>
+  <g fill="#FFE7A3">
+    <path d="M1240 190l9 22 22 9-22 9-9 22-9-22-22-9 22-9z"/>
+    <path d="M520 110l6 14 14 6-14 6-6 14-6-14-14-6 14-6z"/>
+  </g>
+  <!-- 별똥별 -->
+  <path d="M1460 90L1300 170" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+  <circle cx="1300" cy="170" r="4" fill="#FFFFFF"/>
+  <!-- 초승달 -->
+  <path d="M300 150a70 70 0 1 0 70 92a56 56 0 1 1 -70 -92z" fill="#FFF1C2"/>
+  <!-- 먼 언덕 -->
+  <path d="M0 640C200 590 360 600 520 630S880 660 1060 620S1420 580 1600 610V900H0z" fill="#5A3F7A" opacity=".85"/>
+  <!-- 가까운 언덕 -->
+  <path d="M0 740C180 690 380 660 600 640C760 626 880 640 1000 690C1160 750 1380 760 1600 730V900H0z" fill="#1E1A3A"/>
+  <!-- 아이와 망원경 (실루엣) -->
+  <g fill="#1E1A3A">
+    <!-- 삼각대 -->
+    <path d="M846 560l-38 104h10l34-94 34 94h10l-38-104z"/>
+    <!-- 망원경 -->
+    <rect x="800" y="520" width="150" height="26" rx="6" transform="rotate(-24 846 560)"/>
+    <rect x="930" y="512" width="34" height="40" rx="5" transform="rotate(-24 846 560)"/>
+    <!-- 아이 -->
+    <circle cx="772" cy="548" r="24"/>
+    <path d="M760 572c-26 6-38 30-40 60l-4 40h20l4-34 6 34h22l2-40 8-26 28-14-6-12-24 10z"/>
+    <path d="M748 546c-8-14-4-30 12-36 14-6 32 0 36 12-14-4-30 2-36 16z"/>
+  </g>
+</svg>
