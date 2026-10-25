@@ -379,7 +379,9 @@
   .k-brand{ display:flex; align-items:center; gap:14px; }
   .k-brand img{ width:clamp(52px, 8vh, 72px); height:auto; }
   .k-brand b{ display:block; font-size:clamp(24px, 4.2vh, 34px); font-weight:900; text-align:left; letter-spacing:-0.5px; }
-  .k-brand span{ display:block; font-size:clamp(14px, 2.2vh, 18px); font-weight:700; color:var(--ink-soft); text-align:left; }
+  .k-name{ display:inline-flex; flex-direction:column; }
+  .k-brand span{ display:flex; justify-content:space-between; font-size:clamp(14px, 2.2vh, 18px); font-weight:700; color:var(--ink-soft); margin-top:2px; }
+  .k-brand span i{ font-style:normal; }
   .k-guide{ margin:0; font-size:clamp(15px, 2.4vh, 19px); color:var(--ink-soft); }
   .k-guide b{ color:var(--ink); }
   .k-display{ width:min(340px, 86vw); height:clamp(60px, 9vh, 78px); border-radius:16px; border:2px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; gap:22px; font-size:clamp(34px, 6vh, 46px); font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:2px; }
@@ -931,7 +933,7 @@
     <div class="k-clock" id="kClock"></div>
   </div>
   <div class="k-main" id="kMain">
-    <div class="k-brand"><img src="logo.png" alt="비욘드잉글리쉬 로고" width="72" height="72"><div><b>비욘드잉글리쉬</b><span>사직캠퍼스</span></div></div>
+    <div class="k-brand"><img src="logo.png" alt="비욘드잉글리쉬 로고" width="72" height="72"><div class="k-name"><b>비욘드잉글리쉬</b><span aria-label="사직캠퍼스"><i>사</i><i>직</i><i>캠</i><i>퍼</i><i>스</i></span></div></div>
     <p class="k-guide">부모님 전화번호 뒷 4자리를 누르고 <b>등원</b> 또는 <b>하원</b>을 눌러 주세요</p>
     <div class="k-display" id="kDisplay" aria-live="polite"></div>
     <div class="k-pad" id="kPad"></div>
