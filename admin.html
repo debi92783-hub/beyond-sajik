@@ -370,6 +370,32 @@
     .at-seg .out{ margin-left:0; }
   }
 
+  /* 태블릿 등원·하원 */
+  .kiosk{ position:fixed; inset:0; z-index:40; background:var(--ground); display:flex; flex-direction:column; padding:20px 24px; }
+  .k-top{ display:flex; justify-content:space-between; align-items:center; }
+  .k-clock{ font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--ink-soft); }
+  .k-main{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; text-align:center; }
+  .k-main h1{ margin:0; font-size:clamp(20px, 3.4vw, 30px); font-weight:800; }
+  .k-dots{ display:flex; gap:16px; }
+  .k-dots i{ width:22px; height:22px; border-radius:50%; border:2px solid var(--ink-faint); }
+  .k-dots i.on{ background:var(--accent); border-color:var(--accent); }
+  .k-pad{ display:grid; grid-template-columns:repeat(3, minmax(76px, 104px)); gap:12px; }
+  .k-pad button{ height:clamp(64px, 11vh, 92px); border-radius:18px; border:1px solid var(--border); background:var(--surface); font:inherit; font-size:30px; font-weight:800; color:var(--ink); cursor:pointer; }
+  .k-pad button:active{ background:var(--accent-soft); }
+  .k-pad button.fn{ font-size:16px; color:var(--ink-soft); }
+  .k-list{ display:flex; flex-direction:column; gap:10px; width:min(420px, 100%); }
+  .k-list button, .k-big{ font:inherit; font-size:22px; font-weight:800; padding:18px; border-radius:16px; border:1px solid var(--border); background:var(--surface); color:var(--ink); cursor:pointer; }
+  .k-big.in{ background:var(--good); border-color:var(--good); color:#fff; }
+  .k-big.out{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .k-sub{ font-size:16px; color:var(--ink-soft); margin:0; }
+  .k-ok{ font-size:clamp(30px, 6vw, 48px); font-weight:900; }
+  .k-ok.in{ color:var(--good); } .k-ok.out{ color:var(--accent); }
+  .k-foot{ display:flex; justify-content:space-between; }
+  .k-foot button{ background:none; border:0; font:inherit; font-size:12.5px; color:var(--ink-faint); cursor:pointer; padding:6px; }
+  .k-hintbox{ position:absolute; left:24px; bottom:56px; max-width:min(520px, calc(100% - 48px)); max-height:40vh; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; font-size:12.5px; line-height:1.7; box-shadow:0 8px 30px rgba(0,0,0,.08); }
+  .k-exit{ position:absolute; inset:0; background:rgba(20,22,26,.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#fff; }
+  .k-exit input{ font-size:18px; padding:12px; border-radius:10px; border:0; width:min(320px, 80%); }
+
   /* 로그인 */
   .login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:var(--ground); }
   .login-card{ width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 26px; box-shadow:0 8px 30px rgba(32,36,43,0.06); display:flex; flex-direction:column; gap:14px; }
@@ -760,6 +786,7 @@
             <div class="at-bar-btns">
               <button class="btn soft" type="button" id="atAll">전체출석</button>
               <button class="btn" type="button" id="atSave">저장하기</button>
+              <button class="btn soft" type="button" id="atKiosk">태블릿 등원 화면</button>
             </div>
           </div>
           <p class="at-tip">늦게 오는 학생은 체크하지 말고 두었다가, 등원하면 그때 '출석'이나 '지각'으로 체크하고 저장해 주세요.</p>
@@ -881,6 +908,32 @@
       <button class="btn ghost" type="button" id="evCancel">취소</button>
       <button class="btn" type="submit">저장</button>
     </div>
+  </form>
+</div>
+
+<!-- 태블릿 등원·하원 화면 -->
+<div class="kiosk" id="kiosk" hidden>
+  <div class="k-top">
+    <div class="brand"><img class="brand-mark" src="logo.png" alt="" width="34" height="34"><div class="brand-text"><b>비욘드잉글리쉬</b><small>등원 · 하원 체크</small></div></div>
+    <div class="k-clock" id="kClock"></div>
+  </div>
+  <div class="k-main" id="kMain">
+    <h1>부모님 전화번호 뒷 4자리를 눌러 주세요</h1>
+    <div class="k-dots" id="kDots"><i></i><i></i><i></i><i></i></div>
+    <div class="k-pad" id="kPad"></div>
+  </div>
+  <div class="k-main" id="kPick" hidden></div>
+  <div class="k-main" id="kDone" hidden></div>
+  <div class="k-foot">
+    <button type="button" id="kHint">시안용 예시 번호 보기</button>
+    <button type="button" id="kExit">나가기</button>
+  </div>
+  <div class="k-hintbox" id="kHintBox" hidden></div>
+  <form class="k-exit" id="kExitForm" hidden novalidate>
+    <b>나가려면 지금 로그인한 계정의 비밀번호를 넣어 주세요</b>
+    <input type="password" id="kExitPw" autocomplete="current-password" aria-label="비밀번호">
+    <p class="form-err" id="kExitErr"></p>
+    <div><button class="btn" type="submit">나가기</button> <button class="btn soft" type="button" id="kExitCancel">취소</button></div>
   </form>
 </div>
 
@@ -2301,6 +2354,115 @@ $('atSend').addEventListener('click', function(){
 $('atClass').addEventListener('change', function(){ atClassId = this.value; renderAttend(); });
 $('atPrev').addEventListener('click', function(){ atDay.setDate(atDay.getDate() - 1); renderAttend(); });
 $('atNext').addEventListener('click', function(){ atDay.setDate(atDay.getDate() + 1); renderAttend(); });
+
+/* ===== 태블릿 등원·하원 =====
+   부모님 전화번호 뒷 4자리 → (같은 번호가 여럿이면 이름 고르기) → 오늘 처음이면 등원, 두 번째면 하원.
+   기록은 출결·지각에 그대로 들어가고, 등원·하원 카톡이 '보낼 카톡'에 쌓여요.
+   시안: 전화번호는 예시로 만든 뒷자리예요. 실제로는 서버에 학부모 번호를 두고 태블릿에는 보이지 않게 해요. */
+var PHONE4 = (function(){
+  var m = {}, n = 0;
+  CLASSES.forEach(function(c){ c.students.forEach(function(s){ n++; m[c.id + '|' + s] = String((n * 7919 + 1234) % 9000 + 1000); }); });
+  m['r-2|박서준'] = m['r-2|이도윤'];   // 형제처럼 뒷자리가 같은 경우 예시
+  return m;
+})();
+var kCode = '', kTimer = null, kClockT = null;
+function maskName(s){ return s.length <= 2 ? s.charAt(0) + '*' : s.charAt(0) + '*'.repeat(s.length - 2) + s.charAt(s.length - 1); }
+function kMatches(code){
+  var out = [];
+  CLASSES.forEach(function(c){ c.students.forEach(function(s){ if(PHONE4[c.id + '|' + s] === code) out.push({ cid:c.id, s:s, cname:c.name }); }); });
+  return out;
+}
+function kShow(which){ ['kMain','kPick','kDone'].forEach(function(id){ $(id).hidden = id !== which; }); }
+function kReset(){ kCode = ''; kDots(); kShow('kMain'); clearTimeout(kTimer); }
+function kDots(){ Array.from($('kDots').children).forEach(function(d, i){ d.classList.toggle('on', i < kCode.length); }); }
+function kRec(m){
+  var k = m.cid + '|' + ymd(new Date()), c = CLASSES.find(function(x){ return x.id === m.cid; });
+  if(!atStore[k]) atStore[k] = { rows:{}, outbox:[], log:[] };
+  var e = atStore[k];
+  c.students.forEach(function(s){ if(!e.rows[s]) e.rows[s] = { st:'', reason:'', notice:'', recheck:false, inAt:'', outAt:'', queued:{}, sent:{} }; });
+  return e;
+}
+function kOpenStudent(m){
+  var e = kRec(m), r = e.rows[m.s];
+  var next = !r.inAt ? 'in' : !r.outAt ? 'out' : 'done';
+  if(next === 'done'){ kDoneScreen(m, 'done', r); return; }
+  $('kPick').innerHTML = '<h1>' + esc(maskName(m.s)) + ' 학생</h1><p class="k-sub">' + esc(m.cname) + '</p>' +
+    '<button type="button" class="k-big ' + next + '" data-k="go">' + (next === 'in' ? '등원했어요' : '하원할게요') + '</button>' +
+    '<button type="button" class="k-big" data-k="back">내가 아니에요</button>';
+  $('kPick').dataset.cid = m.cid; $('kPick').dataset.s = m.s; $('kPick').dataset.cname = m.cname;
+  kShow('kPick');
+  clearTimeout(kTimer); kTimer = setTimeout(kReset, 15000);
+}
+function kDoneScreen(m, type, r){
+  $('kDone').innerHTML = type === 'done'
+    ? '<div class="k-ok">오늘은 이미 하원했어요</div><p class="k-sub">' + esc(maskName(m.s)) + ' 학생 · 하원 ' + korTime(r.outAt) + '</p>'
+    : '<div class="k-ok ' + type + '">' + (type === 'in' ? '등원 완료!' : '하원 완료!') + '</div><p class="k-sub">' + esc(maskName(m.s)) + ' 학생 · ' + korTime(type === 'in' ? r.inAt : r.outAt) + (type === 'in' ? ' · 오늘도 화이팅!' : ' · 조심히 가요!') + '</p>';
+  kShow('kDone');
+  clearTimeout(kTimer); kTimer = setTimeout(kReset, 3500);
+}
+function kGo(m){
+  var e = kRec(m), r = e.rows[m.s], t = nowHM(), type;
+  if(!r.inAt){
+    r.inAt = t; if(!r.st || r.st === '결석') r.st = '출석'; type = 'in';
+  } else { r.outAt = t; type = 'out'; }
+  if(!r.queued[type] && !r.sent[type]){
+    // 카톡 문구는 출결·지각 화면과 같은 문구를 써요
+    var keep = atClassId; atClassId = m.cid;
+    e.outbox.push({ name:m.s, type:type, text:atMsg(type, m.s, r), from:'태블릿' });
+    atClassId = keep;
+    r.queued[type] = true;
+  }
+  atSave();
+  kDoneScreen(m, type, r);
+}
+$('kPad').innerHTML = ['1','2','3','4','5','6','7','8','9','지우기','0','처음'].map(function(k){ return '<button type="button" data-key="'+k+'"'+(k.length > 1 ? ' class="fn"' : '')+'>'+k+'</button>'; }).join('');
+$('kPad').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-key]'); if(!b) return;
+  var k = b.dataset.key;
+  if(k === '지우기') kCode = kCode.slice(0, -1);
+  else if(k === '처음') kCode = '';
+  else if(kCode.length < 4) kCode += k;
+  kDots();
+  if(kCode.length === 4){
+    var list = kMatches(kCode);
+    if(!list.length){ toast('등록된 번호가 아니에요. 다시 눌러 주세요.'); setTimeout(function(){ kCode = ''; kDots(); }, 400); return; }
+    if(list.length === 1) return kOpenStudent(list[0]);
+    $('kPick').innerHTML = '<h1>누구인가요?</h1><div class="k-list">' + list.map(function(m, i){ return '<button type="button" data-pick="'+i+'">' + esc(maskName(m.s)) + ' · ' + esc(m.cname) + '</button>'; }).join('') + '</div><button type="button" class="k-big" data-k="back">처음으로</button>';
+    $('kPick')._list = list;
+    kShow('kPick');
+    clearTimeout(kTimer); kTimer = setTimeout(kReset, 15000);
+  }
+});
+$('kPick').addEventListener('click', function(ev){
+  var p = ev.target.closest('[data-pick]'); if(p) return kOpenStudent($('kPick')._list[+p.dataset.pick]);
+  var b = ev.target.closest('[data-k]'); if(!b) return;
+  if(b.dataset.k === 'back') return kReset();
+  if(b.dataset.k === 'go') kGo({ cid:$('kPick').dataset.cid, s:$('kPick').dataset.s, cname:$('kPick').dataset.cname });
+});
+function kClock(){ var d = new Date(); $('kClock').textContent = (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + DAYS[d.getDay()] + ') ' + korTime(nowHM()); }
+$('atKiosk').addEventListener('click', function(){
+  $('kiosk').hidden = false; kReset(); kClock(); clearInterval(kClockT); kClockT = setInterval(kClock, 15000);
+  $('kHintBox').hidden = true; $('kExitForm').hidden = true;
+  try{ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }catch(e){}
+});
+$('kHint').addEventListener('click', function(){
+  var box = $('kHintBox');
+  if(!box.hidden){ box.hidden = true; return; }
+  box.innerHTML = '<b>시안용 예시 번호</b> (실제로는 학부모 번호로 바뀌어요)<br>' + CLASSES.map(function(c){ return esc(c.name) + ': ' + c.students.map(function(s){ return esc(s) + ' ' + PHONE4[c.id + '|' + s]; }).join(', '); }).join('<br>');
+  box.hidden = false;
+});
+$('kExit').addEventListener('click', function(){ $('kExitForm').hidden = false; $('kExitPw').value = ''; $('kExitErr').textContent = ''; $('kExitPw').focus(); });
+$('kExitCancel').addEventListener('click', function(){ $('kExitForm').hidden = true; });
+$('kExitForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var acc = session && findAcc(session.id); if(!acc) return;
+  hashPw($('kExitPw').value, acc.salt).then(function(h){
+    if(h !== acc.hash){ $('kExitErr').textContent = '비밀번호가 맞지 않아요.'; return; }
+    $('kiosk').hidden = true; clearInterval(kClockT); clearTimeout(kTimer);
+    try{ document.fullscreenElement && document.exitFullscreen(); }catch(e){}
+    if(state.page === 'attend') renderAttend();
+  });
+});
 
 /* ===== 계정 · 로그인 =====
    시안용: 계정은 이 브라우저(localStorage)에만 저장하고 비밀번호는 SHA-256 해시로만 보관해요.
