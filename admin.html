@@ -1071,7 +1071,7 @@
               <label>숙제 · PB <span class="pg"><b>page</b><input type="text" id="jPb" inputmode="numeric" placeholder="예: 11-13"></span></label>
               <label class="jr-note">숙제 추가 내용 <input type="text" id="jNote" placeholder="예: 단어 20개 암기 + 테스트 (오른쪽 자주 쓰는 문구를 눌러도 돼요)"></label>
             </div>
-            <p class="muted" style="margin:0 0 12px">데일리 테스트와 같은 교재·책진도 목록이에요. 같은 날 데일리 테스트에 적은 진도·숙제가 있으면 자동으로 불러와요.</p>
+            <p class="muted" style="margin:0 0 12px">데일리 테스트와 같은 교재·책진도 목록이에요. 데일리 테스트 점검 페이지는 수업 진도와 다를 수 있어서 따로 적어요. 교재는 지난 수업 기록에서 이어 받고 책진도는 다음 차시로 미리 골라 둬요.</p>
             <button class="btn" type="button" id="applyAll">전체 학생에 적용</button>
           </div>
 
@@ -1956,16 +1956,34 @@ function gyAuto(t, d){
     var k = c.id + '|' + d, j = state.entries[k], dt = dtStore[k], prog = '', hw = '';
     if(j){
       prog = jrProgText(j);
-      var diff = c.students.filter(function(s){ var r = j.rows[s]; return r && (r.book || r.sb || r.pb); }).length;
+      var diff = c.students.filter(function(s){ var r = j.rows[s]; return r && r.book; }).length;
       if(prog && diff) prog += ' (학생별 다름 ' + diff + '명)';
       hw = [jrHwText(j), j.note].filter(Boolean).join(' · ');
     }
-    if(!prog && dt) prog = progText(dt);
-    if(!hw && dt) hw = hwRange(dt);
-    var abs = c.students.filter(function(s){ var a = atFor(c.id, d, s); return a && a.st === '결석'; }).map(function(s){
-      var a = atFor(c.id, d, s); return s + (a.reason.trim() ? '(' + a.reason.trim() + ')' : '');
-    });
-    return { cid:c.id, time:c.time, name:c.name, n:c.students.length, absN:abs.length, prog:prog, hw:hw, abs:abs.join(', ') };
+    // 진도·과제는 수업 기록에서만 가져와요. 데일리 테스트의 점검 페이지는 수업 진도와 다를 수 있어서 섞지 않아요.
+    if(j){
+      var hdiff = c.students.filter(function(s){ var r = j.rows[s]; return r && (r.sb || r.pb); }).length;
+      if(hw && hdiff) hw += ' (학생별 다름 ' + hdiff + '명)';
+    }
+    // 데일리 테스트 숙제 검사에서 미완료·일부완료 학생만 덧붙여요
+    var dr = (dt && dt.rows) || {};
+    var hwNo = c.students.filter(function(s){ return dr[s] && (dr[s].hw === '미완료' || dr[s].hw === '일부완료') && dr[s].att !== '결석'; })
+      .map(function(s){ return s + (dr[s].hw === '일부완료' ? '(일부)' : ''); });
+    if(hwNo.length) hw += (hw ? '\n' : '') + '숙제 검사 미완료: ' + hwNo.join(', ');
+    // 결석·지각·조퇴: 출결 기록이 먼저, 없으면 데일리 테스트 출결에서 가져와요
+    var ae = atStore[k], hasAt = !!(ae && Object.keys(ae.rows || {}).some(function(s){ return ae.rows[s].st; }));
+    var pick = function(st){
+      return c.students.map(function(s){
+        var a = atFor(c.id, d, s);
+        if(a) return a.st === st ? s + (a.reason && a.reason.trim() ? '(' + a.reason.trim() + ')' : '') : null;
+        var x = dr[s]; return x && x.att === st ? s + (x.attNote ? '(' + x.attNote + (st === '지각' && /^\d+$/.test(x.attNote) ? '분' : '') + ')' : '') : null;
+      }).filter(Boolean);
+    };
+    var absL = pick('결석'), late = pick('지각'), early = pick('조퇴');
+    var abs = absL.slice();
+    var absTxt = [absL.join(', '), late.length ? '지각: ' + late.join(', ') : '', early.length ? '조퇴: ' + early.join(', ') : ''].filter(Boolean).join('\n');
+    if(!absTxt && (hasAt || Object.keys(dr).length)) absTxt = '없음';
+    return { cid:c.id, time:c.time, name:c.name, n:c.students.length, absN:abs.length, prog:prog, hw:hw, abs:absTxt };
   });
   // 이 날로 잡힌 보충 수업 (출결·지각 화면에서 확정한 것)
   var mk = [];
@@ -2023,8 +2041,8 @@ function gySheet(t, d){
       (ed ? '<button type="button" class="gy-x" data-gyoff="' + c.cid + '" title="이 날 수업이 없으면 빼요">수업 없음</button>' : '') + '</td>' +
       '<td class="c">' + c.n + ' / ' + c.absN + '</td>' +
       '<td>' + ta('data-gyo="' + c.cid + '|prog"', c.prog, '수업 기록에서 자동으로 채워져요') + '</td>' +
-      '<td>' + ta('data-gyo="' + c.cid + '|hw"', c.hw, '') + '</td>' +
-      '<td>' + ta('data-gyo="' + c.cid + '|abs"', c.abs, '') + (ed && c.edited ? '<button type="button" class="gy-x" data-gyreset="' + c.cid + '">자동 내용으로</button>' : '') + '</td></tr>';
+      '<td>' + ta('data-gyo="' + c.cid + '|hw"', c.hw, '수업 기록의 숙제 칸에서 채워져요') + '</td>' +
+      '<td>' + ta('data-gyo="' + c.cid + '|abs"', c.abs, '출결에서 결석·지각을 체크하면 채워져요') + (ed && c.edited ? '<button type="button" class="gy-x" data-gyreset="' + c.cid + '">자동 내용으로</button>' : '') + '</td></tr>';
   });
   for(var i = D.cls.length; i < 6; i++) rows.push('<tr class="blank"><td class="c">' + (i + 1) + '교시</td><td></td><td></td><td></td><td></td><td></td></tr>');
   h += '<table class="gy-t gy-main"><colgroup><col style="width:9%"><col style="width:13%"><col style="width:9%"><col style="width:29%"><col style="width:22%"><col style="width:18%"></colgroup>' +
@@ -2166,9 +2184,11 @@ function entry(){
   if(!state.entries[k]){
     var rows = {};
     c.students.forEach(function(s, i){ rows[s] = { checked:true, hw: (i % 4 === 2 ? '미완료' : '완료'), score:'', book:'', prog:'', sb:'', pb:'', memo:'' }; });
-    // 같은 날 데일리 테스트에 적은 반 진도·숙제를 불러와요
-    var d = (typeof dtStore !== 'undefined' && dtStore[k]) || {};
-    state.entries[k] = { book:d.book || '', prog:d.prog || '', sb:d.sb || '', pb:d.pb || '', note:'', rows:rows };
+    // 데일리 테스트 점검 페이지는 수업 진도와 다를 수 있어서 불러오지 않아요. 교재만 지난 수업 기록에서 이어 받아요.
+    var last = Object.keys(state.entries).filter(function(x){ return x.indexOf(c.id + '|') === 0 && x < k; }).sort().pop();
+    var pv = last ? state.entries[last] : {};
+    var its = bookItems(pv.book || ''), at = its.indexOf(pv.prog);
+    state.entries[k] = { book:pv.book || '', prog:at >= 0 ? (its[at+1] || its[at]) : (its[0] || ''), sb:'', pb:'', note:'', rows:rows };
   }
   var en = state.entries[k];
   // 나중에 반에 들어온 학생도 칸이 생기게
