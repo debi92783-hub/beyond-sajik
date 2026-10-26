@@ -184,7 +184,19 @@
   .stu select.s-todo{ background:var(--warn-soft); color:var(--warn); }
   .stu select.s-hold{ background:var(--hold-soft); color:var(--hold); }
   .stu .score{ width:110px; }
-  .stu .memo{ flex:1 1 180px; }
+  .stu .memo{ flex:1 1 140px; }
+  .jr-lesson{ padding:0; margin-bottom:10px; }
+  .jr-lesson .jr-note{ grid-column:1 / -1; }
+  .jr-grp{ display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .jr-grp > i{ font-style:normal; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
+  .jr-own{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:2 1 360px; }
+  .jr-own select{ max-width:150px; }
+  .jr-own select:disabled{ color:var(--ink-faint); background:var(--surface-soft); }
+  .jr-pg{ display:inline-flex; align-items:stretch; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface); }
+  .jr-pg b{ display:flex; align-items:center; padding:0 7px; background:var(--surface-soft); color:var(--ink-soft); font-size:11.5px; border-right:1px solid var(--border); }
+  .stu .jr-pg input{ border:0; border-radius:0; width:70px; padding:6px 8px; }
+  .stu.own{ background:var(--accent-soft); margin:0 -10px; padding-left:10px; padding-right:10px; border-radius:8px; }
+  @media screen and (max-width: 720px){ .jr-lesson{ grid-template-columns:1fr; } }
   .preview-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 12px; }
   .preview-head select{ font-size:12.5px; border:1px solid var(--border); border-radius:8px; padding:5px 8px; background:var(--surface); }
   .bubble{ background:var(--surface-soft); border:1px solid var(--border); border-radius:12px; padding:16px 18px; max-width:460px; font-size:13px; line-height:1.65; white-space:pre-line; margin-bottom:14px; }
@@ -939,17 +951,19 @@
 
           <div class="card">
             <div class="card-head"><h2>오늘 수업 공통 입력 — <span class="className"></span></h2></div>
-            <div class="fields">
-              <label>수업 교재<input type="text" id="book" placeholder="예: Reading Explorer 2 Unit 5"></label>
-              <label>오늘 진도<input type="text" id="progress" placeholder="예: Unit 5 pp.42–48"></label>
-              <label>오늘 숙제<input type="text" id="homework" placeholder="예: 워크북 p.49–50 풀어오기"></label>
+            <div class="dt-lesson jr-lesson">
+              <label>진도 (교재명 &gt; 책진도)<span class="prog"><select id="jBook" aria-label="교재명"></select><select id="jProg" aria-label="책진도"></select></span></label>
+              <label>숙제 · SB <span class="pg"><b>page</b><input type="text" id="jSb" inputmode="numeric" placeholder="예: 15-16"></span></label>
+              <label>숙제 · PB <span class="pg"><b>page</b><input type="text" id="jPb" inputmode="numeric" placeholder="예: 11-13"></span></label>
+              <label class="jr-note">숙제 추가 내용 <input type="text" id="jNote" placeholder="예: 단어 20개 암기 + 테스트 (오른쪽 자주 쓰는 문구를 눌러도 돼요)"></label>
             </div>
+            <p class="muted" style="margin:0 0 12px">데일리 테스트와 같은 교재·책진도 목록이에요. 같은 날 데일리 테스트에 적은 진도·숙제가 있으면 자동으로 불러와요.</p>
             <button class="btn" type="button" id="applyAll">전체 학생에 적용</button>
           </div>
 
           <div class="card">
             <div class="card-head">
-              <h2>학생별 진도·숙제</h2>
+              <h2>학생별 진도·숙제 <small class="muted" style="font-weight:500;font-size:12px">진도와 숙제는 따로 적어요. 반 공통과 다른 학생만 바꿔요</small></h2>
               <span class="muted" id="stuCount"></span>
             </div>
             <div id="stuList"></div>
@@ -1388,7 +1402,7 @@ var day = new Date(); day.setHours(0,0,0,0);
 /* ===== 화면 전환 ===== */
 var state = {
   view:'director', page:'main', teacher:'이수진', classId:'r-2',
-  entries:{},   // classId -> { book, progress, homework, rows:{name:{checked,hw,score,memo}} }
+  entries:{},   // 'classId|날짜' -> { book, prog, sb, pb, rows:{name:{checked,hw,score,book,prog,sb,pb,memo}} }
   sent:{}       // classId -> 보낸 명 수
 };
 
@@ -1460,7 +1474,7 @@ $('side').addEventListener('click', function(e){
     return;
   }
   var p = e.target.closest('[data-phrase]');
-  if(p){ $('homework').value = PHRASES[+p.dataset.phrase]; saveCommon(); renderPreview(); toast('오늘 숙제 칸에 넣었어요.'); return; }
+  if(p){ $('jNote').value = PHRASES[+p.dataset.phrase]; saveCommon(); renderPreview(); toast('숙제 추가 내용 칸에 넣었어요.'); return; }
   if(e.target.id === 'addPhrase'){
     e.target.outerHTML = '<input type="text" id="newPhrase" placeholder="새 문구 입력 후 Enter" style="font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface);">';
     $('newPhrase').focus();
@@ -1643,12 +1657,15 @@ $('lcCopy').addEventListener('click', function(){
 function cls(){ return CLASSES.find(function(c){ return c.id === state.classId; }); }
 function entry(){
   var c = cls();
-  if(!state.entries[c.id]){
+  var k = c.id + '|' + ymd(day);
+  if(!state.entries[k]){
     var rows = {};
-    c.students.forEach(function(s, i){ rows[s] = { checked:true, hw: (i % 4 === 2 ? '미완료' : '완료'), score:'', memo:'' }; });
-    state.entries[c.id] = { book:'', progress:'', homework:'', rows:rows };
+    c.students.forEach(function(s, i){ rows[s] = { checked:true, hw: (i % 4 === 2 ? '미완료' : '완료'), score:'', book:'', prog:'', sb:'', pb:'', memo:'' }; });
+    // 같은 날 데일리 테스트에 적은 반 진도·숙제를 불러와요
+    var d = (typeof dtStore !== 'undefined' && dtStore[k]) || {};
+    state.entries[k] = { book:d.book || '', prog:d.prog || '', sb:d.sb || '', pb:d.pb || '', note:'', rows:rows };
   }
-  return state.entries[c.id];
+  return state.entries[k];
 }
 
 function renderTeacher(){
@@ -1673,24 +1690,46 @@ function renderTeacher(){
   $('dayLabel').textContent = fmtDate(day);
   renderLessonCheck();
   document.querySelectorAll('.className').forEach(function(el){ el.textContent = cls().name; });
-  var e = entry();
-  $('book').value = e.book; $('progress').value = e.progress; $('homework').value = e.homework;
+  renderJrCommon();
   renderStudents();
 }
 
+function progOpts(book, prog){
+  var b = DT_BOOKS.find(function(x){ return x[0] === book; });
+  return b ? b[1].map(function(g){ return '<optgroup label="'+esc(g[0])+'">' + g[1].map(function(it){ return '<option'+(it===prog?' selected':'')+'>'+esc(it)+'</option>'; }).join('') + '</optgroup>'; }).join('') : '';
+}
+function firstProg(book){ var it = bookItems(book); return it[0] || ''; }
+// 학생별 값이 비어 있으면 반 공통 값을 써요
+// 진도와 숙제는 따로: 진도만 바꿔도 숙제는 반 공통, 숙제만 바꿔도 진도는 반 공통이에요.
+function effJr(r, e){ return { book:r.book || e.book, prog:r.book ? r.prog : e.prog, sb:r.sb || e.sb, pb:r.pb || e.pb }; }
+function jrProgText(x){ return x.book && x.prog ? x.book + ' > ' + x.prog : ''; }
+function jrHwText(x){ return [x.sb ? 'SB page ' + x.sb : '', x.pb ? 'PB page ' + x.pb : ''].filter(Boolean).join(' · '); }
+function renderJrCommon(){
+  var e = entry();
+  $('jBook').innerHTML = '<option value="">교재 선택</option>' + DT_BOOKS.map(function(b){ return '<option'+(b[0]===e.book?' selected':'')+'>'+b[0]+'</option>'; }).join('');
+  $('jProg').disabled = !e.book;
+  $('jProg').innerHTML = e.book ? progOpts(e.book, e.prog) : '<option>교재를 먼저 골라 주세요</option>';
+  $('jSb').value = e.sb; $('jPb').value = e.pb; $('jNote').value = e.note || '';
+}
 function hwClass(v){ return v === '완료' ? 's-done' : v === '미완료' ? 's-todo' : 's-hold'; }
 
 function renderStudents(){
   var e = entry();
   $('stuList').innerHTML = cls().students.map(function(s, i){
     var r = e.rows[s];
-    return '<div class="stu" data-name="'+esc(s)+'">'+
+    return '<div class="stu'+(r.book || r.sb || r.pb ? ' own' : '')+'" data-name="'+esc(s)+'">'+
       '<input type="checkbox" id="stu-'+i+'" data-f="checked"'+(r.checked?' checked':'')+' aria-label="'+esc(s)+' 알림 보내기">'+
       '<label for="stu-'+i+'">'+esc(s)+'</label>'+
       '<select data-f="hw" class="'+hwClass(r.hw)+'" aria-label="'+esc(s)+' 숙제 상태">'+
         ['완료','미완료','보류'].map(function(o){ return '<option'+(o===r.hw?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'+
       '<input type="text" class="score" data-f="score" value="'+esc(r.score)+'" placeholder="단어테스트 점수" aria-label="'+esc(s)+' 단어테스트 점수">'+
-      '<input type="text" class="memo" data-f="memo" value="'+esc(r.memo)+'" placeholder="개별 진도·숙제가 다르면 입력" aria-label="'+esc(s)+' 개별 메모">'+
+      '<span class="jr-own"><span class="jr-grp"><i>진도</i>'+
+        '<select data-f="book" aria-label="'+esc(s)+' 교재"><option value="">반 공통 진도</option>'+DT_BOOKS.map(function(b){ return '<option'+(b[0]===r.book?' selected':'')+'>'+b[0]+'</option>'; }).join('')+'</select>'+
+        '<select data-f="prog" aria-label="'+esc(s)+' 책진도"'+(r.book ? '' : ' disabled')+'>'+(r.book ? progOpts(r.book, r.prog) : '<option>'+esc(e.prog || '–')+'</option>')+'</select></span>'+
+        '<span class="jr-grp"><i>숙제</i><span class="jr-pg"><b>SB</b><input type="text" data-f="sb" inputmode="numeric" value="'+esc(r.sb)+'" placeholder="'+esc(e.sb || 'page')+'" aria-label="'+esc(s)+' SB page"></span>'+
+        '<span class="jr-pg"><b>PB</b><input type="text" data-f="pb" inputmode="numeric" value="'+esc(r.pb)+'" placeholder="'+esc(e.pb || 'page')+'" aria-label="'+esc(s)+' PB page"></span></span>'+
+      '</span>'+
+      '<input type="text" class="memo" data-f="memo" value="'+esc(r.memo)+'" placeholder="메모" aria-label="'+esc(s)+' 메모">'+
     '</div>';
   }).join('');
   var keep = $('previewPick').value;
@@ -1715,9 +1754,9 @@ function renderPreview(){
   var e = entry(), s = $('previewPick').value, r = e.rows[s];
   if(!r){ $('bubble').textContent = ''; return; }
   var lines = [];
-  if(e.book) lines.push('📗 교재: ' + e.book);
-  lines.push('📘 진도: ' + (e.progress || '(오늘 진도를 입력해 주세요)'));
-  lines.push('📝 숙제: ' + (e.homework || '(오늘 숙제를 입력해 주세요)') + ' — ' + r.hw);
+  var x = effJr(r, e);
+  lines.push('📘 진도: ' + (jrProgText(x) || '(오늘 진도를 골라 주세요)'));
+  lines.push('📝 숙제: ' + ([jrHwText(x), e.note].filter(Boolean).join(' · ') || '(숙제 page를 적어 주세요)') + ' — ' + r.hw);
   if(r.score) lines.push('✏️ 단어테스트: ' + r.score);
   if(r.memo) lines.push('💬 ' + r.memo);
   $('bubble').innerHTML = '<b>[비욘드잉글리쉬] 주간 학습 알림</b>' + esc(
@@ -1725,14 +1764,17 @@ function renderPreview(){
     '\n\n꼼꼼한 학습을 위해 최선을 다하겠습니다.\n— ' + state.teacher + ' 선생님');
 }
 
-function saveCommon(){ var e = entry(); e.book = $('book').value; e.progress = $('progress').value; e.homework = $('homework').value; }
-['book','progress','homework'].forEach(function(id){ $(id).addEventListener('input', function(){ saveCommon(); renderPreview(); }); });
+function saveCommon(){ var e = entry(); e.book = $('jBook').value; e.prog = e.book ? $('jProg').value : ''; e.sb = $('jSb').value.trim(); e.pb = $('jPb').value.trim(); e.note = $('jNote').value.trim(); }
+$('jBook').addEventListener('change', function(){ var e = entry(); e.book = this.value; e.prog = firstProg(e.book); renderJrCommon(); renderStudents(); });
+$('jProg').addEventListener('change', function(){ saveCommon(); renderStudents(); });
+['jSb','jPb'].forEach(function(id){ $(id).addEventListener('input', function(){ saveCommon(); renderStudents(); }); });
+$('jNote').addEventListener('input', function(){ saveCommon(); renderPreview(); });
 
 $('applyAll').addEventListener('click', function(){
   saveCommon();
   var e = entry();
-  if(!e.progress && !e.homework) return toast('오늘 진도나 숙제를 먼저 입력해 주세요.');
-  cls().students.forEach(function(s){ e.rows[s].memo = ''; });
+  if(!e.prog && !e.sb && !e.pb) return toast('오늘 진도나 숙제 page를 먼저 입력해 주세요.');
+  cls().students.forEach(function(s){ var r = e.rows[s]; r.book = ''; r.prog = ''; r.sb = ''; r.pb = ''; });
   renderStudents();
   toast(cls().name + ' ' + cls().students.length + '명 모두에게 같은 진도·숙제를 넣었어요.');
 });
@@ -1744,6 +1786,8 @@ function onStudentChange(ev){
   var f = ev.target.dataset.f, r = entry().rows[row.dataset.name];
   r[f] = f === 'checked' ? ev.target.checked : ev.target.value;
   if(f === 'hw') ev.target.className = hwClass(r.hw);
+  if(f === 'book' && ev.type === 'change'){ r.prog = firstProg(r.book); return renderStudents(); }
+  if(f === 'book' || f === 'sb' || f === 'pb') row.classList.toggle('own', !!(r.book || r.sb || r.pb));
   renderCounts();
   if($('previewPick').value === row.dataset.name) renderPreview();
 }
@@ -1761,8 +1805,8 @@ $('teacherPick').addEventListener('change', function(){
 $('myClasses').addEventListener('click', function(e){
   var b = e.target.closest('[data-class]'); if(b){ state.classId = b.dataset.class; renderTeacher(); }
 });
-$('prevDay').addEventListener('click', function(){ day.setDate(day.getDate() - 1); $('dayLabel').textContent = fmtDate(day); renderLessonCheck(); });
-$('nextDay').addEventListener('click', function(){ day.setDate(day.getDate() + 1); $('dayLabel').textContent = fmtDate(day); renderLessonCheck(); });
+$('prevDay').addEventListener('click', function(){ day.setDate(day.getDate() - 1); renderTeacher(); });
+$('nextDay').addEventListener('click', function(){ day.setDate(day.getDate() + 1); renderTeacher(); });
 $('sendBtn').addEventListener('click', function(){
   var e = entry(), names = cls().students;
   var n = names.filter(function(s){ return e.rows[s].checked; }).length;
