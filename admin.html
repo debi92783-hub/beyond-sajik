@@ -468,6 +468,48 @@
     .bd-view, .bd-form{ padding:18px 16px; }
   }
 
+  /* 상담 신청 관리 · 신규 상담 기록지 */
+  .cs-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .cs-bar p{ margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .cs-res{ font-size:12px; font-weight:800; padding:2px 8px; border-radius:6px; }
+  .cs-res.r-ok{ background:var(--good-soft); color:var(--good); } .cs-res.r-no{ background:var(--warn-soft); color:var(--warn); } .cs-res.r-hold{ background:var(--hold-soft); color:var(--hold); }
+  .cs-sheet{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px 26px; max-width:900px; }
+  .cs-hd{ text-align:center; border-bottom:2px solid var(--ink); padding-bottom:12px; margin-bottom:6px; }
+  .cs-hd h2{ margin:0 0 4px; font-size:20px; font-weight:900; }
+  .cs-hd p{ margin:0; font-size:12.5px; color:var(--ink-soft); }
+  .cs-top{ display:flex; justify-content:flex-end; gap:12px; margin-top:12px; flex-wrap:wrap; }
+  .cs-top label{ font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .cs-sec{ margin-top:14px; }
+  .cs-sec h3{ margin:0; background:#24345F; color:#fff; font-size:13.5px; font-weight:800; padding:7px 12px; }
+  .cs-row{ display:grid; grid-template-columns:170px 1fr; border:1px solid var(--border); border-top:0; }
+  .cs-k{ background:var(--surface-soft); font-size:13px; font-weight:700; padding:9px 12px; display:flex; align-items:center; }
+  .cs-v{ padding:6px 10px; display:flex; align-items:center; min-width:0; }
+  .cs-v > input, .cs-v textarea, .cs-top input{ font:inherit; font-size:13.5px; width:100%; border:1px solid var(--border); border-radius:6px; padding:7px 9px; background:var(--surface); color:var(--ink); }
+  .cs-top input{ width:160px; }
+  .cs-v textarea{ resize:vertical; }
+  .cs-opts{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:13px; width:100%; }
+  .cs-opts label{ display:flex; align-items:center; gap:5px; cursor:pointer; }
+  .cs-opts input{ accent-color:var(--accent); width:15px; height:15px; }
+  .cs-note{ font:inherit; font-size:12.5px; flex:1 1 140px; min-width:120px; height:32px; box-sizing:border-box; border:1px solid var(--border); border-radius:6px; padding:5px 8px; background:var(--surface); color:var(--ink); }
+  .cs-privacy{ margin:14px 0 0; font-size:12px; color:var(--ink-soft); }
+  @media (max-width: 720px){
+    .cs-sheet{ padding:16px 14px; }
+    .cs-row{ grid-template-columns:1fr; }
+    .cs-k{ padding:7px 10px; }
+  }
+  @media print{
+    .cs-sheet{ border:0; padding:0; max-width:none; }
+    .cs-btns, .cs-privacy + .form-err, #view-consult .greet, #toast{ display:none !important; }
+    .cs-sheet *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .cs-hd h2{ font-size:16px; } .cs-hd p{ font-size:10.5px; } .cs-top{ margin-top:6px; }
+    .cs-sec{ margin-top:7px; } .cs-sec h3{ font-size:11.5px; padding:4px 10px; }
+    .cs-row{ grid-template-columns:130px 1fr; }
+    .cs-k{ font-size:10.5px; padding:3px 8px; } .cs-v{ padding:2px 8px; } .cs-opts{ font-size:10.5px; gap:2px 10px; } .cs-opts input{ width:11px; height:11px; }
+    .cs-v > input, .cs-v textarea, .cs-note, .cs-top input{ border:0; border-bottom:1px solid #bbb; border-radius:0; font-size:11px; padding:2px 4px; height:auto; }
+    .cs-v textarea{ height:46px; resize:none; }
+    .cs-privacy{ font-size:10px; margin-top:6px; }
+  }
+
   /* 업무 매뉴얼 */
   .man-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
   .man-item{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; text-align:left; font:inherit; color:var(--ink); cursor:pointer; padding:18px 20px; }
@@ -950,6 +992,12 @@
       <div id="bdBody"></div>
     </section>
 
+    <!-- 상담 신청 관리 (원장님 전용) -->
+    <section id="view-consult" hidden>
+      <div class="greet"><div><h1>상담 신청 관리</h1><p>신규 상담 기록지를 쓰고 모아 봐요. 학부모 연락처가 들어가서 원장님 화면에서만 열려요.</p></div></div>
+      <div id="csBody"></div>
+    </section>
+
     <!-- 선생님·설정 (원장님 전용) -->
     <section id="view-settings" hidden>
       <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
@@ -1165,7 +1213,7 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
-    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리'],['bell','전체 공지']]],
+    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리','consult'],['bell','전체 공지']]],
     ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
@@ -1197,14 +1245,14 @@ var state = {
 };
 
 function setView(v, page){
-  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings') page = 'main'; }
+  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'consult') page = 'main'; }
   state.view = v;
   state.page = page || 'main';
-  if(state.page === 'settings' && v !== 'director') state.page = 'main';
-  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board';
+  if((state.page === 'settings' || state.page === 'consult') && v !== 'director') state.page = 'main';
+  var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1214,6 +1262,7 @@ function setView(v, page){
   $('view-attend').hidden = !attend;
   $('view-manual').hidden = !manual;
   $('view-board').hidden = !board;
+  $('view-consult').hidden = !consult;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -1222,9 +1271,10 @@ function setView(v, page){
   else if(attend) renderAttend();
   else if(manual) renderManual();
   else if(board) renderBoard();
+  else if(consult) renderConsult();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : '';
-  try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' ? 'teacher-' + tag : tag) : v)); }catch(e){}
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : '';
+  try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
 
@@ -1254,6 +1304,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
+    if(a.dataset.key === 'consult'){ cs.mode = 'list'; return setView('director', 'consult'); }
     if(a.dataset.key === 'kiosk') return $('atKiosk').click();
     if(a.dataset.key.indexOf('board:') === 0){ var bk = a.dataset.key.split(':'); return openBoard(bk[1], bk[2]); }
     if(a.dataset.key === 'daily' || a.dataset.key === 'monthly' || a.dataset.key === 'attend' || a.dataset.key === 'manual'){ if(a.dataset.key === 'manual') manOpen = null; return setView(state.view, a.dataset.key); }
@@ -2644,6 +2695,98 @@ $('bdBody').addEventListener('submit', function(ev){
   saveBd(); bd.id = p.id; bd.mode = 'view'; toast(bd.id && p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
 });
 
+/* ===== 상담 신청 관리 · 신규 상담 기록지 (원장님 전용) =====
+   학부모 연락처가 들어가는 자료라 원장님 화면에서만 열려요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
+   실제 운영 때는 홈페이지 상담 신청과 같은 구글 시트(원장님 계정)로 옮길 예정이에요. */
+var CS_KEY = 'beyond-consult-v1';
+var CS_FORM = [
+  ['1. 기본 정보', [
+    ['name','학생 이름','text'], ['school','학교 / 학년','text'],
+    ['phone','학부모 연락처','tel'], ['sib','형제자매','radio',['있음','없음'],'sibNote','학년'],
+    ['other','다른 학원 시간','text','','','예: 월수금 4시 수학'],
+    ['route','알게 된 경로','check',['소개','유튜브·인스타','블로그·카페','간판·전단','지나가다','기타'],'routeNote','누구 소개 / 기타']
+  ]],
+  ['2. 영어 학습 이력', [
+    ['prev','이전 학습 형태','check',['처음','학원','과외','학습지','공부방','영어유치원','엄마표·자기주도']],
+    ['quit','그만두게 된 이유','text','','','이전 학습이 있다면'],
+    ['phonics','파닉스','radio',['처음이에요','배우는 중','끝냈어요','잘 몰라요']],
+    ['level','현재 진도·선행 정도','text','','','예: 교재명, 문법 어디까지'],
+    ['score','최근 성적','text','','','학교 시험·레벨테스트']
+  ]],
+  ['3. 아이의 성향 (해당하는 곳 모두 체크)', [
+    ['feel','영어에 대한 감정','check',['좋아함','싫지는 않음','부담스러워함','거부감']],
+    ['wrong','문제를 틀렸을 때','check',['다시 시도함','위축됨','짜증을 냄','회피함']],
+    ['ask','질문 성향','check',['스스로 질문함','물어보면 답함','모르는 것도 말 안 함']],
+    ['hw','숙제 습관','check',['스스로 함','챙겨 주면 함','잘 안 하려고 함']],
+    ['char','성격','check',['내향적','외향적','꼼꼼함','급한 편','승부욕 있음']]
+  ]],
+  ['4. 학부모 요청과 상담 결과', [
+    ['want','학부모님이 걱정하시는 부분','area'],
+    ['test','레벨테스트 결과','text','','','예: BASIC 3권 추천'],
+    ['result','상담 결과','radio',['등록','보류(재연락)','미등록'],'resultNote','반·시작일 / 재연락일'],
+    ['memo','상담 메모','area']
+  ]]
+];
+var csStore = (function(){ try{ var r = localStorage.getItem(CS_KEY); if(r) return JSON.parse(r); }catch(e){} return { seq:0, items:[] }; })();
+function saveCs(){ try{ localStorage.setItem(CS_KEY, JSON.stringify(csStore)); }catch(e){} }
+var cs = { mode:'list', id:null };
+function csFieldHtml(f, v){
+  var key = f[0], val = v[key];
+  var inner;
+  if(f[2] === 'radio' || f[2] === 'check'){
+    var type = f[2] === 'radio' ? 'radio' : 'checkbox';
+    inner = '<div class="cs-opts">' + f[3].map(function(o){
+      var on = type === 'radio' ? val === o : (val || []).indexOf(o) !== -1;
+      return '<label><input type="'+type+'" name="cs-'+key+'" value="'+esc(o)+'"'+(on ? ' checked' : '')+'>'+esc(o)+'</label>';
+    }).join('') + (f[4] ? '<input type="text" class="cs-note" data-cs="'+f[4]+'" placeholder="'+esc(f[5] || '')+'" value="'+esc(v[f[4]] || '')+'">' : '') + '</div>';
+  } else if(f[2] === 'area'){
+    inner = '<textarea data-cs="'+key+'" rows="3">'+esc(val || '')+'</textarea>';
+  } else {
+    inner = '<input type="'+f[2]+'" data-cs="'+key+'" value="'+esc(val || '')+'"'+(f[5] ? ' placeholder="'+esc(f[5])+'"' : '')+'>';
+  }
+  return '<div class="cs-row"><span class="cs-k">'+esc(f[1])+'</span><div class="cs-v">'+inner+'</div></div>';
+}
+function renderConsult(){
+  if(cs.mode === 'form'){
+    var it = cs.id ? csStore.items.find(function(x){ return x.id === cs.id; }) : null, v = it ? it.data : {};
+    $('csBody').innerHTML = '<form class="cs-sheet" id="csForm" novalidate>' +
+      '<header class="cs-hd"><h2>비욘드잉글리쉬 사직캠퍼스 신규 상담 기록지</h2><p>아이에게 꼭 맞는 수업을 준비하기 위한 자료예요. 편하게, 솔직하게 적어 주세요.</p>' +
+      '<div class="cs-top"><label>상담일 <input type="date" data-cs="date" value="'+esc(v.date || ymd(new Date()))+'"></label><label>상담자 <input type="text" data-cs="by" value="'+esc(v.by || (session ? session.name : ''))+'"></label></div></header>' +
+      CS_FORM.map(function(sec){ return '<section class="cs-sec"><h3>'+esc(sec[0])+'</h3>' + sec[1].map(function(f){ return csFieldHtml(f, v); }).join('') + '</section>'; }).join('') +
+      '<p class="cs-privacy">🔒 상담 기록지는 상담과 수업 준비에만 쓰고, 외부에 일체 제공하거나 공개하지 않아요.</p>' +
+      '<p class="form-err" id="csErr"></p>' +
+      '<div class="bd-actions cs-btns"><button type="button" class="btn soft" data-csback>목록</button><span><button type="button" class="btn soft" onclick="window.print()">인쇄하기</button> ' +
+      (it ? '<button type="button" class="btn soft bd-del" data-csdel="'+it.id+'">삭제</button> ' : '') + '<button type="submit" class="btn">저장</button></span></div></form>';
+    return;
+  }
+  var rows = csStore.items.slice().sort(function(a, b){ return (b.data.date || '').localeCompare(a.data.date || '') || b.id - a.id; });
+  $('csBody').innerHTML = '<div class="cs-bar"><p>상담 전화를 받거나 방문 상담을 할 때 <b>새 상담 기록지</b>를 열어 적어 주세요. 빈 기록지를 인쇄해서 손으로 써도 돼요.</p><button type="button" class="btn" data-csnew>새 상담 기록지</button></div>' +
+    '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="d">상담일</th><th class="t">학생</th><th>학교 / 학년</th><th>레벨테스트</th><th>상담 결과</th></tr></thead><tbody>' +
+    (rows.length ? rows.map(function(it){ var d = it.data;
+      return '<tr><td class="d">'+esc(d.date || '')+'</td><td class="t"><button type="button" class="bd-link" data-csopen="'+it.id+'">'+esc(d.name || '(이름 없음)')+'</button></td><td>'+esc(d.school || '')+'</td><td>'+esc(d.test || '')+'</td><td>'+(d.result ? '<span class="cs-res r-'+(d.result === '등록' ? 'ok' : d.result === '미등록' ? 'no' : 'hold')+'">'+esc(d.result)+'</span>' : '')+'</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="bd-empty">아직 저장된 상담 기록이 없어요.</td></tr>') + '</tbody></table></div>';
+}
+$('csBody').addEventListener('click', function(ev){
+  if(ev.target.closest('[data-csnew]')){ cs.mode = 'form'; cs.id = null; renderConsult(); return window.scrollTo(0, 0); }
+  var o = ev.target.closest('[data-csopen]'); if(o){ cs.mode = 'form'; cs.id = +o.dataset.csopen; renderConsult(); return window.scrollTo(0, 0); }
+  if(ev.target.closest('[data-csback]')){ cs.mode = 'list'; return renderConsult(); }
+  var d = ev.target.closest('[data-csdel]');
+  if(d){ if(!confirm('이 상담 기록을 삭제할까요? 되돌릴 수 없어요.')) return; csStore.items = csStore.items.filter(function(x){ return x.id !== +d.dataset.csdel; }); saveCs(); cs.mode = 'list'; toast('상담 기록을 삭제했어요.'); renderConsult(); }
+});
+$('csBody').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var f = ev.target, data = {};
+  f.querySelectorAll('[data-cs]').forEach(function(el){ data[el.dataset.cs] = el.value.trim(); });
+  CS_FORM.forEach(function(sec){ sec[1].forEach(function(x){
+    if(x[2] === 'radio'){ var c = f.querySelector('input[name="cs-'+x[0]+'"]:checked'); data[x[0]] = c ? c.value : ''; }
+    if(x[2] === 'check') data[x[0]] = [].map.call(f.querySelectorAll('input[name="cs-'+x[0]+'"]:checked'), function(c){ return c.value; });
+  }); });
+  if(!data.name){ $('csErr').textContent = '학생 이름을 적어 주세요.'; return f.querySelector('[data-cs="name"]').focus(); }
+  var it = cs.id ? csStore.items.find(function(x){ return x.id === cs.id; }) : null;
+  if(it) it.data = data; else { it = { id:++csStore.seq, data:data }; csStore.items.push(it); }
+  saveCs(); cs.id = it.id; toast('상담 기록을 저장했어요.'); renderConsult();
+});
+
 /* ===== 업무 매뉴얼 =====
    학원 고유 업무 규칙. 새 선생님도 한눈에 볼 수 있도록 매뉴얼마다 한 장짜리 요약으로 보여 줘요. */
 var MANUALS = [
@@ -3111,6 +3254,7 @@ function enter(acc){
     else if(h === '#attend') setView('director', 'attend');
     else if(h === '#teacher-attend') setView('teacher', 'attend');
     else if(h === '#manual') setView('director', 'manual');
+    else if(h === '#consult') setView('director', 'consult');
     else if(/^#(teacher-)?board-(comm|data)$/.test(h)){ bd.board = h.slice(-4); setView(h.indexOf('teacher') !== -1 ? 'teacher' : 'director', 'board'); }
     else if(h === '#teacher-manual') setView('teacher', 'manual');
     else setView(h === '#teacher' ? 'teacher' : 'director');
