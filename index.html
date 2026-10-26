@@ -1168,15 +1168,17 @@ var CONFIG = {
   // 학원 관리 화면의 공통 일정표에 상담 예약을 표시하기 위한 기록
   // (같은 브라우저 미리보기용. 구글 시트를 연결하면 관리 화면이 시트에서 직접 불러와요)
   var CONSULT_KEY = 'beyond-consult-v1';
-  function readConsults(){ try{ return JSON.parse(localStorage.getItem(CONSULT_KEY) || '[]'); }catch(e){ return []; } }
+  function readConsults(){ try{ var a = JSON.parse(localStorage.getItem(CONSULT_KEY) || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } }
   function saveConsult(data){
     try{
       var list = readConsults();
-      list.push({ date: data.date, time: data.time, grade: data.grade, kind: data.purpose, status: '대기' });
+      // 이 기기(신청하신 분의 브라우저)에만 남는 미리보기용 기록이에요. 연락처는 남기지 않아요.
+      list.push({ date: data.date, time: data.time, grade: data.grade, kind: data.purpose, status: '대기',
+        name: data.name, student: data.student, message: data.message, created: Date.now() });
       localStorage.setItem(CONSULT_KEY, JSON.stringify(list));
     }catch(e){}
   }
-  readConsults().forEach(function(c){ state.booked[c.date + ' ' + c.time] = true; });
+  readConsults().forEach(function(c){ if(c.status !== '취소') state.booked[c.date + ' ' + c.time] = true; });
 
   // 시트에 이미 들어온 예약 시간은 회색으로 막아요 (이름·전화번호는 받아오지 않아요)
   function loadBooked(){

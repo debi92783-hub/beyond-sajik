@@ -468,9 +468,77 @@
     .bd-view, .bd-form{ padding:18px 16px; }
   }
 
-  /* 상담 신청 관리 · 신규 상담 기록지 */
+  /* 상담 관리 · 예약 현황 · 상담 기록지 */
   .cs-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
   .cs-bar p{ margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .cs-tabs{ display:flex; gap:2px; border-bottom:1px solid var(--border); margin-bottom:16px; overflow-x:auto; max-width:1100px; }
+  .cs-tabs button{ font:inherit; font-size:14px; font-weight:800; padding:10px 14px; border:0; border-bottom:3px solid transparent; background:none; color:var(--ink-soft); cursor:pointer; white-space:nowrap; margin-bottom:-1px; }
+  .cs-tabs button[aria-selected="true"]{ color:var(--accent); border-bottom-color:var(--accent); }
+  .cs-bar-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+  .cs-prog{ white-space:nowrap; font-size:12px; font-weight:800; padding:2px 8px; border-radius:6px; background:var(--hold-soft); color:var(--hold); }
+  .cs-prog.full{ background:var(--good-soft); color:var(--good); }
+  .cs-list{ display:flex; flex-direction:column; gap:5px; font-size:13px; width:100%; padding:2px 0; }
+  .cs-list label{ display:flex; gap:8px; align-items:flex-start; cursor:pointer; }
+  .cs-list input{ accent-color:var(--good); width:16px; height:16px; margin:1px 0 0; flex:none; }
+  .rs-sum{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:14px; max-width:1100px; }
+  .rs-sum div{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .rs-sum b{ display:block; font-size:22px; font-weight:900; line-height:1.2; }
+  .rs-sum span{ font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .rs-filter{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px; max-width:1100px; }
+  .rs-chips{ display:flex; flex-wrap:wrap; gap:6px; flex:1 1 auto; }
+  .rs-chips button{ font:inherit; font-size:13px; font-weight:700; padding:7px 12px; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .rs-chips button[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:var(--surface); }
+  .rs-chips small{ font-weight:800; opacity:.7; margin-left:2px; }
+  #rsWhen, .rs-st, .rs-fgrid select, .rs-fgrid input, .rs-key input{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:7px; padding:7px 9px; background:var(--surface); color:var(--ink); min-width:0; }
+  .rs-list{ background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; max-width:1100px; }
+  .rs-row{ display:grid; grid-template-columns:100px 108px minmax(0,1fr) minmax(0,1.1fr) minmax(0,1.3fr) 88px 140px; gap:10px; align-items:center; padding:11px 14px; border-top:1px solid var(--border); font-size:13px; }
+  .rs-row.rs-head{ border-top:0; background:var(--surface-soft); font-size:12px; font-weight:800; color:var(--ink-soft); padding:9px 14px; }
+  .rs-row.today{ background:var(--accent-soft); }
+  .rs-row.off{ opacity:.55; } .rs-row.off .rs-who b{ text-decoration:line-through; }
+  .rs-when{ display:flex; flex-direction:column; font-size:12px; color:var(--ink-soft); }
+  .rs-when b{ font-size:15px; color:var(--ink); } .rs-when em{ font-style:normal; font-weight:800; color:var(--accent); }
+  .rs-who, .rs-par, .rs-kind{ display:flex; flex-direction:column; min-width:0; overflow-wrap:anywhere; }
+  .rs-who small, .rs-kind small{ font-size:12px; color:var(--ink-soft); }
+  .rs-par a{ color:var(--accent); font-size:12.5px; text-decoration:none; }
+  .rs-src{ display:inline-block; font-size:11.5px; font-weight:800; padding:3px 8px; border-radius:6px; white-space:nowrap; }
+  .rs-src.s-naver{ background:#E3F5EA; color:#127A3F; } .rs-src.s-web{ background:var(--accent-soft); color:var(--accent); }
+  .rs-src.s-phone{ background:var(--hold-soft); color:var(--hold); } .rs-src.s-sms{ background:#EFE8FB; color:#6B40C4; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .rs-src.s-naver{ background:#1C3527; color:#6FD99A; } :root:not([data-theme="light"]) .rs-src.s-sms{ background:#2E2542; color:#B9A0F0; } }
+  :root[data-theme="dark"] .rs-src.s-naver{ background:#1C3527; color:#6FD99A; } :root[data-theme="dark"] .rs-src.s-sms{ background:#2E2542; color:#B9A0F0; }
+  .rs-st{ width:100%; font-weight:700; } .rs-st.st-0{ color:var(--hold); } .rs-st.st-1{ color:var(--accent); } .rs-st.st-2{ color:var(--good); } .rs-st.st-3{ color:var(--ink-faint); }
+  .rs-act{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .rs-empty{ padding:28px; text-align:center; color:var(--ink-soft); font-size:13.5px; border-top:1px solid var(--border); }
+  .rs-form{ padding:18px 20px; margin-bottom:14px; max-width:1100px; }
+  .rs-form h3{ margin:0 0 12px; font-size:15px; }
+  .rs-fgrid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px 12px; }
+  .rs-fgrid label{ display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .rs-fgrid .full{ grid-column:1 / -1; }
+  .rs-fbtn{ display:flex; justify-content:space-between; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .rs-sync{ margin-top:18px; max-width:1100px; background:var(--surface-soft); border-radius:12px; padding:14px 18px; font-size:13px; line-height:1.6; }
+  .rs-sync h3{ margin:0 0 8px; font-size:14px; }
+  .rs-sync ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .rs-sync li .rs-src{ margin-right:6px; }
+  .rs-key{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; font-size:12.5px; font-weight:700; }
+  .rs-key small{ font-weight:500; color:var(--ink-soft); }
+  .man-pop{ position:fixed; inset:0; background:rgba(20,22,26,0.55); z-index:35; display:flex; justify-content:center; align-items:flex-start; padding:24px 16px; overflow-y:auto; }
+  .man-pop[hidden]{ display:none; }
+  .man-pop-box{ width:100%; max-width:980px; }
+  .man-pop-top{ display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-bottom:0; border-radius:12px 12px 0 0; padding:10px 14px; }
+  .man-pop .ms{ border-radius:0 0 12px 12px; margin:0; }
+  .man-pop .ms-ft{ display:none; }
+  @media screen and (max-width: 900px){
+    .cs-tabs{ flex-wrap:wrap; overflow:visible; }
+    .cs-tabs button{ padding:9px 10px; font-size:13.5px; }
+    .rs-sum{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .rs-fgrid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .rs-row.rs-head{ display:none; }
+    .rs-row{ display:flex; flex-wrap:wrap; gap:6px 12px; }
+    .rs-when{ flex-direction:row; align-items:baseline; gap:6px; flex:1 1 100%; }
+    .rs-who, .rs-par{ flex:1 1 40%; }
+    .rs-kind{ flex:1 1 100%; }
+    .rs-row > span:nth-child(6){ flex:0 0 96px; }
+    .rs-act{ flex:1 1 auto; }
+  }
   .cs-res{ font-size:12px; font-weight:800; padding:2px 8px; border-radius:6px; }
   .cs-res.r-ok{ background:var(--good-soft); color:var(--good); } .cs-res.r-no{ background:var(--warn-soft); color:var(--warn); } .cs-res.r-hold{ background:var(--hold-soft); color:var(--hold); }
   .cs-sheet{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px 26px; max-width:900px; }
@@ -517,6 +585,7 @@
     .cs-sec{ margin-top:7px; } .cs-sec h3{ font-size:11.5px; padding:4px 10px; }
     .cs-row{ grid-template-columns:130px 1fr; }
     .cs-k{ font-size:10.5px; padding:3px 8px; } .cs-v{ padding:2px 8px; } .cs-opts{ font-size:10.5px; gap:2px 10px; } .cs-opts input[type=radio], .cs-opts input[type=checkbox]{ width:11px; height:11px; }
+    .cs-list{ font-size:10.5px; gap:1px; padding:0; } .cs-list input{ width:11px; height:11px; }
     .cs-v > input, .cs-v textarea, .cs-note, .cs-top input{ border:0; border-bottom:1px solid #bbb; border-radius:0; font-size:11px; padding:2px 4px; height:auto; }
     .cs-v textarea{ height:36px; resize:none; }
     .cs-sheet{ zoom:0.92; }
@@ -1008,10 +1077,16 @@
       <div id="bdBody"></div>
     </section>
 
-    <!-- 상담 신청 관리 (원장님 전용) -->
+    <!-- 상담 관리 (원장님 전용) -->
     <section id="view-consult" hidden>
-      <div class="greet"><div><h1>상담 신청 관리</h1><p>신규 상담 기록지를 쓰고 모아 봐요. 학부모 연락처가 들어가서 원장님 화면에서만 열려요.</p></div></div>
+      <div class="greet"><div><h1>상담 관리</h1><p>예약 현황과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요. 학부모 연락처가 들어가서 원장님 화면에서만 열려요.</p></div></div>
       <div id="csBody"></div>
+      <div class="man-pop" id="manPop" hidden role="dialog" aria-modal="true" aria-labelledby="manPopT">
+        <div class="man-pop-box">
+          <div class="man-pop-top"><b id="manPopT"></b><span><button type="button" class="btn soft" data-manfull>매뉴얼 화면에서 보기</button> <button type="button" class="btn" id="manPopClose" data-manclose>닫기</button></span></div>
+          <article class="card ms" id="manPopBody"></article>
+        </div>
+      </div>
     </section>
 
     <!-- 선생님·설정 (원장님 전용) -->
@@ -1229,7 +1304,7 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
-    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 신청 관리','consult'],['bell','전체 공지']]],
+    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','전체 공지']]],
     ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
@@ -1576,30 +1651,70 @@ var EVENTS = (function(){
 })();
 function saveEvents(){ try{ localStorage.setItem(CAL_KEY, JSON.stringify(EVENTS)); }catch(e){} }
 
-// 상담 예약: 안내 페이지에서 신청된 예약을 공통 일정으로 보여 줘요 (지울 수 없고, 시트에서 '취소'로 바꾸면 사라져요)
-var CONSULT_KEY = 'beyond-consult-v1';
-var sheetConsults = [];
-function consultEvents(){
-  var local = [];
-  try{ local = JSON.parse(localStorage.getItem(CONSULT_KEY) || '[]'); }catch(e){}
-  var seen = {}, out = [];
-  sheetConsults.concat(local).forEach(function(c){
-    var k = c.date + ' ' + c.time;
-    if(seen[k] || !c.date || !c.time) return;
-    seen[k] = true;
-    out.push({ id:'consult-' + k, kind:'consult', date:c.date, time:c.time,
-      title:'상담 예약' + (c.grade ? ' · ' + c.grade : ''),
-      memo:(c.kind ? c.kind : '상담') + ' · ' + (c.status || '대기') + '\n보호자 이름과 연락처는 구글 시트에서 확인해요.',
-      owner:'홈페이지 신청' });
-  });
-  return out;
+// 상담 예약: 네이버 플레이스·홈페이지·전화·문자 예약을 모아 상담 관리와 공통 일정표에 보여 줘요.
+// 일정표에는 학년·경로만 보이고, 학생·학부모 이름과 연락처는 원장님 상담 관리 화면에서만 보여요.
+var WEB_KEY = 'beyond-consult-v1';          // 안내 페이지(index.html)가 같은 브라우저에 남기는 미리보기 신청
+var RES_KEY = 'beyond-reserve-v1';          // 전화·문자 등 직접 넣은 예약과 상태 기록
+var SHEET_KEY_LS = 'beyond-sheet-key';      // 시트 관리 키 (원장님 기기에만 저장)
+var RES_SRC = { naver:['네이버 플레이스','s-naver'], web:['홈페이지','s-web'], phone:['전화','s-phone'], sms:['문자','s-sms'] };
+var RES_ST = ['대기','확정','완료','취소'];
+var RES_KIND = ['상담','레벨테스트','상담 + 레벨테스트'];
+function resSeed(){
+  var d = function(n){ return ymd(new Date(Date.now() + n * 864e5)); }, now = Date.now();
+  return { seq:3, ext:{}, items:[
+    { id:1, src:'sms', date:d(0), time:'19:00', student:'(예시) 박OO', grade:'초5', parent:'(예시) 박OO 어머님', phone:'010-0000-0000', kind:'레벨테스트', memo:'예시예요. 지워도 돼요.', status:'확정', created:now },
+    { id:2, src:'naver', date:d(1), time:'19:00', student:'(예시) 김OO', grade:'초3', parent:'(예시) 김OO 어머님', phone:'010-0000-0000', kind:'상담 + 레벨테스트', memo:'파닉스 처음 · 예시예요.', status:'확정', created:now },
+    { id:3, src:'phone', date:d(2), time:'12:00', student:'(예시) 이OO', grade:'중1', parent:'(예시) 이OO 아버님', phone:'010-0000-0000', kind:'상담', memo:'문법이 걱정 · 예시예요.', status:'대기', created:now }
+  ]};
 }
+var resStore = (function(){ try{ var r = localStorage.getItem(RES_KEY); if(r) return JSON.parse(r); }catch(e){} return resSeed(); })();
+if(!resStore.ext) resStore.ext = {};
+function saveRes(){ try{ localStorage.setItem(RES_KEY, JSON.stringify(resStore)); }catch(e){} }
+function sheetKey(){ try{ return localStorage.getItem(SHEET_KEY_LS) || ''; }catch(e){ return ''; } }
+function webLocal(){ try{ var a = JSON.parse(localStorage.getItem(WEB_KEY) || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } }
+var sheetConsults = [], sheetRows = null, sheetErr = '';
+function allReservations(){
+  var out = [], seen = {};
+  resStore.items.forEach(function(i){ out.push(Object.assign({ key:'m' + i.id, manual:true }, i)); });
+  if(sheetRows) sheetRows.forEach(function(r){
+    seen[r.date + ' ' + r.time] = 1;
+    out.push({ key:'s' + r.row, row:r.row, src:r.src === '네이버' ? 'naver' : 'web', date:r.date, time:r.time, student:r.student, grade:r.grade,
+      parent:r.name, phone:r.phone, kind:r.kind, memo:r.message, status:r.status || '대기' });
+  });
+  else sheetConsults.forEach(function(c){
+    seen[c.date + ' ' + c.time] = 1;
+    out.push({ key:'p' + c.date + ' ' + c.time, src:c.src === '네이버' ? 'naver' : 'web', date:c.date, time:c.time, grade:c.grade, kind:c.kind, status:c.status || '대기', hidden:true });
+  });
+  webLocal().forEach(function(c){
+    var k = c.date + ' ' + c.time; if(seen[k] || !c.date || !c.time) return; seen[k] = 1;
+    out.push({ key:'w' + k, src:'web', date:c.date, time:c.time, student:c.student || '', grade:c.grade, parent:c.name || '', kind:c.kind, memo:c.message || '', status:c.status || '대기', local:true });
+  });
+  out.forEach(function(r){ var x = resStore.ext[r.key]; if(x){ if(x.status && !r.row) r.status = x.status; if(x.csId) r.csId = x.csId; } });
+  return out.filter(function(r){ return r.date && r.time && RES_SRC[r.src]; });
+}
+function consultEvents(){
+  return allReservations().filter(function(r){ return r.status !== '취소'; }).map(function(r){
+    var src = RES_SRC[r.src][0];
+    return { id:'consult-' + r.key, kind:'consult', date:r.date, time:r.time,
+      title:'상담 예약' + (r.grade ? ' · ' + r.grade : '') + ' · ' + src,
+      memo:(r.kind || '상담') + ' · ' + r.status + '\n학생·학부모 이름과 연락처는 상담 관리(원장님 화면)에서 확인해요.',
+      owner:src };
+  });
+}
+function sheetPost(o){
+  return fetch(SHEET_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(Object.assign({ key:sheetKey() }, o)) })
+    .then(function(r){ return r.json(); })
+    .then(function(j){ if(!j.ok && o.action === 'status') toast('구글 시트에 상태를 저장하지 못했어요. 시트에서 직접 바꿔 주세요.'); return j; });
+}
+// 구글 시트에서 예약을 불러와요. 관리 키가 있으면 이름·연락처까지, 없으면 날짜·시간·학년만 받아요.
 function loadSheetConsults(){
   if(!SHEET_URL) return;
-  fetch(SHEET_URL + '?action=booked')
-    .then(function(r){ return r.json(); })
-    .then(function(j){ sheetConsults = j.items || []; if(state.page === 'calendar') renderCalendar(); })
-    .catch(function(){});
+  var redraw = function(){ if(state.page === 'calendar') renderCalendar(); if(state.page === 'consult' && cs.mode === 'list') renderConsult(); };
+  var pub = function(){ return fetch(SHEET_URL + '?action=booked').then(function(r){ return r.json(); }).then(function(j){ sheetConsults = j.items || []; redraw(); }); };
+  if(!sheetKey()) return pub().catch(function(){});
+  sheetPost({ action:'list' })
+    .then(function(j){ if(j.ok){ sheetRows = j.rows || []; sheetErr = ''; redraw(); } else { sheetRows = null; sheetErr = '시트 관리 키가 맞지 않아요. 다시 넣어 주세요.'; return pub(); } })
+    .catch(function(){ sheetErr = '구글 시트에 연결하지 못했어요.'; redraw(); });
 }
 
 var calMonth = new Date(day.getFullYear(), day.getMonth(), 1);
@@ -2711,10 +2826,11 @@ $('bdBody').addEventListener('submit', function(ev){
   saveBd(); bd.id = p.id; bd.mode = 'view'; toast(bd.id && p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
 });
 
-/* ===== 상담 신청 관리 · 신규 상담 기록지 (원장님 전용) =====
-   학부모 연락처가 들어가는 자료라 원장님 화면에서만 열려요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
+/* ===== 상담 관리 (원장님 전용) =====
+   예약 현황(네이버 플레이스·홈페이지·전화·문자)과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요.
+   학부모 연락처가 들어가서 원장님 화면에서만 열려요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
    실제 운영 때는 홈페이지 상담 신청과 같은 구글 시트(원장님 계정)로 옮길 예정이에요. */
-var CS_KEY = 'beyond-consult-v1';
+var CS_KEY = 'beyond-consult-record-v1';
 var CS_FORM = [
   ['1. 기본 정보', [
     ['name','학생 이름','text'], ['school','학교 / 학년','text'],
@@ -2756,9 +2872,6 @@ function ltTotal(v){
   return any ? got + ' / ' + max : '';
 }
 function csRecText(d){ return d.ltRec ? d.ltRec + (d.ltBook ? ' ' + d.ltBook : '') : (d.test || ''); }
-var csStore = (function(){ try{ var r = localStorage.getItem(CS_KEY); if(r) return JSON.parse(r); }catch(e){} return { seq:0, items:[] }; })();
-function saveCs(){ try{ localStorage.setItem(CS_KEY, JSON.stringify(csStore)); }catch(e){} }
-var cs = { mode:'list', id:null };
 function csFieldHtml(f, v){
   var key = f[0], val = v[key];
   var inner;
@@ -2776,39 +2889,236 @@ function csFieldHtml(f, v){
     inner = '<div class="cs-opts"><select data-cs="ltRec" aria-label="추천 교재"><option value="">교재 선택</option>' + DT_BOOKS.map(function(b){ return '<option'+(v.ltRec === b[0] ? ' selected' : '')+'>'+b[0]+'</option>'; }).join('') + '</select>' +
       '<input type="text" class="cs-note" data-cs="ltBook" placeholder="권·단원 (예: 3권)" value="'+esc(v.ltBook || '')+'">' +
       '<input type="text" class="cs-note" data-cs="ltClass" placeholder="추천 반·시간" value="'+esc(v.ltClass || '')+'"></div>';
+  } else if(f[2] === 'list'){
+    inner = '<div class="cs-list">' + f[3].map(function(o){
+      return '<label><input type="checkbox" name="cs-'+key+'" value="'+esc(o)+'"'+((val || []).indexOf(o) !== -1 ? ' checked' : '')+'><span>'+esc(o)+'</span></label>';
+    }).join('') + '</div>';
   } else if(f[2] === 'area'){
-    inner = '<textarea data-cs="'+key+'" rows="3"'+(f[5] ? ' placeholder="'+esc(f[5])+'"' : '')+'>'+esc(val || '')+'</textarea>';
+    inner = '<textarea data-cs="'+key+'" rows="'+(f[6] || 3)+'"'+(f[5] ? ' placeholder="'+esc(f[5])+'"' : '')+'>'+esc(val || '')+'</textarea>';
   } else {
     inner = '<input type="'+f[2]+'" data-cs="'+key+'" value="'+esc(val || '')+'"'+(f[5] ? ' placeholder="'+esc(f[5])+'"' : '')+'>';
   }
   return '<div class="cs-row"><span class="cs-k">'+esc(f[1])+'</span><div class="cs-v'+(f[2] === 'lt' ? ' lt-cell' : '')+'">'+inner+'</div></div>';
 }
+// 신규 등록 7일 · 재원생 · 퇴원생 상담 체크리스트 (상담 매뉴얼 순서와 같아요)
+var CS_WEEK = [
+  ['1. 기본 정보', [
+    ['name','학생 이름','text'], ['cls','반 / 담임','text','','','예: BASIC 3 · 박지은'],
+    ['regDate','등록일','date'], ['how','연락 방법','radio',['카톡','전화','대면']]
+  ]],
+  ['2. 연락 전 체크리스트', [
+    ['prep','준비한 것','list',['데일리 테스트 기록 확인 (단어·숙제·Speaking)','영어 노트 사진 준비','수업 태도·참여도 정리','과제 완료 여부 확인','정성 담긴 코멘트 작성']]
+  ]],
+  ['3. 피드백 내용', [
+    ['send','보낸 내용','list',['노트 사진과 함께 학습 상황 안내','앞으로의 지도 방향 안내','필요하면 학습 꿀팁 안내']],
+    ['adapt','적응 상태','radio',['잘 적응함','보통','관심 필요']],
+    ['comment','담임 코멘트','area','','','수업 태도, 학습 내용, 앞으로의 지도 방향']
+  ]],
+  ['4. 학부모 반응과 후속 조치', [
+    ['reply','학부모님 반응·요청','area'], ['next','후속 조치','area','','','다음 연락일, 반에서 챙길 것']
+  ]]
+];
+var CS_CUR = [
+  ['1. 기본 정보', [
+    ['name','학생 이름','text'], ['cls','반 / 담임','text','','','예: BASIC 3 · 박지은'],
+    ['why','상담 계기','radio',['정기 (월말 리포트)','학습 변화','출결·과제','요청·변경']],
+    ['how','상담 방법','radio',['전화','대면','카톡']]
+  ]],
+  ['2. 상담 전 체크리스트', [
+    ['prep','준비한 것','list',['데일리 테스트·월말 리포트 기록 확인','최근 노트·과제 사진','담임 의견을 강점·보완할 점으로 정리','민감한 내용은 원장님과 미리 공유']]
+  ]],
+  ['3. 상담 내용 (월말 리포트 4단계)', [
+    ['s1','① 현황','area','','','진도, 출결, 단어 시험 기록',2], ['s2','② 강점','area','','','학습 태도, 이해도, 성실함',2],
+    ['s3','③ 보완할 점','area','','','관찰한 부족한 부분',2], ['s4','④ 학원 대응','area','','','학원에서 함께 보완할 계획',2]
+  ]],
+  ['4. 상담 후 체크리스트', [
+    ['after','한 일','list',['상담 내용 기록','약속한 지도를 다음 수업부터 실행','변화가 보이면 학부모님께 다시 알리기','퇴원 이야기가 나오면 원장님께 바로 공유']],
+    ['reply','학부모님 반응·요청','area','','','',2]
+  ]]
+];
+var CS_LEAVE = [
+  ['1. 기본 정보', [
+    ['name','학생 이름','text'], ['cls','반 / 담임','text','','','예: BASIC 3 · 박지은'],
+    ['outDate','퇴원 예정일','date'],
+    ['reason','퇴원 사유','check',['이사','시간·일정','학습 부담','비용','다른 학원·과외','효과·성적 불만','기타'],'reasonNote','자세한 사유']
+  ]],
+  ['2. 5가지 순서 체크리스트', [
+    ['steps','한 것','list',['① 상냥한 인사로 시작','② 불만에 먼저 공감','③ 함께한 성장 이야기 (구체적인 순간)','④ 앞으로의 성장을 응원하는 마무리 인사','⑤ 교재 수령 안내 · 교재 위 손편지']]
+  ]],
+  ['3. 마무리', [
+    ['done','정리','list',['원장님께 공유','반 명단·출결에서 정리']],
+    ['back','다시 올 가능성','radio',['높음','보통','낮음']],
+    ['voice','학부모님 말씀','area','','','불만, 요청, 마지막 인사'], ['memo','메모','area','','','다시 연락할 때 참고할 점',2]
+  ]]
+];
+var CS_TYPES = [
+  { id:'new', tab:'신규 상담', title:'신규 상담 기록지', man:'c-new', form:CS_FORM, who:'상담자', cols:['학교 / 학년','레벨테스트','상담 결과'],
+    desc:'처음 상담하는 학생의 학습 이력, 성향, 레벨테스트 결과를 적어요. 빈 기록지를 인쇄해서 손으로 써도 돼요.' },
+  { id:'week', tab:'신규 등록 7일', title:'신규 등록 7일 경과 상담 기록지', man:'c-week', form:CS_WEEK, who:'담임', cols:['반 / 담임','체크리스트','적응 상태'],
+    desc:'등록 7일 뒤 담임 선생님이 먼저 연락한 내용을 체크리스트로 남겨요.' },
+  { id:'cur', tab:'재원생 상담', title:'재원생 상담 기록지', man:'c-cur', form:CS_CUR, who:'상담자', cols:['반 / 담임','체크리스트','상담 계기'],
+    desc:'정기 상담이나 학습·출결 변화로 나눈 상담을 월말 리포트 4단계로 남겨요.' },
+  { id:'leave', tab:'퇴원생 상담', title:'퇴원생 상담 기록지', man:'c-leave', form:CS_LEAVE, who:'상담자', cols:['반 / 담임','체크리스트','퇴원 사유 · 다시 올 가능성'],
+    desc:'\'학원 그만둘게요\' 연락을 받았을 때 5가지 순서대로 마무리했는지 남겨요.' }
+];
+function csType(id){ return CS_TYPES.find(function(t){ return t.id === id; }) || CS_TYPES[0]; }
+// 체크리스트 진행: 체크한 항목 / 전체 항목
+function csProg(T, d){
+  var got = 0, all = 0;
+  T.form.forEach(function(sec){ sec[1].forEach(function(f){ if(f[2] === 'list'){ all += f[3].length; got += (d[f[0]] || []).length; } }); });
+  return all ? '<span class="cs-prog'+(got === all ? ' full' : '')+'">'+got+' / '+all+'</span>' : '';
+}
+function csBadge(v, ok, no){ return v ? '<span class="cs-res r-'+(v === ok ? 'ok' : v === no ? 'no' : 'hold')+'">'+esc(v)+'</span>' : ''; }
+function csCells(T, d){
+  if(T.id === 'new') return [esc(d.school || ''), esc(csRecText(d)) + (ltTotal(d) ? ' <small class="lt-mini">('+ltTotal(d)+')</small>' : ''), csBadge(d.result, '등록', '미등록')];
+  if(T.id === 'week') return [esc(d.cls || ''), csProg(T, d), csBadge(d.adapt, '잘 적응함', '관심 필요')];
+  if(T.id === 'cur') return [esc(d.cls || ''), csProg(T, d), esc(d.why || '')];
+  return [esc(d.cls || ''), csProg(T, d), esc((d.reason || []).join(', ')) + (d.back ? ' ' + csBadge(d.back, '높음', '낮음') : '')];
+}
+var csStore = (function(){
+  try{
+    var r = localStorage.getItem(CS_KEY); if(r) return JSON.parse(r);
+    // 예전 시안은 기록지를 홈페이지 신청과 같은 이름으로 저장했어요. 겹치지 않게 옮겨요.
+    var old = JSON.parse(localStorage.getItem('beyond-consult-v1') || 'null');
+    if(old && !Array.isArray(old) && old.items){ localStorage.setItem(CS_KEY, JSON.stringify(old)); localStorage.removeItem('beyond-consult-v1'); return old; }
+  }catch(e){}
+  return { seq:0, items:[] };
+})();
+function saveCs(){ try{ localStorage.setItem(CS_KEY, JSON.stringify(csStore)); }catch(e){} }
+var cs = { tab:'res', mode:'list', id:null, ftype:'new', prefill:null, fromRes:null };
+function csTabsHtml(){
+  return '<div class="cs-tabs" role="tablist">' + [['res','예약 현황']].concat(CS_TYPES.map(function(t){ return [t.id, t.tab]; })).map(function(x){
+    return '<button type="button" role="tab" data-cstab="'+x[0]+'" aria-selected="'+(cs.tab === x[0])+'">'+x[1]+'</button>';
+  }).join('') + '</div>';
+}
+function manBtn(id){ var m = MANUALS.find(function(x){ return x.id === id; }); return '<button type="button" class="btn soft" data-csman="'+id+'">'+esc(m ? m.title : '매뉴얼')+' 보기</button>'; }
 function renderConsult(){
   if(cs.mode === 'form'){
-    var it = cs.id ? csStore.items.find(function(x){ return x.id === cs.id; }) : null, v = it ? it.data : {};
+    var it = cs.id ? csStore.items.find(function(x){ return x.id === cs.id; }) : null, v = it ? it.data : (cs.prefill || {});
+    var T = csType(it ? it.type || 'new' : cs.ftype);
     $('csBody').innerHTML = '<form class="cs-sheet" id="csForm" novalidate>' +
-      '<header class="cs-hd"><h2>비욘드잉글리쉬 사직캠퍼스 신규 상담 기록지</h2><p>아이에게 꼭 맞는 수업을 준비하기 위한 자료예요. 편하게, 솔직하게 적어 주세요.</p>' +
-      '<div class="cs-top"><label>상담일 <input type="date" data-cs="date" value="'+esc(v.date || ymd(new Date()))+'"></label><label>상담자 <input type="text" data-cs="by" value="'+esc(v.by || (session ? session.name : ''))+'"></label></div></header>' +
-      CS_FORM.map(function(sec){ return '<section class="cs-sec"><h3>'+esc(sec[0])+'</h3>' + sec[1].map(function(f){ return csFieldHtml(f, v); }).join('') + '</section>'; }).join('') +
+      '<header class="cs-hd"><h2>비욘드잉글리쉬 사직캠퍼스 '+T.title+'</h2><p>'+(T.id === 'new' ? '아이에게 꼭 맞는 수업을 준비하기 위한 자료예요. 편하게, 솔직하게 적어 주세요.' : '매뉴얼 순서대로 체크하고, 나눈 이야기를 짧게 적어요.')+'</p>' +
+      '<div class="cs-top"><label>상담일 <input type="date" data-cs="date" value="'+esc(v.date || ymd(new Date()))+'"></label><label>'+T.who+' <input type="text" data-cs="by" value="'+esc(v.by || (session ? session.name : ''))+'"></label></div></header>' +
+      T.form.map(function(sec){ return '<section class="cs-sec"><h3>'+esc(sec[0])+'</h3>' + sec[1].map(function(f){ return csFieldHtml(f, v); }).join('') + '</section>'; }).join('') +
       '<p class="cs-privacy">🔒 상담 기록지는 상담과 수업 준비에만 쓰고, 외부에 일체 제공하거나 공개하지 않아요.</p>' +
       '<p class="form-err" id="csErr"></p>' +
-      '<div class="bd-actions cs-btns"><button type="button" class="btn soft" data-csback>목록</button><span><button type="button" class="btn soft" onclick="window.print()">인쇄하기</button> ' +
+      '<div class="bd-actions cs-btns"><span><button type="button" class="btn soft" data-csback>목록</button> '+manBtn(T.man)+'</span><span><button type="button" class="btn soft" onclick="window.print()">인쇄하기</button> ' +
       (it ? '<button type="button" class="btn soft bd-del" data-csdel="'+it.id+'">삭제</button> ' : '') + '<button type="submit" class="btn">저장</button></span></div></form>';
     return;
   }
-  var rows = csStore.items.slice().sort(function(a, b){ return (b.data.date || '').localeCompare(a.data.date || '') || b.id - a.id; });
-  $('csBody').innerHTML = '<div class="cs-bar"><p>상담 전화를 받거나 방문 상담을 할 때 <b>새 상담 기록지</b>를 열어 적어 주세요. 빈 기록지를 인쇄해서 손으로 써도 돼요.</p><button type="button" class="btn" data-csnew>새 상담 기록지</button></div>' +
-    '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="d">상담일</th><th class="t">학생</th><th>학교 / 학년</th><th>레벨테스트</th><th>상담 결과</th></tr></thead><tbody>' +
-    (rows.length ? rows.map(function(it){ var d = it.data;
-      return '<tr><td class="d">'+esc(d.date || '')+'</td><td class="t"><button type="button" class="bd-link" data-csopen="'+it.id+'">'+esc(d.name || '(이름 없음)')+'</button></td><td>'+esc(d.school || '')+'</td><td>'+esc(csRecText(d))+(ltTotal(d) ? ' <small class="lt-mini">('+ltTotal(d)+')</small>' : '')+'</td><td>'+(d.result ? '<span class="cs-res r-'+(d.result === '등록' ? 'ok' : d.result === '미등록' ? 'no' : 'hold')+'">'+esc(d.result)+'</span>' : '')+'</td></tr>';
-    }).join('') : '<tr><td colspan="5" class="bd-empty">아직 저장된 상담 기록이 없어요.</td></tr>') + '</tbody></table></div>';
+  if(cs.tab === 'res'){ $('csBody').innerHTML = csTabsHtml() + resHtml(); return; }
+  var T2 = csType(cs.tab);
+  var rows = csStore.items.filter(function(x){ return (x.type || 'new') === T2.id; }).sort(function(a, b){ return (b.data.date || '').localeCompare(a.data.date || '') || b.id - a.id; });
+  $('csBody').innerHTML = csTabsHtml() +
+    '<div class="cs-bar"><p>'+T2.desc+'</p><span class="cs-bar-btns">'+manBtn(T2.man)+'<button type="button" class="btn" data-csnew>새 기록지</button></span></div>' +
+    '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="d">상담일</th><th class="t">학생</th>' + T2.cols.map(function(c){ return '<th>'+c+'</th>'; }).join('') + '</tr></thead><tbody>' +
+    (rows.length ? rows.map(function(x){ var d = x.data;
+      return '<tr><td class="d">'+esc(d.date || '')+'</td><td class="t"><button type="button" class="bd-link" data-csopen="'+x.id+'">'+esc(d.name || '(이름 없음)')+'</button></td>' + csCells(T2, d).map(function(c){ return '<td>'+c+'</td>'; }).join('') + '</tr>';
+    }).join('') : '<tr><td colspan="5" class="bd-empty">아직 저장된 '+T2.tab+' 기록이 없어요.</td></tr>') + '</tbody></table></div>';
 }
+
+/* --- 예약 현황 화면 --- */
+var rs = { src:'all', when:'up', form:false, edit:null };
+function resDate(s){ var d = parseYmd(s); return (d.getMonth()+1)+'/'+d.getDate()+' ('+DAYS[d.getDay()]+')'; }
+function resHtml(){
+  var all = allReservations(), today = ymd(new Date()), wk = ymd(new Date(Date.now() + 6 * 864e5)), mon = today.slice(0, 7);
+  var live = all.filter(function(r){ return r.status !== '취소'; });
+  var sum = '<div class="rs-sum">' + [
+    [live.filter(function(r){ return r.date === today; }).length, '오늘 예약'],
+    [live.filter(function(r){ return r.date >= today && r.date <= wk; }).length, '7일 안 예약'],
+    [all.filter(function(r){ return (r.status === '대기' || r.status === '확인필요') && r.date >= today; }).length, '확인 대기'],
+    [all.filter(function(r){ return r.status === '완료' && r.date.slice(0, 7) === mon; }).length, '이번 달 상담 완료']
+  ].map(function(x){ return '<div><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'; }).join('') + '</div>';
+  var inWhen = all.filter(function(r){ return rs.when === 'all' || (rs.when === 'up' ? r.date >= today : r.date < today); });
+  var cnt = { all:inWhen.length }; inWhen.forEach(function(r){ cnt[r.src] = (cnt[r.src] || 0) + 1; });
+  var list = inWhen.filter(function(r){ return rs.src === 'all' || r.src === rs.src; }).sort(function(a, b){ var k = (a.date + a.time).localeCompare(b.date + b.time); return rs.when === 'past' ? -k : k; });
+  var bar = '<div class="rs-filter"><div class="rs-chips">' + [['all','전체']].concat(Object.keys(RES_SRC).map(function(k){ return [k, RES_SRC[k][0]]; })).map(function(c){
+      return '<button type="button" data-rssrc="'+c[0]+'" aria-pressed="'+(rs.src === c[0])+'">'+c[1]+' <small>'+(cnt[c[0]] || 0)+'</small></button>';
+    }).join('') + '</div>' +
+    '<select id="rsWhen" aria-label="기간">' + [['up','다가오는 예약'],['past','지난 예약'],['all','전체 기간']].map(function(o){ return '<option value="'+o[0]+'"'+(rs.when === o[0] ? ' selected' : '')+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<button type="button" class="btn" data-rsadd>+ 전화·문자 예약 추가</button></div>';
+  return '<div class="cs-bar"><p>네이버 플레이스·홈페이지 예약과 전화·문자로 받은 예약을 한 번에 봐요. 상태를 바꾸면 공통 일정표에도 바로 반영돼요.</p></div>' + sum + bar + (rs.form ? resFormHtml() : '') +
+    '<div class="rs-list"><div class="rs-row rs-head"><span>날짜·시간</span><span>경로</span><span>학생</span><span>학부모 · 연락처</span><span>종류 · 메모</span><span>상태</span><span></span></div>' +
+    (list.length ? list.map(resRowHtml).join('') : '<div class="rs-empty">'+(rs.when === 'up' ? '다가오는 예약이 없어요.' : '예약이 없어요.')+'</div>') + '</div>' + resSyncHtml();
+}
+function resRowHtml(r){
+  var s = RES_SRC[r.src], today = ymd(new Date()), sts = RES_ST.indexOf(r.status) < 0 ? RES_ST.concat([r.status]) : RES_ST;
+  var linked = r.csId && csStore.items.some(function(x){ return x.id === r.csId; });
+  return '<div class="rs-row'+(r.date === today ? ' today' : '')+(r.status === '취소' ? ' off' : '')+'">' +
+    '<span class="rs-when">'+resDate(r.date)+(r.date === today ? ' <em>오늘</em>' : '')+'<b>'+esc(r.time)+'</b></span>' +
+    '<span><span class="rs-src '+s[1]+'">'+s[0]+'</span></span>' +
+    '<span class="rs-who"><b>'+esc(r.student || (r.hidden ? '시트에서 확인' : '이름 미기재'))+'</b>'+(r.grade ? '<small>'+esc(r.grade)+'</small>' : '')+'</span>' +
+    '<span class="rs-par">'+esc(r.parent || '')+(r.phone ? '<a href="tel:'+esc(r.phone.replace(/[^0-9]/g, ''))+'">'+esc(r.phone)+'</a>' : '')+'</span>' +
+    '<span class="rs-kind">'+esc(r.kind || '상담')+(r.memo ? '<small>'+esc(r.memo)+'</small>' : '')+'</span>' +
+    '<span><select class="rs-st st-'+RES_ST.indexOf(r.status)+'" data-rsst="'+esc(r.key)+'" aria-label="상태">' + sts.map(function(o){ return '<option'+(o === r.status ? ' selected' : '')+'>'+esc(o)+'</option>'; }).join('') + '</select></span>' +
+    '<span class="rs-act">' + (linked ? '<button type="button" class="btn soft" data-csopen="'+r.csId+'">기록지 보기</button>' : '<button type="button" class="btn soft" data-rscs="'+esc(r.key)+'">기록지 쓰기</button>') +
+    (r.manual ? '<button type="button" class="linkish" data-rsedit="'+esc(r.key)+'">수정</button>' : '') + '</span></div>';
+}
+function resFormHtml(){
+  var i = rs.edit ? resStore.items.find(function(x){ return 'm' + x.id === rs.edit; }) : null, v = i || { src:'phone', date:ymd(new Date()), kind:'상담' };
+  var inp = function(n, label, type, ph){ return '<label>'+label+'<input type="'+(type || 'text')+'" name="'+n+'" value="'+esc(v[n] || '')+'"'+(ph ? ' placeholder="'+ph+'"' : '')+'></label>'; };
+  return '<form class="rs-form card" id="rsForm" novalidate><h3>'+(i ? '예약 고치기' : '예약 직접 추가')+'</h3><div class="rs-fgrid">' +
+    '<label>경로<select name="src">' + ['phone','sms','naver','web'].map(function(k){ return '<option value="'+k+'"'+(v.src === k ? ' selected' : '')+'>'+RES_SRC[k][0]+'</option>'; }).join('') + '</select></label>' +
+    inp('date', '날짜', 'date') + inp('time', '시간', 'time') +
+    '<label>종류<select name="kind">' + RES_KIND.map(function(k){ return '<option'+(v.kind === k ? ' selected' : '')+'>'+k+'</option>'; }).join('') + '</select></label>' +
+    inp('student', '학생 이름') + inp('grade', '학년', 'text', '예: 초3') + inp('parent', '학부모', 'text', '예: 김OO 어머님') + inp('phone', '연락처', 'tel', '010-0000-0000') +
+    '<label class="full">메모<input type="text" name="memo" value="'+esc(v.memo || '')+'" placeholder="문의 내용, 걱정하시는 부분"></label></div>' +
+    '<p class="form-err" id="rsErr"></p><div class="rs-fbtn">'+(i ? '<button type="button" class="btn soft bd-del" data-rsdel="'+i.id+'">삭제</button>' : '<span></span>') +
+    '<span><button type="button" class="btn soft" data-rscancel>취소</button> <button type="submit" class="btn">저장</button></span></div></form>';
+}
+function resSyncHtml(){
+  var key = sheetKey();
+  var web = !SHEET_URL ? '구글 시트 주소를 아직 넣지 않았어요. 지금은 이 브라우저에서 넣은 미리보기 신청만 보여요.'
+    : sheetRows ? '구글 시트와 연결됐어요. 홈페이지에서 예약하면 이 화면과 공통 일정표에 바로 떠요.'
+    : key ? (sheetErr || '구글 시트에서 불러오는 중이에요…') : '아래에 시트 관리 키를 넣으면 학생·학부모 이름까지 보여요. 지금은 날짜·시간·학년만 보여요.';
+  return '<div class="rs-sync"><h3>자동 연결 상태</h3><ul>' +
+    '<li><span class="rs-src s-web">홈페이지</span>'+web+'</li>' +
+    '<li><span class="rs-src s-naver">네이버 플레이스</span>네이버 예약 알림 메일을 구글 시트가 5분마다 읽어서 자동으로 넣는 방식으로 준비 중이에요. 실제 알림 메일 형식에 맞춘 뒤 켜요. 그 전에는 \'+ 전화·문자 예약 추가\'에서 경로를 네이버 플레이스로 골라 넣어 주세요.</li>' +
+    '<li><span class="rs-src s-phone">전화</span><span class="rs-src s-sms">문자</span>받은 즉시 \'+ 전화·문자 예약 추가\'로 적어요.</li></ul>' +
+    (SHEET_URL ? '<form id="rsKeyForm" class="rs-key"><label>시트 관리 키 <input type="password" id="rsKey" autocomplete="off" placeholder="'+(key ? '저장됨 · 바꾸려면 새로 입력' : '원장님만 아는 키')+'"></label><button type="submit" class="btn soft">저장</button><small>이 기기에만 저장돼요. 다른 사람과 공유하지 마세요.</small></form>' : '') + '</div>';
+}
+function resFind(key){ return allReservations().find(function(x){ return x.key === key; }); }
+function resLink(key, csId){
+  if(key.charAt(0) === 'm'){ var i = resStore.items.find(function(x){ return 'm' + x.id === key; }); if(i) i.csId = csId; }
+  else (resStore.ext[key] = resStore.ext[key] || {}).csId = csId;
+  saveRes();
+}
+function resSetStatus(key, st){
+  var r = resFind(key); if(!r) return;
+  if(r.manual) resStore.items.find(function(x){ return 'm' + x.id === key; }).status = st;
+  else if(r.row){ sheetRows.find(function(x){ return x.row === r.row; }).status = st; sheetPost({ action:'status', row:r.row, status:st }); }
+  else {
+    (resStore.ext[key] = resStore.ext[key] || {}).status = st;
+    if(r.local) try{ var a = webLocal(); a.forEach(function(c){ if('w' + c.date + ' ' + c.time === key) c.status = st; }); localStorage.setItem(WEB_KEY, JSON.stringify(a)); }catch(e){}
+  }
+  saveRes();
+}
+
 $('csBody').addEventListener('click', function(ev){
-  if(ev.target.closest('[data-csnew]')){ cs.mode = 'form'; cs.id = null; renderConsult(); return window.scrollTo(0, 0); }
+  var t = ev.target.closest('[data-cstab]'); if(t){ cs.tab = t.dataset.cstab; rs.form = false; return renderConsult(); }
+  var mb = ev.target.closest('[data-csman]'); if(mb) return openManPop(mb.dataset.csman);
+  if(ev.target.closest('[data-csnew]')){ cs.mode = 'form'; cs.id = null; cs.ftype = cs.tab; cs.prefill = null; cs.fromRes = null; renderConsult(); return window.scrollTo(0, 0); }
   var o = ev.target.closest('[data-csopen]'); if(o){ cs.mode = 'form'; cs.id = +o.dataset.csopen; renderConsult(); return window.scrollTo(0, 0); }
-  if(ev.target.closest('[data-csback]')){ cs.mode = 'list'; return renderConsult(); }
+  if(ev.target.closest('[data-csback]')){ cs.mode = 'list'; cs.prefill = null; cs.fromRes = null; return renderConsult(); }
   var d = ev.target.closest('[data-csdel]');
-  if(d){ if(!confirm('이 상담 기록을 삭제할까요? 되돌릴 수 없어요.')) return; csStore.items = csStore.items.filter(function(x){ return x.id !== +d.dataset.csdel; }); saveCs(); cs.mode = 'list'; toast('상담 기록을 삭제했어요.'); renderConsult(); }
+  if(d){ if(!confirm('이 상담 기록을 삭제할까요? 되돌릴 수 없어요.')) return; csStore.items = csStore.items.filter(function(x){ return x.id !== +d.dataset.csdel; }); saveCs(); cs.mode = 'list'; toast('상담 기록을 삭제했어요.'); return renderConsult(); }
+  var sb = ev.target.closest('[data-rssrc]'); if(sb){ rs.src = sb.dataset.rssrc; return renderConsult(); }
+  if(ev.target.closest('[data-rsadd]')){ rs.form = true; rs.edit = null; renderConsult(); return $('rsForm').querySelector('[name="time"]').focus(); }
+  var ed = ev.target.closest('[data-rsedit]'); if(ed){ rs.form = true; rs.edit = ed.dataset.rsedit; renderConsult(); return $('rsForm').scrollIntoView({ block:'center' }); }
+  if(ev.target.closest('[data-rscancel]')){ rs.form = false; return renderConsult(); }
+  var rd = ev.target.closest('[data-rsdel]');
+  if(rd){ if(!confirm('이 예약을 삭제할까요?')) return; resStore.items = resStore.items.filter(function(x){ return x.id !== +rd.dataset.rsdel; }); saveRes(); rs.form = false; toast('예약을 삭제했어요.'); return renderConsult(); }
+  var rc = ev.target.closest('[data-rscs]');
+  if(rc){
+    var r = resFind(rc.dataset.rscs); if(!r) return;
+    cs.mode = 'form'; cs.id = null; cs.ftype = 'new'; cs.fromRes = r.key;
+    cs.prefill = { name:r.student || '', school:r.grade || '', phone:r.phone || '', date:r.date, want:r.memo || '', ltDate:(r.kind || '').indexOf('레벨') !== -1 ? r.date : '' };
+    renderConsult(); return window.scrollTo(0, 0);
+  }
+});
+$('csBody').addEventListener('change', function(ev){
+  if(ev.target.id === 'rsWhen'){ rs.when = ev.target.value; return renderConsult(); }
+  if(ev.target.dataset.rsst){ resSetStatus(ev.target.dataset.rsst, ev.target.value); toast('상태를 \''+ev.target.value+'\'(으)로 바꿨어요.'); renderConsult(); }
 });
 $('csBody').addEventListener('input', function(ev){
   if(!ev.target.hasAttribute('data-lt')) return;
@@ -2817,17 +3127,49 @@ $('csBody').addEventListener('input', function(ev){
 });
 $('csBody').addEventListener('submit', function(ev){
   ev.preventDefault();
-  var f = ev.target, data = {};
+  var f = ev.target;
+  if(f.id === 'rsKeyForm'){
+    var k = $('rsKey').value.trim(); if(!k) return;
+    try{ localStorage.setItem(SHEET_KEY_LS, k); }catch(e){}
+    sheetErr = ''; toast('시트 관리 키를 이 기기에 저장했어요.'); loadSheetConsults(); return renderConsult();
+  }
+  if(f.id === 'rsForm'){
+    var g = function(n){ return f.querySelector('[name="'+n+'"]').value.trim(); };
+    if(!g('date') || !g('time')){ $('rsErr').textContent = '날짜와 시간을 넣어 주세요.'; return; }
+    if(!g('student') && !g('parent')){ $('rsErr').textContent = '학생 이름이나 학부모 성함 중 하나는 적어 주세요.'; return f.querySelector('[name="student"]').focus(); }
+    var i = rs.edit ? resStore.items.find(function(x){ return 'm' + x.id === rs.edit; }) : null;
+    if(!i){ i = { id:++resStore.seq, status:'확정', created:Date.now() }; resStore.items.push(i); }
+    ['src','date','time','kind','student','grade','parent','phone','memo'].forEach(function(n){ i[n] = g(n); });
+    saveRes(); rs.form = false; rs.edit = null; toast('예약을 저장했어요. 공통 일정표에도 떠요.'); return renderConsult();
+  }
+  var it0 = cs.id ? csStore.items.find(function(x){ return x.id === cs.id; }) : null;
+  var T = csType(it0 ? it0.type || 'new' : cs.ftype), data = {};
   f.querySelectorAll('[data-cs]').forEach(function(el){ data[el.dataset.cs] = el.value.trim(); });
-  CS_FORM.forEach(function(sec){ sec[1].forEach(function(x){
+  T.form.forEach(function(sec){ sec[1].forEach(function(x){
     if(x[2] === 'radio'){ var c = f.querySelector('input[name="cs-'+x[0]+'"]:checked'); data[x[0]] = c ? c.value : ''; }
-    if(x[2] === 'check') data[x[0]] = [].map.call(f.querySelectorAll('input[name="cs-'+x[0]+'"]:checked'), function(c){ return c.value; });
+    if(x[2] === 'check' || x[2] === 'list') data[x[0]] = [].map.call(f.querySelectorAll('input[name="cs-'+x[0]+'"]:checked'), function(c){ return c.value; });
   }); });
   if(!data.name){ $('csErr').textContent = '학생 이름을 적어 주세요.'; return f.querySelector('[data-cs="name"]').focus(); }
-  var it = cs.id ? csStore.items.find(function(x){ return x.id === cs.id; }) : null;
-  if(it) it.data = data; else { it = { id:++csStore.seq, data:data }; csStore.items.push(it); }
-  saveCs(); cs.id = it.id; toast('상담 기록을 저장했어요.'); renderConsult();
+  var it = it0;
+  if(it) it.data = data; else { it = { id:++csStore.seq, type:T.id, data:data }; csStore.items.push(it); }
+  saveCs(); cs.id = it.id; cs.prefill = null;
+  if(cs.fromRes){ resLink(cs.fromRes, it.id); cs.fromRes = null; }
+  toast('상담 기록을 저장했어요.'); renderConsult();
 });
+
+// 상담 화면에서 바로 여는 매뉴얼 (화면을 옮기지 않고 위에 띄워요)
+var manPopId = null;
+function openManPop(id){
+  var m = MANUALS.find(function(x){ return x.id === id; }); if(!m) return;
+  manPopId = id; $('manPopT').textContent = m.title; $('manPopBody').innerHTML = m.sheet();
+  $('manPop').hidden = false; $('manPop').scrollTop = 0; $('manPopClose').focus();
+}
+function closeManPop(){ $('manPop').hidden = true; manPopId = null; }
+$('manPop').addEventListener('click', function(ev){
+  if(ev.target === $('manPop') || ev.target.closest('[data-manclose]')) return closeManPop();
+  if(ev.target.closest('[data-manfull]')){ var id = manPopId; closeManPop(); manOpen = id; setView(state.view, 'manual'); window.scrollTo(0, 0); }
+});
+document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && !$('manPop').hidden) closeManPop(); });
 
 /* ===== 업무 매뉴얼 =====
    학원 고유 업무 규칙. 새 선생님도 한눈에 볼 수 있도록 매뉴얼마다 한 장짜리 요약으로 보여 줘요. */
