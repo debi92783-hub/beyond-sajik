@@ -4026,6 +4026,33 @@ var MANUALS = [
       '</div></div>' +
       '<div class="ms-ft"><button type="button" class="btn soft" data-go="monthly">월말 리포트 화면 열기 →</button><button type="button" class="btn soft" data-go="daily">데일리 테스트 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
     } },
+  { id:'report-form', title:'월말 리포트 양식·작성 기준', tag:'리포트', updated:'2026-10-26',
+    summary:'새 월말 리포트 양식의 네 덩어리, 3A 평점 기준(90·80·70%), 원장님 사인, 학생별 글 쓰는 법, 자주 틀리는 영어 표현을 한 장으로 정리했어요. 모든 교재 리포트에 똑같이 써요.',
+    sheet:function(){
+      return msHead(this, '2026년 10월 26일 원장님이 정한 새 양식 기준이에요. PHONICS부터 ADVANCED까지 <b>모든 교재</b> 리포트에 똑같이 써요.') +
+      msRules(['학생별 글은 학생마다 다르게', '느낌 대신 숫자와 관찰로', '발송 전 영어 표현 한 번 더 확인']) +
+      '<div class="ms-sec"><h3><span class="pill">양식</span>리포트는 네 덩어리예요</h3><div class="ms-flow">' +
+        '<div class="ms-step"><b>① 머리말</b><span>월, 레벨(교재명 권·단원), 다음 달 교재, 담임, 3A 평점, 출석일</span><em>수업 기록·출결·데일리 테스트에서 자동</em></div>' +
+        '<div class="ms-step"><b>② 반 공통</b><span>이달의 수업 이야기, 배운 내용, 다음 달 예고</span><em>반마다 한 달에 한 번 · 원장님이 확인한 교재 설명 모음에서 가져와요</em></div>' +
+        '<div class="ms-step"><b>③ MONTHLY REVIEW</b><span>학생별: 현황 → 강점 → 보완할 점 → 학원의 지도 계획</span><em>선생님 메모로 초안, 필요할 때 클로드로 다듬기</em></div>' +
+        '<div class="ms-step"><b>④ 학원 안내</b><span>휴원일, 일정 변경</span><em>원장님이 한 번 쓰면 모든 반에 똑같이</em></div>' +
+      '</div></div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box"><h4>3A 평점 기준</h4><ul><li><b>A</b> 90% 이상 · <b>B</b> 80% 이상 · <b>C</b> 70% 이상</li><li>70% 미만은 원장님과 상의해서 적어요</li><li>과제물 = 숙제 완료율, 출석일 = 출석률(보충 포함)</li><li>등급 옆에 숫자도 함께 써요 (예: A, 숙제 완료 19/20회)</li></ul></div>' +
+        '<div class="ms-box"><h4>서명 칸</h4><ul><li>Teacher\'s Signature: 담임 선생님</li><li>예전 Parent\'s Signature 칸 → <b>원장님 사인</b></li><li>보내기 전 선생님 확인 → 원장님 확인을 꼭 거쳐요</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-two">' +
+        '<div class="ms-box ok"><h4>✓ 학생별 글은 이렇게</h4><ul><li>숫자를 한 가지 이상 넣기 (단어 통과, 숙제 완료)</li><li>강점과 보완할 점을 함께 쓰기</li><li>보완할 점 뒤에는 학원의 계획으로 끝내기</li><li>이름 조사는 받침에 맞게: 민우가 / 하율이가</li></ul></div>' +
+        '<div class="ms-box no"><h4>✕ 이렇게 쓰지 않아요</h4><ul><li>이름만 바꾼 같은 글 (학부모님끼리 비교하면 바로 보여요)</li><li>기록에 없는 칭찬이나 성과</li><li>모든 학생 A/A/A처럼 기준 없는 평점</li><li>클로드에 학생 이름·연락처 넣기 (이름은 OO로)</li></ul></div>' +
+      '</div>' +
+      '<div class="ms-sec"><h3><span class="pill">확인</span>자주 틀리는 영어 표현 (9월 리포트에서 나온 것)</h3><div class="ms-who">' +
+        '<div><b>either A or B</b>A 또는 B (둘 중 하나)<br><small>either A and B ✕</small></div>' +
+        '<div><b>neither A nor B</b>A도 B도 아닌<br><small>neither A and B ✕</small></div>' +
+        '<div><b>B as well as A</b>A뿐만 아니라 B도<br><small>B as well A ✕</small></div>' +
+        '<div><b>on / over</b>on은 접촉해서 위에, over는 떨어져서 바로 위에·덮어서<br><small>over ~(접촉)위에 ✕</small></div>' +
+      '</div><p class="ms-ex">예문은 관사까지 확인해요. After I took <b>a</b> shower, I got dressed. (written) — 저는 샤워를 한 후에 옷을 입었습니다. · 오타도 확인: nto → into, UNIT서는 → UNIT에서는</p></div>' +
+      msFoot([['monthly','월말 리포트 화면 열기']]);
+    } },
   { id:'vacation', title:'방학특강 준비·실시 매뉴얼', tag:'특강', updated:'2026-10-25',
     summary:'3개월 전 기획, 2개월 전 얼리버드 모집, 타깃·클래스 설계, 특강 진행 순서, 특강 피드백, 정규반 연결까지 한 장으로 정리했어요.',
     sheet:function(){
