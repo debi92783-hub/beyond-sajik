@@ -67,6 +67,7 @@
   .side{ flex:0 0 220px; padding:22px 14px; background:var(--surface); border-right:1px solid var(--border); min-height:calc(100vh - 65px); max-height:calc(100vh - 65px); overflow-y:auto; position:sticky; top:65px; display:flex; flex-direction:column; gap:3px; }
   .side h3{ margin:14px 10px 6px; font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:0.04em; }
   .side h3:first-child{ margin-top:0; }
+  .side a[data-key="kiosk"]{ margin-top:14px; box-shadow:0 -1px 0 var(--border); border-radius:0 0 9px 9px; }
   .side a{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; font-size:13.5px; font-weight:600; }
   .side a[aria-current="page"]{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
   .side a:not([aria-current="page"]):hover{ background:var(--surface-soft); }
@@ -1451,14 +1452,16 @@ var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','전체 공지']]],
-    ['수업 관리', [['book','수업 체크리스트','lcsum'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
+    ['수업 관리', [['book','수업 체크리스트','lcsum'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
-    ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
+    ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
+    ['', [['clock','태블릿 등원 화면','kiosk']]]
   ],
   teacher: [
-    ['내 수업', [['book','수업 체크리스트','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
+    ['내 수업', [['book','수업 체크리스트','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
-    ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
+    ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
+    ['', [['clock','태블릿 등원 화면','kiosk']]]
   ]
 };
 
