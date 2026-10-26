@@ -971,18 +971,18 @@
 
           <div class="card">
             <div class="card-head">
-              <h2>주간 알림 미리보기</h2>
+              <h2>학부모 알림 미리보기</h2>
             </div>
-            <p class="muted" style="margin:0 0 12px;">체크한 학부모님께 아래 형식으로 카카오 알림톡이 가요. 학생을 바꿔 가며 미리 볼 수 있어요.</p>
+            <p class="muted" style="margin:0 0 12px;">여기 적은 학생별 진도·숙제는 <b>데일리 테스트 리포트에 함께 들어가서 한 번에 발송</b>돼요. 발송은 데일리 테스트 화면의 ①저장 → ②리포트 만들기 → ③확인 → ④발송 순서로 해요.</p>
             <div class="preview-head"><span class="muted">미리 볼 학생</span><select id="previewPick" aria-label="미리 볼 학생"></select></div>
             <div class="bubble" id="bubble"></div>
-            <button class="btn" type="button" id="sendBtn"></button>
+            <button class="btn" type="button" id="sendBtn">데일리 테스트에서 함께 발송하기 →</button>
           </div>
         </div>
 
         <aside class="t-aside">
           <div class="card sent">
-            <h2>이번 주 발송 현황</h2>
+            <h2>오늘 데일리 리포트 발송</h2>
             <b id="sentNum"></b>
             <div class="bar"><i id="sentBar" style="width:0"></i></div>
           </div>
@@ -1661,6 +1661,9 @@ state.entries = (function(){ try{ return JSON.parse(localStorage.getItem(JR_KEY)
 var jrTimer = null;
 function saveJr(){
   try{ localStorage.setItem(JR_KEY, JSON.stringify(state.entries)); }catch(e){}
+  // 이미 만든 데일리 리포트는 진도·숙제가 바뀌었으니 다시 만들어 확인하도록 되돌려요 (발송한 건 그대로)
+  var d = dtStore[state.classId + '|' + ymd(day)];
+  if(d && d.stage === 'made'){ d.stage = 'saved'; dtSave(); toast('진도·숙제가 바뀌어서 데일리 리포트를 다시 만들어 주세요.'); }
   var el = $('jrSaved'); if(!el) return;
   var t = new Date(); el.textContent = '저장됨 ' + ('0'+t.getHours()).slice(-2) + ':' + ('0'+t.getMinutes()).slice(-2);
 }
@@ -1731,18 +1734,14 @@ function renderStudents(){
   $('stuList').innerHTML = cls().students.map(function(s, i){
     var r = e.rows[s];
     return '<div class="stu'+(r.book || r.sb || r.pb ? ' own' : '')+'" data-name="'+esc(s)+'">'+
-      '<input type="checkbox" id="stu-'+i+'" data-f="checked"'+(r.checked?' checked':'')+' aria-label="'+esc(s)+' 알림 보내기">'+
-      '<label for="stu-'+i+'">'+esc(s)+'</label>'+
-      '<select data-f="hw" class="'+hwClass(r.hw)+'" aria-label="'+esc(s)+' 숙제 상태">'+
-        ['완료','미완료','보류'].map(function(o){ return '<option'+(o===r.hw?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'+
-      '<input type="text" class="score" data-f="score" value="'+esc(r.score)+'" placeholder="단어테스트 점수" aria-label="'+esc(s)+' 단어테스트 점수">'+
+      '<label>'+esc(s)+'</label>'+
       '<span class="jr-own"><span class="jr-grp"><i>진도</i>'+
         '<select data-f="book" aria-label="'+esc(s)+' 교재"><option value="">반 공통 진도</option>'+DT_BOOKS.map(function(b){ return '<option'+(b[0]===r.book?' selected':'')+'>'+b[0]+'</option>'; }).join('')+'</select>'+
         '<select data-f="prog" aria-label="'+esc(s)+' 책진도"'+(r.book ? '' : ' disabled')+'>'+(r.book ? progOpts(r.book, r.prog) : '<option>'+esc(e.prog || '–')+'</option>')+'</select></span>'+
         '<span class="jr-grp"><i>숙제</i><span class="jr-pg"><b>SB</b><input type="text" data-f="sb" inputmode="numeric" value="'+esc(r.sb)+'" placeholder="'+esc(e.sb || 'page')+'" aria-label="'+esc(s)+' SB page"></span>'+
         '<span class="jr-pg"><b>PB</b><input type="text" data-f="pb" inputmode="numeric" value="'+esc(r.pb)+'" placeholder="'+esc(e.pb || 'page')+'" aria-label="'+esc(s)+' PB page"></span></span>'+
       '</span>'+
-      '<input type="text" class="memo" data-f="memo" value="'+esc(r.memo)+'" placeholder="메모" aria-label="'+esc(s)+' 메모">'+
+      '<input type="text" class="memo" data-f="memo" value="'+esc(r.memo)+'" placeholder="학부모님께 전할 말 (리포트 기타사항에 들어가요)" aria-label="'+esc(s)+' 기타사항">'+
     '</div>';
   }).join('');
   var keep = $('previewPick').value;
@@ -1753,28 +1752,29 @@ function renderStudents(){
 
 function renderCounts(){
   var e = entry(), names = cls().students;
-  var done = names.filter(function(s){ return e.rows[s].hw === '완료'; }).length;
-  var checked = names.filter(function(s){ return e.rows[s].checked; }).length;
-  $('stuCount').textContent = names.length + '명 · 숙제 완료 ' + done + '명';
-  $('sendBtn').textContent = '체크한 ' + checked + '명에게 발송';
-  $('sendBtn').disabled = checked === 0;
-  var sent = state.sent[state.classId] || 0;
+  var own = names.filter(function(s){ var r = e.rows[s]; return r.book || r.sb || r.pb; }).length;
+  $('stuCount').textContent = names.length + '명 · 진도·숙제가 다른 학생 ' + own + '명';
+  var d = dtStore[state.classId + '|' + ymd(day)], sent = d && d.stage === 'sent' ? d.sent || 0 : 0;
   $('sentNum').textContent = sent + ' / ' + names.length + '명';
   $('sentBar').style.width = Math.round(sent / names.length * 100) + '%';
 }
 
 function renderPreview(){
-  var e = entry(), s = $('previewPick').value, r = e.rows[s];
-  if(!r){ $('bubble').textContent = ''; return; }
-  var lines = [];
-  var x = effJr(r, e);
-  lines.push('📘 진도: ' + (jrProgText(x) || '(오늘 진도를 골라 주세요)'));
-  lines.push('📝 숙제: ' + ([jrHwText(x), e.note].filter(Boolean).join(' · ') || '(숙제 page를 적어 주세요)') + ' — ' + r.hw);
-  if(r.score) lines.push('✏️ 단어테스트: ' + r.score);
-  if(r.memo) lines.push('💬 ' + r.memo);
-  $('bubble').innerHTML = '<b>[비욘드잉글리쉬] 주간 학습 알림</b>' + esc(
-    s + ' 학부모님, 안녕하세요 🙂\n이번 주 학습 현황을 안내드립니다.\n\n' + lines.join('\n') +
-    '\n\n꼼꼼한 학습을 위해 최선을 다하겠습니다.\n— ' + state.teacher + ' 선생님');
+  var s = $('previewPick').value; if(!s || !entry().rows[s]){ $('bubble').textContent = ''; return; }
+  var k = state.classId + '|' + ymd(day), d = dtStore[k];
+  // 데일리 테스트 점검표가 저장돼 있으면 실제로 나갈 리포트 그대로 보여 줘요
+  if(d && d.rows && d.rows[s]){
+    var keepC = dtClassId, keepD = dtDay;
+    dtClassId = state.classId; dtDay = new Date(day);
+    var txt = dtText(s, d);
+    dtClassId = keepC; dtDay = keepD;
+    $('bubble').innerHTML = '<b>데일리 리포트 (진도·숙제 포함)</b>' + esc(txt);
+    return;
+  }
+  var j = jrFor(s, state.classId, ymd(day), {});
+  $('bubble').innerHTML = '<b>데일리 리포트 중 진도·숙제 부분</b>' + esc(
+    (j.prog ? '진도: ' + j.prog + '\n' : '') + (j.hw ? '숙제: ' + j.hw + '\n' : '') + (j.memo ? '기타사항: ' + j.memo + '\n' : '') +
+    '\n데일리 테스트 점검표를 저장하면 출결·교재·숙제 검사·단어 결과와 함께 한 장으로 나가요.');
 }
 
 function saveCommon(){ var e = entry(); e.book = $('jBook').value; e.prog = e.book ? $('jProg').value : ''; e.sb = $('jSb').value.trim(); e.pb = $('jPb').value.trim(); e.note = $('jNote').value.trim(); saveJrSoon(); }
@@ -1824,11 +1824,8 @@ $('myClasses').addEventListener('click', function(e){
 $('prevDay').addEventListener('click', function(){ day.setDate(day.getDate() - 1); renderTeacher(); });
 $('nextDay').addEventListener('click', function(){ day.setDate(day.getDate() + 1); renderTeacher(); });
 $('sendBtn').addEventListener('click', function(){
-  var e = entry(), names = cls().students;
-  var n = names.filter(function(s){ return e.rows[s].checked; }).length;
-  state.sent[state.classId] = Math.min(names.length, n);
-  renderCounts();
-  toast(n + '명 학부모님께 보낼 준비가 됐어요. (시안이라 실제 알림톡은 나가지 않아요)');
+  dtClassId = state.classId; dtDay = new Date(day);
+  setView(state.view, 'daily'); window.scrollTo(0, 0);
 });
 
 /* ===== 일정 달력 ===== */
@@ -2246,18 +2243,30 @@ function wordText(r, e){
   return (parts.join(', ') || '응시 전') + (r.wDone ? ' → 완료' : parts.length ? ' → 재시험 예정' : '');
 }
 function hwRange(e){ return [e.sb ? 'SB: page ' + e.sb : '', e.pb ? 'PB: page ' + e.pb : ''].filter(Boolean).join('  '); }
+// 수업 체크리스트에 적은 학생별 진도·숙제를 리포트에 넣어요. 비어 있으면 데일리 테스트 반 공통 값을 써요.
+function jrFor(s, classId, date, e){
+  var j = state.entries[classId + '|' + date], r = j && j.rows[s];
+  if(!j) return { prog:progText(e), hw:hwRange(e), memo:'' };
+  var x = effJr(r || { book:'', sb:'', pb:'' }, j);
+  if(!x.book){ x.book = e.book; x.prog = e.prog; }
+  x.sb = x.sb || e.sb; x.pb = x.pb || e.pb;
+  var hw = hwRange(x);
+  return { prog:(x.book && x.prog ? x.book + ' > ' + x.prog : progText(e)), hw:[hw, j.note].filter(Boolean).join(' · '), memo:(r && r.memo || '').trim() };
+}
+function dtJr(s, e){ return jrFor(s, dtClassId, ymd(dtDay), e); }
+function memoText(r, jx){ return [r.memo.trim(), jx.memo].filter(Boolean).join(' / '); }
 function opts(f, v){ return DT_OPT[f].map(function(o){ return '<span class="opt'+(o===v?' on':'')+'">'+o+'</span>'; }).join(', '); }
 function dtCard(s, e){
-  var c = dtCls(), r = e.rows[s];
+  var c = dtCls(), r = e.rows[s], jx = dtJr(s, e);
   var attLine = DT_OPT.att.map(function(o){ var on = o === r.att; return '<span class="opt'+(on?' on':'')+'">'+(on ? esc(attText(r)) : o)+'</span>'; }).join(', ');
-  var rows = r.att === '결석' ? [['출결', attLine], ['진도', esc(progText(e) || '–')], ['숙제', esc(hwRange(e) || '–')], ['기타<br>사항', esc(r.memo || '')]] : [
+  var rows = r.att === '결석' ? [['출결', attLine], ['진도', esc(jx.prog || '–')], ['숙제', esc(jx.hw || '–')], ['기타<br>사항', esc(memoText(r, jx))]] : [
     ['출결', attLine],
     ['교재', opts('book', r.book)],
     ['숙제', opts('hw', r.hw) + ' // Speaking (' + opts('spk', r.spk) + ')'],
     ['단어', esc(wordText(r, e))],
-    ['진도', esc(progText(e) || '–')],
-    ['숙제', esc(hwRange(e) || '–')],
-    ['기타<br>사항', esc(r.memo || '')]
+    ['진도', esc(jx.prog || '–')],
+    ['숙제', esc(jx.hw || '–')],
+    ['기타<br>사항', esc(memoText(r, jx))]
   ];
   return '<div class="rc" data-name="'+esc(s)+'"><table>' +
     '<tr class="top"><th>이름</th><td>'+esc(s)+'</td></tr>' +
@@ -2267,7 +2276,7 @@ function dtCard(s, e){
     '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button><button class="btn soft okbtn" type="button" data-ok aria-pressed="false">확인</button></div></div>';
 }
 function dtText(s, e){
-  var c = dtCls(), r = e.rows[s], L = [];
+  var c = dtCls(), r = e.rows[s], jx = dtJr(s, e), L = [];
   L.push('[비욘드 잉글리쉬 사직] ' + dtDateText() + ' (' + DAYS[dtDay.getDay()] + ') 데일리 리포트');
   L.push('이름: ' + s + ' (' + c.name + ' · ' + c.teacher + ' 선생님)');
   L.push('출결: ' + attText(r));
@@ -2276,9 +2285,9 @@ function dtText(s, e){
     L.push('숙제: ' + r.hw + ' / Speaking: ' + r.spk);
     L.push('단어: ' + wordText(r, e));
   }
-  if(progText(e)) L.push('진도: ' + progText(e));
-  if(hwRange(e)) L.push('숙제: ' + hwRange(e));
-  if(r.memo.trim()) L.push('기타사항: ' + r.memo.trim());
+  if(jx.prog) L.push('진도: ' + jx.prog);
+  if(jx.hw) L.push('숙제: ' + jx.hw);
+  if(memoText(r, jx)) L.push('기타사항: ' + memoText(r, jx));
   return L.join('\n');
 }
 
