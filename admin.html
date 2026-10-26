@@ -557,6 +557,16 @@
   .cs-tabs button{ font:inherit; font-size:14px; font-weight:800; padding:10px 14px; border:0; border-bottom:3px solid transparent; background:none; color:var(--ink-soft); cursor:pointer; white-space:nowrap; margin-bottom:-1px; }
   .cs-tabs button[aria-selected="true"]{ color:var(--accent); border-bottom-color:var(--accent); }
   .cs-bar-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+  .lt-files{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:16px; max-width:1100px; }
+  .lt-files h3{ margin:0 0 10px; font-size:14px; font-weight:800; }
+  .lt-files h3 small{ font-size:12px; font-weight:500; color:var(--ink-soft); margin-left:6px; }
+  .lt-file-list{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; }
+  .lt-file{ display:grid; grid-template-columns:auto 1fr; grid-template-areas:"i b" "i s" "e e"; gap:2px 10px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:10px; text-decoration:none; color:var(--ink); background:var(--surface-soft); }
+  .lt-file:hover{ border-color:var(--accent); }
+  .lt-file .pdf{ grid-area:i; font-size:11px; font-weight:900; color:#fff; background:#C4372B; border-radius:6px; padding:8px 6px; }
+  .lt-file b{ grid-area:b; font-size:13.5px; } .lt-file small{ grid-area:s; font-size:12px; color:var(--ink-soft); }
+  .lt-file em{ grid-area:e; font-style:normal; font-size:12px; font-weight:800; color:var(--accent); margin-top:6px; }
+  @media screen and (max-width: 900px){ .lt-file-list{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
   .cs-prog{ white-space:nowrap; font-size:12px; font-weight:800; padding:2px 8px; border-radius:6px; background:var(--hold-soft); color:var(--hold); }
   .cs-prog.full{ background:var(--good-soft); color:var(--good); }
   .cs-list{ display:flex; flex-direction:column; gap:5px; font-size:13px; width:100%; padding:2px 0; }
@@ -3404,6 +3414,17 @@ function csTabsHtml(){
     return '<button type="button" role="tab" data-cstab="'+x[0]+'" aria-selected="'+(cs.tab === x[0])+'">'+x[1]+'</button>';
   }).join('') + '</div>';
 }
+// 레벨테스트 양식: 원장님이 주신 PDF 원본 그대로 (leveltest 폴더). 눌러서 열고 인쇄해요.
+var LT_FILES = [
+  ['leveltest/phonics-test.pdf', '파닉스 테스트', '29쪽'],
+  ['leveltest/basic-test.pdf', '베이직 테스트', '7쪽 · A4'],
+  ['leveltest/inter-test.pdf', '인터 테스트', '7쪽 · A4'],
+  ['leveltest/basic-speaking-test.pdf', 'Basic Speaking Test', '3쪽 · A4']
+];
+function ltFilesHtml(){
+  return '<div class="lt-files"><h3>레벨테스트 양식 <small>원본 파일 그대로예요. 눌러서 연 뒤 인쇄(Ctrl+P)하면 돼요.</small></h3><div class="lt-file-list">' +
+    LT_FILES.map(function(f){ return '<a class="lt-file" href="'+f[0]+'" target="_blank" rel="noopener"><span class="pdf">PDF</span><b>'+esc(f[1])+'</b><small>'+f[2]+'</small><em>열기 · 인쇄</em></a>'; }).join('') + '</div></div>';
+}
 function manBtn(id){ var m = MANUALS.find(function(x){ return x.id === id; }); return '<button type="button" class="btn soft" data-csman="'+id+'">'+esc(m ? m.title : '매뉴얼')+' 보기</button>'; }
 function renderConsult(){
   if(cs.mode === 'form'){
@@ -3424,6 +3445,7 @@ function renderConsult(){
   var rows = csStore.items.filter(function(x){ return (x.type || 'new') === T2.id; }).sort(function(a, b){ return (b.data.date || '').localeCompare(a.data.date || '') || b.id - a.id; });
   $('csBody').innerHTML = csTabsHtml() +
     '<div class="cs-bar"><p>'+T2.desc+'</p><span class="cs-bar-btns">'+manBtn(T2.man)+'<button type="button" class="btn" data-csnew>새 기록지</button></span></div>' +
+    (T2.id === 'new' ? ltFilesHtml() : '') +
     '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="d">상담일</th><th class="t">학생</th>' + T2.cols.map(function(c){ return '<th>'+c+'</th>'; }).join('') + '</tr></thead><tbody>' +
     (rows.length ? rows.map(function(x){ var d = x.data;
       return '<tr><td class="d">'+esc(d.date || '')+'</td><td class="t"><button type="button" class="bd-link" data-csopen="'+x.id+'">'+esc(d.name || '(이름 없음)')+'</button></td>' + csCells(T2, d).map(function(c){ return '<td>'+c+'</td>'; }).join('') + '</tr>';
