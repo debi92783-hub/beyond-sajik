@@ -964,7 +964,7 @@
           <div class="card">
             <div class="card-head">
               <h2>학생별 진도·숙제 <small class="muted" style="font-weight:500;font-size:12px">진도와 숙제는 따로 적어요. 반 공통과 다른 학생만 바꿔요</small></h2>
-              <span class="muted" id="stuCount"></span>
+              <span class="muted"><span id="stuCount"></span> · <span id="jrSaved">입력하면 바로 저장돼요</span></span>
             </div>
             <div id="stuList"></div>
           </div>
@@ -1655,6 +1655,16 @@ $('lcCopy').addEventListener('click', function(){
 });
 
 function cls(){ return CLASSES.find(function(c){ return c.id === state.classId; }); }
+// 진도·숙제 입력은 반·날짜별로 이 브라우저에 바로 저장돼요 (나중에 구글 시트로 옮길 자리)
+var JR_KEY = 'beyond-journal-v1';
+state.entries = (function(){ try{ return JSON.parse(localStorage.getItem(JR_KEY) || '{}') || {}; }catch(e){ return {}; } })();
+var jrTimer = null;
+function saveJr(){
+  try{ localStorage.setItem(JR_KEY, JSON.stringify(state.entries)); }catch(e){}
+  var el = $('jrSaved'); if(!el) return;
+  var t = new Date(); el.textContent = '저장됨 ' + ('0'+t.getHours()).slice(-2) + ':' + ('0'+t.getMinutes()).slice(-2);
+}
+function saveJrSoon(){ clearTimeout(jrTimer); jrTimer = setTimeout(saveJr, 300); }
 function entry(){
   var c = cls();
   var k = c.id + '|' + ymd(day);
@@ -1665,7 +1675,10 @@ function entry(){
     var d = (typeof dtStore !== 'undefined' && dtStore[k]) || {};
     state.entries[k] = { book:d.book || '', prog:d.prog || '', sb:d.sb || '', pb:d.pb || '', note:'', rows:rows };
   }
-  return state.entries[k];
+  var en = state.entries[k];
+  // 나중에 반에 들어온 학생도 칸이 생기게
+  c.students.forEach(function(s){ if(!en.rows[s]) en.rows[s] = { checked:true, hw:'완료', score:'', book:'', prog:'', sb:'', pb:'', memo:'' }; });
+  return en;
 }
 
 function renderTeacher(){
@@ -1764,8 +1777,8 @@ function renderPreview(){
     '\n\n꼼꼼한 학습을 위해 최선을 다하겠습니다.\n— ' + state.teacher + ' 선생님');
 }
 
-function saveCommon(){ var e = entry(); e.book = $('jBook').value; e.prog = e.book ? $('jProg').value : ''; e.sb = $('jSb').value.trim(); e.pb = $('jPb').value.trim(); e.note = $('jNote').value.trim(); }
-$('jBook').addEventListener('change', function(){ var e = entry(); e.book = this.value; e.prog = firstProg(e.book); renderJrCommon(); renderStudents(); });
+function saveCommon(){ var e = entry(); e.book = $('jBook').value; e.prog = e.book ? $('jProg').value : ''; e.sb = $('jSb').value.trim(); e.pb = $('jPb').value.trim(); e.note = $('jNote').value.trim(); saveJrSoon(); }
+$('jBook').addEventListener('change', function(){ var e = entry(); e.book = this.value; e.prog = firstProg(e.book); saveJrSoon(); renderJrCommon(); renderStudents(); });
 $('jProg').addEventListener('change', function(){ saveCommon(); renderStudents(); });
 ['jSb','jPb'].forEach(function(id){ $(id).addEventListener('input', function(){ saveCommon(); renderStudents(); }); });
 $('jNote').addEventListener('input', function(){ saveCommon(); renderPreview(); });
@@ -1776,6 +1789,7 @@ $('applyAll').addEventListener('click', function(){
   if(!e.prog && !e.sb && !e.pb) return toast('오늘 진도나 숙제 page를 먼저 입력해 주세요.');
   cls().students.forEach(function(s){ var r = e.rows[s]; r.book = ''; r.prog = ''; r.sb = ''; r.pb = ''; });
   renderStudents();
+  saveJr();
   toast(cls().name + ' ' + cls().students.length + '명 모두에게 같은 진도·숙제를 넣었어요.');
 });
 
@@ -1785,8 +1799,10 @@ function onStudentChange(ev){
   var row = ev.target.closest('.stu'); if(!row) return;
   var f = ev.target.dataset.f, r = entry().rows[row.dataset.name];
   r[f] = f === 'checked' ? ev.target.checked : ev.target.value;
+  if(f === 'book' && ev.type === 'change') r.prog = firstProg(r.book);
+  saveJrSoon();
   if(f === 'hw') ev.target.className = hwClass(r.hw);
-  if(f === 'book' && ev.type === 'change'){ r.prog = firstProg(r.book); return renderStudents(); }
+  if(f === 'book' && ev.type === 'change') return renderStudents();
   if(f === 'book' || f === 'sb' || f === 'pb') row.classList.toggle('own', !!(r.book || r.sb || r.pb));
   renderCounts();
   if($('previewPick').value === row.dataset.name) renderPreview();
