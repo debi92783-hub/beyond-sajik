@@ -127,7 +127,42 @@
   .tag.info{ background:var(--accent-soft); color:var(--accent); }
   .alerts .d{ flex:1; font-size:12.5px; color:var(--ink-soft); }
 
-  /* 선생님 수업 일지 */
+  /* 선생님 수업 체크리스트 */
+  .lc-top{ display:flex; gap:10px 18px; align-items:center; flex-wrap:wrap; margin-bottom:12px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+  .lc-top label{ display:flex; align-items:center; gap:8px; }
+  .lc-top input[type=text]{ font:inherit; font-size:13px; font-weight:500; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); color:var(--ink); width:150px; }
+  .lc-top input[type=checkbox]{ width:16px; height:16px; accent-color:var(--accent); }
+  .lc-prog{ font-size:13px; font-weight:800; padding:4px 10px; border-radius:999px; background:var(--hold-soft); color:var(--hold); }
+  .lc-prog.full{ background:var(--good-soft); color:var(--good); }
+  .lc-table{ border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .lc-hd, .lc-grp{ display:grid; grid-template-columns:130px 1fr; }
+  .lc-hd{ background:#24345F; color:#fff; font-size:12.5px; font-weight:800; }
+  .lc-hd > span{ padding:8px 12px; } .lc-hd .lc-cols{ display:grid; grid-template-columns:1fr 52px minmax(120px, 0.6fr); padding:0; } .lc-hd .lc-cols span{ padding:8px 12px; } .lc-hd .lc-cols span:nth-child(2){ text-align:center; padding:8px 0; }
+  .lc-grp{ border-top:1px solid var(--border); }
+  .lc-g{ background:var(--accent-soft); color:var(--accent); font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; text-align:center; padding:8px; }
+  .lc-grp.off{ opacity:.45; }
+  .lc-row{ display:grid; grid-template-columns:1fr 52px minmax(120px, 0.6fr); align-items:center; border-top:1px solid var(--border); font-size:13px; }
+  .lc-row:first-child{ border-top:0; }
+  .lc-row > label{ padding:8px 12px; cursor:pointer; line-height:1.5; }
+  .lc-row > .lc-ck{ display:flex; justify-content:center; }
+  .lc-row > .lc-ck input{ width:19px; height:19px; accent-color:var(--good); cursor:pointer; }
+  .lc-row > input[type=text]{ font:inherit; font-size:12.5px; border:0; border-left:1px solid var(--border); padding:9px 10px; background:transparent; color:var(--ink); min-width:0; height:100%; box-sizing:border-box; }
+  .lc-row.done > label{ color:var(--ink-soft); }
+  .lc-say{ display:block; font-weight:700; color:var(--ink); } .lc-say em{ font-style:normal; font-size:11px; font-weight:800; color:var(--accent); background:var(--accent-soft); padding:1px 6px; border-radius:5px; margin-right:6px; }
+  .lc-say + small{ display:block; color:var(--ink-soft); font-size:12px; }
+  .lc-report{ margin-top:14px; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; }
+  .lc-report label{ display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .lc-report input{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); }
+  .lc-msg{ grid-column:1 / -1; background:var(--surface-soft); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:13px; line-height:1.65; white-space:pre-line; }
+  .lc-rbtn{ grid-column:1 / -1; display:flex; justify-content:flex-end; gap:8px; }
+  @media screen and (max-width: 720px){
+    .lc-hd{ display:none; }
+    .lc-grp{ grid-template-columns:1fr; }
+    .lc-g{ justify-content:flex-start; padding:7px 12px; }
+    .lc-row{ grid-template-columns:1fr 44px; }
+    .lc-row > input[type=text]{ grid-column:1 / -1; border-left:0; border-top:1px dashed var(--border); padding:7px 12px; }
+    .lc-report{ grid-template-columns:1fr; }
+  }
   .t-grid{ display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap; }
   .t-main{ flex:3 1 560px; min-width:0; display:flex; flex-direction:column; gap:20px; }
   .t-aside{ flex:1 1 260px; display:flex; flex-direction:column; gap:20px; position:sticky; top:93px; }
@@ -840,7 +875,7 @@
       <div class="card">
         <div class="card-head">
           <h2>반별 현황</h2>
-          <span class="muted">반을 누르면 그 반 수업 일지로 가요</span>
+          <span class="muted">반을 누르면 그 반 수업 체크리스트로 가요</span>
         </div>
         <div class="table-wrap">
           <table class="classes">
@@ -868,11 +903,11 @@
       <p class="sample-note">지금 보이는 반·학생·숫자는 모두 화면 확인용 예시예요. 구글 시트를 연결하면 실제 데이터로 바뀌어요.</p>
     </section>
 
-    <!-- 선생님 수업 일지 -->
+    <!-- 선생님 수업 체크리스트 -->
     <section id="view-teacher" hidden>
       <div class="card" id="noClass" hidden>
         <h2>아직 담당 반이 없어요</h2>
-        <p class="muted" style="margin:8px 0 0">원장님이 "선생님 계정·권한"에서 담당 반을 정해 주면 여기에 수업 일지가 나타나요.</p>
+        <p class="muted" style="margin:8px 0 0">원장님이 "선생님 계정·권한"에서 담당 반을 정해 주면 여기에 수업 체크리스트가 나타나요.</p>
       </div>
       <div class="t-grid" id="tGrid">
         <div class="t-main">
@@ -883,6 +918,23 @@
               <button class="sq" type="button" id="nextDay" aria-label="다음 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
             </div>
             <label>반 선택 <select id="classPick" aria-label="반 선택"></select></label>
+          </div>
+
+          <div class="card" id="lcCard">
+            <div class="card-head"><h2>수업 체크리스트 — <span id="lcWho"></span></h2><span class="lc-prog" id="lcProg"></span></div>
+            <div class="lc-top">
+              <label>강의실 <input type="text" id="lcRoom" placeholder="예: 1강의실"></label>
+              <label><input type="checkbox" id="lcCloser"> 오늘 마감 담당이에요</label>
+              <span class="muted" style="font-weight:500">날짜를 바꾸면 그날 체크리스트로 바뀌어요.</span>
+            </div>
+            <div class="lc-table" id="lcBody"></div>
+            <div class="lc-report">
+              <label>결석 <input type="text" id="lcAbs" data-lcr placeholder="예: 초3 김OO (부모님 문자 발송)"></label>
+              <label>지각 <input type="text" id="lcLate" data-lcr placeholder="예: 중1 이OO (20분)"></label>
+              <label>특이사항 <input type="text" id="lcEtc" data-lcr placeholder="예: 박OO 교재 미지참, 프린트로 보충"></label>
+              <div class="lc-msg" id="lcMsg"></div>
+              <div class="lc-rbtn"><button type="button" class="btn soft" id="lcCopy">마감 보고 문구 복사</button></div>
+            </div>
           </div>
 
           <div class="card">
@@ -1310,12 +1362,12 @@ var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','전체 공지']]],
-    ['수업 관리', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
+    ['수업 관리', [['book','수업 체크리스트','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
   ],
   teacher: [
-    ['내 수업', [['book','수업 일지','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
+    ['내 수업', [['book','수업 체크리스트','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
   ]
@@ -1497,7 +1549,97 @@ $('alerts').addEventListener('click', function(e){
   toast(a.name + ' 학부모님께 보낼 ' + a.type + ' 안내 문자예요. (시안이라 실제로 보내지는 않아요)');
 });
 
-/* ===== 선생님 수업 일지 ===== */
+/* ===== 선생님 수업 체크리스트 =====
+   원장님이 보내 준 강의 화면(주말보충센터 체크리스트)을 우리 학원 평일 수업에 맞게 바꿨어요.
+   잔디 대신 업무 화면 게시판·일정표·카톡 마감 보고를 써요. 선생님·날짜별로 이 브라우저에 저장돼요. */
+var LC_GROUPS = [
+  ['before30', '수업 30분 전', [
+    ['in', '업무 화면 로그인 · 출근 체크'],
+    ['board', '게시판(전달사항) 확인'],
+    ['cal', '일정표에서 오늘 보충·상담 일정 확인'],
+    ['tag', '명찰 착용 / 교재 챙기기'],
+    ['room', '강의실 책상·화이트보드 정리'],
+    ['kiosk', '입구 태블릿 등원 화면 켜기'],
+    ['list', '오늘 반 시간·학생 명단 확인'],
+    ['mat', '교재·답지·단어 시험지·프린트 확인 → 문제가 있으면 원장님께 보고']
+  ]],
+  ['before10', '수업 10분 전', [
+    ['door', '강의실 앞에서 맞이 · 태블릿 등원 확인']
+  ]],
+  ['hi', '환영 인사', [
+    ['hi', '<span class="lc-say"><em>spoken</em>"Hi, ○○! Welcome. Are you ready for today\'s class?"</span><small>"안녕, ○○! 어서 와. 오늘 수업 준비됐니?"</small>']
+  ]],
+  ['during', '수업 중', [
+    ['att', '출석 체크 (\'문자발송\' 체크 → 저장 → 카톡 발송)'],
+    ['dt', '데일리 테스트 기록 (단어·숙제·Speaking)']
+  ]],
+  ['bye', '마무리 인사', [
+    ['bye', '<span class="lc-say"><em>spoken</em>"Great job today, ○○! See you next time."</span><small>"오늘 정말 잘했어, ○○! 다음에 보자."</small>']
+  ]],
+  ['end', '수업 종료', [
+    ['hw', '오늘 진도·숙제 입력 (아래 \'오늘 수업 공통 입력\')'],
+    ['memo', '학생별 특이사항 기록'],
+    ['mk', '결석·지각 학생 보충 일정 잡기 (일정표에 공유)'],
+    ['clean', '지우개 가루 청소 / 책상 정리정돈'],
+    ['ret', '교재 반납 / 명찰 반납']
+  ]],
+  ['close', '마감할 경우', [
+    ['close', '모든 강의실 창문 확인 / 조명·에어컨 off / 도어락 잠금']
+  ]],
+  ['report', '마감 보고', [
+    ['report', '결석·지각·특이사항 적고 아래 문구 복사 → 원장님께 카톡']
+  ]]
+];
+var LC_KEY = 'beyond-lesson-check-v1';
+var lcStore = (function(){ try{ return JSON.parse(localStorage.getItem(LC_KEY) || '{}') || {}; }catch(e){ return {}; } })();
+function saveLc(){ try{ localStorage.setItem(LC_KEY, JSON.stringify(lcStore)); }catch(e){} }
+function lcRec(){ var k = state.teacher + '|' + ymd(day); return lcStore[k] || (lcStore[k] = { room:'', closer:false, c:{}, n:{}, abs:'', late:'', etc:'' }); }
+function lcCount(r){
+  var got = 0, all = 0;
+  LC_GROUPS.forEach(function(g){ if(g[0] === 'close' && !r.closer) return; g[2].forEach(function(it){ all++; if(r.c[it[0]]) got++; }); });
+  return [got, all];
+}
+function renderLessonCheck(){
+  var r = lcRec();
+  $('lcWho').textContent = state.teacher + ' 선생님 · ' + fmtDate(day);
+  $('lcRoom').value = r.room; $('lcCloser').checked = !!r.closer;
+  $('lcAbs').value = r.abs; $('lcLate').value = r.late; $('lcEtc').value = r.etc;
+  $('lcBody').innerHTML = '<div class="lc-hd"><span>구분</span><span class="lc-cols"><span>체크리스트</span><span>체크</span><span>비고</span></span></div>' +
+    LC_GROUPS.map(function(g){
+      return '<div class="lc-grp'+(g[0] === 'close' && !r.closer ? ' off' : '')+'"><div class="lc-g">'+g[1]+'</div><div>' + g[2].map(function(it){
+        var on = !!r.c[it[0]];
+        return '<div class="lc-row'+(on ? ' done' : '')+'"><label for="lc-'+it[0]+'">'+it[1]+'</label>' +
+          '<span class="lc-ck"><input type="checkbox" id="lc-'+it[0]+'" data-lc="'+it[0]+'"'+(on ? ' checked' : '')+'></span>' +
+          '<input type="text" data-lcn="'+it[0]+'" value="'+esc(r.n[it[0]] || '')+'" placeholder="비고" aria-label="비고"></div>';
+      }).join('') + '</div></div>';
+    }).join('');
+  lcRefresh();
+}
+function lcRefresh(){
+  var r = lcRec(), n = lcCount(r);
+  $('lcProg').textContent = n[0] + ' / ' + n[1] + ' 완료';
+  $('lcProg').className = 'lc-prog' + (n[0] === n[1] ? ' full' : '');
+  $('lcMsg').textContent = '[' + fmtDate(day) + '] ' + state.teacher + ' 선생님 수업 마감 보고' + (r.room ? ' (' + r.room + ')' : '') +
+    '\n- 결석: ' + (r.abs || '없음') + '\n- 지각: ' + (r.late || '없음') + '\n- 특이사항: ' + (r.etc || '없음') +
+    '\n- 수업 체크리스트 ' + n[0] + ' / ' + n[1] + ' 완료' + (r.closer && r.c.close ? '\n- 학원 마감했습니다.' : '');
+}
+$('lcBody').addEventListener('change', function(ev){
+  var k = ev.target.dataset.lc; if(!k) return;
+  var r = lcRec(); r.c[k] = ev.target.checked; saveLc();
+  ev.target.closest('.lc-row').classList.toggle('done', ev.target.checked); lcRefresh();
+});
+$('lcBody').addEventListener('input', function(ev){ var k = ev.target.dataset.lcn; if(!k) return; lcRec().n[k] = ev.target.value; saveLc(); });
+$('lcRoom').addEventListener('input', function(){ lcRec().room = this.value; saveLc(); lcRefresh(); });
+$('lcCloser').addEventListener('change', function(){ lcRec().closer = this.checked; saveLc(); renderLessonCheck(); });
+document.querySelectorAll('[data-lcr]').forEach(function(el){ el.addEventListener('input', function(){
+  var r = lcRec(); r.abs = $('lcAbs').value; r.late = $('lcLate').value; r.etc = $('lcEtc').value; saveLc(); lcRefresh();
+}); });
+$('lcCopy').addEventListener('click', function(){
+  var t = $('lcMsg').textContent;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ toast('마감 보고 문구를 복사했어요. 원장님 카톡에 붙여 넣어 주세요.'); })
+    .catch(function(){ toast('복사가 안 되면 문구를 길게 눌러 직접 복사해 주세요.'); });
+});
+
 function cls(){ return CLASSES.find(function(c){ return c.id === state.classId; }); }
 function entry(){
   var c = cls();
@@ -1529,6 +1671,7 @@ function renderTeacher(){
   $('myClasses').innerHTML = html;
 
   $('dayLabel').textContent = fmtDate(day);
+  renderLessonCheck();
   document.querySelectorAll('.className').forEach(function(el){ el.textContent = cls().name; });
   var e = entry();
   $('book').value = e.book; $('progress').value = e.progress; $('homework').value = e.homework;
@@ -1618,8 +1761,8 @@ $('teacherPick').addEventListener('change', function(){
 $('myClasses').addEventListener('click', function(e){
   var b = e.target.closest('[data-class]'); if(b){ state.classId = b.dataset.class; renderTeacher(); }
 });
-$('prevDay').addEventListener('click', function(){ day.setDate(day.getDate() - 1); $('dayLabel').textContent = fmtDate(day); });
-$('nextDay').addEventListener('click', function(){ day.setDate(day.getDate() + 1); $('dayLabel').textContent = fmtDate(day); });
+$('prevDay').addEventListener('click', function(){ day.setDate(day.getDate() - 1); $('dayLabel').textContent = fmtDate(day); renderLessonCheck(); });
+$('nextDay').addEventListener('click', function(){ day.setDate(day.getDate() + 1); $('dayLabel').textContent = fmtDate(day); renderLessonCheck(); });
 $('sendBtn').addEventListener('click', function(){
   var e = entry(), names = cls().students;
   var n = names.filter(function(s){ return e.rows[s].checked; }).length;
