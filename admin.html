@@ -489,13 +489,25 @@
   .cs-v textarea{ resize:vertical; }
   .cs-opts{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:13px; width:100%; }
   .cs-opts label{ display:flex; align-items:center; gap:5px; cursor:pointer; }
-  .cs-opts input{ accent-color:var(--accent); width:15px; height:15px; }
+  .cs-opts input[type=radio], .cs-opts input[type=checkbox]{ accent-color:var(--accent); width:15px; height:15px; }
   .cs-note{ font:inherit; font-size:12.5px; flex:1 1 140px; min-width:120px; height:32px; box-sizing:border-box; border:1px solid var(--border); border-radius:6px; padding:5px 8px; background:var(--surface); color:var(--ink); }
   .cs-privacy{ margin:14px 0 0; font-size:12px; color:var(--ink-soft); }
+  .cs-v.lt-cell{ flex-direction:column; align-items:stretch; gap:4px; }
+  .lt-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px 10px; }
+  .lt-grid label{ display:flex; flex-direction:column; gap:3px; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .lt-sc{ display:flex; align-items:center; gap:4px; font-weight:500; }
+  .lt-sc input{ font:inherit; font-size:13.5px; width:100%; min-width:0; border:1px solid var(--border); border-radius:6px; padding:5px 6px; background:var(--surface); color:var(--ink); text-align:center; }
+  .lt-sc input:last-child{ color:var(--ink-faint); }
+  .lt-total{ display:flex; flex-direction:column; justify-content:flex-end; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .lt-total b{ font-size:16px; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .lt-hint{ font-size:11.5px; color:var(--ink-faint); }
+  .lt-mini{ color:var(--ink-faint); font-size:11.5px; }
+  .cs-opts select{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:6px; padding:6px 8px; background:var(--surface); color:var(--ink); height:32px; }
   @media (max-width: 720px){
     .cs-sheet{ padding:16px 14px; }
     .cs-row{ grid-template-columns:1fr; }
     .cs-k{ padding:7px 10px; }
+    .lt-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
   }
   @media print{
     .cs-sheet{ border:0; padding:0; max-width:none; }
@@ -504,10 +516,14 @@
     .cs-hd h2{ font-size:16px; } .cs-hd p{ font-size:10.5px; } .cs-top{ margin-top:6px; }
     .cs-sec{ margin-top:7px; } .cs-sec h3{ font-size:11.5px; padding:4px 10px; }
     .cs-row{ grid-template-columns:130px 1fr; }
-    .cs-k{ font-size:10.5px; padding:3px 8px; } .cs-v{ padding:2px 8px; } .cs-opts{ font-size:10.5px; gap:2px 10px; } .cs-opts input{ width:11px; height:11px; }
+    .cs-k{ font-size:10.5px; padding:3px 8px; } .cs-v{ padding:2px 8px; } .cs-opts{ font-size:10.5px; gap:2px 10px; } .cs-opts input[type=radio], .cs-opts input[type=checkbox]{ width:11px; height:11px; }
     .cs-v > input, .cs-v textarea, .cs-note, .cs-top input{ border:0; border-bottom:1px solid #bbb; border-radius:0; font-size:11px; padding:2px 4px; height:auto; }
-    .cs-v textarea{ height:46px; resize:none; }
+    .cs-v textarea{ height:36px; resize:none; }
+    .cs-sheet{ zoom:0.92; }
+    @page{ size:A4; margin:10mm; }
     .cs-privacy{ font-size:10px; margin-top:6px; }
+    .lt-grid{ gap:2px 8px; } .lt-grid label{ font-size:10px; } .lt-sc input{ font-size:11px; padding:1px 3px; border:0; border-bottom:1px solid #bbb; border-radius:0; } .lt-hint{ display:none; } .lt-total b{ font-size:12px; }
+    .cs-opts select{ font-size:11px; height:auto; padding:1px 4px; }
   }
 
   /* 업무 매뉴얼 */
@@ -2722,11 +2738,24 @@ var CS_FORM = [
   ]],
   ['4. 학부모 요청과 상담 결과', [
     ['want','학부모님이 걱정하시는 부분','area'],
-    ['test','레벨테스트 결과','text','','','예: BASIC 3권 추천'],
     ['result','상담 결과','radio',['등록','보류(재연락)','미등록'],'resultNote','반·시작일 / 재연락일'],
     ['memo','상담 메모','area']
+  ]],
+  ['5. 레벨테스트 결과', [
+    ['ltDate','테스트 날짜','date'],
+    ['lt','영역별 점수','lt'],
+    ['ltRec','추천 레벨','rec'],
+    ['ltNote','총평','area','','','잘하는 부분, 보완할 부분, 학부모님께 안내한 내용']
   ]]
 ];
+// 레벨테스트 영역 [키, 이름, 기본 만점]
+var LT_AREAS = [['word','단어',20], ['phon','파닉스·읽기',20], ['read','독해',20], ['gram','문법',20], ['listen','듣기',20], ['speak','말하기',10], ['write','쓰기',10]];
+function ltTotal(v){
+  var got = 0, max = 0, any = false;
+  LT_AREAS.forEach(function(a){ var sc = v['lt_' + a[0]]; if(sc !== '' && sc != null){ any = true; got += +sc || 0; max += +(v['lt_' + a[0] + '_m'] || a[2]); } });
+  return any ? got + ' / ' + max : '';
+}
+function csRecText(d){ return d.ltRec ? d.ltRec + (d.ltBook ? ' ' + d.ltBook : '') : (d.test || ''); }
 var csStore = (function(){ try{ var r = localStorage.getItem(CS_KEY); if(r) return JSON.parse(r); }catch(e){} return { seq:0, items:[] }; })();
 function saveCs(){ try{ localStorage.setItem(CS_KEY, JSON.stringify(csStore)); }catch(e){} }
 var cs = { mode:'list', id:null };
@@ -2739,12 +2768,20 @@ function csFieldHtml(f, v){
       var on = type === 'radio' ? val === o : (val || []).indexOf(o) !== -1;
       return '<label><input type="'+type+'" name="cs-'+key+'" value="'+esc(o)+'"'+(on ? ' checked' : '')+'>'+esc(o)+'</label>';
     }).join('') + (f[4] ? '<input type="text" class="cs-note" data-cs="'+f[4]+'" placeholder="'+esc(f[5] || '')+'" value="'+esc(v[f[4]] || '')+'">' : '') + '</div>';
+  } else if(f[2] === 'lt'){
+    inner = '<div class="lt-grid">' + LT_AREAS.map(function(a){
+      return '<label><span>'+a[1]+'</span><span class="lt-sc"><input type="number" min="0" inputmode="numeric" data-cs="lt_'+a[0]+'" data-lt value="'+esc(v['lt_'+a[0]] || '')+'" aria-label="'+a[1]+' 점수"> / <input type="number" min="1" inputmode="numeric" data-cs="lt_'+a[0]+'_m" data-lt value="'+esc(v['lt_'+a[0]+'_m'] || a[2])+'" aria-label="'+a[1]+' 만점"></span></label>';
+    }).join('') + '<div class="lt-total">합계 <b id="ltTotal">'+(ltTotal(v) || '–')+'</b></div></div><small class="lt-hint">본 영역만 점수를 적어요. 만점은 시험지에 맞게 바꿀 수 있어요.</small>';
+  } else if(f[2] === 'rec'){
+    inner = '<div class="cs-opts"><select data-cs="ltRec" aria-label="추천 교재"><option value="">교재 선택</option>' + DT_BOOKS.map(function(b){ return '<option'+(v.ltRec === b[0] ? ' selected' : '')+'>'+b[0]+'</option>'; }).join('') + '</select>' +
+      '<input type="text" class="cs-note" data-cs="ltBook" placeholder="권·단원 (예: 3권)" value="'+esc(v.ltBook || '')+'">' +
+      '<input type="text" class="cs-note" data-cs="ltClass" placeholder="추천 반·시간" value="'+esc(v.ltClass || '')+'"></div>';
   } else if(f[2] === 'area'){
-    inner = '<textarea data-cs="'+key+'" rows="3">'+esc(val || '')+'</textarea>';
+    inner = '<textarea data-cs="'+key+'" rows="3"'+(f[5] ? ' placeholder="'+esc(f[5])+'"' : '')+'>'+esc(val || '')+'</textarea>';
   } else {
     inner = '<input type="'+f[2]+'" data-cs="'+key+'" value="'+esc(val || '')+'"'+(f[5] ? ' placeholder="'+esc(f[5])+'"' : '')+'>';
   }
-  return '<div class="cs-row"><span class="cs-k">'+esc(f[1])+'</span><div class="cs-v">'+inner+'</div></div>';
+  return '<div class="cs-row"><span class="cs-k">'+esc(f[1])+'</span><div class="cs-v'+(f[2] === 'lt' ? ' lt-cell' : '')+'">'+inner+'</div></div>';
 }
 function renderConsult(){
   if(cs.mode === 'form'){
@@ -2763,7 +2800,7 @@ function renderConsult(){
   $('csBody').innerHTML = '<div class="cs-bar"><p>상담 전화를 받거나 방문 상담을 할 때 <b>새 상담 기록지</b>를 열어 적어 주세요. 빈 기록지를 인쇄해서 손으로 써도 돼요.</p><button type="button" class="btn" data-csnew>새 상담 기록지</button></div>' +
     '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="d">상담일</th><th class="t">학생</th><th>학교 / 학년</th><th>레벨테스트</th><th>상담 결과</th></tr></thead><tbody>' +
     (rows.length ? rows.map(function(it){ var d = it.data;
-      return '<tr><td class="d">'+esc(d.date || '')+'</td><td class="t"><button type="button" class="bd-link" data-csopen="'+it.id+'">'+esc(d.name || '(이름 없음)')+'</button></td><td>'+esc(d.school || '')+'</td><td>'+esc(d.test || '')+'</td><td>'+(d.result ? '<span class="cs-res r-'+(d.result === '등록' ? 'ok' : d.result === '미등록' ? 'no' : 'hold')+'">'+esc(d.result)+'</span>' : '')+'</td></tr>';
+      return '<tr><td class="d">'+esc(d.date || '')+'</td><td class="t"><button type="button" class="bd-link" data-csopen="'+it.id+'">'+esc(d.name || '(이름 없음)')+'</button></td><td>'+esc(d.school || '')+'</td><td>'+esc(csRecText(d))+(ltTotal(d) ? ' <small class="lt-mini">('+ltTotal(d)+')</small>' : '')+'</td><td>'+(d.result ? '<span class="cs-res r-'+(d.result === '등록' ? 'ok' : d.result === '미등록' ? 'no' : 'hold')+'">'+esc(d.result)+'</span>' : '')+'</td></tr>';
     }).join('') : '<tr><td colspan="5" class="bd-empty">아직 저장된 상담 기록이 없어요.</td></tr>') + '</tbody></table></div>';
 }
 $('csBody').addEventListener('click', function(ev){
@@ -2772,6 +2809,11 @@ $('csBody').addEventListener('click', function(ev){
   if(ev.target.closest('[data-csback]')){ cs.mode = 'list'; return renderConsult(); }
   var d = ev.target.closest('[data-csdel]');
   if(d){ if(!confirm('이 상담 기록을 삭제할까요? 되돌릴 수 없어요.')) return; csStore.items = csStore.items.filter(function(x){ return x.id !== +d.dataset.csdel; }); saveCs(); cs.mode = 'list'; toast('상담 기록을 삭제했어요.'); renderConsult(); }
+});
+$('csBody').addEventListener('input', function(ev){
+  if(!ev.target.hasAttribute('data-lt')) return;
+  var v = {}; ev.target.form.querySelectorAll('[data-lt]').forEach(function(el){ v[el.dataset.cs] = el.value.trim(); });
+  $('ltTotal').textContent = ltTotal(v) || '–';
 });
 $('csBody').addEventListener('submit', function(ev){
   ev.preventDefault();
