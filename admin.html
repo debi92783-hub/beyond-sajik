@@ -127,6 +127,40 @@
   .tag.info{ background:var(--accent-soft); color:var(--accent); }
   .alerts .d{ flex:1; font-size:12.5px; color:var(--ink-soft); }
 
+  .modal.lc-edit{ max-width:680px; }
+  #lcEditT{ font:inherit; font-size:13px; line-height:1.6; width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface); color:var(--ink); resize:vertical; }
+  .lc-edit-btns{ display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .ls-bar .btn.soft{ margin-left:auto; }
+  /* 수업 체크리스트 집계 */
+  .ls-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px; margin-bottom:16px; }
+  .ls-bar .nav{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:700; flex-wrap:wrap; }
+  .ls-mode{ display:flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; }
+  .ls-mode button{ font:inherit; font-size:13px; font-weight:700; padding:7px 14px; border:0; background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .ls-mode button[aria-pressed="true"]{ background:var(--accent); color:#fff; }
+  .ls-table{ border-collapse:separate; border-spacing:0; font-size:12.5px; width:100%; }
+  .ls-table th, .ls-table td{ border-bottom:1px solid var(--border); padding:8px 6px; text-align:center; white-space:nowrap; }
+  .ls-table thead th{ background:var(--surface-soft); font-weight:800; color:var(--ink-soft); font-size:12px; }
+  .ls-table thead th.sat{ color:var(--accent); }
+  .ls-table th.who{ text-align:left; padding-left:12px; position:sticky; left:0; background:var(--surface); z-index:1; font-size:13px; }
+  .ls-table thead th.who{ background:var(--surface-soft); }
+  .ls-table td.tot{ font-weight:800; }
+  .ls-table td.today{ background:var(--accent-soft); }
+  .ls-c{ display:inline-flex; align-items:center; justify-content:center; gap:3px; min-width:52px; padding:4px 6px; border-radius:7px; font-size:12px; font-weight:800; border:0; font-family:inherit; cursor:pointer; background:transparent; color:var(--ink-faint); }
+  .ls-c.full{ background:var(--good-soft); color:var(--good); }
+  .ls-c.part{ background:var(--hold-soft); color:var(--hold); }
+  .ls-c.none{ background:var(--warn-soft); color:var(--warn); }
+  .ls-table.month .ls-c{ min-width:30px; padding:4px 3px; font-size:11px; }
+  .ls-legend{ margin:12px 0 0; font-size:12px; color:var(--ink-soft); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .ls-legend .ls-c{ cursor:default; min-width:0; }
+  .ls-two{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .ls-miss{ display:flex; flex-direction:column; gap:10px; font-size:13px; }
+  .ls-miss b{ display:block; margin-bottom:3px; }
+  .ls-miss span{ color:var(--ink-soft); }
+  .ls-rep{ font-size:13px; border-top:1px solid var(--border); padding:9px 0; line-height:1.6; }
+  .ls-rep:first-child{ border-top:0; padding-top:0; }
+  .ls-rep small{ color:var(--ink-soft); font-weight:700; display:block; }
+  @media screen and (max-width: 900px){ .ls-two{ grid-template-columns:1fr; } }
+
   /* 선생님 수업 체크리스트 */
   .lc-top{ display:flex; gap:10px 18px; align-items:center; flex-wrap:wrap; margin-bottom:12px; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
   .lc-top label{ display:flex; align-items:center; gap:8px; }
@@ -668,6 +702,14 @@
   .ms-rules div{ background:var(--warn-soft); border-radius:10px; padding:10px 12px; font-weight:800; font-size:13.5px; display:flex; gap:8px; align-items:center; }
   .ms-rules i{ font-style:normal; flex:none; width:24px; height:24px; border-radius:50%; background:var(--warn); color:#fff; display:grid; place-items:center; font-size:13px; }
   .ms-sec h3{ margin:0 0 8px; font-size:15px; font-weight:900; display:flex; align-items:center; gap:8px; }
+  .ms-lc{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .ms-lc th, .ms-lc td{ border:1px solid var(--border); padding:5px 8px; text-align:left; vertical-align:middle; }
+  .ms-lc th{ background:var(--accent-soft); color:var(--accent); font-weight:800; width:110px; text-align:center; }
+  .ms-lc th small{ display:block; font-size:10.5px; font-weight:600; color:var(--ink-soft); }
+  .ms-lc td.no{ width:26px; text-align:center; color:var(--ink-soft); font-weight:700; }
+  .ms-lc td.bx{ width:30px; text-align:center; font-size:15px; color:var(--ink-soft); }
+  .ms-lc .lc-say{ display:inline; } .ms-lc .lc-say + small{ display:inline; margin-left:6px; }
+  @media print{ .ms-lc{ font-size:11px; } .ms-lc th, .ms-lc td{ padding:2px 7px; } .ms-lc td.bx{ font-size:12px; } .ms-lc .lc-say em{ font-size:9.5px; padding:0 4px; } }
   .ms-sec h3 .pill{ font-size:11.5px; font-weight:800; padding:2px 9px; border-radius:99px; background:var(--accent); color:#fff; }
   .ms-flow{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:22px; }
   .ms-flow.three{ grid-template-columns:repeat(3, minmax(0,1fr)); }
@@ -938,6 +980,8 @@
               <label>강의실 <input type="text" id="lcRoom" placeholder="예: 1강의실"></label>
               <label><input type="checkbox" id="lcCloser"> 오늘 마감 담당이에요</label>
               <span class="muted" style="font-weight:500">날짜를 바꾸면 그날 체크리스트로 바뀌어요.</span>
+              <button type="button" class="linkish" data-lcmanual>업무 매뉴얼로 보기</button>
+              <button type="button" class="linkish" data-lcedit hidden>항목 고치기</button>
             </div>
             <div class="lc-table" id="lcBody"></div>
             <div class="lc-report">
@@ -1148,6 +1192,27 @@
       <div id="bdBody"></div>
     </section>
 
+    <!-- 수업 체크리스트 집계 (원장님 전용) -->
+    <section id="view-lcsum" hidden>
+      <div class="greet"><div><h1>수업 체크리스트 집계</h1><p>선생님별·날짜별로 수업 체크리스트를 얼마나 채웠는지 한눈에 봐요. 칸을 누르면 그날 체크리스트가 열려요.</p></div></div>
+      <div class="card ls-bar">
+        <div class="nav">
+          <button class="sq" type="button" id="lsPrev" aria-label="이전"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button>
+          <span id="lsLabel"></span>
+          <button class="sq" type="button" id="lsNext" aria-label="다음"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
+          <button class="btn soft" type="button" id="lsToday">이번 주</button>
+        </div>
+        <button type="button" class="btn soft" data-lcedit>체크리스트 항목 고치기</button>
+        <div class="ls-mode" role="group" aria-label="보기"><button type="button" data-lsmode="week">주간</button><button type="button" data-lsmode="month">월간</button></div>
+      </div>
+      <div class="card"><div class="table-wrap"><table class="ls-table" id="lsTable"></table></div>
+        <p class="ls-legend"><span class="ls-c full">완료</span><span class="ls-c part">일부</span><span class="ls-c none">미작성</span><span class="ls-c">🔒 마감까지 완료</span> · 일요일은 빼고 계산해요.</p></div>
+      <div class="ls-two">
+        <div class="card"><div class="card-head"><h2>자주 빠뜨린 항목</h2><span class="muted">이 기간 작성한 날 기준</span></div><div id="lsMiss"></div></div>
+        <div class="card"><div class="card-head"><h2>마감 보고 모아 보기</h2><span class="muted">결석·지각·특이사항</span></div><div id="lsReport"></div></div>
+      </div>
+    </section>
+
     <!-- 상담 관리 (원장님 전용) -->
     <section id="view-consult" hidden>
       <div class="greet"><div><h1>상담 관리</h1><p>예약 현황과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요. 학부모 연락처가 들어가서 원장님 화면에서만 열려요.</p></div></div>
@@ -1245,6 +1310,16 @@
       <p class="sample-note">공통일정은 모든 선생님이 함께 보고, 개인일정은 쓴 사람만 봐요. 홈페이지에서 들어온 상담 예약은 날짜·시간·학년만 주황색으로 자동 표시되고, 보호자 이름과 연락처는 구글 시트에서만 볼 수 있어요. 지금은 이 브라우저에만 저장되고, 구글 시트를 연결하면 모두에게 공유돼요. 처음 보이는 일정은 예시예요.</p>
     </section>
   </main>
+</div>
+
+<div class="overlay" id="lcEditOv" hidden>
+  <form class="modal lc-edit" id="lcEditForm" novalidate>
+    <h2>수업 체크리스트 항목 고치기</h2>
+    <p class="muted" style="margin:0;font-size:12.5px;line-height:1.6">여기서 고치면 <b>선생님 수업 체크리스트</b>와 <b>업무 매뉴얼</b>에 함께 반영돼요.<br>'# 구분 이름' 아래에 한 줄에 한 항목씩 적어요. 영어 인사는 <code>spoken: 영어 / 한국어 뜻</code>으로 적어요. '# 마감할 경우'는 마감 담당일 때만 계산돼요.</p>
+    <textarea id="lcEditT" rows="18" spellcheck="false"></textarea>
+    <p class="form-err" id="lcEditErr"></p>
+    <div class="lc-edit-btns"><button type="button" class="btn soft" id="lcEditReset">처음 항목으로 되돌리기</button><span><button type="button" class="btn soft" id="lcEditCancel">취소</button> <button type="submit" class="btn">저장</button></span></div>
+  </form>
 </div>
 
 <div class="overlay" id="evOverlay" hidden>
@@ -1376,7 +1451,7 @@ var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','전체 공지']]],
-    ['수업 관리', [['book','수업 체크리스트','journal'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
+    ['수업 관리', [['book','수업 체크리스트','lcsum'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['clock','태블릿 등원 화면','kiosk'],['doc','월말 리포트','monthly']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]]
   ],
@@ -1407,14 +1482,15 @@ var state = {
 };
 
 function setView(v, page){
-  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'consult') page = 'main'; }
+  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'consult' || page === 'lcsum') page = 'main'; }
   state.view = v;
   state.page = page || 'main';
-  if((state.page === 'settings' || state.page === 'consult') && v !== 'director') state.page = 'main';
+  if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum') && v !== 'director') state.page = 'main';
+  var lcsum = state.page === 'lcsum';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board || consult;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1425,6 +1501,7 @@ function setView(v, page){
   $('view-manual').hidden = !manual;
   $('view-board').hidden = !board;
   $('view-consult').hidden = !consult;
+  $('view-lcsum').hidden = !lcsum;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -1434,8 +1511,9 @@ function setView(v, page){
   else if(manual) renderManual();
   else if(board) renderBoard();
   else if(consult) renderConsult();
+  else if(lcsum) renderLcSum();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -1466,6 +1544,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
+    if(a.dataset.key === 'lcsum') return setView('director', 'lcsum');
     if(a.dataset.key === 'consult'){ cs.mode = 'list'; return setView('director', 'consult'); }
     if(a.dataset.key === 'kiosk') return $('atKiosk').click();
     if(a.dataset.key.indexOf('board:') === 0){ var bk = a.dataset.key.split(':'); return openBoard(bk[1], bk[2]); }
@@ -1566,7 +1645,8 @@ $('alerts').addEventListener('click', function(e){
 /* ===== 선생님 수업 체크리스트 =====
    원장님이 보내 준 강의 화면(주말보충센터 체크리스트)을 우리 학원 평일 수업에 맞게 바꿨어요.
    잔디 대신 업무 화면 게시판·일정표·카톡 마감 보고를 써요. 선생님·날짜별로 이 브라우저에 저장돼요. */
-var LC_GROUPS = [
+// 항목 [id, 글] · 영어 인사는 [id, 영어, 한국어 뜻] (spoken). 원장님이 고치면 업무 매뉴얼과 체크리스트에 함께 반영돼요.
+var LC_DEFAULT = [
   ['before30', '수업 30분 전', [
     ['in', '업무 화면 로그인 · 출근 체크'],
     ['board', '게시판(전달사항) 확인'],
@@ -1581,17 +1661,17 @@ var LC_GROUPS = [
     ['door', '강의실 앞에서 맞이 · 태블릿 등원 확인']
   ]],
   ['hi', '환영 인사', [
-    ['hi', '<span class="lc-say"><em>spoken</em>"Hi, ○○! Welcome. Are you ready for today\'s class?"</span><small>"안녕, ○○! 어서 와. 오늘 수업 준비됐니?"</small>']
+    ['hi', "Hi, ○○! Welcome. Are you ready for today's class?", '안녕, ○○! 어서 와. 오늘 수업 준비됐니?']
   ]],
   ['during', '수업 중', [
-    ['att', '출석 체크 (\'문자발송\' 체크 → 저장 → 카톡 발송)'],
+    ['att', "출석 체크 ('문자발송' 체크 → 저장 → 카톡 발송)"],
     ['dt', '데일리 테스트 기록 (단어·숙제·Speaking)']
   ]],
   ['bye', '마무리 인사', [
-    ['bye', '<span class="lc-say"><em>spoken</em>"Great job today, ○○! See you next time."</span><small>"오늘 정말 잘했어, ○○! 다음에 보자."</small>']
+    ['bye', 'Great job today, ○○! See you next time.', '오늘 정말 잘했어, ○○! 다음에 보자.']
   ]],
   ['end', '수업 종료', [
-    ['hw', '오늘 진도·숙제 입력 (아래 \'오늘 수업 공통 입력\')'],
+    ['hw', "오늘 진도·숙제 입력 (아래 '오늘 수업 공통 입력')"],
     ['memo', '학생별 특이사항 기록'],
     ['mk', '결석·지각 학생 보충 일정 잡기 (일정표에 공유)'],
     ['clean', '지우개 가루 청소 / 책상 정리정돈'],
@@ -1604,6 +1684,30 @@ var LC_GROUPS = [
     ['report', '결석·지각·특이사항 적고 아래 문구 복사 → 원장님께 카톡']
   ]]
 ];
+var LC_ITEMS_KEY = 'beyond-lesson-items-v1';
+var lcItems = (function(){ try{ var r = JSON.parse(localStorage.getItem(LC_ITEMS_KEY) || 'null'); if(r && r.groups && r.groups.length) return r; }catch(e){} return { groups:LC_DEFAULT, updated:'2026-10-26' }; })();
+var LC_GROUPS = lcItems.groups;
+function lcLabel(it){ return it[2] ? '<span class="lc-say"><em>spoken</em>"'+esc(it[1])+'"</span><small>"'+esc(it[2])+'"</small>' : esc(it[1]); }
+// 고치기 창의 글 형식: '# 구분' 다음 줄부터 항목, 영어 인사는 'spoken: 영어 / 한국어'
+function lcToText(groups){ return groups.map(function(g){ return '# ' + g[1] + '\n' + g[2].map(function(it){ return it[2] ? 'spoken: ' + it[1] + ' / ' + it[2] : it[1]; }).join('\n'); }).join('\n\n'); }
+function lcFromText(txt){
+  var old = {}, oldG = {}, out = [], g = null, n = 0;
+  LC_GROUPS.forEach(function(x){ oldG[x[1]] = x[0]; x[2].forEach(function(it){ old[it[1]] = it[0]; }); });
+  txt.split('\n').forEach(function(line){
+    line = line.trim(); if(!line) return;
+    if(line.charAt(0) === '#'){
+      var name = line.replace(/^#+\s*/, '');
+      g = [name === '마감할 경우' ? 'close' : oldG[name] || 'g' + Date.now().toString(36) + (n++), name, []]; out.push(g); return;
+    }
+    if(!g){ g = ['g' + Date.now().toString(36) + (n++), '기타', []]; out.push(g); }
+    var sp = line.match(/^spoken\s*[:：]\s*(.+?)\s*\/\s*(.+)$/i);
+    var text = sp ? sp[1].replace(/^"|"$/g, '') : line;
+    var id = old[text] || 'i' + Date.now().toString(36) + (n++);
+    g[2].push(sp ? [id, text, sp[2].replace(/^"|"$/g, '')] : [id, text]);
+  });
+  return out.filter(function(x){ return x[2].length; });
+}
+function lcCanEdit(){ return !!session && session.role !== 'teacher'; }
 var LC_KEY = 'beyond-lesson-check-v1';
 var lcStore = (function(){ try{ return JSON.parse(localStorage.getItem(LC_KEY) || '{}') || {}; }catch(e){ return {}; } })();
 function saveLc(){ try{ localStorage.setItem(LC_KEY, JSON.stringify(lcStore)); }catch(e){} }
@@ -1616,13 +1720,14 @@ function lcCount(r){
 function renderLessonCheck(){
   var r = lcRec();
   $('lcWho').textContent = state.teacher + ' 선생님 · ' + fmtDate(day);
+  document.querySelector('#lcCard [data-lcedit]').hidden = !lcCanEdit();
   $('lcRoom').value = r.room; $('lcCloser').checked = !!r.closer;
   $('lcAbs').value = r.abs; $('lcLate').value = r.late; $('lcEtc').value = r.etc;
   $('lcBody').innerHTML = '<div class="lc-hd"><span>구분</span><span class="lc-cols"><span>체크리스트</span><span>체크</span><span>비고</span></span></div>' +
     LC_GROUPS.map(function(g){
       return '<div class="lc-grp'+(g[0] === 'close' && !r.closer ? ' off' : '')+'"><div class="lc-g">'+g[1]+'</div><div>' + g[2].map(function(it){
         var on = !!r.c[it[0]];
-        return '<div class="lc-row'+(on ? ' done' : '')+'"><label for="lc-'+it[0]+'">'+it[1]+'</label>' +
+        return '<div class="lc-row'+(on ? ' done' : '')+'"><label for="lc-'+it[0]+'">'+lcLabel(it)+'</label>' +
           '<span class="lc-ck"><input type="checkbox" id="lc-'+it[0]+'" data-lc="'+it[0]+'"'+(on ? ' checked' : '')+'></span>' +
           '<input type="text" data-lcn="'+it[0]+'" value="'+esc(r.n[it[0]] || '')+'" placeholder="비고" aria-label="비고"></div>';
       }).join('') + '</div></div>';
@@ -1648,6 +1753,94 @@ $('lcCloser').addEventListener('change', function(){ lcRec().closer = this.check
 document.querySelectorAll('[data-lcr]').forEach(function(el){ el.addEventListener('input', function(){
   var r = lcRec(); r.abs = $('lcAbs').value; r.late = $('lcLate').value; r.etc = $('lcEtc').value; saveLc(); lcRefresh();
 }); });
+// 항목 고치기 (원장님) → 체크리스트·업무 매뉴얼에 함께 반영
+function openLcEdit(){ $('lcEditT').value = lcToText(LC_GROUPS); $('lcEditErr').textContent = ''; $('lcEditOv').hidden = false; $('lcEditT').focus(); }
+function lcRerender(){
+  if(state.page === 'manual') renderManual();
+  else if(state.page === 'lcsum') renderLcSum();
+  else if(state.view === 'teacher' && state.page === 'main') renderLessonCheck();
+}
+document.addEventListener('click', function(ev){
+  if(ev.target.closest('[data-lcedit]')){ if(lcCanEdit()) openLcEdit(); return; }
+  if(ev.target.closest('[data-lcmanual]')){ manOpen = 'lesson'; setView(state.view, 'manual'); }
+});
+$('lcEditCancel').addEventListener('click', function(){ $('lcEditOv').hidden = true; });
+$('lcEditReset').addEventListener('click', function(){ $('lcEditT').value = lcToText(LC_DEFAULT); });
+$('lcEditForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var g = lcFromText($('lcEditT').value);
+  if(!g.length){ $('lcEditErr').textContent = '항목이 하나도 없어요. \'# 구분 이름\' 아래에 항목을 적어 주세요.'; return; }
+  lcItems = { groups:g, updated:ymd(new Date()) }; LC_GROUPS = g;
+  try{ localStorage.setItem(LC_ITEMS_KEY, JSON.stringify(lcItems)); }catch(e){}
+  $('lcEditOv').hidden = true; toast('체크리스트 항목을 고쳤어요. 업무 매뉴얼에도 함께 반영됐어요.'); lcRerender();
+});
+
+/* 원장님 화면: 수업 체크리스트 집계 (선생님별 × 날짜별) */
+var ls = { mode:'week', base:null };
+function lsDays(){
+  var b = new Date(ls.base), out = [];
+  if(ls.mode === 'week'){
+    var mon = new Date(b); mon.setDate(b.getDate() - ((b.getDay() + 6) % 7));
+    for(var i = 0; i < 6; i++){ var d = new Date(mon); d.setDate(mon.getDate() + i); out.push(d); }
+  } else {
+    var n = new Date(b.getFullYear(), b.getMonth() + 1, 0).getDate();
+    for(var k = 1; k <= n; k++){ var m = new Date(b.getFullYear(), b.getMonth(), k); if(m.getDay() !== 0) out.push(m); }
+  }
+  return out;
+}
+function lsItemName(id){ var n = ''; LC_GROUPS.forEach(function(g){ g[2].forEach(function(it){ if(it[0] === id) n = it[2] ? g[1] : it[1].replace(/\s*\(.*\)$/, ''); }); }); return n; }
+function renderLcSum(){
+  if(!ls.base){ ls.base = new Date(); ls.base.setHours(0,0,0,0); }
+  var days = lsDays(), today = ymd(new Date()), month = ls.mode === 'month';
+  document.querySelectorAll('[data-lsmode]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.lsmode === ls.mode); });
+  $('lsToday').textContent = month ? '이번 달' : '이번 주';
+  var f = days[0], l = days[days.length - 1];
+  $('lsLabel').textContent = month ? f.getFullYear() + '년 ' + (f.getMonth()+1) + '월' : (f.getMonth()+1) + '/' + f.getDate() + ' (' + DAYS[f.getDay()] + ') ~ ' + (l.getMonth()+1) + '/' + l.getDate() + ' (' + DAYS[l.getDay()] + ')';
+  var miss = {}, reps = [];
+  var rows = TEACHERS.map(function(t){
+    var got = 0, all = 0, wrote = 0, past = 0;
+    var cells = days.map(function(d){
+      var k = ymd(d), r = lcStore[t + '|' + k], isPast = k <= today;
+      if(isPast) past++;
+      var cls = k === today ? ' class="today"' : '';
+      if(!r || !Object.keys(r.c || {}).some(function(x){ return r.c[x]; })){
+        return '<td'+cls+'>' + (isPast ? '<button type="button" class="ls-c none" data-lsopen="'+esc(t)+'|'+k+'" title="'+esc(t)+' '+k+' 미작성">'+(month ? '–' : '미작성')+'</button>' : '<span class="ls-c">·</span>') + '</td>';
+      }
+      var n = lcCount(r); got += n[0]; all += n[1]; wrote++;
+      LC_GROUPS.forEach(function(g){ if(g[0] === 'close' && !r.closer) return; g[2].forEach(function(it){ if(!r.c[it[0]]) miss[t] = (miss[t] || {}), miss[t][it[0]] = (miss[t][it[0]] || 0) + 1; }); });
+      if(r.abs || r.late || r.etc) reps.push({ t:t, k:k, r:r });
+      var full = n[0] === n[1], lock = r.closer && r.c.close ? '🔒' : '';
+      return '<td'+cls+'><button type="button" class="ls-c '+(full ? 'full' : 'part')+'" data-lsopen="'+esc(t)+'|'+k+'" title="'+esc(t)+' '+k+' '+n[0]+'/'+n[1]+'">'+(month ? (full ? '✓' : Math.round(n[0] / n[1] * 100)) : n[0] + '/' + n[1]) + lock + '</button></td>';
+    }).join('');
+    var rate = all ? Math.round(got / all * 100) + '%' : '–';
+    return '<tr><th class="who">'+esc(t)+'</th>'+cells+'<td class="tot">'+rate+'</td><td class="tot">'+wrote+' / '+past+'일</td></tr>';
+  }).join('');
+  $('lsTable').className = 'ls-table' + (month ? ' month' : '');
+  $('lsTable').innerHTML = '<thead><tr><th class="who">선생님</th>' + days.map(function(d){
+    return '<th'+(d.getDay() === 6 ? ' class="sat"' : '')+'>'+(month ? d.getDate() + '<br>' + DAYS[d.getDay()] : (d.getMonth()+1) + '/' + d.getDate() + ' (' + DAYS[d.getDay()] + ')')+'</th>';
+  }).join('') + '<th>완료율</th><th>작성일</th></tr></thead><tbody>' + rows + '</tbody>';
+  var mh = TEACHERS.filter(function(t){ return miss[t]; }).map(function(t){
+    var top = Object.keys(miss[t]).sort(function(a, b){ return miss[t][b] - miss[t][a]; }).slice(0, 3);
+    return '<div><b>'+esc(t)+' 선생님</b><span>'+top.map(function(id){ return esc(lsItemName(id)) + ' ' + miss[t][id] + '회'; }).join(' · ')+'</span></div>';
+  }).join('');
+  $('lsMiss').innerHTML = mh ? '<div class="ls-miss">' + mh + '</div>' : '<p class="muted" style="margin:0">빠뜨린 항목이 없어요.</p>';
+  $('lsReport').innerHTML = reps.length ? reps.sort(function(a, b){ return b.k.localeCompare(a.k); }).map(function(x){
+    var d = parseYmd(x.k);
+    return '<div class="ls-rep"><small>'+(d.getMonth()+1)+'/'+d.getDate()+' ('+DAYS[d.getDay()]+') · '+esc(x.t)+' 선생님'+(x.r.room ? ' · ' + esc(x.r.room) : '')+'</small>' +
+      [['결석', x.r.abs], ['지각', x.r.late], ['특이사항', x.r.etc]].filter(function(y){ return y[1]; }).map(function(y){ return y[0] + ': ' + esc(y[1]); }).join('<br>') + '</div>';
+  }).join('') : '<p class="muted" style="margin:0">이 기간에 적힌 결석·지각·특이사항이 없어요.</p>';
+}
+$('lsPrev').addEventListener('click', function(){ if(ls.mode === 'week') ls.base.setDate(ls.base.getDate() - 7); else ls.base = new Date(ls.base.getFullYear(), ls.base.getMonth() - 1, 1); renderLcSum(); });
+$('lsNext').addEventListener('click', function(){ if(ls.mode === 'week') ls.base.setDate(ls.base.getDate() + 7); else ls.base = new Date(ls.base.getFullYear(), ls.base.getMonth() + 1, 1); renderLcSum(); });
+$('lsToday').addEventListener('click', function(){ ls.base = null; renderLcSum(); });
+document.querySelectorAll('[data-lsmode]').forEach(function(b){ b.addEventListener('click', function(){ ls.mode = b.dataset.lsmode; renderLcSum(); }); });
+$('lsTable').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-lsopen]'); if(!b) return;
+  var p = b.dataset.lsopen.split('|');
+  state.teacher = p[0]; day = parseYmd(p[1]);
+  setView('teacher'); setTimeout(function(){ $('lcCard').scrollIntoView({ block:'start' }); }, 0);
+});
+
 $('lcCopy').addEventListener('click', function(){
   var t = $('lcMsg').textContent;
   (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ toast('마감 보고 문구를 복사했어요. 원장님 카톡에 붙여 넣어 주세요.'); })
@@ -3453,6 +3646,23 @@ var MANUALS = [
       '</div></div>' +
       '<div class="ms-ft"><button type="button" class="btn soft" data-go="attend">출결·지각 화면 열기 →</button><button type="button" class="btn soft" data-go="calendar">일정표 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
     } },
+  { id:'lesson', title:'수업 체크리스트 매뉴얼', tag:'수업', get updated(){ return lcItems.updated; },
+    summary:'수업 30분 전부터 마감 보고까지 선생님이 매일 체크하는 순서예요. 수업 체크리스트 화면과 같은 항목이라 한쪽을 고치면 함께 바뀌어요.',
+    sheet:function(){
+      var n = 0;
+      return msHead(this, '선생님 화면의 수업 체크리스트와 같은 내용이에요. 매일 수업 날짜별로 체크하고, 마감 보고 문구를 원장님께 보내요.') +
+      msRules(['수업 30분 전에 출근해서 준비', '인사는 학생 이름을 넣어 영어로', '마감 보고까지 해야 하루 끝']) +
+      '<div class="ms-sec"><h3><span class="pill">순서</span>수업 체크리스트</h3><table class="ms-lc">' +
+        LC_GROUPS.map(function(g){
+          return g[2].map(function(it, i){
+            n++;
+            return '<tr>' + (i === 0 ? '<th rowspan="'+g[2].length+'">'+esc(g[1])+(g[0] === 'close' ? '<small>마감 담당일 때</small>' : '')+'</th>' : '') + '<td class="no">'+n+'</td><td>'+lcLabel(it)+'</td><td class="bx">☐</td></tr>';
+          }).join('');
+        }).join('') + '</table></div>' +
+      '<div class="ms-two"><div class="ms-box"><h4>마감 보고 예시</h4><div class="ms-msg">[10월 26일 (월)] ○○○ 선생님 수업 마감 보고 (2강의실)\n- 결석: 초3 김OO (부모님 문자 발송)\n- 지각: 중1 이OO (20분)\n- 특이사항: 박OO 교재 미지참, 프린트로 보충\n- 수업 체크리스트 20 / 20 완료\n- 학원 마감했습니다.</div></div>' +
+        '<div class="ms-box"><h4>이렇게 써요</h4><ul><li>선생님 화면 → 수업 체크리스트에서 날짜를 맞추고 하나씩 체크</li><li>마감 담당이면 \'오늘 마감 담당이에요\'를 켜고 마감 항목까지</li><li>결석·지각·특이사항을 적고 <b>마감 보고 문구 복사</b> → 원장님 카톡</li><li>원장님은 \'수업 체크리스트 집계\'에서 선생님별·날짜별로 확인</li></ul></div></div>' +
+      msFoot([['journal','수업 체크리스트 열기']]);
+    } },
   { id:'monthly', title:'월말 리포트 업무 매뉴얼', tag:'리포트', updated:'2026-10-25',
     summary:'학부모가 신뢰하는 피드백 공식 4단계(현황·강점·보완할 점·학원 대응 방법), 작성 방법, 예시, 저장부터 발송까지 순서를 한 장으로 정리했어요.',
     sheet:function(){
@@ -3625,12 +3835,14 @@ function renderManual(){
     return;
   }
   var m = MANUALS.find(function(x){ return x.id === manOpen; });
-  $('manBody').innerHTML = '<div class="man-top"><button type="button" class="linkish" data-man-back>← 매뉴얼 목록</button></div><article class="card ms">' + m.sheet() + '</article>';
+  $('manBody').innerHTML = '<div class="man-top"><button type="button" class="linkish" data-man-back>← 매뉴얼 목록</button>' + (m.id === 'lesson' && lcCanEdit() ? ' <button type="button" class="btn soft" data-manedit>체크리스트 항목 고치기</button>' : '') + '</div><article class="card ms">' + m.sheet() + '</article>';
 }
 $('manBody').addEventListener('click', function(ev){
   var it = ev.target.closest('[data-man]'); if(it){ manOpen = it.dataset.man; renderManual(); window.scrollTo(0, 0); return; }
   if(ev.target.closest('[data-man-back]')){ manOpen = null; renderManual(); return; }
-  var go = ev.target.closest('[data-go]'); if(go) setView(state.view, go.dataset.go);
+  var go = ev.target.closest('[data-go]');
+  if(go){ if(go.dataset.go === 'journal') setView('teacher'); else setView(state.view, go.dataset.go); }
+  if(ev.target.closest('[data-manedit]') && lcCanEdit()) openLcEdit();
 });
 
 /* ===== 태블릿 등원·하원 =====
@@ -3889,6 +4101,7 @@ function enter(acc){
     else if(h === '#teacher-attend') setView('teacher', 'attend');
     else if(h === '#manual') setView('director', 'manual');
     else if(h === '#consult') setView('director', 'consult');
+    else if(h === '#lesson-check') setView('director', 'lcsum');
     else if(/^#(teacher-)?board-(comm|data)$/.test(h)){ bd.board = h.slice(-4); setView(h.indexOf('teacher') !== -1 ? 'teacher' : 'director', 'board'); }
     else if(h === '#teacher-manual') setView('teacher', 'manual');
     else setView(h === '#teacher' ? 'teacher' : 'director');
