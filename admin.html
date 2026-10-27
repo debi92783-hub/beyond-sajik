@@ -828,6 +828,8 @@
   .gy-box{ border:1px solid var(--ink-soft); display:grid; grid-template-columns:1fr 1fr; }
   .gy-box > div{ padding:7px 9px; min-height:90px; } .gy-box > div + div{ border-left:1px solid var(--ink-soft); }
   .gy-box b{ display:block; font-size:12px; margin-bottom:4px; }
+  .gy-ed tr.auto td, .gy-ed .gy-box.auto > div{ background:var(--accent-soft); }
+  .gy-legend{ display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--accent-soft); border:1px solid var(--accent); vertical-align:-2px; margin-right:4px; }
   .gy-auto{ font-size:11px; font-weight:500; color:var(--ink-faint); margin-left:8px; }
   .gy-me{ color:var(--accent); }
   .gy-box.one{ grid-template-columns:1fr; } .gy-box.one > div{ min-height:0; } .gy-old{ margin-top:6px; border-style:dashed; } .gy-old p{ margin:0; font-size:12px; white-space:pre-line; } .gy-old small{ font-weight:500; color:var(--ink-soft); }
@@ -2600,11 +2602,11 @@ function gySheet(t, d){
   // 교무일지(자동): 면담 내용만 선생님이 써요. 나머지는 원래 화면에서 고치면 여기도 바뀌어요.
   var taR = function(attr, v){ return '<div class="gy-txt">' + esc(v || '') + '</div>'; };
   var stamp = r.st === 'ok' ? '<div class="gy-stamp">결재<small>' + esc(r.okBy || '원장') + '<br>' + gyHm(r.okAt) + '</small></div>' : '';
-  var h = '<div class="gy-sheet"><div class="gy-hd"><h2>교 무 일 지</h2><table class="gy-sign"><tr><th rowspan="2">결<br>재</th><th>원장</th></tr><tr><td>' + stamp + '</td></tr></table></div>';
+  var h = '<div class="gy-sheet' + (ed ? ' gy-ed' : '') + '"><div class="gy-hd"><h2>교 무 일 지</h2><table class="gy-sign"><tr><th rowspan="2">결<br>재</th><th>원장</th></tr><tr><td>' + stamp + '</td></tr></table></div>';
   h += '<table class="gy-meta"><tr><th>날짜</th><td>' + gyFmt(d) + '</td><th>담당</th><td>' + esc(t) + ' 선생님</td></tr></table>';
   // 교시별 수업
   var rows = D.cls.map(function(c, i){
-    return '<tr><td class="c">' + (i + 1) + '교시<small>' + esc(gyStart(c)) + '</small></td><td class="c">' + esc(c.name) +
+    return '<tr class="auto"><td class="c">' + (i + 1) + '교시<small>' + esc(gyStart(c)) + '</small></td><td class="c">' + esc(c.name) +
       (ed ? '<button type="button" class="gy-x" data-gyoff="' + c.cid + '" title="이 날 수업이 없으면 빼요">수업 없음</button>' : '') + '</td>' +
       '<td class="c">' + c.n + ' / ' + c.absN + '</td>' +
       '<td>' + taR('data-gyo="' + c.cid + '|prog"', c.prog, '수업 기록에서 자동으로 채워져요') + '</td>' +
@@ -2617,21 +2619,21 @@ function gySheet(t, d){
   if(ed && D.off.length) h += '<p class="gy-off">뺀 수업: ' + D.off.map(function(c){ return '<button type="button" class="gy-x" data-gyon="' + c.cid + '">' + esc(c.name) + ' 다시 넣기</button>'; }).join(' ') + '</p>';
   // 보충
   var mk = D.mk.map(function(m){
-    if(m.i == null) return '<tr><td class="c">' + esc(m.time) + '</td><td class="c">' + esc(m.cls) + '</td><td class="c">' + esc(m.name) + '</td><td>' + esc(m.why) + '</td></tr>';
-    return '<tr><td class="c">' + esc(m.time) + '</td><td class="c">' + esc(m.cls) + '</td><td class="c">' + esc(m.name) + '</td><td>' + esc(m.why) + '</td></tr>';
+    if(m.i == null) return '<tr class="auto"><td class="c">' + esc(m.time) + '</td><td class="c">' + esc(m.cls) + '</td><td class="c">' + esc(m.name) + '</td><td>' + esc(m.why) + '</td></tr>';
+    return '<tr class="auto"><td class="c">' + esc(m.time) + '</td><td class="c">' + esc(m.cls) + '</td><td class="c">' + esc(m.name) + '</td><td>' + esc(m.why) + '</td></tr>';
   });
   for(i = mk.length; i < 2; i++) mk.push('<tr class="blank"><td></td><td></td><td></td><td></td></tr>');
   h += '<h3>보강시간 및 명단' + (ed ? '<small class="gy-auto">일정표의 보강·출결 화면의 보충에서 자동</small>' : '') + '</h3><table class="gy-t"><colgroup><col style="width:14%"><col style="width:16%"><col style="width:14%"><col></colgroup><thead><tr><th>보강시간</th><th>반명</th><th>학생명</th><th>보강사유 및 수업내용</th></tr></thead><tbody>' + mk.join('') + '</tbody></table>';
   // 상담
   var cs = D.cs.map(function(c){
-    if(c.i == null) return '<tr><td class="c">' + esc(c.name) + '</td><td class="c">' + esc(c.cls) + '</td><td>' + esc(c.note) + ' <small class="gy-auto">상담 관리에서 자동</small></td></tr>';
+    if(c.i == null) return '<tr class="auto"><td class="c">' + esc(c.name) + '</td><td class="c">' + esc(c.cls) + '</td><td>' + esc(c.note) + ' <small class="gy-auto">상담 관리에서 자동</small></td></tr>';
     return '<tr><td>' + inp('data-gycx="' + c.i + '|name" list="gyStuList"', c.name, '학생 이름') + '</td><td>' + inp('data-gycx="' + c.i + '|cls"', c.cls) + '</td><td>' + inp('data-gycx="' + c.i + '|note"', c.note, '예: 숙제를 자주 빠뜨려 이유를 물어봄 · 다음 주부터 단어장 먼저 하기로 함') + '</td></tr>';
   });
   for(i = cs.length; i < 2; i++) cs.push('<tr class="blank"><td></td><td></td><td></td></tr>');
   if(ed) h += '<datalist id="gyStuList">' + CLASSES.filter(function(c){ return c.teacher === t; }).map(function(c){ return c.students.map(function(x){ return '<option value="' + esc(x) + '">' + esc(c.name) + '</option>'; }).join(''); }).join('') + '</datalist>';
   h += '<h3 class="gy-me">수업 중 면담 내용' + (ed ? ' <small class="gy-auto">선생님이 쓰는 칸은 여기 하나예요</small><button type="button" class="gy-add" data-gyadd="cs">+ 줄 추가</button>' : '') + '</h3><table class="gy-t"><colgroup><col style="width:16%"><col style="width:18%"><col></colgroup><thead><tr><th>학생명</th><th>반명</th><th>면담 내용</th></tr></thead><tbody>' + cs.join('') + '</tbody></table>';
   // 건의·전달사항 칸은 뺐어요(건의사항 게시판·쪽지함으로). 예전에 써 둔 내용은 지우지 않고 그대로 보여 줘요.
-  h += '<h3>특이사항' + (ed ? '<small class="gy-auto">업무 체크리스트 마감 보고에서 자동</small>' : '') + '</h3><div class="gy-box one"><div>' + taR('', D.etc) + '</div></div>';
+  h += '<h3>특이사항' + (ed ? '<small class="gy-auto">업무 체크리스트 마감 보고에서 자동</small>' : '') + '</h3><div class="gy-box one auto"><div>' + taR('', D.etc) + '</div></div>';
   if(D.sug) h += '<div class="gy-box one gy-old"><div><b>건의사항 및 전달사항 <small>(예전 양식에 쓴 내용)</small></b><p>' + esc(D.sug) + '</p></div></div>';
   if(ed) h += '<p class="gy-note gy-sugnote">건의할 내용은 <b>건의사항 게시판</b>에, 원장님께 전할 말은 <b>쪽지함</b>에 써 주세요.</p>';
   return h + '</div>';
@@ -2680,7 +2682,7 @@ function renderGyDoc(){
   a += '<button type="button" class="btn soft" data-gy="print">인쇄</button></div>';
   if(st === 'back' && r.backMsg) a += '<p class="gy-note warn">원장님 반려 사유: ' + esc(r.backMsg) + '</p>';
   if(dir && !st) a += '<p class="gy-note">아직 제출 전이에요. 지금까지 자동으로 모인 내용을 미리 보여 드려요.</p>';
-  if(!dir && (st === '' || st === 'back')) a += '<p class="gy-note">출결·수업 기록·보충·상담 기록·마감 보고에서 자동으로 채워졌어요. 고칠 칸만 고치면 바로 저장되고, 제출하면 그 순간 내용이 그대로 남아요.</p>';
+  if(!dir && (st === '' || st === 'back')) a += '<p class="gy-note"><span class="gy-legend"></span>파란 칸은 출결·수업 기록·보강·상담 기록·마감 보고에서 자동으로 채워져요. 틀린 곳은 원래 화면에서 고치면 여기도 바뀌어요. 선생님은 ‘수업 중 면담 내용’만 쓰고 제출하면 돼요. 제출하면 그 순간 내용이 그대로 남아요.</p>';
   if(dir && st === 'sub' && gy.backing) a += '<div class="gy-backf"><input type="text" id="gyBackMsg" placeholder="반려 사유 (예: 결석생 사유를 적어 주세요)"><button type="button" class="btn" data-gy="backok">반려하기</button></div>';
   $('gyAct').innerHTML = a;
   $('gySheet').innerHTML = gySheet(t, d);
