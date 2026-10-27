@@ -6716,6 +6716,12 @@ $('rsForm').addEventListener('change', function(ev){ if(ev.target.id === 'rsScho
 $('rsOv').addEventListener('click', function(ev){ if(ev.target === this) this.hidden = true; });
 document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && !$('rsOv').hidden) $('rsOv').hidden = true; });
 
+// 날짜 칸은 아무 곳이나 눌러도 달력이 열려요 (작은 달력 아이콘만 누르지 않아도 돼요)
+document.addEventListener('click', function(ev){
+  var el = ev.target;
+  if(el.tagName !== 'INPUT' || (el.type !== 'date' && el.type !== 'time') || el.disabled || el.readOnly || typeof el.showPicker !== 'function') return;
+  try{ el.showPicker(); }catch(e){}
+});
 /* ===== 시작 ===== */
 applyAssign();
 loadSheetConsults();
