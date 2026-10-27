@@ -1115,6 +1115,13 @@
   .t-card{ margin-top:20px; }
   .t-head-r{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .t-head-r .btn{ padding:5px 11px; font-size:12.5px; }
+  .pt-parts{ display:flex; flex-direction:column; gap:4px; max-height:260px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; padding:6px 8px; background:var(--surface); }
+  .pt-row{ display:flex; align-items:center; gap:4px 10px; flex-wrap:wrap; padding:4px 2px; font-size:12.5px; }
+  .pt-row + .pt-row{ border-top:1px solid var(--border); }
+  .pt-c{ flex:1 1 140px; font-weight:700; color:var(--ink); } .pt-c small{ color:var(--ink-faint); font-weight:500; }
+  .pt-row label{ flex-direction:row !important; align-items:center; gap:4px !important; font-weight:600; color:var(--ink-soft); cursor:pointer; }
+  .pt-row input{ accent-color:var(--accent); margin:0; }
+  .pt-edit{ flex-basis:100%; } .pt-edit > p{ margin:0 0 2px; font-weight:700; }
   .t-part{ background:var(--hold-soft); color:var(--hold); }
   .t-list .info-row select{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:6px 8px; background:var(--surface); color:var(--ink); }
   .t-list td.dt{ white-space:nowrap; font-variant-numeric:tabular-nums; }
@@ -1688,17 +1695,12 @@
       <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요. 입사일·교육청 등록일과 퇴사한 선생님 기록도 여기에서 관리해요.</p></div></div>
       <div class="set-grid">
         <div class="card">
-          <div class="card-head"><h2>선생님 등록</h2></div>
+          <div class="card-head"><h2>선생님 등록 <small class="muted">정규</small></h2></div>
           <form class="reg" id="regForm" novalidate>
-            <div class="row2">
-              <label>이름<input type="text" id="regName" placeholder="예: 박지은" maxlength="10"></label>
-              <label>근무 형태<select id="regType"><option value="">정규</option><option value="part">아르바이트</option></select></label>
+            <label>이름<input type="text" id="regName" placeholder="예: 박지은" maxlength="10"></label>
+            <div>
+              <label>아이디 <span class="hint">영문·숫자 4~20자 · 비밀번호는 선생님이 처음 로그인할 때 직접 정해요</span><input type="text" id="regId" placeholder="예: jieun" autocapitalize="off" spellcheck="false" autocomplete="off"></label>
             </div>
-            <div class="row2">
-              <label>아이디 <span class="hint">영문·숫자 4~20자</span><input type="text" id="regId" placeholder="예: jieun" autocapitalize="off" spellcheck="false" autocomplete="off"></label>
-              <label>비밀번호 <span class="hint">6자 이상</span><input type="password" id="regPw" autocomplete="new-password"></label>
-            </div>
-            <label>비밀번호 확인<input type="password" id="regPw2" autocomplete="new-password"></label>
             <div class="row2">
               <label>입사일 <span class="hint">첫 근무일</span><input type="date" id="regHire"></label>
               <label>교육청 등록일 <span class="hint">아직이면 비워 두세요</span><input type="date" id="regEdu"></label>
@@ -1713,6 +1715,26 @@
           </form>
         </div>
         <div style="display:flex; flex-direction:column; gap:20px; min-width:0">
+          <div class="card">
+            <div class="card-head"><h2>아르바이트 선생님 등록</h2></div>
+            <form class="reg" id="ptForm" novalidate>
+              <label>이름<input type="text" id="ptName" placeholder="예: 김하늘" maxlength="10"></label>
+              <div>
+                <label>아이디 <span class="hint">영문·숫자 4~20자 · 비밀번호는 선생님이 처음 로그인할 때 직접 정해요</span><input type="text" id="ptId" placeholder="예: haneul" autocapitalize="off" spellcheck="false" autocomplete="off"></label>
+              </div>
+              <div class="row2">
+                <label>입사일 <span class="hint">첫 근무일</span><input type="date" id="ptHire"></label>
+                <label>교육청 등록일 <span class="hint">아직이면 비워 두세요</span><input type="date" id="ptEdu"></label>
+              </div>
+              <div>
+                <span class="hint" style="display:block; margin-bottom:6px; font-size:12px; font-weight:600; color:var(--ink-soft)">담당 반과 맡을 파트 (반마다 테스트 관리·숙제 관리를 골라요)</span>
+                <div class="pt-parts" id="ptParts"></div>
+              </div>
+              <p class="form-err" id="ptErr"></p>
+              <p class="ok-msg" id="ptOk"></p>
+              <button class="btn" type="submit" style="align-self:flex-start">아르바이트 선생님 등록</button>
+            </form>
+          </div>
           <div class="card">
             <div class="card-head"><h2>원장님 비밀번호 바꾸기</h2></div>
             <form class="reg" id="myPwForm" novalidate>
@@ -1737,8 +1759,17 @@
         <div class="card-head"><h2>재직 선생님 명단</h2><span class="t-head-r"><span class="muted" id="tCount"></span><button type="button" class="btn soft" id="tCsv">명단 내려받기 (엑셀)</button></span></div>
         <div class="table-wrap">
           <table class="t-list">
-            <thead><tr><th>이름</th><th>근무 형태</th><th>아이디</th><th>담당 반</th><th>입사일</th><th>교육청 등록일</th><th></th></tr></thead>
+            <thead><tr><th>이름</th><th>아이디</th><th>담당 반</th><th>입사일</th><th>교육청 등록일</th><th></th></tr></thead>
             <tbody id="tRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card t-card">
+        <div class="card-head"><h2>아르바이트 선생님 명단</h2><span class="muted" id="ptCount"></span></div>
+        <div class="table-wrap">
+          <table class="t-list">
+            <thead><tr><th>이름</th><th>아이디</th><th>담당 반 · 파트</th><th>입사일</th><th>교육청 등록일</th><th></th></tr></thead>
+            <tbody id="ptRows"></tbody>
           </table>
         </div>
       </div>
@@ -3078,7 +3109,8 @@ var dtStore = (function(){ try{ return JSON.parse(localStorage.getItem(DT_KEY) |
 var dtDay = new Date(); dtDay.setHours(0,0,0,0);
 var dtClassId = null;
 function dtSave(){ try{ localStorage.setItem(DT_KEY, JSON.stringify(dtStore)); }catch(e){} }
-function dtClasses(){ return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher; }); }
+// 선생님은 담당 반, 아르바이트 선생님은 테스트·숙제 파트를 맡은 반을 봐요
+function dtClasses(){ var pt = ptClassIds(state.teacher); return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher || pt.indexOf(c.id) !== -1; }); }
 function dtCls(){ return CLASSES.find(function(c){ return c.id === dtClassId; }); }
 function dtNewRow(){ return { on:true, att:'출석', attNote:'', book:'지참', hw:'완료', spk:'완료', flash:'', self:'', inter:'', text:'', w1:'', w2:'', w3:'', wDone:false, memo:'' }; }
 function dtEntry(){
@@ -4487,7 +4519,7 @@ $('trBody').addEventListener('click', function(ev){
    인쇄(PDF)와 엑셀(CSV) 내려받기. 선생님은 담당 반만, 원장님은 모든 반을 봐요. */
 var rc = { cls:'', stu:'', book:'', from:'', to:'', view:'day', cols:{ att:true, prog:true, hw:true, chk:true, score:true, memo:true } };
 var RC_COLS = [['att','출결'],['prog','진도'],['hw','숙제'],['chk','데일리 점검(교재·숙제·Speaking)'],['score','점수(단어·flash 등)'],['memo','메모']];
-function rcClasses(){ return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher; }); }
+function rcClasses(){ return dtClasses(); }
 function rcRange(q){
   var t = new Date(); t.setHours(0,0,0,0);
   if(q === 'month') return [ymd(new Date(t.getFullYear(), t.getMonth(), 1)), ymd(t)];
@@ -5976,6 +6008,15 @@ $('loginForm').addEventListener('submit', function(e){
   var acc = findAcc($('loginId').value.trim()), pw = $('loginPw').value;
   var fail = function(){ $('loginErr').textContent = '아이디 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요.'; $('loginPw').value = ''; $('loginPw').focus(); };
   if(!acc) return fail();
+  // 처음 로그인(또는 원장님이 초기화한 계정): 입력한 비밀번호를 이 계정 비밀번호로 정해요
+  if(!acc.hash && acc.role === 'teacher'){
+    if(acc.left){ $('loginErr').textContent = '퇴사 처리된 계정이라 로그인할 수 없어요. 원장님께 문의해 주세요.'; return; }
+    if(pw.length < 6){ $('loginErr').textContent = '처음 로그인이에요. 앞으로 쓸 비밀번호를 6자 이상 입력해 주세요.'; $('loginPw').focus(); return; }
+    if(!confirm(acc.name + ' 선생님, 처음 로그인이에요. 방금 입력한 비밀번호로 정할까요? 다음부터 이 비밀번호로 로그인해요.')) return;
+    var s0 = randSalt();
+    return hashPw(pw, s0).then(function(h){ acc.salt = s0; acc.hash = h; saveStore(); $('loginErr').textContent = ''; $('loginPw').value = ''; enter(acc); setTimeout(function(){ toast('비밀번호를 정했어요. 다음부터 이 비밀번호로 로그인해요.'); }, 600); })
+      .catch(function(){ $('loginErr').textContent = '이 브라우저에서는 로그인할 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
+  }
   hashPw(pw, acc.salt).then(function(h){
     if(h !== acc.hash) return fail();
     if(acc.left){ $('loginErr').textContent = '퇴사 처리된 계정이라 로그인할 수 없어요. 원장님께 문의해 주세요.'; $('loginPw').value = ''; return; }
@@ -6001,20 +6042,26 @@ function renderSettings(){
   $('regClasses').innerHTML = CLASSES.map(function(c){
     return '<label><input type="checkbox" value="'+c.id+'">'+esc(c.name)+' <small>'+esc(c.teacher)+'</small></label>';
   }).join('');
-  var teachers = store.accounts.filter(function(a){ return a.role === 'teacher' && !a.left; });
+  var all = store.accounts.filter(function(a){ return a.role === 'teacher' && !a.left; });
+  var teachers = all.filter(function(a){ return a.type !== 'part'; }), parts = all.filter(function(a){ return a.type === 'part'; });
+  $('ptParts').innerHTML = ptPartsHtml({});
+  $('ptCount').textContent = parts.length + '명';
+  $('ptRows').innerHTML = parts.length ? parts.map(function(a){
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+((store.resetReq || {})[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+esc(a.id)+'</td><td>'+ptPartsText(a)+'</td><td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td>' +
+      '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 초기화</button><button type="button" class="danger" data-act="leave">퇴사 처리</button></td></tr>';
+  }).join('') : '<tr><td colspan="6" class="muted" style="padding:16px 10px">등록된 아르바이트 선생님이 없어요.</td></tr>';
   var gone = store.accounts.filter(function(a){ return a.role === 'teacher' && a.left; }).sort(function(a, b){ return (b.left || '').localeCompare(a.left || ''); });
-  var req = store.resetReq || {}, reqN = teachers.filter(function(a){ return req[a.id]; }).length;
-  var partN = teachers.filter(function(a){ return a.type === 'part'; }).length;
-  $('tCount').textContent = teachers.length + '명' + (partN ? ' (아르바이트 ' + partN + '명)' : '') + (reqN ? ' · 재설정 요청 ' + reqN + '건' : '');
+  var req = store.resetReq || {}, reqN = all.filter(function(a){ return req[a.id]; }).length;
+  $('tCount').textContent = teachers.length + '명' + (reqN ? ' · 재설정 요청 ' + reqN + '건' : '');
   var me0 = session && findAcc(session.id);
   $('codeState').textContent = me0 && me0.rhash ? '만들어 둠' : '아직 없어요';
   $('codeShow').hidden = true;
   $('tRows').innerHTML = teachers.length ? teachers.map(function(a){
     var cl = CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; });
-    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+tType(a)+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
       '<td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td>' +
-      '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 바꾸기</button><button type="button" class="danger" data-act="leave">퇴사 처리</button></td></tr>';
-  }).join('') : '<tr><td colspan="7" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 위에서 첫 선생님을 등록해 주세요.</td></tr>';
+      '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 초기화</button><button type="button" class="danger" data-act="leave">퇴사 처리</button></td></tr>';
+  }).join('') : '<tr><td colspan="6" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 위에서 첫 선생님을 등록해 주세요.</td></tr>';
   $('tLeftCount').textContent = gone.length + '명';
   $('tLeftRows').innerHTML = gone.length ? gone.map(function(a){
     return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b></td><td>'+tType(a)+'</td><td>'+esc(a.id)+'</td><td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td><td class="dt">'+tDate(a.left)+'</td><td class="dt">'+tDate(a.eduOff)+'</td>' +
@@ -6022,6 +6069,29 @@ function renderSettings(){
   }).join('') : '<tr><td colspan="8" class="muted" style="padding:16px 10px">퇴사한 선생님이 없어요.</td></tr>';
 }
 
+/* 아르바이트 선생님: 반마다 맡을 파트(테스트 관리 test · 숙제 관리 hw)를 골라요. a.parts = { 반id:['test','hw'] } */
+var PT_PARTS = [['test','테스트 관리'],['hw','숙제 관리']];
+function ptPartsHtml(cur){
+  return CLASSES.map(function(c){
+    var on = cur[c.id] || [];
+    return '<div class="pt-row"><span class="pt-c">'+esc(c.name)+' <small>'+esc(c.teacher)+'</small></span>' + PT_PARTS.map(function(pp){
+      return '<label><input type="checkbox" data-cid="'+c.id+'" data-part="'+pp[0]+'"'+(on.indexOf(pp[0]) !== -1 ? ' checked' : '')+'>'+pp[1]+'</label>'; }).join('') + '</div>';
+  }).join('');
+}
+function ptPartsRead(box){ var o = {}; box.querySelectorAll('input[data-part]:checked').forEach(function(i){ (o[i.dataset.cid] = o[i.dataset.cid] || []).push(i.dataset.part); }); return o; }
+function ptPartsText(a){
+  var p = a.parts || {}, ks = Object.keys(p).filter(function(k){ return (p[k] || []).length; });
+  if(!ks.length) return '<span class="muted">없음</span>';
+  return ks.map(function(k){ var c = CLASSES.find(function(x){ return x.id === k; }); return c ? esc(c.name) + ' <small class="muted">(' + p[k].map(function(x){ return x === 'test' ? '테스트' : '숙제'; }).join('·') + ')</small>' : ''; }).filter(Boolean).join('<br>');
+}
+// 아르바이트 선생님이 파트를 맡은 반 id 목록
+function ptClassIds(name){ var a = store.accounts.find(function(x){ return x.role === 'teacher' && x.name === name && x.type === 'part' && !x.left; }); return a && a.parts ? Object.keys(a.parts).filter(function(k){ return a.parts[k].length; }) : []; }
+// 비밀번호 초기화: 선생님이 다음에 로그인할 때 새 비밀번호를 직접 정해요
+function tPwReset(acc){
+  if(!confirm(acc.name + ' 선생님 비밀번호를 초기화할까요? 다음에 로그인할 때 선생님이 새 비밀번호를 정해요.')) return;
+  acc.salt = ''; acc.hash = ''; if(store.resetReq) delete store.resetReq[acc.id];
+  saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 초기화했어요. 아이디로 로그인하면서 새 비밀번호를 정하면 돼요.');
+}
 function tType(a){ return a.type === 'part' ? '<span class="tag t-part">아르바이트</span>' : '<span class="muted">정규</span>'; }
 function tDate(v){ return v ? esc(v.replace(/-/g, '.')) : '<span class="muted">–</span>'; }
 // 날짜 수정·퇴사 처리 칸 (표 아래에 열려요)
@@ -6032,7 +6102,8 @@ function tInfoRow(tr, acc, mode){
   var f = function(k, l, v){ return '<label>'+l+'<input type="date" data-k="'+k+'" value="'+esc(v || '')+'"></label>'; };
   var body = mode === 'leave'
     ? '<p><b>'+esc(acc.name)+' 선생님 퇴사 처리</b> · 로그인이 막히고 담당 반은 미배정이 돼요. 계정과 기록은 지우지 않아요.</p>' + f('left', '퇴사일', today) + f('eduOff', '교육청 등록 철회일 (아직이면 비워 두세요)', acc.eduOff)
-    : '<label>근무 형태<select data-k="type"><option value="">정규</option><option value="part"'+(acc.type === 'part' ? ' selected' : '')+'>아르바이트</option></select></label>' + f('hire', '입사일', acc.hire) + f('edu', '교육청 등록일', acc.edu) + (acc.left ? f('left', '퇴사일', acc.left) + f('eduOff', '교육청 등록 철회일', acc.eduOff) : '');
+    : '<label>근무 형태<select data-k="type"><option value="">정규</option><option value="part"'+(acc.type === 'part' ? ' selected' : '')+'>아르바이트</option></select></label>' + f('hire', '입사일', acc.hire) + f('edu', '교육청 등록일', acc.edu) + (acc.left ? f('left', '퇴사일', acc.left) + f('eduOff', '교육청 등록 철회일', acc.eduOff) : '') +
+      (acc.type === 'part' && !acc.left ? '<div class="pt-parts pt-edit"><p>담당 반과 맡을 파트</p>'+ptPartsHtml(acc.parts || {})+'</div>' : '');
   tr.insertAdjacentHTML('afterend', '<tr class="info-row" data-mode="'+mode+'"><td colspan="'+cols+'"><form data-id="'+acc.id+'" data-mode="'+mode+'">'+body+'<button class="btn'+(mode === 'leave' ? '' : ' soft')+'" type="submit">'+(mode === 'leave' ? '퇴사 처리' : '저장')+'</button><button class="btn soft" type="button" data-act="close">취소</button><span class="form-err"></span></form></td></tr>');
   tr.nextElementSibling.querySelector('input').focus();
 }
@@ -6049,6 +6120,7 @@ function tInfoSubmit(e){
     toast(acc.name + ' 선생님을 퇴사 처리했어요. 퇴사한 선생님 목록에 남아요.');
   } else {
     ['type','hire','edu','left','eduOff'].forEach(function(k){ if(k in v){ if(k === 'left' && !v.left) return; acc[k] = v[k]; } });
+    var pe = f.querySelector('.pt-edit'); if(pe) acc.parts = ptPartsRead(pe);
     toast(acc.name + ' 선생님 정보를 저장했어요.');
   }
   saveStore(); renderDirector(); renderSettings();
@@ -6056,34 +6128,54 @@ function tInfoSubmit(e){
 $('regForm').addEventListener('submit', function(e){
   e.preventDefault();
   $('regOk').textContent = '';
-  var name = $('regName').value.trim(), id = $('regId').value.trim(), pw = $('regPw').value;
+  var name = $('regName').value.trim(), id = $('regId').value.trim();
   var dupName = store.accounts.some(function(a){ return a.role === 'teacher' && a.name === name; });
-  var err = !name ? '이름을 입력해 주세요.' : dupName ? '같은 이름의 선생님 계정이 이미 있어요. 이름 뒤에 구분을 붙여 주세요. (예: 박지은B)' : (checkId(id) || checkPw(pw, $('regPw2').value));
+  var err = !name ? '이름을 입력해 주세요.' : dupName ? '같은 이름의 선생님 계정이 이미 있어요. 이름 뒤에 구분을 붙여 주세요. (예: 박지은B)' : checkId(id);
   if(err){ $('regErr').textContent = err; return; }
   $('regErr').textContent = '';
   var picked = Array.from(document.querySelectorAll('#regClasses input:checked')).map(function(i){ return i.value; });
-  var salt = randSalt();
-  hashPw(pw, salt).then(function(h){
-    store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', salt:salt, hash:h, hire:$('regHire').value, edu:$('regEdu').value, type:$('regType').value });
-    picked.forEach(function(cid){ store.assign[cid] = name; });
-    saveStore(); applyAssign(); renderDirector();
-    $('regForm').reset(); renderSettings();
-    $('regOk').textContent = name + ' 선생님을 등록했어요. 아이디: ' + id.toLowerCase() + ' · 비밀번호는 방금 정하신 대로예요. 선생님께 알려 주세요.';
-  }).catch(function(){ $('regErr').textContent = '이 브라우저에서는 등록할 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
+  store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', salt:'', hash:'', hire:$('regHire').value, edu:$('regEdu').value });
+  picked.forEach(function(cid){ store.assign[cid] = name; });
+  saveStore(); applyAssign(); renderDirector();
+  $('regForm').reset(); renderSettings();
+  $('regOk').textContent = name + ' 선생님을 등록했어요. 아이디는 ' + id.toLowerCase() + '예요. 선생님께 알려 주세요. 처음 로그인할 때 선생님이 비밀번호를 정해요.';
 });
 
+$('ptForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  $('ptOk').textContent = '';
+  var name = $('ptName').value.trim(), id = $('ptId').value.trim();
+  var dupName = store.accounts.some(function(a){ return a.role === 'teacher' && a.name === name; });
+  var err = !name ? '이름을 입력해 주세요.' : dupName ? '같은 이름의 선생님 계정이 이미 있어요. 이름 뒤에 구분을 붙여 주세요. (예: 김하늘B)' : checkId(id);
+  if(err){ $('ptErr').textContent = err; return; }
+  $('ptErr').textContent = '';
+  store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', type:'part', salt:'', hash:'', hire:$('ptHire').value, edu:$('ptEdu').value, parts:ptPartsRead($('ptParts')) });
+  saveStore(); renderDirector();
+  $('ptForm').reset(); renderSettings();
+  $('ptOk').textContent = name + ' 선생님(아르바이트)을 등록했어요. 아이디는 ' + id.toLowerCase() + '예요. 선생님께 알려 주세요. 로그인 화면의 \'원장님·선생님\'에서 처음 들어올 때 비밀번호를 정하면 선생님 화면이 열려요.';
+});
+$('ptRows').addEventListener('click', function(e){
+  var b = e.target.closest('[data-act]'); if(!b) return;
+  if(b.dataset.act === 'close'){ b.closest('.info-row').remove(); return; }
+  var tr = b.closest('tr'), acc = findAcc(tr.dataset.id); if(!acc) return;
+  if(b.dataset.act === 'info' || b.dataset.act === 'leave') return tInfoRow(tr, acc, b.dataset.act);
+  if(b.dataset.act === 'pw') return tPwReset(acc);
+});
+$('ptRows').addEventListener('submit', function(e){
+  if(e.target.matches('.info-row form')) return tInfoSubmit(e);
+  e.preventDefault();
+  var f = e.target, acc = findAcc(f.dataset.id), pw = f.querySelector('input').value;
+  if(pw.length < 6){ f.querySelector('.form-err').textContent = '6자 이상으로 정해 주세요.'; return; }
+  var salt = randSalt();
+  hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; if(store.resetReq) delete store.resetReq[acc.id]; saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 바꿨어요.'); });
+});
 // 선생님 계정은 지우지 않아요(규칙: 원장님 승인 없이 삭제 금지). 그만두면 '퇴사 처리'로 로그인만 막고 기록은 남겨요.
 $('tRows').addEventListener('click', function(e){
   var b = e.target.closest('[data-act]'); if(!b) return;
   if(b.dataset.act === 'close'){ b.closest('.info-row').remove(); return; }
   var tr = b.closest('tr'), acc = findAcc(tr.dataset.id); if(!acc) return;
   if(b.dataset.act === 'info' || b.dataset.act === 'leave') return tInfoRow(tr, acc, b.dataset.act);
-  if(b.dataset.act === 'pw'){
-    var next = tr.nextElementSibling;
-    if(next && next.classList.contains('pw-row')){ next.remove(); return; }
-    tr.insertAdjacentHTML('afterend', '<tr class="pw-row"><td colspan="4"><form data-id="'+acc.id+'"><input type="password" placeholder="새 비밀번호 (6자 이상)" autocomplete="new-password" aria-label="새 비밀번호"><button class="btn soft" type="submit">저장</button><span class="form-err"></span></form></td></tr>');
-    tr.nextElementSibling.querySelector('input').focus();
-  }
+  if(b.dataset.act === 'pw') return tPwReset(acc);
 });
 $('tLeftRows').addEventListener('click', function(e){
   var b = e.target.closest('[data-act]'); if(!b) return;
@@ -6252,7 +6344,7 @@ loadSheetConsults();
     // 자동 로그인: 비밀번호가 바뀌면 저장해 둔 정보가 맞지 않아 다시 로그인해야 해요.
     var auto = null; try{ auto = JSON.parse(localStorage.getItem(AUTO_KEY) || 'null'); }catch(e){}
     var a2 = auto && findAcc(auto.id);
-    if(a2 && a2.hash === auto.hash) acc = a2;
+    if(a2 && a2.hash && a2.hash === auto.hash) acc = a2;
     else if(auto){ try{ localStorage.removeItem(AUTO_KEY); }catch(e){} }
   }
   if(acc && acc.left){ acc = null; try{ sessionStorage.removeItem(SES_KEY); localStorage.removeItem(AUTO_KEY); }catch(e){} }
