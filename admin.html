@@ -2599,7 +2599,7 @@ function gySheet(t, d){
   if(ed) h += '<datalist id="gyStuList">' + CLASSES.filter(function(c){ return c.teacher === t; }).map(function(c){ return c.students.map(function(x){ return '<option value="' + esc(x) + '">' + esc(c.name) + '</option>'; }).join(''); }).join('') + '</datalist>';
   h += '<h3 class="gy-me">수업 중 면담 내용' + (ed ? ' <small class="gy-auto">선생님이 쓰는 칸은 여기 하나예요</small><button type="button" class="gy-add" data-gyadd="cs">+ 줄 추가</button>' : '') + '</h3><table class="gy-t"><colgroup><col style="width:16%"><col style="width:18%"><col></colgroup><thead><tr><th>학생명</th><th>반명</th><th>면담 내용</th></tr></thead><tbody>' + cs.join('') + '</tbody></table>';
   // 건의·전달사항 칸은 뺐어요(건의사항 게시판·쪽지함으로). 예전에 써 둔 내용은 지우지 않고 그대로 보여 줘요.
-  h += '<h3>특이사항(문제학생보고)' + (ed ? '<small class="gy-auto">업무 체크리스트 마감 보고에서 자동</small>' : '') + '</h3><div class="gy-box one"><div>' + taR('', D.etc) + '</div></div>';
+  h += '<h3>특이사항' + (ed ? '<small class="gy-auto">업무 체크리스트 마감 보고에서 자동</small>' : '') + '</h3><div class="gy-box one"><div>' + taR('', D.etc) + '</div></div>';
   if(D.sug) h += '<div class="gy-box one gy-old"><div><b>건의사항 및 전달사항 <small>(예전 양식에 쓴 내용)</small></b><p>' + esc(D.sug) + '</p></div></div>';
   if(ed) h += '<p class="gy-note gy-sugnote">건의할 내용은 <b>건의사항 게시판</b>에, 원장님께 전할 말은 <b>쪽지함</b>에 써 주세요.</p>';
   return h + '</div>';
