@@ -3826,6 +3826,17 @@ function bdViewHtml(){
     '<div class="bd-actions"><button type="button" class="btn soft" data-bdback>목록</button>' +
     (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">삭제</button></span>' : '') + '</div></article>';
 }
+// Claude 미리보기 안에서는 일반 내려받기 링크가 막혀서, 미리보기일 때만 미리보기의 저장 기능으로 내려받아요(실제 운영 주소에서는 보통 링크로 받아요).
+document.addEventListener('click', function(ev){
+  var a = ev.target.closest('a[download][data-bdf]'); if(!a || !window.claude || typeof window.claude.use !== 'function') return;
+  ev.preventDefault();
+  var f = null; bdStore.posts.some(function(p){ return (p.files || []).some(function(x){ if(x.id === a.dataset.bdf){ f = x; return true; } }); });
+  if(!f) return;
+  Promise.all([window.claude.use('downloads'), bdFile('get', f.id)]).then(function(r){
+    if(!r[0] || !r[1]){ toast('이 화면에서는 내려받을 수 없어요. \'열기\'로 열어 주세요.'); return; }
+    return r[0].save({ filename:f.name, data:r[1] });
+  }).catch(function(e){ if(e && e.code !== 'declined') toast(e && e.code === 'rejected_extension' ? '미리보기에서는 이 파일 형식을 내려받을 수 없어요. 실제 주소에서는 받아져요.' : '내려받지 못했어요.'); });
+});
 function bdFilesHtml(p){
   var fs = p.files || []; if(!fs.length) return '';
   var imgs = fs.filter(function(f){ return /^image\//.test(f.type); });
