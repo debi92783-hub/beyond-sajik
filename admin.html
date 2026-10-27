@@ -1100,6 +1100,8 @@
   .an-old{ margin-top:10px; font-size:13px; }
   .an-tools{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; } .an-tools select{ flex:1 1 180px; min-width:0; padding:6px 10px !important; font-size:12.5px !important; }
   .an-pbox textarea{ width:100%; box-sizing:border-box; }
+  .an-st{ font-size:10.5px !important; padding:2px 7px !important; margin-left:4px; vertical-align:1px; white-space:nowrap; }
+  .rc-an td{ font-size:12.5px; line-height:1.5; }
   .an-to{ margin:0; font-size:13px; color:var(--ink-soft); } .an-to b{ color:var(--ink); }
   .an-file{ display:flex; flex-direction:column; gap:6px; } .an-pick{ position:relative; align-self:flex-start; cursor:pointer; flex-direction:row !important; color:var(--accent) !important; } .an-pick input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
   .an-post .bd-files{ margin-top:10px; }
@@ -1696,7 +1698,7 @@
     </section>
 
     <section id="view-pnotice" hidden>
-      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보여요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
+      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보이고, <b>각 반 데일리 리포트를 보낼 때 아직 안 보낸 공지가 리포트 끝에 같이 붙어 나가요.</b> 공지마다 미발송·발송 중·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
       <div class="card an-card an-box" id="anList"></div>
     </section>
 
@@ -3418,6 +3420,7 @@ function dtCard(s, e){
     '<tr><th>반/담임</th><td>'+esc(c.name)+' · '+esc(c.teacher)+' 선생님</td></tr>' +
     '<tr><th>날짜</th><td>'+dtDateText()+' ('+DAYS[dtDay.getDay()]+')</td></tr>' +
     rows.map(function(x){ return '<tr><th>'+x[0]+'</th><td>'+x[1]+'</td></tr>'; }).join('') +
+    (dtAnOf(s, e).length ? '<tr class="rc-an"><th>학원<br>공지</th><td>' + dtAnOf(s, e).map(function(a){ return '<b>[' + anKind(a.kind) + ']</b> ' + esc(a.title); }).join('<br>') + '</td></tr>' : '') +
     '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button><button class="btn soft okbtn" type="button" data-ok aria-pressed="false">확인</button></div></div>';
 }
 function dtText(s, e){
@@ -3433,7 +3436,20 @@ function dtText(s, e){
   if(jx.prog) L.push('진도: ' + jx.prog);
   if(jx.hw) L.push('숙제: ' + jx.hw);
   if(memoText(r, jx)) L.push('기타사항: ' + memoText(r, jx));
+  var ans = dtAnOf(s, e);
+  if(ans.length){ L.push('', '[학원 공지]'); ans.forEach(function(a){ L.push(anLine(a)); }); }
   return L.join('\n');
+}
+/* 데일리 리포트에 같이 나가는 학원 공지: 이 학생에게 아직 안 보낸, 지금 올라가 있는 공지.
+   발송하면 공지마다 받은 학생을 기록(sentTo)해서 다음 리포트에는 다시 붙지 않아요. 보낸 리포트는 그때 붙은 공지 그대로 보여요. */
+function dtAnOf(s, e){
+  var all = anAll();
+  if(e.stage === 'sent') return ((e.anSent || {})[s] || []).map(function(id){ return all.find(function(a){ return a.id === id; }); }).filter(Boolean);
+  var k = dtClassId + '|' + s, today = ymd(new Date());
+  return all.filter(function(a){ return anLive(a) && a.from <= today && anFor(a, dtClassId, s) && !(a.sentTo && a.sentTo[k]); }).sort(function(x, y){ return (x.at || 0) - (y.at || 0); });
+}
+function anLine(a){
+  return '· [' + anKind(a.kind) + '] ' + a.title + (a.date ? ' · ' + pvDate(a.date) + (a.time ? ' ' + korTime(a.time) : '') : '') + (a.text ? '\n' + a.text : '') + (a.files && a.files.length ? '\n※ 사진·첨부 파일은 학부모·학생 화면에서 볼 수 있어요.' : '');
 }
 
 $('dtRows').addEventListener('input', function(ev){
@@ -3568,6 +3584,11 @@ $('dtSend').addEventListener('click', function(){
   var e = dtEntry(); if(e.stage !== 'made') return;
   var names = (e.made || []).filter(function(s){ return e.ok && e.ok[s]; });
   if(!names.length){ toast('먼저 리포트를 확인해 주세요.'); return; }
+  // 같이 나가는 학원 공지를 먼저 정해 두고(받은 학생 기록), 리포트 글에 그대로 넣어요
+  var anList = anAll(), anN = 0; e.anSent = {};
+  names.forEach(function(st){ var l = dtAnOf(st, e); e.anSent[st] = l.map(function(a){ return a.id; }); anN += l.length;
+    l.forEach(function(a){ var x = anList.find(function(y){ return y.id === a.id; }); x.sentTo = x.sentTo || {}; x.sentTo[dtClassId + '|' + st] = Date.now(); }); });
+  if(anN) anSaveAll(anList);
   e.made = names; e.sent = names.length; e.sentAt = Date.now(); e.stage = 'sent';
   ntPost(names.map(function(st){ return { type:'daily', cid:dtClassId, s:st, date:ymd(dtDay), title:dtDateText() + ' (' + DAYS[dtDay.getDay()] + ') 데일리 리포트', text:dtText(st, e) }; }));
   dtSave(); renderFlow();
@@ -6797,12 +6818,24 @@ function anAttHtml(){
 // 원장님·선생님 모두 학원 공지를 올릴 수 있어요. 고치기·내리기는 원장님과 쓴 사람만.
 function anCanEdit(a){ return state.view === 'director' || !!(a.byId && session && a.byId === session.id); }
 function anRefresh(){ if(state.page === 'pnotice') renderAnList(); if(state.page === 'pview') renderPView(); }
+// 발송 현황: 데일리 리포트로 공지를 받은 학생 수 / 지금 재원생 수
+function anSendState(a){
+  var tot = 0, got = 0;
+  CLASSES.forEach(function(c){ c.students.forEach(function(st){ if(!anFor(a, c.id, st)) return; tot++; if(a.sentTo && a.sentTo[c.id + '|' + st]) got++; }); });
+  return { tot:tot, got:got };
+}
+function anSendTag(a){
+  var x = anSendState(a);
+  if(!x.got) return '<span class="tag warn an-st">미발송</span>';
+  if(x.got >= x.tot) return '<span class="tag rs-good an-st">발송 완료 ' + x.got + '명</span>';
+  return '<span class="tag info an-st">발송 중 ' + x.got + ' / ' + x.tot + '명</span>';
+}
 function renderAnList(el, only, head, emptyMsg){
   el = el || $('anList');
   var all = anAll().filter(only || function(){ return true; }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
   var live = all.filter(anLive), old = all.filter(function(a){ return !anLive(a); });
   var row = function(a){
-    return '<div class="an-row"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><div><b>' + esc(a.title) + '</b><small>' + esc(anScopeText(a)) + ' · ' + esc(anPeriod(a)) + ' · ' + esc(a.by || '') + (a.files && a.files.length ? ' · 📎 ' + a.files.length : '') + '</small></div>'
+    return '<div class="an-row"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><div><b>' + esc(a.title) + '</b> ' + anSendTag(a) + '<small>' + esc(anScopeText(a)) + ' · ' + esc(anPeriod(a)) + ' · ' + esc(a.by || '') + (a.files && a.files.length ? ' · 📎 ' + a.files.length : '') + '</small></div>'
       + '<span class="an-acts"><button type="button" class="btn soft" data-ancopy="' + a.id + '">가져와서 새로 쓰기</button>' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
   };
   el.innerHTML = '<div class="card-head"><h2>' + (head || '올린 학원 공지') + ' <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
@@ -6883,7 +6916,9 @@ $('anForm').addEventListener('submit', function(ev){
   var fresh = an.att.filter(function(f){ return f.blob; });
   v.files = an.att.map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; });
   // 수정할 때 뺀 파일도 지우지 않고 고치기 전 기록(hist)에 남겨요
-  if(a){ a.hist = a.hist || []; a.hist.push({ at:Date.now(), title:a.title, text:a.text, files:a.files || [] }); Object.assign(a, v); a.edAt = Date.now(); }
+  if(a){ a.hist = a.hist || []; a.hist.push({ at:Date.now(), title:a.title, text:a.text, files:a.files || [], sentTo:a.sentTo });
+    if(a.sentTo && Object.keys(a.sentTo).length && confirm('이미 데일리 리포트로 보낸 공지예요. 고친 내용을 다음 데일리 리포트에 다시 붙여 보낼까요?\n\n[확인] 다시 보내기 · [취소] 고친 내용만 저장')) a.sentTo = {};
+    Object.assign(a, v); a.edAt = Date.now(); }
   else { list.push(Object.assign({ id:'a' + Date.now(), at:Date.now(), byId:session && session.id, by:state.view === 'director' ? '원장님' : state.teacher + ' 선생님' }, v)); }
   var done = function(){ anSaveAll(list); $('anOv').hidden = true; anRefresh(); toast(a ? '공지를 고쳤어요.' : '학부모·학생 화면에 학원 공지를 올렸어요.'); };
   Promise.all(fresh.map(function(f){ return bdFile('put', f.id, f.blob); })).then(done, function(){ toast('첨부 파일을 저장하지 못했어요. 파일 없이 올렸어요.'); v.files = v.files.filter(function(f){ return !fresh.some(function(x){ return x.id === f.id; }); }); (a || list[list.length - 1]).files = v.files; done(); });
