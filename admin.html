@@ -781,6 +781,55 @@
   .ms-msg{ white-space:pre-line; background:var(--surface-soft); border-radius:10px; padding:9px 11px; font-size:12px; line-height:1.6; }
   .man-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; max-width:980px; }
   .man-top .linkish{ margin:0; }
+  .ml-bar{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; max-width:980px; }
+  .ml-tabs{ display:inline-flex; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--surface); }
+  .ml-tabs button{ font:inherit; font-size:14px; font-weight:700; padding:10px 16px; border:0; background:none; color:var(--ink-soft); cursor:pointer; }
+  .ml-tabs button + button{ border-left:1px solid var(--border); }
+  .ml-tabs button[aria-selected="true"]{ background:var(--accent); color:#fff; }
+  .ml-tabs b.o{ background:var(--ink-soft); }
+  .side .ml-side{ margin-left:auto; display:flex; gap:3px; }
+  .side .ml-side span{ height:20px; padding:0 6px; border-radius:99px; font-size:11px; font-weight:800; line-height:20px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .side .ml-side .in{ background:var(--warn); color:#fff; }
+  .side .ml-side .out{ background:var(--surface-soft); color:var(--ink-soft); border:1px solid var(--border); line-height:18px; }
+  .ml-tabs b{ display:inline-block; min-width:18px; margin-left:5px; padding:0 5px; border-radius:99px; background:var(--warn); color:#fff; font-size:11px; line-height:18px; }
+  .ml-list{ list-style:none; margin:0; padding:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; max-width:980px; }
+  .ml-list li + li{ border-top:1px solid var(--border); }
+  .ml-row{ display:grid; grid-template-columns:14px 150px minmax(0,1fr) auto; gap:10px; align-items:center; width:100%; font:inherit; text-align:left; background:none; border:0; padding:13px 16px; cursor:pointer; color:var(--ink-soft); }
+  .ml-row:hover{ background:var(--surface-soft); }
+  .ml-row .dot{ width:8px; height:8px; border-radius:99px; background:transparent; }
+  .ml-row.unread .dot{ background:var(--accent); }
+  .ml-row.unread .who, .ml-row.unread .subj{ color:var(--ink); font-weight:800; }
+  .ml-row .who{ font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ml-row .subj{ font-size:14px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ml-row .subj small{ color:var(--ink-faint); font-weight:500; margin-left:8px; }
+  .ml-row .meta{ font-size:12.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .ml-read{ font-size:11.5px; font-weight:800; border-radius:6px; padding:1px 7px; margin-right:8px; background:var(--surface-soft); color:var(--ink-soft); }
+  .ml-read.all{ background:var(--good-soft); color:var(--good); }
+  .ml-empty{ padding:40px 16px; text-align:center; color:var(--ink-faint); font-size:14px; }
+  .ml-view, .ml-form{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 24px; max-width:980px; }
+  .ml-view h2{ margin:0 0 10px; font-size:20px; }
+  .ml-head{ display:grid; grid-template-columns:72px minmax(0,1fr); gap:6px 10px; font-size:13.5px; padding-bottom:14px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+  .ml-head dt{ color:var(--ink-faint); } .ml-head dd{ margin:0; display:flex; flex-wrap:wrap; gap:5px; }
+  .ml-to{ display:inline-flex; align-items:center; gap:4px; font-size:12.5px; border:1px solid var(--border); border-radius:99px; padding:1px 9px; }
+  .ml-to.r{ border-color:transparent; background:var(--good-soft); color:var(--good); }
+  .ml-content{ white-space:pre-wrap; font-size:14.5px; line-height:1.75; min-height:100px; word-break:break-word; }
+  .ml-form{ display:flex; flex-direction:column; gap:14px; }
+  .ml-form h2{ margin:0; font-size:18px; }
+  .ml-form label, .ml-form .lbl{ display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:700; }
+  .ml-form input[type=text], .ml-form textarea{ font:inherit; font-size:14px; font-weight:400; border:1px solid var(--border); border-radius:8px; padding:10px 12px; background:var(--surface); color:var(--ink); }
+  .ml-form textarea{ resize:vertical; line-height:1.65; }
+  .ml-pick{ display:flex; flex-wrap:wrap; gap:7px; }
+  .ml-pick button{ font:inherit; font-size:13.5px; font-weight:700; padding:8px 13px; border-radius:99px; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .ml-pick button[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .ml-pick button.all{ border-style:dashed; }
+  .ml-pick button.all[aria-pressed="true"]{ border-style:solid; }
+  .ml-picked{ font-size:12.5px; font-weight:500; color:var(--ink-faint); }
+  @media (max-width:700px){
+    .ml-row{ grid-template-columns:10px minmax(0,1fr) auto; grid-template-areas:"d w m" "d s s"; gap:2px 8px; padding:12px 14px; }
+    .ml-row .dot{ grid-area:d; align-self:start; margin-top:6px; } .ml-row .who{ grid-area:w; } .ml-row .subj{ grid-area:s; } .ml-row .meta{ grid-area:m; }
+    .ml-view, .ml-form{ padding:18px 16px; }
+    .ml-tabs button{ padding:9px 12px; font-size:13px; }
+  }
   .man-tabs{ display:inline-flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; background:var(--surface); }
   .man-tabs button{ font:inherit; font-size:13px; font-weight:700; padding:7px 14px; border:0; background:none; color:var(--ink-soft); cursor:pointer; }
   .man-tabs button + button{ border-left:1px solid var(--border); }
@@ -1047,9 +1096,9 @@
           <h1>안녕하세요, 원장님</h1>
           <p><span class="today"></span> · 비욘드잉글리쉬 사직캠퍼스</p>
         </div>
-        <button class="btn" type="button" data-soon="전체 공지 발송">
+        <button class="btn" type="button" id="noticeWrite">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg>
-          전체 공지 발송
+          전달사항 쓰기
         </button>
       </div>
 
@@ -1316,6 +1365,11 @@
     </section>
 
     <!-- 게시판 · 자료실 (탭으로 분류) -->
+    <section id="view-mail" hidden>
+      <div class="greet"><div><h1>쪽지함</h1><p>원장님과 선생님이 서로 쪽지를 주고받아요. 받는 사람은 한 명부터 전체 선생님까지 눌러서 골라요.</p></div></div>
+      <div id="mlBody"></div>
+    </section>
+
     <section id="view-board" hidden>
       <div class="greet"><div><h1 id="bdTitle">게시판</h1><p id="bdDesc"></p></div></div>
       <div id="bdBody"></div>
@@ -1583,6 +1637,7 @@ var ICON = {
   bulb:'<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0012 3z"/>',
   talk:'<path d="M3 6h12v8H7l-4 3z"/><path d="M15 9h6v8l-3-2h-6v-1"/>',
   manual:'<path d="M5 4.5A1.5 1.5 0 016.5 3H19v15H6.5A1.5 1.5 0 005 19.5z"/><path d="M5 19.5A1.5 1.5 0 006.5 21H19v-3"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="11.5" x2="13" y2="11.5"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>',
   bell:'<path d="M6 17h12l-1.5-2.5V10a4.5 4.5 0 00-9 0v4.5z"/><path d="M10.3 20a1.8 1.8 0 003.4 0"/>',
   doc:'<path d="M6 3h8l4 4v14H6z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/>',
   video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',
@@ -1601,15 +1656,15 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
-    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','전체 공지']]],
+    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult']]],
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly']]],
-    ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
+    ['소통', [['mail','쪽지함','mail'],['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
     ['', [['clock','태블릿 등원 화면','kiosk'],['bell','학부모·학생 알림 페이지','parent']]]
   ],
   teacher: [
     ['내 수업', [['book','업무 체크리스트','journal'],['pen','수업 기록(진도·과제)','progress'],['stamp','교무일지','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
-    ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
+    ['소통', [['mail','쪽지함','mail'],['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
     ['', [['clock','태블릿 등원 화면','kiosk']]]
   ]
@@ -1639,11 +1694,11 @@ function setView(v, page){
   state.view = v;
   state.page = page || 'main';
   if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum') && v !== 'director') state.page = 'main';
-  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu';
+  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1656,6 +1711,7 @@ function setView(v, page){
   $('view-consult').hidden = !consult;
   $('view-lcsum').hidden = !lcsum;
   $('view-gyomu').hidden = !gyomu;
+  $('view-mail').hidden = !mail;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -1667,8 +1723,9 @@ function setView(v, page){
   else if(consult) renderConsult();
   else if(lcsum) renderLcSum();
   else if(gyomu) renderGyomu();
+  else if(mail) renderMail();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -1680,8 +1737,8 @@ function renderSide(){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
     group[1].forEach(function(m){
       var cur = m[2] === current ? ' aria-current="page"' : '';
-      var un = m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
-      html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+(un ? ' aria-label="'+m[1]+', 안 읽은 글 '+un+'개"' : '')+'>'+icon(m[0])+m[1]+(un ? '<span class="unread">'+(un > 99 ? '99+' : un)+'</span>' : '')+'</a>';
+      var un = m[2] === 'mail' ? 0 : m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
+      html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+(un ? ' aria-label="'+m[1]+', 안 읽은 '+(m[2] === 'mail' ? '쪽지' : '글')+' '+un+'개"' : '')+'>'+icon(m[0])+m[1]+(un ? '<span class="unread">'+(un > 99 ? '99+' : un)+'</span>' : '')+(m[2] === 'mail' ? mlSideBadge() : '')+'</a>';
     });
   });
   if(state.view === 'teacher'){
@@ -1692,6 +1749,7 @@ function renderSide(){
   $('side').innerHTML = html;
 }
 
+$('noticeWrite').addEventListener('click', function(){ openBoard('comm', 'notice'); bd.id = null; bd.mode = 'write'; renderBoard(); $('bdT').focus(); });
 $('brandHome').addEventListener('click', function(e){ e.preventDefault(); if(!session) return; state.tpart = 'check'; setView(session.role === 'director' ? state.view : 'teacher'); window.scrollTo(0, 0); });
 $('side').addEventListener('click', function(e){
   var a = e.target.closest('a');
@@ -1700,6 +1758,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'journal'){ state.tpart = 'check'; return setView('teacher'); }
     if(a.dataset.key === 'progress'){ state.tpart = 'jr'; return setView('teacher'); }
     if(a.dataset.key === 'gyomu') return setView(state.view, 'gyomu');
+    if(a.dataset.key === 'mail'){ ml.mode = 'list'; ml.box = 'in'; return setView(state.view, 'mail'); }
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
     if(a.dataset.key === 'settings') return setView('director', 'settings');
@@ -3706,6 +3765,134 @@ $('bdBody').addEventListener('submit', function(ev){
   saveBd(); bd.id = p.id; bd.mode = 'view'; toast(bd.id && p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
 });
 
+/* ===== 쪽지함 =====
+   원장님과 선생님이 서로 주고받는 쪽지예요. 받는 사람은 계정·권한에 등록된 사람 중에서 눌러서 골라요(1명 ~ 전체 선생님).
+   지우기는 내 쪽지함에서만 지워져요(받은 사람·보낸 사람 쪽지함은 그대로).
+   시안이라 이 브라우저(localStorage)에만 저장돼요. 공용 저장소를 붙이면 다른 기기로도 오가요. */
+var ML_KEY = 'beyond-mail-v1';
+var mlStore = (function(){ try{ var raw = localStorage.getItem(ML_KEY); if(raw) return JSON.parse(raw); }catch(e){} return { seq:0, msgs:[] }; })();
+function saveMl(){ try{ localStorage.setItem(ML_KEY, JSON.stringify(mlStore)); }catch(e){} }
+var ml = { box:'in', mode:'list', id:null, to:[], subj:'', body:'' };
+function mlPeople(){ return store.accounts.filter(function(a){ return !session || a.id !== session.id; }).sort(function(a, b){ return (a.role === 'director' ? 0 : 1) - (b.role === 'director' ? 0 : 1) || a.name.localeCompare(b.name, 'ko'); }); }
+function mlName(id){ var a = findAcc(id); return a ? (a.role === 'director' ? '원장님' : a.name + ' 선생님') : '(삭제된 계정)'; }
+function mlIn(){ return session ? mlStore.msgs.filter(function(m){ return m.to.indexOf(session.id) !== -1 && !(m.delIn || {})[session.id]; }).sort(function(a, b){ return b.id - a.id; }) : []; }
+function mlOut(){ return session ? mlStore.msgs.filter(function(m){ return m.from === session.id && !m.delOut; }).sort(function(a, b){ return b.id - a.id; }) : []; }
+function mlIsRead(m){ return !!(m.read || {})[session.id]; }
+// 보낸 쪽지 중 아직 다 읽지 않은 것
+function mlPending(){ return mlOut().filter(function(m){ return m.to.some(function(id){ return !(m.read || {})[id] && findAcc(id); }); }).length; }
+// 왼쪽 메뉴 표시: 수신 = 안 읽은 받은 쪽지, 발신 = 상대가 아직 안 읽은 보낸 쪽지
+function mlSideBadge(){
+  if(!session) return '';
+  var i = mlUnread(), o = mlPending();
+  return (i || o ? '<span class="ml-side" aria-label="안 읽은 받은 쪽지 '+i+'건, 상대가 안 읽은 보낸 쪽지 '+o+'건">' : '') +
+    (i ? '<span class="in">수신 '+i+'</span>' : '') + (o ? '<span class="out">발신 '+o+'</span>' : '') + (i || o ? '</span>' : '');
+}
+function mlUnread(){ return mlIn().filter(function(m){ return !mlIsRead(m); }).length; }
+function mlWhen(ts){ var d = new Date(ts), t = ymd(d); return t === ymd(new Date()) ? ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) : t; }
+function mlToText(m){ var n = m.to.map(mlName); return n.length > 2 ? n.slice(0, 2).join(', ') + ' 외 ' + (n.length - 2) + '명' : n.join(', '); }
+function renderMail(){
+  if(!session){ $('mlBody').innerHTML = ''; return; }
+  var un = mlUnread(), html = '<div class="ml-bar"><div class="ml-tabs" role="tablist">' +
+    '<button type="button" role="tab" data-mlbox="in" aria-selected="'+(ml.mode !== 'write' && ml.box === 'in')+'">받은 쪽지'+(un ? '<b>'+un+'</b>' : '')+'</button>' +
+    '<button type="button" role="tab" data-mlbox="out" aria-selected="'+(ml.mode !== 'write' && ml.box === 'out')+'">보낸 쪽지'+(mlPending() ? '<b class="o" title="상대가 아직 안 읽은 쪽지">'+mlPending()+'</b>' : '')+'</button></div>' +
+    '<button type="button" class="btn" data-mlwrite>쪽지 쓰기</button></div>';
+  if(ml.mode === 'write') html += mlFormHtml();
+  else if(ml.mode === 'view') html += mlViewHtml();
+  else html += mlListHtml();
+  $('mlBody').innerHTML = html;
+  renderSide();
+}
+function mlListHtml(){
+  var out = ml.box === 'out', list = out ? mlOut() : mlIn();
+  if(!list.length) return '<ul class="ml-list"><li class="ml-empty">'+(out ? '보낸 쪽지가 없어요.' : '받은 쪽지가 없어요.')+'</li></ul>';
+  return '<ul class="ml-list">' + list.map(function(m){
+    var rd = m.to.filter(function(id){ return (m.read || {})[id]; }).length;
+    return '<li><button type="button" class="ml-row'+(!out && !mlIsRead(m) ? ' unread' : '')+'" data-mlopen="'+m.id+'"><span class="dot"></span>' +
+      '<span class="who">'+esc(out ? mlToText(m) : mlName(m.from))+'</span>' +
+      '<span class="subj">'+esc(m.subj)+'<small>'+esc(m.body.split('\n')[0].slice(0, 40))+'</small></span>' +
+      '<span class="meta">'+(out ? '<span class="ml-read'+(rd === m.to.length ? ' all' : '')+'">'+(m.to.length === 1 ? (rd ? '읽음' : '안 읽음') : '읽음 '+rd+'/'+m.to.length)+'</span>' : '')+mlWhen(m.date)+'</span></button></li>';
+  }).join('') + '</ul>';
+}
+function mlCur(){ return mlStore.msgs.find(function(x){ return x.id === ml.id; }); }
+function mlViewHtml(){
+  var m = mlCur();
+  if(!m){ ml.mode = 'list'; return mlListHtml(); }
+  var mine = m.from === session.id, d = new Date(m.date);
+  return '<article class="ml-view"><h2>'+esc(m.subj)+'</h2><dl class="ml-head">' +
+    '<dt>보낸 사람</dt><dd>'+esc(mlName(m.from))+'</dd>' +
+    '<dt>받는 사람</dt><dd>'+m.to.map(function(id){ var r = (m.read || {})[id]; return '<span class="ml-to'+(mine && r ? ' r' : '')+'">'+esc(mlName(id))+(mine ? (r ? ' ✓' : '') : '')+'</span>'; }).join('')+'</dd>' +
+    '<dt>보낸 때</dt><dd>'+ymd(d)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+(mine ? ' · 읽은 사람 ✓ 표시' : '')+'</dd></dl>' +
+    '<div class="ml-content">'+esc(m.body)+'</div>' +
+    '<div class="bd-actions"><button type="button" class="btn soft" data-mlback>목록</button><span>' +
+      (!mine ? '<button type="button" class="btn" data-mlreply="one">답장</button> ' : '') +
+      (!mine && m.to.length > 1 ? '<button type="button" class="btn soft" data-mlreply="all">전체 답장</button> ' : '') +
+      '<button type="button" class="btn soft" data-mlfwd>전달</button> <button type="button" class="btn soft bd-del" data-mldel>삭제</button></span></div></article>';
+}
+function mlFormHtml(){
+  var ppl = mlPeople(), ts = ppl.filter(function(a){ return a.role === 'teacher'; });
+  var allT = ts.length && ts.every(function(a){ return ml.to.indexOf(a.id) !== -1; });
+  var pick = ppl.length ? '<div class="ml-pick">' + (ts.length > 1 ? '<button type="button" class="all" data-mlall aria-pressed="'+allT+'">전체 선생님</button>' : '') +
+    ppl.map(function(a){ return '<button type="button" data-mlto="'+esc(a.id)+'" aria-pressed="'+(ml.to.indexOf(a.id) !== -1)+'">'+esc(mlName(a.id))+'</button>'; }).join('') + '</div>' +
+    '<span class="ml-picked">'+(ml.to.length ? ml.to.length + '명 선택했어요' : '받는 사람을 눌러서 골라 주세요')+'</span>'
+    : '<span class="ml-picked">아직 쪽지를 받을 계정이 없어요. 원장님이 \'선생님 계정·권한\'에서 선생님을 등록하면 여기에 나와요.</span>';
+  return '<form class="ml-form" id="mlForm" novalidate><h2>쪽지 쓰기</h2><div class="lbl">받는 사람'+pick+'</div>' +
+    '<label>제목<input type="text" id="mlS" maxlength="80" value="'+esc(ml.subj)+'"></label>' +
+    '<label>내용<textarea id="mlB" rows="9">'+esc(ml.body)+'</textarea></label>' +
+    '<p class="form-err" id="mlErr"></p>' +
+    '<div class="bd-actions"><button type="button" class="btn soft" data-mlcancel>취소</button><button type="submit" class="btn">보내기</button></div></form>';
+}
+function mlKeepDraft(){ if($('mlS')){ ml.subj = $('mlS').value; ml.body = $('mlB').value; } }
+function mlWrite(to, subj, body){ ml.mode = 'write'; ml.to = to || []; ml.subj = subj || ''; ml.body = body || ''; renderMail(); window.scrollTo(0, 0); }
+$('mlBody').addEventListener('click', function(ev){
+  var bx = ev.target.closest('[data-mlbox]'); if(bx){ ml.box = bx.dataset.mlbox; ml.mode = 'list'; return renderMail(); }
+  if(ev.target.closest('[data-mlwrite]')) return mlWrite();
+  var o = ev.target.closest('[data-mlopen]');
+  if(o){
+    ml.id = +o.dataset.mlopen; ml.mode = 'view';
+    var m = mlCur(); if(m && m.to.indexOf(session.id) !== -1 && !mlIsRead(m)){ (m.read = m.read || {})[session.id] = Date.now(); saveMl(); }
+    renderMail(); return window.scrollTo(0, 0);
+  }
+  var t = ev.target.closest('[data-mlto]');
+  if(t){ mlKeepDraft(); var id = t.dataset.mlto, i = ml.to.indexOf(id); if(i === -1) ml.to.push(id); else ml.to.splice(i, 1); return renderMail(); }
+  if(ev.target.closest('[data-mlall]')){
+    mlKeepDraft();
+    var ts = mlPeople().filter(function(a){ return a.role === 'teacher'; }).map(function(a){ return a.id; });
+    var all = ts.every(function(id){ return ml.to.indexOf(id) !== -1; });
+    ml.to = all ? ml.to.filter(function(id){ return ts.indexOf(id) === -1; }) : ml.to.concat(ts.filter(function(id){ return ml.to.indexOf(id) === -1; }));
+    return renderMail();
+  }
+  var cur = mlCur();
+  var rp = ev.target.closest('[data-mlreply]');
+  if(rp && cur){
+    var to = [cur.from]; if(rp.dataset.mlreply === 'all') cur.to.forEach(function(id){ if(id !== session.id && to.indexOf(id) === -1 && findAcc(id)) to.push(id); });
+    return mlWrite(to, /^RE:/.test(cur.subj) ? cur.subj : 'RE: ' + cur.subj, '\n\n----- 받은 쪽지 -----\n보낸 사람: ' + mlName(cur.from) + '\n' + cur.body);
+  }
+  if(ev.target.closest('[data-mlfwd]') && cur) return mlWrite([], 'FW: ' + cur.subj, '\n\n----- 전달하는 쪽지 -----\n보낸 사람: ' + mlName(cur.from) + '\n받는 사람: ' + cur.to.map(mlName).join(', ') + '\n' + cur.body);
+  if(ev.target.closest('[data-mldel]') && cur){
+    if(!confirm('이 쪽지를 내 쪽지함에서 지울까요? 상대방 쪽지함에는 그대로 남아요.')) return;
+    if(ml.box === 'out' && cur.from === session.id) cur.delOut = 1; else (cur.delIn = cur.delIn || {})[session.id] = 1;
+    saveMl(); ml.mode = 'list'; toast('쪽지를 지웠어요.'); return renderMail();
+  }
+  if(ev.target.closest('[data-mlback]')){ ml.mode = 'list'; return renderMail(); }
+  if(ev.target.closest('[data-mlcancel]')){ ml.mode = 'list'; return renderMail(); }
+});
+$('mlBody').addEventListener('submit', function(ev){
+  ev.preventDefault(); if(ev.target.id !== 'mlForm') return;
+  var subj = $('mlS').value.trim(), body = $('mlB').value.trim();
+  if(!ml.to.length){ $('mlErr').textContent = '받는 사람을 한 명 이상 골라 주세요.'; return; }
+  if(!subj){ $('mlErr').textContent = '제목을 적어 주세요.'; return $('mlS').focus(); }
+  if(!body){ $('mlErr').textContent = '내용을 적어 주세요.'; return $('mlB').focus(); }
+  mlStore.seq = (mlStore.seq || 0) + 1;
+  mlStore.msgs.push({ id:mlStore.seq, from:session.id, to:ml.to.slice(), subj:subj, body:body, date:Date.now(), read:{} });
+  saveMl(); toast(ml.to.length + '명에게 쪽지를 보냈어요.');
+  ml.to = []; ml.subj = ''; ml.body = ''; ml.box = 'out'; ml.mode = 'list'; renderMail();
+});
+window.addEventListener('storage', function(e){
+  if(e.key !== ML_KEY || !session) return;
+  try{ mlStore = JSON.parse(e.newValue) || mlStore; }catch(err){}
+  if(state.page === 'mail' && ml.mode !== 'write') renderMail(); else renderSide();
+});
+
 /* ===== 상담 관리 (원장님 전용) =====
    예약 현황(네이버 플레이스·홈페이지·전화·문자)과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요.
    학부모 연락처가 들어가서 원장님 화면에서만 열려요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
@@ -4627,6 +4814,7 @@ $('resetForm').addEventListener('submit', function(e){
 });
 function enter(acc){
   session = { id:acc.id, role:acc.role, name:acc.name };
+  ml.box = 'in'; ml.mode = 'list'; ml.to = []; ml.subj = ''; ml.body = '';
   try{ sessionStorage.setItem(SES_KEY, JSON.stringify(session)); }catch(e){}
   $('loginScreen').hidden = true;
   if(acc.role === 'director' && !acc.rhash) setTimeout(function(){ toast('선생님 계정·권한 화면에서 원장님 복구 코드를 만들어 두세요.'); }, 2800);
@@ -4639,7 +4827,7 @@ function enter(acc){
     state.teacher = acc.name;
     var th = location.hash.replace('#teacher-', '').replace('#', '');
     if(/^board-(comm|data)$/.test(th)){ bd.board = th.slice(-4); setView('teacher', 'board'); }
-    else { if(th === 'progress') state.tpart = 'jr'; setView('teacher', ['calendar','daily','monthly','attend','manual','gyomu'].indexOf(th) !== -1 ? th : 'main'); }
+    else { if(th === 'progress') state.tpart = 'jr'; setView('teacher', ['calendar','daily','monthly','attend','manual','gyomu','mail'].indexOf(th) !== -1 ? th : 'main'); }
   } else {
     var h = location.hash;
     if(h === '#calendar') setView('director', 'calendar');
@@ -4659,6 +4847,7 @@ function enter(acc){
     else if(h === '#teacher-progress'){ state.tpart = 'jr'; setView('teacher'); }
     else if(/^#(teacher-)?board-(comm|data)$/.test(h)){ bd.board = h.slice(-4); setView(h.indexOf('teacher') !== -1 ? 'teacher' : 'director', 'board'); }
     else if(h === '#teacher-manual') setView('teacher', 'manual');
+    else if(h === '#mail') setView('director', 'mail');
     else setView(h === '#teacher' ? 'teacher' : 'director');
   }
 }
