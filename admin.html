@@ -562,6 +562,21 @@
   .bd-linkline{ font-size:13.5px; word-break:break-all; }
   .bd-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:20px; flex-wrap:wrap; }
   .bd-del{ color:var(--warn) !important; }
+  .bd-drop{ border:2px dashed var(--border); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px; background:var(--surface-soft); }
+  .bd-drop.over{ border-color:var(--accent); background:var(--accent-soft); }
+  .bd-drop-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; font-weight:500; color:var(--ink-soft); }
+  .bd-drop-top .btn{ font-weight:700; }
+  .bd-att{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .bd-att li{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px; font-weight:500; min-width:0; }
+  .bd-att .nm{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bd-att .sz{ color:var(--ink-faint); font-size:12px; white-space:nowrap; }
+  .bd-att button{ font:inherit; border:0; background:none; color:var(--warn); cursor:pointer; font-size:13px; font-weight:700; padding:2px 6px; }
+  .bd-files{ margin-top:16px; border-top:1px solid var(--border); padding-top:14px; }
+  .bd-files h3{ margin:0 0 10px; font-size:14px; }
+  .bd-files .imgs{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px; margin-bottom:8px; }
+  .bd-files .imgs a{ display:block; border:1px solid var(--border); border-radius:10px; overflow:hidden; aspect-ratio:4/3; background:var(--surface-soft); }
+  .bd-files .imgs img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .bd-files .bd-att a{ font-weight:700; color:var(--accent); white-space:nowrap; }
   .bd-cmt{ margin-top:22px; border-top:1px solid var(--border); padding-top:16px; }
   .bd-cmt h3{ margin:0 0 10px; font-size:15px; }
   .bd-cmt h3 b{ color:var(--accent); }
@@ -3753,7 +3768,7 @@ function bdList(){
     return hay.toLowerCase().indexOf(q) !== -1;
   }).sort(function(a, b){ return b.id - a.id; });
 }
-function openBoard(board, tab){ bd.board = board; bd.tab = tab || 'all'; bd.page = 1; bd.mode = 'list'; bd.q = ''; setView(state.view, 'board'); }
+function openBoard(board, tab){ bd.attFor = null; bd.board = board; bd.tab = tab || 'all'; bd.page = 1; bd.mode = 'list'; bd.q = ''; setView(state.view, 'board'); }
 function renderBoard(){
   var B = BOARDS[bd.board];
   $('bdTitle').textContent = B.title; $('bdDesc').textContent = B.desc;
@@ -3765,6 +3780,14 @@ function renderBoard(){
   else if(bd.mode === 'write') html += bdFormHtml();
   else html += bdListHtml();
   $('bdBody').innerHTML = html;
+  if(bd.mode === 'view'){ var cp0 = bdCur(); if(cp0) bdLoadFiles(cp0); }
+  if(bd.mode === 'write' && $('bdF')){
+    $('bdF').addEventListener('change', function(){ bdAddFiles(this.files); this.value = ''; });
+    var dz = $('bdDrop');
+    ['dragenter','dragover'].forEach(function(t){ dz.addEventListener(t, function(e){ e.preventDefault(); dz.classList.add('over'); }); });
+    ['dragleave','drop'].forEach(function(t){ dz.addEventListener(t, function(e){ e.preventDefault(); dz.classList.remove('over'); }); });
+    dz.addEventListener('drop', function(e){ if(e.dataTransfer) bdAddFiles(e.dataTransfer.files); });
+  }
   renderSide();
 }
 function bdListHtml(){
@@ -3777,7 +3800,7 @@ function bdListHtml(){
     html += '<tr><td class="n">'+p.id+'</td><td class="t'+(bdIsRead(p) ? '' : ' is-unread')+'"><button type="button" class="bd-link" data-bdopen="'+p.id+'">' +
       (bd.tab === 'all' ? '<span class="bd-cat">'+esc(bdCatName(p.board, p.cat))+'</span>' : '') + esc(p.title) + '</button>' +
       (p.comments && p.comments.length ? '<span class="bd-ccount" title="댓글">['+p.comments.length+']</span>' : '') +
-      (p.link ? '<span class="bd-clip" title="링크 있음">🔗</span>' : '') + (p.date > fresh ? '<span class="bd-new">NEW</span>' : '') +
+      (p.files && p.files.length ? '<span class="bd-clip" title="첨부 파일 '+p.files.length+'개">📎</span>' : '') + (p.link ? '<span class="bd-clip" title="링크 있음">🔗</span>' : '') + (p.date > fresh ? '<span class="bd-new">NEW</span>' : '') +
       '</td><td class="a">'+esc(p.author)+'</td><td class="d">'+bdDate(p.date)+'</td><td class="v">'+p.views+'</td></tr>';
   });
   html += '</tbody></table></div>';
@@ -3798,9 +3821,19 @@ function bdViewHtml(){
     '<p class="bd-meta">'+esc(p.author)+' · '+bdDate(p.date)+(p.edited ? ' (수정 '+bdDate(p.edited)+')' : '')+' · 조회 '+p.views+'</p></header>' +
     '<div class="bd-content">'+esc(p.body)+'</div>' +
     (p.link ? '<p class="bd-linkline">🔗 <a href="'+esc(p.link)+'" target="_blank" rel="noopener">'+esc(p.link)+'</a></p>' : '') +
+    bdFilesHtml(p) +
     bdCmtHtml(p) +
     '<div class="bd-actions"><button type="button" class="btn soft" data-bdback>목록</button>' +
     (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">삭제</button></span>' : '') + '</div></article>';
+}
+function bdFilesHtml(p){
+  var fs = p.files || []; if(!fs.length) return '';
+  var imgs = fs.filter(function(f){ return /^image\//.test(f.type); });
+  return '<section class="bd-files" aria-label="첨부 파일"><h3>📎 첨부 파일 '+fs.length+'개</h3>' +
+    (imgs.length ? '<div class="imgs">' + imgs.map(function(f){ return '<a data-bdf="'+f.id+'" target="_blank" rel="noopener" title="'+esc(f.name)+'"><img alt="'+esc(f.name)+'"></a>'; }).join('') + '</div>' : '') +
+    '<ul class="bd-att">' + fs.map(function(f){
+      return '<li><span aria-hidden="true">'+bdIcon(f)+'</span><span class="nm">'+esc(f.name)+'</span><span class="sz">'+bdSize(f.size)+'</span><a data-bdf="'+f.id+'" target="_blank" rel="noopener">열기</a><a data-bdf="'+f.id+'" download="'+esc(f.name)+'">내려받기</a></li>';
+    }).join('') + '</ul></section>';
 }
 /* 댓글: 모든 게시판(소통·자료 전체)에 공통. 쓴 사람과 원장님만 고치고 지울 수 있어요. */
 function bdCmtHtml(p){
@@ -3820,14 +3853,67 @@ function bdCmtHtml(p){
   return html;
 }
 function bdCur(){ return bdStore.posts.find(function(x){ return x.id === bd.id; }); }
+/* 첨부 파일: 컴퓨터·휴대폰·태블릿에서 파일이나 사진을 골라 올려요(휴대폰은 사진 보관함·카메라·파일 중에서 골라요).
+   파일은 브라우저 안의 큰 저장 공간(IndexedDB)에 두고, 글에는 이름·크기만 적어요. 시안이라 이 기기에서만 보여요.
+   공용 저장소(Firebase Storage 또는 학원 구글 드라이브)를 붙이면 다른 선생님 기기에서도 열려요. */
+var BD_FILE_MAX = 30 * 1024 * 1024;
+var bdDbP = null;
+function bdDb(){
+  if(!bdDbP) bdDbP = new Promise(function(res, rej){
+    if(!window.indexedDB) return rej(new Error('no idb'));
+    var r = indexedDB.open('beyond-files', 1);
+    r.onupgradeneeded = function(){ r.result.createObjectStore('files'); };
+    r.onsuccess = function(){ res(r.result); }; r.onerror = function(){ rej(r.error); };
+  });
+  return bdDbP;
+}
+function bdFile(mode, id, val){
+  return bdDb().then(function(db){ return new Promise(function(res, rej){
+    var tx = db.transaction('files', mode === 'get' ? 'readonly' : 'readwrite'), st = tx.objectStore('files');
+    var rq = mode === 'get' ? st.get(id) : mode === 'put' ? st.put(val, id) : st.delete(id);
+    rq.onsuccess = function(){ res(rq.result); }; rq.onerror = function(){ rej(rq.error); };
+  }); });
+}
+function bdSize(n){ return n >= 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB'; }
+function bdIcon(f){ return /^image\//.test(f.type) ? '🖼️' : /pdf/.test(f.type) || /\.pdf$/i.test(f.name) ? '📕' : /^video\//.test(f.type) ? '🎬' : /^audio\//.test(f.type) ? '🎧' : /sheet|excel|\.xlsx?$/i.test(f.type + f.name) ? '📊' : /\.(hwp|hwpx|docx?)$/i.test(f.name) ? '📄' : '📎'; }
+function bdAttList(){
+  return bd.att.length ? '<ul class="bd-att">' + bd.att.map(function(f, i){
+    return '<li><span aria-hidden="true">'+bdIcon(f)+'</span><span class="nm">'+esc(f.name)+'</span><span class="sz">'+bdSize(f.size)+'</span><button type="button" data-bdattdel="'+i+'" aria-label="'+esc(f.name)+' 빼기">빼기</button></li>';
+  }).join('') + '</ul>' : '';
+}
+function bdAddFiles(list){
+  var big = [];
+  Array.prototype.forEach.call(list || [], function(file){
+    if(file.size > BD_FILE_MAX){ big.push(file.name); return; }
+    bd.att.push({ id:'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name:file.name, size:file.size, type:file.type || '', blob:file });
+  });
+  if(big.length) toast('30MB가 넘는 파일은 올릴 수 없어요: ' + big.join(', ') + ' — 구글 드라이브에 올리고 링크를 붙여 주세요.');
+  var box = $('bdAtt'); if(box) box.innerHTML = bdAttList();
+}
+function bdLoadFiles(p){
+  if(!p.files || !p.files.length) return;
+  p.files.forEach(function(f){
+    bdFile('get', f.id).then(function(blob){
+      var els = document.querySelectorAll('[data-bdf="'+f.id+'"]');
+      if(!blob){ els.forEach(function(el){ if(el.tagName === 'A' && !el.querySelector('img')){ el.removeAttribute('href'); el.textContent = '이 기기에 없어요'; } }); return; }
+      var url = URL.createObjectURL(blob);
+      els.forEach(function(el){ el.href = url; var im = el.querySelector('img'); if(im) im.src = url; });
+    }).catch(function(){});
+  });
+}
 function bdFormHtml(){
   var p = bd.id ? bdStore.posts.find(function(x){ return x.id === bd.id; }) : null;
   var B = BOARDS[bd.board], cat = p ? p.cat : (bd.tab !== 'all' ? bd.tab : B.tabs[0][0]);
+  var fk = bd.board + ':' + (bd.id || 'new');
+  if(bd.attFor !== fk){ bd.attFor = fk; bd.att = p && p.files ? p.files.slice() : []; }
   return '<form class="bd-form" id="bdForm" novalidate><h2>'+(p ? '글 수정' : '글쓰기')+'</h2>' +
     '<label>분류<select id="bdCat">'+B.tabs.map(function(t){ return '<option value="'+t[0]+'"'+(t[0] === cat ? ' selected' : '')+'>'+esc(t[1])+'</option>'; }).join('')+'</select></label>' +
     '<label>제목<input type="text" id="bdT" maxlength="80" value="'+esc(p ? p.title : '')+'"></label>' +
     '<label>내용<textarea id="bdB" rows="10">'+esc(p ? p.body : '')+'</textarea></label>' +
-    (bd.board === 'data' ? '<label>자료 링크 <small>구글 드라이브·유튜브 등 공유 주소 (선택)</small><input type="url" id="bdL" placeholder="https://" value="'+esc(p && p.link ? p.link : '')+'"></label>' : '') +
+    '<div class="lbl" style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">파일 올리기 <small>사진·PDF·한글·엑셀·영상 등, 한 파일 30MB까지 (선택)</small>' +
+      '<div class="bd-drop" id="bdDrop"><div class="bd-drop-top"><button type="button" class="btn soft" data-bdpick>📎 파일 고르기</button><span>휴대폰·태블릿은 사진 보관함·카메라·파일에서 골라요. 컴퓨터는 여기로 끌어다 놓아도 돼요.</span></div>' +
+      '<input type="file" id="bdF" multiple hidden><div id="bdAtt">'+bdAttList()+'</div></div></div>' +
+    (bd.board === 'data' ? '<label>자료 링크 <small>큰 영상은 구글 드라이브·유튜브 공유 주소로 (선택)</small><input type="url" id="bdL" placeholder="https://" value="'+esc(p && p.link ? p.link : '')+'"></label>' : '') +
     '<p class="form-err" id="bdErr"></p>' +
     '<div class="bd-actions"><button type="button" class="btn soft" data-bdcancel>취소</button><button type="submit" class="btn">'+(p ? '수정 완료' : '등록')+'</button></div></form>';
 }
@@ -3836,11 +3922,15 @@ $('bdBody').addEventListener('click', function(ev){
   var o = ev.target.closest('[data-bdopen]');
   if(o){ var p = bdStore.posts.find(function(x){ return x.id === +o.dataset.bdopen; }); if(p){ p.views++; saveBd(); bdMarkRead(p); } bd.id = +o.dataset.bdopen; bd.mode = 'view'; bd.cedit = null; renderBoard(); return window.scrollTo(0, 0); }
   var pg = ev.target.closest('[data-bdpage]'); if(pg){ bd.page = +pg.dataset.bdpage; return renderBoard(); }
-  if(ev.target.closest('[data-bdwrite]')){ bd.id = null; bd.mode = 'write'; renderBoard(); return $('bdT').focus(); }
+  if(ev.target.closest('[data-bdpick]')) return $('bdF').click();
+  var ad = ev.target.closest('[data-bdattdel]'); if(ad){ bd.att.splice(+ad.dataset.bdattdel, 1); $('bdAtt').innerHTML = bdAttList(); return; }
+  if(ev.target.closest('[data-bdwrite]')){ bd.attFor = null; bd.id = null; bd.mode = 'write'; renderBoard(); return $('bdT').focus(); }
   var ed = ev.target.closest('[data-bdedit]'); if(ed){ bd.id = +ed.dataset.bdedit; bd.mode = 'write'; return renderBoard(); }
   var dl = ev.target.closest('[data-bddel]');
   if(dl){
     if(!confirm('이 글을 삭제할까요? 삭제하면 되돌릴 수 없어요.')) return;
+    var gone = bdStore.posts.find(function(x){ return x.id === +dl.dataset.bddel; });
+    if(gone && gone.files) gone.files.forEach(function(f){ bdFile('del', f.id).catch(function(){}); });
     bdStore.posts = bdStore.posts.filter(function(x){ return x.id !== +dl.dataset.bddel; }); saveBd();
     bd.mode = 'list'; toast('글을 삭제했어요.'); return renderBoard();
   }
@@ -3855,7 +3945,7 @@ $('bdBody').addEventListener('click', function(ev){
     toast('댓글을 삭제했어요.'); return renderBoard();
   }
   if(ev.target.closest('[data-bdback]')){ bd.mode = 'list'; return renderBoard(); }
-  if(ev.target.closest('[data-bdcancel]')){ bd.mode = bd.id ? 'view' : 'list'; return renderBoard(); }
+  if(ev.target.closest('[data-bdcancel]')){ bd.attFor = null; bd.mode = bd.id ? 'view' : 'list'; return renderBoard(); }
 });
 $('bdBody').addEventListener('submit', function(ev){
   ev.preventDefault();
@@ -3883,9 +3973,19 @@ $('bdBody').addEventListener('submit', function(ev){
   if(!body){ $('bdErr').textContent = '내용을 적어 주세요.'; return $('bdB').focus(); }
   if(link && !/^https?:\/\//i.test(link)){ $('bdErr').textContent = '링크는 http:// 또는 https:// 로 시작하는 주소로 넣어 주세요.'; return $('bdL').focus(); }
   var p = bd.id ? bdStore.posts.find(function(x){ return x.id === bd.id; }) : null;
-  if(p){ p.cat = $('bdCat').value; p.title = title; p.body = body; p.link = link; p.edited = Date.now(); }
-  else { p = { id:++bdStore.seq, board:bd.board, cat:$('bdCat').value, title:title, body:body, link:link, author:session ? session.name : '', authorId:session ? session.id : '', date:Date.now(), views:0 }; bdStore.posts.push(p); }
-  saveBd(); bd.id = p.id; bd.mode = 'view'; toast(bd.id && p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
+  var oldFiles = p && p.files ? p.files : [], keep = bd.att.map(function(f){ return f.id; });
+  var fresh = bd.att.filter(function(f){ return f.blob; });
+  var btn = ev.target.querySelector('button[type=submit]'); btn.disabled = true; if(fresh.length) btn.textContent = '파일 저장 중…';
+  Promise.all(fresh.map(function(f){ return bdFile('put', f.id, f.blob); })).then(function(){
+    oldFiles.forEach(function(f){ if(keep.indexOf(f.id) === -1) bdFile('del', f.id).catch(function(){}); });
+    var meta = bd.att.map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; });
+    if(p){ p.cat = $('bdCat').value; p.title = title; p.body = body; p.link = link; p.files = meta; p.edited = Date.now(); }
+    else { p = { id:++bdStore.seq, board:bd.board, cat:$('bdCat').value, title:title, body:body, link:link, files:meta, author:session ? session.name : '', authorId:session ? session.id : '', date:Date.now(), views:0 }; bdStore.posts.push(p); }
+    saveBd(); bd.attFor = null; bd.id = p.id; bd.mode = 'view'; toast(p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
+  }).catch(function(){
+    btn.disabled = false; btn.textContent = p ? '수정 완료' : '등록';
+    $('bdErr').textContent = '파일을 저장하지 못했어요. 기기 저장 공간이 부족하거나 개인정보 보호 모드일 수 있어요. 큰 파일은 구글 드라이브 링크로 붙여 주세요.';
+  });
 });
 
 /* ===== 홈 한눈에 보기 =====
