@@ -566,6 +566,10 @@
   .bd-drop.over{ border-color:var(--accent); background:var(--accent-soft); }
   .bd-drop-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; font-weight:500; color:var(--ink-soft); }
   .bd-drop-top .btn{ font-weight:700; }
+  .bd-guide{ list-style:none; margin:0; padding:10px 12px; background:var(--surface); border:1px solid var(--border); border-radius:10px; display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:500; color:var(--ink-soft); }
+  .bd-guide li{ display:flex; gap:8px; } .bd-guide li::before{ content:'✓'; color:var(--good); font-weight:800; }
+  .bd-guide b{ color:var(--ink); font-weight:700; min-width:104px; }
+  @media (max-width:600px){ .bd-guide li{ flex-wrap:wrap; column-gap:8px; row-gap:0; } .bd-guide b{ min-width:0; } }
   .bd-att{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
   .bd-att li{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px; font-weight:500; min-width:0; }
   .bd-att .nm{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -3921,8 +3925,10 @@ function bdFormHtml(){
     '<label>분류<select id="bdCat">'+B.tabs.map(function(t){ return '<option value="'+t[0]+'"'+(t[0] === cat ? ' selected' : '')+'>'+esc(t[1])+'</option>'; }).join('')+'</select></label>' +
     '<label>제목<input type="text" id="bdT" maxlength="80" value="'+esc(p ? p.title : '')+'"></label>' +
     '<label>내용<textarea id="bdB" rows="10">'+esc(p ? p.body : '')+'</textarea></label>' +
-    '<div class="lbl" style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">파일 올리기 <small>사진·PDF·한글·엑셀·영상 등, 한 파일 30MB까지 (선택)</small>' +
+    '<div class="lbl" style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">파일 올리기 <small>(선택)</small>' +
       '<div class="bd-drop" id="bdDrop"><div class="bd-drop-top"><button type="button" class="btn soft" data-bdpick>📎 파일 고르기</button><span>휴대폰·태블릿은 사진 보관함·카메라·파일에서 골라요. 컴퓨터는 여기로 끌어다 놓아도 돼요.</span></div>' +
+      '<ul class="bd-guide"><li><b>올릴 수 있는 파일</b>사진 · PDF · 한글 · 엑셀 · 영상</li><li><b>크기</b>여러 개 함께, 한 파일 30MB까지</li>' +
+      '<li><b>더 큰 영상</b>'+(bd.board === 'data' ? '아래 \'자료 링크\' 칸에 구글 드라이브·유튜브 주소' : '구글 드라이브·유튜브에 올리고 주소를 내용에 붙여 주세요')+'</li></ul>' +
       '<input type="file" id="bdF" multiple hidden><div id="bdAtt">'+bdAttList()+'</div></div></div>' +
     (bd.board === 'data' ? '<label>자료 링크 <small>큰 영상은 구글 드라이브·유튜브 공유 주소로 (선택)</small><input type="url" id="bdL" placeholder="https://" value="'+esc(p && p.link ? p.link : '')+'"></label>' : '') +
     '<p class="form-err" id="bdErr"></p>' +
