@@ -781,6 +781,15 @@
   .ms-msg{ white-space:pre-line; background:var(--surface-soft); border-radius:10px; padding:9px 11px; font-size:12px; line-height:1.6; }
   .man-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; max-width:980px; }
   .man-top .linkish{ margin:0; }
+  .man-tabs{ display:inline-flex; border:1px solid var(--border); border-radius:9px; overflow:hidden; background:var(--surface); }
+  .man-tabs button{ font:inherit; font-size:13px; font-weight:700; padding:7px 14px; border:0; background:none; color:var(--ink-soft); cursor:pointer; }
+  .man-tabs button + button{ border-left:1px solid var(--border); }
+  .man-tabs button[aria-pressed="true"]{ background:var(--accent); color:#fff; }
+  .man-item .ck{ align-self:flex-start; font-size:11px; font-weight:800; color:var(--good); background:var(--good-soft); border-radius:6px; padding:1px 7px; }
+  .ms-check{ list-style:none; padding:0 !important; gap:5px !important; }
+  .ms-check label{ display:flex; gap:8px; align-items:flex-start; cursor:pointer; font-size:13px; line-height:1.5; }
+  .ms-check input{ width:16px; height:16px; margin:2px 0 0; flex:none; accent-color:var(--accent); }
+  .ms-check-wide{ grid-column:1 / -1; }
   .ms{ max-width:980px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; font-size:13px; line-height:1.55; }
   .ms-hd{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; border-bottom:3px solid var(--ink); padding-bottom:10px; }
   .ms-hd h2{ margin:0; font-size:23px; font-weight:900; letter-spacing:-0.02em; }
@@ -4323,22 +4332,64 @@ function msHead(m, lead){ return '<div class="ms-hd"><div><h2>'+esc(m.title)+'</
 function msRules(a){ return '<div class="ms-rules">' + a.map(function(t, i){ return '<div><i>'+(i+1)+'</i>'+t+'</div>'; }).join('') + '</div>'; }
 function msB(t){ return '<b>'+t+'</b>'; }
 function msFoot(gos){ return '<div class="ms-ft">' + gos.map(function(g){ return '<button type="button" class="btn soft" data-go="'+g[0]+'">'+g[1]+' →</button>'; }).join('') + '<button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>'; }
+/* 상담 매뉴얼마다 '체크리스트' 탭: 매뉴얼 순서를 체크 항목으로 모았어요.
+   7일·재원생·퇴원생은 상담 관리 기록지(CS_WEEK·CS_CUR·CS_LEAVE)의 체크 항목을 그대로 가져와서, 한쪽을 고치면 같이 바뀌어요.
+   여기 체크는 보면서 따라 하는 용도라 저장하지 않아요. 기록은 상담 관리에서 남겨요. */
+function csListSecs(form){
+  var out = [];
+  form.forEach(function(sec){ sec[1].forEach(function(f){ if(f[2] === 'list') out.push([sec[0].replace(/^\d+\.\s*/, ''), f[3]]); }); });
+  return out;
+}
+var MAN_CHECK = {
+  'c-new': function(){ return [
+    ['상담 전화 직후', ['상담 후 1시간 이내에 메시지 발송', '간단하지만 정중하고 따뜻한 말투로', '학년·관심 과목에 맞는 자료 고르기']],
+    ['상담 예약한 경우 메시지', ['① 학원 가치를 담은 한 문장', '② 위치 안내 (주소, 건물명, 주차, 지도)', '③ 상담 시간 안내 (날짜, 요일, 시간, 소요 시간, 준비물)', '④ 학년에 맞는 자료 파일', '⑤ 추가 안내 (주의사항, 연락처, 변경 시 연락 방법)']],
+    ['상담 예약하지 않은 경우 메시지', ['① 학원 가치를 담은 한 문장 + 사진', '② 학년에 맞는 자료', '③ 또는 학교 요약 자료', '④ 설명회·이벤트·체험 수업 등 학원 소식']],
+    ['상담 당일', ['신규 상담 기록지 작성 (학습 이력·성향)', '레벨테스트 실시 후 영역별 점수 기록', '추천 레벨과 상담 결과 안내', '학부모님 연락처·상담 내용은 외부에 공유하지 않기']]
+  ]; },
+  'c-week': function(){ return [['등록하는 날', ['일정표 개인일정에 \'7일 상담 · 학생 이름\' 넣기']]].concat(csListSecs(CS_WEEK)); },
+  'c-cur': function(){ return csListSecs(CS_CUR); },
+  'c-exam': function(){ return [
+    ['시험 전 — 목표와 과정 점검', ['① 학생과 함께 정한 목표 확인 (영역별 목표까지)', '② 시험 대비 중 생긴 문제점 점검', '③ 학원과 학생의 노력 공유', '④ 예상 결과와 다음 전략 안내']],
+    ['시험 후 — 정확한 분석과 구체적 방향', ['① 시험분석지 전송', '② 시험 총평 설명', '③ 오답 원인 짧은 코멘트', '④ 향후 개선 방향 제시']],
+    ['상담 자료', ['목표 설정표', '학습 점검표', '영역별 보완 계획', '시험분석지 (챗GPT에는 학생 이름 넣지 않기)']]
+  ]; },
+  'c-leave': function(){ return csListSecs(CS_LEAVE); }
+};
+var MAN_CS = { 'c-new':'new', 'c-week':'week', 'c-cur':'cur', 'c-leave':'leave' };
+var manTab = 'sheet';
+function csOpenType(t){ cs.tab = t; cs.mode = 'list'; setView('director', 'consult'); window.scrollTo(0, 0); }
+function manCheckHtml(m){
+  var secs = MAN_CHECK[m.id](), n = 0;
+  return msHead({ title:m.title.replace(/매뉴얼$/, '체크리스트'), updated:m.updated }, '매뉴얼 순서대로 하나씩 체크하며 따라 해요. 인쇄해서 상담할 때 옆에 두고 써도 돼요.') +
+    '<div class="ms-two">' + secs.map(function(sec, i){
+      return '<div class="ms-box'+(secs.length % 2 && i === secs.length - 1 ? ' ms-check-wide' : '')+'"><h4>'+esc(sec[0])+'</h4><ul class="ms-check">' +
+        sec[1].map(function(t){ n++; return '<li><label><input type="checkbox" id="mck'+n+'"><span>'+esc(t)+'</span></label></li>'; }).join('') + '</ul></div>';
+    }).join('') + '</div>' +
+    '<p class="ms-ex">여기 체크는 저장되지 않아요.'+(MAN_CS[m.id] ? ' 상담 기록은 상담 관리의 기록지에 남겨요.' : '')+'</p>' +
+    '<div class="ms-ft">' + (MAN_CS[m.id] && state.view === 'director' ? '<button type="button" class="btn soft" data-mancs="'+MAN_CS[m.id]+'">상담 관리에서 기록하기 →</button>' : '') +
+    '<button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+}
 var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생']];
 var manOpen = null;
 function renderManual(){
   if(!manOpen){
     $('manBody').innerHTML = MAN_GROUPS.map(function(g){
       return '<h3 class="man-group">'+g[1]+'</h3><div class="man-list">' + MANUALS.filter(function(m){ return (m.group || '업무') === g[0]; }).map(function(m){
-        return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span><b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
+        return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span>'+(MAN_CHECK[m.id] ? '<span class="ck">✓ 체크리스트</span>' : '')+'<b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
       }).join('') + (g[0] === '업무' ? '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div>' : '') + '</div>';
     }).join('');
     return;
   }
-  var m = MANUALS.find(function(x){ return x.id === manOpen; });
-  $('manBody').innerHTML = '<div class="man-top"><button type="button" class="linkish" data-man-back>← 매뉴얼 목록</button>' + (m.id === 'lesson' && lcCanEdit() ? ' <button type="button" class="btn soft" data-manedit>체크리스트 항목 고치기</button>' : '') + '</div><article class="card ms">' + m.sheet() + '</article>';
+  var m = MANUALS.find(function(x){ return x.id === manOpen; }), ck = !!MAN_CHECK[m.id] && manTab === 'check';
+  $('manBody').innerHTML = '<div class="man-top"><button type="button" class="linkish" data-man-back>← 매뉴얼 목록</button>' + (m.id === 'lesson' && lcCanEdit() ? ' <button type="button" class="btn soft" data-manedit>체크리스트 항목 고치기</button>' : '') +
+    (MAN_CHECK[m.id] ? '<span class="man-tabs" role="group" aria-label="보기"><button type="button" data-mantab="sheet" aria-pressed="'+!ck+'">매뉴얼</button><button type="button" data-mantab="check" aria-pressed="'+ck+'">✓ 체크리스트</button></span>' : '') +
+    '</div><article class="card ms">' + (ck ? manCheckHtml(m) : m.sheet()) + '</article>';
 }
 $('manBody').addEventListener('click', function(ev){
-  var it = ev.target.closest('[data-man]'); if(it){ manOpen = it.dataset.man; renderManual(); window.scrollTo(0, 0); return; }
+  var it = ev.target.closest('[data-man]'); if(it){ manOpen = it.dataset.man; manTab = 'sheet'; renderManual(); window.scrollTo(0, 0); return; }
+  var mt = ev.target.closest('[data-mantab]'); if(mt){ manTab = mt.dataset.mantab; renderManual(); return; }
+  var mc = ev.target.closest('[data-mancs]'); if(mc){ csOpenType(mc.dataset.mancs); return; }
   if(ev.target.closest('[data-man-back]')){ manOpen = null; renderManual(); return; }
   var go = ev.target.closest('[data-go]');
   if(go){ if(go.dataset.go === 'journal'){ state.tpart = 'check'; setView('teacher'); } else setView(state.view, go.dataset.go); }
