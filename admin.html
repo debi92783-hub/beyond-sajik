@@ -381,6 +381,8 @@
   .dt-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
   .flow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
   .flow .step{ flex:1 1 190px; min-width:0; display:flex; align-items:center; gap:10px; text-align:left; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--ink); cursor:pointer; font:inherit; }
+  #moFlow .step{ flex-basis:150px; }
+  .mo-ai{ background:var(--accent-soft); color:var(--accent); }
   .flow .step b{ display:block; font-size:13.5px; white-space:nowrap; }
   .flow .step small{ display:block; font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
   .flow .n{ flex:none; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:800; background:var(--surface-soft); color:var(--ink-soft); }
@@ -1475,24 +1477,25 @@
       <div id="moBody">
         <div class="card">
           <div class="card-head"><h2>학생별 한 달 기록 — <span id="moClassName"></span></h2><span class="muted" id="moSaved"></span></div>
-          <p class="muted" style="margin:0 0 10px">기록은 데일리 테스트에서 저장한 내용으로 자동으로 모여요. 리포트 항목은 원장님과 협의한 뒤 바뀔 수 있어요.</p>
+          <p class="muted" style="margin:0 0 10px">기록은 데일리 테스트에서 저장한 내용으로 자동으로 모여요. 선생님이 메모를 저장하고 '리포트 만들기 요청'을 누르면, 원장님이 클로드로 한 번에 리포트 글을 만들어요. 클로드에는 학생 이름 대신 OO만 보내요.</p>
           <div class="table-wrap">
             <table class="dt-table mo-table">
               <thead><tr>
                 <th class="stick"><input type="checkbox" id="moAll" checked aria-label="전체 선택"></th>
                 <th class="stick2" style="text-align:left;padding-left:8px">이름</th>
                 <th class="grp">출결</th><th>교재 지참</th><th>숙제 완료</th><th>Speaking</th><th>단어 통과</th><th>진도</th>
-                <th class="grp">선생님 코멘트 (강점 · 개선할 점 · 학원과 함께 보완할 내용)</th>
+                <th class="grp">선생님 메모 (강점 · 개선할 점 · 학원과 함께 보완할 내용) — 키워드만 적어도 클로드가 문장으로 만들어요</th>
               </tr></thead>
               <tbody id="moRows"></tbody>
             </table>
           </div>
           <div class="flow" id="moFlow">
             <button type="button" class="step" id="moSaveBtn"><span class="n">1</span><span><b>저장</b><small id="moStep1">코멘트를 저장해요</small></span></button>
-            <button type="button" class="step" id="moMake"><span class="n">2</span><span><b>리포트 만들기</b><small id="moStep2">체크한 학생 리포트</small></span></button>
-            <button type="button" class="step" id="moTAll"><span class="n">3</span><span><b>선생님 확인</b><small id="moStep3">선생님이 확인해요</small></span></button>
-            <button type="button" class="step" id="moDAll"><span class="n">4</span><span><b>원장님 확인</b><small id="moStep4">원장님이 확인·수정해요</small></span></button>
-            <button type="button" class="step" id="moSend"><span class="n">5</span><span><b>발송</b><small id="moStep5">두 분 모두 확인한 것만</small></span></button>
+            <button type="button" class="step" id="moMake"><span class="n">2</span><span><b>리포트 만들기 요청</b><small id="moStep2">체크한 학생을 원장님께</small></span></button>
+            <button type="button" class="step" id="moGen"><span class="n">3</span><span><b>클로드로 일괄 생성</b><small id="moStepG">원장님이 한 번에 만들어요</small></span></button>
+            <button type="button" class="step" id="moTAll"><span class="n">4</span><span><b>선생님 확인·수정</b><small id="moStep3">선생님이 고치고 확인해요</small></span></button>
+            <button type="button" class="step" id="moDAll"><span class="n">5</span><span><b>원장님 일괄 승인</b><small id="moStep4">원장님이 한 번에 승인해요</small></span></button>
+            <button type="button" class="step" id="moSend"><span class="n">6</span><span><b>발송</b><small id="moStep5">승인한 것만 보내요</small></span></button>
           </div>
         </div>
         <div class="card" id="moMsgCard" hidden style="margin-top:20px">
@@ -1965,8 +1968,8 @@ function renderSide(){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
     group[1].forEach(function(m){
       var cur = m[2] === current ? ' aria-current="page"' : '';
-      var un = m[2] === 'trash' ? delWaiting().length : m[2] === 'mail' ? 0 : m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
-      html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+(un ? ' aria-label="'+m[1]+', 안 읽은 '+(m[2] === 'mail' ? '쪽지' : '글')+' '+un+'개"' : '')+'>'+icon(m[0])+m[1]+(un ? '<span class="unread">'+(un > 99 ? '99+' : un)+'</span>' : '')+(m[2] === 'mail' ? mlSideBadge() : '')+'</a>';
+      var un = m[2] === 'trash' ? delWaiting().length : m[2] === 'monthly' ? moPending() : m[2] === 'mail' ? 0 : m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
+      html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+(un ? ' aria-label="'+m[1]+', '+(m[2] === 'monthly' ? (state.view === 'director' ? '생성 대기 ' : '확인할 리포트 ') + un + '명"' : '안 읽은 '+(m[2] === 'mail' ? '쪽지' : '글')+' '+un+'개"') : '')+'>'+icon(m[0])+m[1]+(un ? '<span class="unread">'+(un > 99 ? '99+' : un)+'</span>' : '')+(m[2] === 'mail' ? mlSideBadge() : '')+'</a>';
     });
   });
   if(state.view === 'teacher'){
@@ -3375,8 +3378,21 @@ var MO_FIELDS = [
   ['improve', '개선할 점', '부족한 부분, 개선이 필요한 관찰 내용'],
   ['plan', '학원과 함께 보완할 내용', '개선 방법, 학원 지도 계획과 실행 방법']
 ];
-function moComment(e, s, f){ var ed = e.edit && e.edit[s]; return ed && ed[f] != null ? ed[f] : e.rows[s][f]; }
-function moEdited(e, s){ return MO_FIELDS.some(function(f){ return moComment(e, s, f[0]) !== e.rows[s][f[0]]; }); }
+// 리포트 글: 클로드가 만든 글(선생님이 고친 글 포함, e.gen)이 있으면 그 글, 없으면 선생님 메모. 원장님이 고친 글(e.edit)이 가장 앞서요.
+function moBase(e, s, f){ var g = e.gen && e.gen[s]; return g && g[f] != null ? g[f] : e.rows[s][f]; }
+function moComment(e, s, f){ var ed = e.edit && e.edit[s]; return ed && ed[f] != null ? ed[f] : moBase(e, s, f); }
+function moEdited(e, s){ return MO_FIELDS.some(function(f){ return moComment(e, s, f[0]) !== moBase(e, s, f[0]); }); }
+// 왼쪽 메뉴 숫자: 원장님 = 생성 대기 학생 수, 선생님 = 확인할 리포트 수
+function moPending(){
+  var dir = state.view === 'director', n = 0;
+  Object.keys(moStore).forEach(function(k){
+    var e = moStore[k], c = CLASSES.find(function(x){ return x.id === k.split('|')[0]; });
+    if(!c || (!dir && c.teacher !== state.teacher)) return;
+    if(dir && e.stage === 'req') n += (e.made || []).filter(function(s){ return !(e.gen && e.gen[s]); }).length;
+    if(!dir && e.stage === 'made') n += (e.made || []).filter(function(s){ return !(e.tOk && e.tOk[s]); }).length;
+  });
+  return n;
+}
 
 function renderMonthly(){
   fillTeacherPick();
@@ -3410,16 +3426,18 @@ function moCard(s, e){
   var c = moCls(), g = moAgg(s), t = !!e.tOk[s], d = !!e.dOk[s], st = e.stage;
   var edited = moEdited(e, s);
   var editable = canD() && st === 'made' && t && !d;
+  var tEditable = canT() && st === 'made' && !t;   // 선생님은 확인 전까지 클로드가 만든 글을 고쳐요
   var cmRows = MO_FIELDS.map(function(f, i){
     var v = moComment(e, s, f[0]);
-    var cell = editable ? '<textarea data-dedit="'+f[0]+'" rows="3" aria-label="'+esc(s)+' '+f[1]+' 수정">'+esc(v)+'</textarea>' : esc(v || '–').replace(/\n/g, '<br>');
+    var cell = editable ? '<textarea data-dedit="'+f[0]+'" rows="3" aria-label="'+esc(s)+' '+f[1]+' 수정">'+esc(v)+'</textarea>'
+      : tEditable ? '<textarea data-tedit="'+f[0]+'" rows="3" aria-label="'+esc(s)+' '+f[1]+' 고치기">'+esc(v)+'</textarea>' : esc(v || '–').replace(/\n/g, '<br>');
     return '<tr><th>'+f[1].replace('학원과 함께 ', '학원과 함께<br>')+'</th><td>'+cell+(i === 2 && edited ? '<span class="tag mo-edited">원장님 수정</span>' : '')+'</td></tr>';
   }).join('');
   var dv = e.dcom[s] || '';
   var dCell = editable ? '<textarea data-dcom rows="3" placeholder="원장님이 학부모님께 전하는 말" aria-label="'+esc(s)+' 원장님 코멘트">'+esc(dv)+'</textarea>'
     : dv ? esc(dv).replace(/\n/g, '<br>') : '<span class="muted">'+(d ? '–' : '원장님 확인 때 써요')+'</span>';
   var tBtn = '<button class="btn soft okbtn" type="button" data-tok aria-pressed="'+t+'"'+(st !== 'made' || !canT() || d ? ' disabled' : '')+'>'+(t ? '선생님 확인함' : '선생님 확인')+'</button>';
-  var dBtn = '<button class="btn soft okbtn" type="button" data-dok aria-pressed="'+d+'"'+(st !== 'made' || !canD() || !t ? ' disabled' : '')+'>'+(d ? '원장님 확인함' : '원장님 확인')+'</button>';
+  var dBtn = '<button class="btn soft okbtn" type="button" data-dok aria-pressed="'+d+'"'+(st !== 'made' || !canD() || !t ? ' disabled' : '')+'>'+(d ? '원장님 승인함' : '원장님 승인')+'</button>';
   return '<div class="rc'+(t && d ? ' ok' : '')+'" data-name="'+esc(s)+'"><table>' +
     '<tr class="top"><th>이름</th><td>'+esc(s)+'</td></tr>' +
     '<tr><th>반/담임</th><td>'+esc(c.name)+' · '+esc(c.teacher)+' 선생님</td></tr>' +
@@ -3429,7 +3447,7 @@ function moCard(s, e){
     '<tr><th>숙제</th><td>완료 '+pct(g.hw, g.in)+' // Speaking 완료 '+pct(g.spk, g.in)+'</td></tr>' +
     '<tr><th>단어</th><td>'+(g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음')+'</td></tr>' +
     '<tr><th>진도</th><td>'+esc(g.progText)+'</td></tr>' +
-    '<tr class="mo-sec"><td colspan="2">선생님 코멘트</td></tr>' + cmRows +
+    '<tr class="mo-sec"><td colspan="2">선생님 코멘트'+(e.gen && e.gen[s] && e.gen[s].ai ? ' <span class="tag mo-ai">클로드로 만듦</span>' : '')+'</td></tr>' + cmRows +
     '<tr class="mo-sec"><td colspan="2">원장님 코멘트</td></tr><tr><th>원장님</th><td>'+dCell+'</td></tr>' +
     '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button>'+tBtn+dBtn+'</div></div>';
 }
@@ -3453,32 +3471,35 @@ function renderMoFlow(){
   var made = st === 'made' || st === 'sent' ? (e.made || []) : [];
   var tN = made.filter(function(s){ return e.tOk[s]; }).length;
   var dN = made.filter(function(s){ return e.tOk[s] && e.dOk[s]; }).length;
-  var nowIdx = st === 'draft' ? 0 : st === 'saved' ? 1 : st === 'made' ? (tN < made.length ? 2 : dN < made.length ? 3 : 4) : -1;
-  ['moSaveBtn','moMake','moTAll','moDAll','moSend'].forEach(function(id, i){
+  var req = st === 'req' ? (e.made || []) : [], reqLeft = req.filter(function(s){ return !(e.gen && e.gen[s]); }).length;
+  var nowIdx = st === 'draft' ? 0 : st === 'saved' ? 1 : st === 'req' ? 2 : st === 'made' ? (tN < made.length ? 3 : dN < made.length ? 4 : 5) : -1;
+  ['moSaveBtn','moMake','moGen','moTAll','moDAll','moSend'].forEach(function(id, i){
     $(id).className = 'step' + (st === 'sent' || i < nowIdx ? ' done' : i === nowIdx ? ' now' : '');
   });
-  $('moMake').disabled = st === 'draft';
+  $('moMake').disabled = st === 'draft' || !!moBusy;
+  $('moGen').disabled = st !== 'req' || !canD() || !!moBusy;
+  $('moStep2').textContent = req.length ? req.length + '명 요청함' + (canD() ? '' : ' · 원장님 차례') : made.length ? made.length + '명 요청함' : '체크한 학생을 원장님께';
+  $('moStepG').textContent = moBusy ? '만드는 중 ' + moBusy.done + ' / ' + moBusy.all + '명…' : req.length ? (canD() ? '생성 대기 ' + reqLeft + '명 · 눌러서 만들기' : '원장님이 만들어요') : made.length ? made.length + '명 생성 완료' : '원장님이 한 번에 만들어요';
   $('moTAll').disabled = st !== 'made' || !canT() || tN === made.length;
   $('moDAll').disabled = st !== 'made' || !canD() || dN === tN;
   $('moSend').disabled = st !== 'made' || dN === 0;
   $('moStep1').textContent = st !== 'draft' ? '저장됨 ' + hm(e.savedAt) : '코멘트를 저장해요';
-  $('moStep2').textContent = made.length ? made.length + '명 리포트 완성' : '체크한 학생 리포트';
-  $('moStep3').textContent = made.length ? '확인 ' + tN + ' / ' + made.length + '명' + (st === 'made' && !canT() && tN < made.length ? ' · 선생님 차례' : '') : '선생님이 확인해요';
-  $('moStep4').textContent = made.length ? '확인 ' + dN + ' / ' + made.length + '명' + (st === 'made' && !canD() && dN < tN ? ' · 원장님 차례' : '') : '원장님이 확인·수정해요';
-  $('moStep5').textContent = st === 'sent' ? e.sent + '명 발송 완료 ' + hm(e.sentAt) : dN ? '확인 끝난 ' + dN + '명에게 보내요' : '두 분 모두 확인한 것만';
-  $('moSaved').textContent = st === 'draft' ? (e.savedAt ? '고친 내용이 있어요 · 다시 저장해 주세요' : '아직 저장 전이에요') : st === 'sent' ? '발송 완료' : '저장됨 · ' + hm(e.savedAt);
+  $('moStep3').textContent = made.length ? '확인 ' + tN + ' / ' + made.length + '명' + (st === 'made' && !canT() && tN < made.length ? ' · 선생님 차례' : '') : '선생님이 고치고 확인해요';
+  $('moStep4').textContent = made.length ? '승인 ' + dN + ' / ' + made.length + '명' + (st === 'made' && !canD() && dN < tN ? ' · 원장님 차례' : '') : '원장님이 한 번에 승인해요';
+  $('moStep5').textContent = st === 'sent' ? e.sent + '명 발송 완료 ' + hm(e.sentAt) : dN ? '승인한 ' + dN + '명에게 보내요' : '승인한 것만 보내요';
+  $('moSaved').textContent = st === 'draft' ? (e.savedAt ? '고친 내용이 있어요 · 다시 저장해 주세요' : '아직 저장 전이에요') : st === 'sent' ? '발송 완료' : st === 'req' ? '원장님께 요청함 · ' + hm(e.reqAt) : '저장됨 · ' + hm(e.savedAt);
   $('moMsgCard').hidden = !made.length;
   if(made.length){
     $('moMsgs').innerHTML = made.map(function(s){ return moCard(s, e); }).join('');
-    $('moOkCount').textContent = st === 'sent' ? e.sent + '명에게 보냈어요' : '선생님 ' + tN + ' · 원장님 ' + dN + ' / ' + made.length + '명';
+    $('moOkCount').textContent = st === 'sent' ? e.sent + '명에게 보냈어요' : '선생님 확인 ' + tN + ' · 원장님 승인 ' + dN + ' / ' + made.length + '명';
     $('moHelp').textContent = canD()
-      ? '선생님이 확인한 리포트는 원장님이 선생님 코멘트를 다듬고 원장님 코멘트를 쓴 뒤 \'원장님 확인\'을 눌러 주세요. 두 분 모두 확인한 리포트만 발송돼요.'
-      : '리포트를 읽어 보고 \'선생님 확인\'을 눌러 주세요. 그다음 원장님이 확인하고, 필요하면 코멘트를 고쳐요.';
+      ? '선생님이 확인한 리포트는 필요하면 코멘트를 다듬고 원장님 코멘트를 쓴 뒤 \'원장님 승인\'을 눌러요. ⑤ \'원장님 일괄 승인\'을 누르면 선생님이 확인한 리포트를 한 번에 승인해요.'
+      : '클로드가 만든 글을 읽고 칸 안에서 바로 고친 뒤 \'선생님 확인\'을 눌러 주세요. 그다음 원장님이 승인해요.';
   }
 }
 function moEdit(selOnly){
   var e = moEntry();
-  if(selOnly){ if(e.stage === 'made') e.stage = 'saved'; }
+  if(selOnly){ if(e.stage === 'made' || e.stage === 'req') e.stage = 'saved'; }
   else if(e.stage !== 'draft') e.stage = 'draft';
   moSave(); renderMoFlow();
 }
@@ -3498,15 +3519,90 @@ $('moAll').addEventListener('change', function(){
 $('moSaveBtn').addEventListener('click', function(){
   var e = moEntry();
   if(e.stage !== 'draft'){ toast('이미 저장돼 있어요.'); return; }
-  e.stage = 'saved'; e.savedAt = Date.now(); e.made = []; e.tOk = {}; e.dOk = {}; e.edit = {}; e.dcom = {};
-  moSave(); renderMoFlow(); toast('저장했어요. 이제 월말 리포트를 만들 수 있어요.');
+  e.stage = 'saved'; e.savedAt = Date.now(); e.made = []; e.gen = {}; e.tOk = {}; e.dOk = {}; e.edit = {}; e.dcom = {};
+  moSave(); renderMoFlow(); toast('저장했어요. 이제 \'리포트 만들기 요청\'을 눌러 주세요.');
 });
 $('moMake').addEventListener('click', function(){
   var e = moEntry(), picked = moCls().students.filter(function(s){ return e.rows[s].on; });
   if(!picked.length){ toast('리포트를 만들 학생을 먼저 체크해 주세요.'); return; }
-  e.made = picked; e.tOk = {}; e.dOk = {}; e.edit = {}; e.dcom = {}; e.stage = 'made';
-  moSave(); renderMoFlow();
-  $('moMsgCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  if(e.stage === 'made' && !confirm('이미 만든 리포트가 있어요. 다시 요청하면 원장님이 새로 만들고, 지금 만든 글은 새 글로 바뀌어요. 다시 요청할까요?')) return;
+  e.made = picked; e.gen = {}; e.tOk = {}; e.dOk = {}; e.edit = {}; e.dcom = {}; e.stage = 'req'; e.reqAt = Date.now(); e.reqBy = session ? session.name : '';
+  moSave(); renderMoFlow(); renderSide();
+  toast(picked.length + '명 리포트를 원장님께 요청했어요. 원장님이 클로드로 만들면 ④에서 고치고 확인해요.');
+});
+/* 클로드로 일괄 생성 (원장님): 업무 화면을 클로드 링크로 열었을 때 원장님 계정으로 만들어요.
+   학생 이름은 OO로 바꿔 보내고, 돌아온 글에서 OO를 이름으로 바꿔 넣어요. 연락처 등 다른 개인정보는 보내지 않아요. */
+var moBusy = null;
+// 이 학생 이름(성 빼고 부르는 이름 포함)은 OO, 같은 반 다른 학생 이름은 '친구'로 바꿔요.
+function moHide(text, s){
+  var out = String(text || ''), list = [];
+  moCls().students.forEach(function(n){ list.push([n, n === s ? 'OO' : '친구']); if(n.length >= 3) list.push([n.slice(1), n === s ? 'OO' : '친구']); });
+  list.sort(function(x, y){ return y[0].length - x[0].length; }).forEach(function(r){ out = out.split(r[0]).join(r[1]); });
+  return out;
+}
+function moPrompt(list){
+  return ['당신은 초·중등 영어학원 \'비욘드잉글리쉬\'의 담임 선생님입니다. 아래 학생별 한 달 기록과 담임 선생님 메모를 바탕으로, 학부모님께 보내는 월말 리포트의 세 칸을 학생마다 써 주세요.',
+    '- strength (강점): 학습 태도, 사고력, 이해도, 성실함 가운데 기록과 메모로 확인되는 장점',
+    '- improve (개선할 점): 부족한 부분이나 관찰된 내용',
+    '- plan (학원과 함께 보완할 내용): 학원의 구체적인 지도 계획과 가정에서 도와주실 점',
+    '규칙:',
+    '1. 학생 이름은 반드시 "OO"로만 쓰세요. 예: "OO 학생은 ~"',
+    '2. 기록과 메모에 없는 사실, 점수, 일화는 지어내지 마세요. 메모가 비어 있으면 숫자 기록으로 확인되는 내용만 짧게 쓰세요.',
+    '3. 학부모님께 드리는 정중한 존댓말(~습니다체)로 쓰고, 칸마다 2~3문장으로 쓰세요. 과장이나 감정적인 표현 대신 관찰한 사실과 계획을 쓰세요.',
+    '4. 교재명과 단원명(예: STORY > (2-unit3))은 원문 그대로 쓰세요.',
+    '5. 백분율과 횟수는 기록에 있는 숫자만 쓰세요.',
+    '반드시 JSON 배열 하나만 답하세요. 형식: [{"id":"s1","strength":"...","improve":"...","plan":"..."}]',
+    '', '학생 기록:', JSON.stringify(list, null, 1)].join('\n');
+}
+function moGenData(e, names){
+  return names.map(function(s, i){
+    var g = moAgg(s), r = e.rows[s];
+    return { id:'s' + (i + 1), 월:moMonth.getFullYear() + '년 ' + (moMonth.getMonth()+1) + '월', 진도:g.progText, 출결:g.attText,
+      교재지참:pct(g.book, g.in), 숙제완료:pct(g.hw, g.in), Speaking완료:pct(g.spk, g.in), 단어:g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음',
+      선생님메모:{ 강점:moHide(r.strength, s), 개선할점:moHide(r.improve, s), 보완계획:moHide(r.plan, s) } };
+  });
+}
+function moSampler(){ return window.claude && typeof window.claude.use === 'function' ? window.claude.use('sample').catch(function(){ return null; }) : Promise.resolve(null); }
+$('moGen').addEventListener('click', function(){
+  var e = moEntry(); if(e.stage !== 'req' || !canD() || moBusy) return;
+  e.gen = e.gen || {};
+  var todo = (e.made || []).filter(function(s){ return !e.gen[s]; });
+  var finish = function(){
+    moBusy = null;
+    if((e.made || []).every(function(s){ return e.gen[s]; })){ e.stage = 'made'; e.genAt = Date.now(); }
+    moSave(); renderMoFlow(); renderSide();
+  };
+  if(!todo.length) return finish();
+  moSampler().then(function(sample){
+    if(!sample){
+      if(!confirm('지금 화면에서는 클로드를 쓸 수 없어요. 클로드 링크(claude.ai)로 업무 화면을 열면 쓸 수 있어요.\n\n대신 선생님 메모를 그대로 넣어 리포트를 만들까요?')) return;
+      todo.forEach(function(s){ e.gen[s] = { strength:e.rows[s].strength, improve:e.rows[s].improve, plan:e.rows[s].plan }; });
+      finish(); toast('선생님 메모로 리포트를 만들었어요. 이제 선생님이 고치고 확인해요.'); return;
+    }
+    moBusy = { done:0, all:todo.length }; renderMoFlow();
+    var chunks = []; for(var i = 0; i < todo.length; i += 5) chunks.push(todo.slice(i, i + 5));
+    var fail = null;
+    var next = function(ci){
+      if(ci >= chunks.length || fail){
+        var left = (e.made || []).filter(function(s){ return !e.gen[s]; }).length;
+        finish();
+        if(!left) toast('클로드로 ' + todo.length + '명 리포트를 만들었어요. 이제 선생님이 고치고 확인해요.');
+        else toast(fail === 'not_granted' ? '클로드 사용을 허용해야 만들 수 있어요.' : fail === 'rate_limited' ? '잠시 뒤에 다시 눌러 주세요. 남은 ' + left + '명을 이어서 만들어요.' : '남은 ' + left + '명은 만들지 못했어요. 다시 누르면 이어서 만들어요.');
+        return;
+      }
+      var names = chunks[ci], data = moGenData(e, names);
+      sample.json(moPrompt(data), { modelTier:'default' }).then(function(res){
+        (Array.isArray(res) ? res : []).forEach(function(x){
+          var k = data.findIndex(function(d){ return d.id === (x && x.id); }); if(k < 0) return;
+          var s = names[k], put = function(v){ return String(v || '').trim().split('OO').join(s); };
+          e.gen[s] = { strength:put(x.strength), improve:put(x.improve), plan:put(x.plan), ai:true };
+        });
+        moBusy.done = Math.min(moBusy.all, moBusy.done + names.length); moSave(); renderMoFlow();
+        next(ci + 1);
+      }, function(err){ fail = (err && err.code) || 'error'; next(ci + 1); });
+    };
+    next(0);
+  });
 });
 $('moTAll').addEventListener('click', function(){
   var e = moEntry(); if(e.stage !== 'made' || !canT()) return;
@@ -3516,17 +3612,18 @@ $('moTAll').addEventListener('click', function(){
 $('moDAll').addEventListener('click', function(){
   var e = moEntry(); if(e.stage !== 'made' || !canD()) return;
   var n = 0; e.made.forEach(function(s){ if(e.tOk[s] && !e.dOk[s]){ e.dOk[s] = true; n++; } });
-  moSave(); renderMoFlow(); toast('원장님 확인 ' + n + '명을 마쳤어요.');
+  moSave(); renderMoFlow(); toast(n ? '선생님이 확인한 ' + n + '명을 한 번에 승인했어요.' : '선생님 확인이 끝난 리포트가 없어요.');
 });
 $('moMsgs').addEventListener('input', function(ev){
   var el = ev.target, e = moEntry(), s = el.closest('.rc') && el.closest('.rc').dataset.name; if(!s) return;
   if(el.matches('[data-dedit]')){ e.edit[s] = e.edit[s] || {}; e.edit[s][el.dataset.dedit] = el.value; moSave(); }
+  else if(el.matches('[data-tedit]')){ e.gen = e.gen || {}; e.gen[s] = e.gen[s] || { strength:e.rows[s].strength, improve:e.rows[s].improve, plan:e.rows[s].plan }; e.gen[s][el.dataset.tedit] = el.value; moSave(); }
   else if(el.matches('[data-dcom]')){ e.dcom[s] = el.value; moSave(); }
 });
 $('moMsgs').addEventListener('click', function(ev){
   var e = moEntry(), card = ev.target.closest('.rc'); if(!card) return;
   var s = card.dataset.name;
-  if(ev.target.closest('[data-tok]')){ e.tOk[s] = !e.tOk[s]; moSave(); renderMoFlow(); return; }
+  if(ev.target.closest('[data-tok]')){ e.tOk[s] = !e.tOk[s]; moSave(); renderMoFlow(); renderSide(); return; }
   if(ev.target.closest('[data-dok]')){
     e.dOk[s] = !e.dOk[s];
     if(e.edit[s] && !moEdited(e, s)) delete e.edit[s];
