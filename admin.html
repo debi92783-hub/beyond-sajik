@@ -862,6 +862,13 @@
   .ml-tabs b{ display:inline-block; min-width:18px; margin-left:5px; padding:0 5px; border-radius:99px; background:var(--warn); color:#fff; font-size:11px; line-height:18px; }
   .ml-list{ list-style:none; margin:0; padding:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; max-width:980px; }
   .ml-list li + li{ border-top:1px solid var(--border); }
+  .ml-li{ display:flex; align-items:center; }
+  .ml-li .ml-row{ flex:1; min-width:0; }
+  .ml-acts{ display:flex; gap:4px; padding-right:12px; flex:none; }
+  .ml-acts button{ font:inherit; font-size:12px; font-weight:700; padding:4px 9px; border-radius:7px; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .ml-acts button:hover{ background:var(--surface-soft); }
+  .ml-acts .bd-del{ color:var(--warn); }
+  .ml-ed{ font-style:normal; font-size:11px; font-weight:700; color:var(--hold); background:var(--hold-soft); border-radius:6px; padding:1px 6px; margin-left:6px; }
   .ml-row{ display:grid; grid-template-columns:14px 150px minmax(0,1fr) auto; gap:10px; align-items:center; width:100%; font:inherit; text-align:left; background:none; border:0; padding:13px 16px; cursor:pointer; color:var(--ink-soft); }
   .ml-row:hover{ background:var(--surface-soft); }
   .ml-row .dot{ width:8px; height:8px; border-radius:99px; background:transparent; }
@@ -4841,7 +4848,7 @@ function renderMail(){
     '<button type="button" role="tab" data-mlbox="in" aria-selected="'+(ml.mode !== 'write' && ml.box === 'in')+'">받은 쪽지'+(un ? '<b>'+un+'</b>' : '')+'</button>' +
     '<button type="button" role="tab" data-mlbox="out" aria-selected="'+(ml.mode !== 'write' && ml.box === 'out')+'">보낸 쪽지'+(mlPending() ? '<b class="o" title="상대가 아직 안 읽은 쪽지">'+mlPending()+'</b>' : '')+'</button></div>' +
     '<button type="button" class="btn" data-mlwrite>쪽지 쓰기</button></div>';
-  if(ml.mode === 'write') html += mlFormHtml();
+  if(ml.mode === 'write' || ml.mode === 'edit') html += mlFormHtml();
   else if(ml.mode === 'view') html += mlViewHtml();
   else html += mlListHtml();
   $('mlBody').innerHTML = html;
@@ -4852,10 +4859,11 @@ function mlListHtml(){
   if(!list.length) return '<ul class="ml-list"><li class="ml-empty">'+(out ? '보낸 쪽지가 없어요.' : '받은 쪽지가 없어요.')+'</li></ul>';
   return '<ul class="ml-list">' + list.map(function(m){
     var rd = m.to.filter(function(id){ return (m.read || {})[id]; }).length;
-    return '<li><button type="button" class="ml-row'+(!out && !mlIsRead(m) ? ' unread' : '')+'" data-mlopen="'+m.id+'"><span class="dot"></span>' +
+    return '<li class="ml-li"><button type="button" class="ml-row'+(!out && !mlIsRead(m) ? ' unread' : '')+'" data-mlopen="'+m.id+'"><span class="dot"></span>' +
       '<span class="who">'+esc(out ? mlToText(m) : mlName(m.from))+'</span>' +
-      '<span class="subj">'+esc(m.subj)+'<small>'+esc(m.body.split('\n')[0].slice(0, 40))+'</small></span>' +
-      '<span class="meta">'+(out ? '<span class="ml-read'+(rd === m.to.length ? ' all' : '')+'">'+(m.to.length === 1 ? (rd ? '읽음' : '안 읽음') : '읽음 '+rd+'/'+m.to.length)+'</span>' : '')+mlWhen(m.date)+'</span></button></li>';
+      '<span class="subj">'+esc(m.subj)+(m.edited ? '<em class="ml-ed">수정됨</em>' : '')+'<small>'+esc(m.body.split('\n')[0].slice(0, 40))+'</small></span>' +
+      '<span class="meta">'+(out ? '<span class="ml-read'+(rd === m.to.length ? ' all' : '')+'">'+(m.to.length === 1 ? (rd ? '읽음' : '안 읽음') : '읽음 '+rd+'/'+m.to.length)+'</span>' : '')+mlWhen(m.date)+'</span></button>' +
+      '<span class="ml-acts">'+(out ? '<button type="button" data-mledit="'+m.id+'">수정</button>' : '')+'<button type="button" class="bd-del" data-mldel="'+m.id+'">삭제</button></span></li>';
   }).join('') + '</ul>';
 }
 function mlCur(){ return mlStore.msgs.find(function(x){ return x.id === ml.id; }); }
@@ -4866,12 +4874,13 @@ function mlViewHtml(){
   return '<article class="ml-view"><h2>'+esc(m.subj)+'</h2><dl class="ml-head">' +
     '<dt>보낸 사람</dt><dd>'+esc(mlName(m.from))+'</dd>' +
     '<dt>받는 사람</dt><dd>'+m.to.map(function(id){ var r = (m.read || {})[id]; return '<span class="ml-to'+(mine && r ? ' r' : '')+'">'+esc(mlName(id))+(mine ? (r ? ' ✓' : '') : '')+'</span>'; }).join('')+'</dd>' +
-    '<dt>보낸 때</dt><dd>'+ymd(d)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+(mine ? ' · 읽은 사람 ✓ 표시' : '')+'</dd></dl>' +
+    '<dt>보낸 때</dt><dd>'+ymd(d)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+(m.edited ? ' · 수정함 ' + mlWhen(m.edited) : '')+(mine ? ' · 읽은 사람 ✓ 표시' : '')+'</dd></dl>' +
     '<div class="ml-content">'+esc(m.body)+'</div>' +
     '<div class="bd-actions"><button type="button" class="btn soft" data-mlback>목록</button><span>' +
       (!mine ? '<button type="button" class="btn" data-mlreply="one">답장</button> ' : '') +
       (!mine && m.to.length > 1 ? '<button type="button" class="btn soft" data-mlreply="all">전체 답장</button> ' : '') +
-      '<button type="button" class="btn soft" data-mlfwd>전달</button> <button type="button" class="btn soft bd-del" data-mldel>삭제</button></span></div></article>';
+      (mine ? '<button type="button" class="btn soft" data-mledit="'+m.id+'">수정</button> ' : '') +
+      '<button type="button" class="btn soft" data-mlfwd>전달</button> <button type="button" class="btn soft bd-del" data-mldel="'+m.id+'">삭제</button></span></div></article>';
 }
 function mlFormHtml(){
   var ppl = mlPeople(), ts = ppl.filter(function(a){ return a.role === 'teacher'; });
@@ -4880,11 +4889,13 @@ function mlFormHtml(){
     ppl.map(function(a){ return '<button type="button" data-mlto="'+esc(a.id)+'" aria-pressed="'+(ml.to.indexOf(a.id) !== -1)+'">'+esc(mlName(a.id))+'</button>'; }).join('') + '</div>' +
     '<span class="ml-picked">'+(ml.to.length ? ml.to.length + '명 선택했어요' : '받는 사람을 눌러서 골라 주세요')+'</span>'
     : '<span class="ml-picked">아직 쪽지를 받을 계정이 없어요. 원장님이 \'선생님 계정·권한\'에서 선생님을 등록하면 여기에 나와요.</span>';
-  return '<form class="ml-form" id="mlForm" novalidate><h2>쪽지 쓰기</h2><div class="lbl">받는 사람'+pick+'</div>' +
+  var em = ml.mode === 'edit' ? mlCur() : null;
+  if(em) pick = '<span class="ml-picked">'+esc(em.to.map(mlName).join(', '))+' <small class="muted">(받는 사람은 바꿀 수 없어요)</small></span>';
+  return '<form class="ml-form" id="mlForm" novalidate><h2>'+(em ? '보낸 쪽지 수정' : '쪽지 쓰기')+'</h2>'+(em ? '<p class="muted" style="margin:0">고쳐서 저장하면 받는 사람 쪽지함에도 고친 내용으로 보이고, \'수정됨\' 표시와 함께 다시 안 읽음으로 바뀌어요. 고치기 전 내용도 기록으로 남아요.</p>' : '')+'<div class="lbl">받는 사람'+pick+'</div>' +
     '<label>제목<input type="text" id="mlS" maxlength="80" value="'+esc(ml.subj)+'"></label>' +
     '<label>내용<textarea id="mlB" rows="9">'+esc(ml.body)+'</textarea></label>' +
     '<p class="form-err" id="mlErr"></p>' +
-    '<div class="bd-actions"><button type="button" class="btn soft" data-mlcancel>취소</button><button type="submit" class="btn">보내기</button></div></form>';
+    '<div class="bd-actions"><button type="button" class="btn soft" data-mlcancel>취소</button><button type="submit" class="btn">'+(em ? '수정 저장' : '보내기')+'</button></div></form>';
 }
 function mlKeepDraft(){ if($('mlS')){ ml.subj = $('mlS').value; ml.body = $('mlB').value; } }
 function mlWrite(to, subj, body){ ml.mode = 'write'; ml.to = to || []; ml.subj = subj || ''; ml.body = body || ''; renderMail(); window.scrollTo(0, 0); }
@@ -4906,6 +4917,19 @@ $('mlBody').addEventListener('click', function(ev){
     ml.to = all ? ml.to.filter(function(id){ return ts.indexOf(id) === -1; }) : ml.to.concat(ts.filter(function(id){ return ml.to.indexOf(id) === -1; }));
     return renderMail();
   }
+  var ed = ev.target.closest('[data-mledit]');
+  if(ed){
+    var em = mlStore.msgs.find(function(x){ return x.id === +ed.dataset.mledit; });
+    if(!em || em.from !== session.id) return;
+    ml.id = em.id; ml.mode = 'edit'; ml.to = em.to.slice(); ml.subj = em.subj; ml.body = em.body; renderMail(); return window.scrollTo(0, 0);
+  }
+  var dl = ev.target.closest('[data-mldel]');
+  if(dl){
+    var dm = mlStore.msgs.find(function(x){ return x.id === +dl.dataset.mldel; }); if(!dm) return;
+    if(!confirm('이 쪽지를 내 쪽지함에서 지울까요? 상대방 쪽지함에는 그대로 남아요.')) return;
+    if(ml.box === 'out' && dm.from === session.id) dm.delOut = 1; else (dm.delIn = dm.delIn || {})[session.id] = 1;
+    saveMl(); ml.mode = 'list'; toast('쪽지를 지웠어요.'); return renderMail();
+  }
   var cur = mlCur();
   var rp = ev.target.closest('[data-mlreply]');
   if(rp && cur){
@@ -4913,13 +4937,8 @@ $('mlBody').addEventListener('click', function(ev){
     return mlWrite(to, /^RE:/.test(cur.subj) ? cur.subj : 'RE: ' + cur.subj, '\n\n----- 받은 쪽지 -----\n보낸 사람: ' + mlName(cur.from) + '\n' + cur.body);
   }
   if(ev.target.closest('[data-mlfwd]') && cur) return mlWrite([], 'FW: ' + cur.subj, '\n\n----- 전달하는 쪽지 -----\n보낸 사람: ' + mlName(cur.from) + '\n받는 사람: ' + cur.to.map(mlName).join(', ') + '\n' + cur.body);
-  if(ev.target.closest('[data-mldel]') && cur){
-    if(!confirm('이 쪽지를 내 쪽지함에서 지울까요? 상대방 쪽지함에는 그대로 남아요.')) return;
-    if(ml.box === 'out' && cur.from === session.id) cur.delOut = 1; else (cur.delIn = cur.delIn || {})[session.id] = 1;
-    saveMl(); ml.mode = 'list'; toast('쪽지를 지웠어요.'); return renderMail();
-  }
   if(ev.target.closest('[data-mlback]')){ ml.mode = 'list'; return renderMail(); }
-  if(ev.target.closest('[data-mlcancel]')){ ml.mode = 'list'; return renderMail(); }
+  if(ev.target.closest('[data-mlcancel]')){ var wasEdit = ml.mode === 'edit'; ml.mode = wasEdit ? 'view' : 'list'; if(wasEdit){ ml.to = []; ml.subj = ''; ml.body = ''; } return renderMail(); }
 });
 $('mlBody').addEventListener('submit', function(ev){
   ev.preventDefault(); if(ev.target.id !== 'mlForm') return;
@@ -4927,6 +4946,15 @@ $('mlBody').addEventListener('submit', function(ev){
   if(!ml.to.length){ $('mlErr').textContent = '받는 사람을 한 명 이상 골라 주세요.'; return; }
   if(!subj){ $('mlErr').textContent = '제목을 적어 주세요.'; return $('mlS').focus(); }
   if(!body){ $('mlErr').textContent = '내용을 적어 주세요.'; return $('mlB').focus(); }
+  if(ml.mode === 'edit'){
+    var em = mlCur(); if(!em || em.from !== session.id) return;
+    if(em.subj !== subj || em.body !== body){
+      (em.hist = em.hist || []).push({ subj:em.subj, body:em.body, at:em.edited || em.date });   // 고치기 전 내용은 기록으로 남겨요
+      em.subj = subj; em.body = body; em.edited = Date.now(); em.read = {};
+      saveMl(); toast('쪽지를 고쳤어요. 받는 사람에게 다시 안 읽음으로 보여요.');
+    }
+    ml.to = []; ml.subj = ''; ml.body = ''; ml.mode = 'view'; return renderMail();
+  }
   mlStore.seq = (mlStore.seq || 0) + 1;
   mlStore.msgs.push({ id:mlStore.seq, from:session.id, to:ml.to.slice(), subj:subj, body:body, date:Date.now(), read:{} });
   saveMl(); toast(ml.to.length + '명에게 쪽지를 보냈어요.');
