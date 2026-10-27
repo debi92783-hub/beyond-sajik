@@ -109,6 +109,30 @@
   .classes .dept{ color:var(--ink-soft); }
   .classes .name{ font-weight:600; }
   .classes .low{ color:var(--warn); font-weight:700; }
+  .hm-row{ margin-top:0; }
+  .hm-list{ list-style:none; margin:0; padding:0; }
+  .hm-list li + li{ border-top:1px solid var(--border); }
+  .hm-list button{ display:grid; grid-template-columns:86px minmax(0,1fr) auto; gap:10px; align-items:center; width:100%; font:inherit; font-size:13px; text-align:left; background:none; border:0; padding:10px 2px; cursor:pointer; color:var(--ink); }
+  .hm-list button:hover{ background:var(--surface-soft); }
+  .hm-list .when{ color:var(--ink-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .hm-list .when.today{ color:var(--accent); font-weight:800; }
+  .hm-list .ttl{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hm-list .ttl i{ display:inline-block; width:8px; height:8px; border-radius:99px; margin-right:7px; vertical-align:1px; }
+  .hm-list .side-t{ color:var(--ink-faint); font-size:12px; white-space:nowrap; }
+  .hm-list .unread .ttl{ font-weight:800; }
+  .hm-list.mail button{ grid-template-columns:110px minmax(0,1fr) auto; }
+  .hm-empty{ color:var(--ink-faint); font-size:13px; padding:14px 2px; margin:0; }
+  .hm-chips{ display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+  .hm-chips span{ font-size:12px; color:var(--ink-faint); align-self:center; margin-right:2px; }
+  .hm-chips button{ font:inherit; font-size:12.5px; font-weight:700; border:1px solid var(--border); background:var(--surface); color:var(--ink); border-radius:99px; padding:4px 11px; cursor:pointer; }
+  .hm-chips button b{ color:var(--warn); margin-left:4px; }
+  .card-head .linkish{ margin:0; font-size:12.5px; }
+  .kpi.go{ cursor:pointer; text-align:left; font:inherit; color:inherit; }
+  .kpi.go:hover{ border-color:var(--accent); }
+  .th-cls{ display:grid; grid-template-columns:100px minmax(0,1fr) auto; gap:10px; align-items:center; padding:11px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .th-cls:last-child{ border-bottom:0; }
+  .th-cls .t{ font-weight:800; font-variant-numeric:tabular-nums; } .th-cls small{ color:var(--ink-faint); margin-left:6px; }
+  @media (max-width:600px){ .hm-list button, .hm-list.mail button{ grid-template-columns:70px minmax(0,1fr); } .hm-list .side-t{ display:none; } .th-cls{ grid-template-columns:80px minmax(0,1fr); } .th-cls .btn{ grid-column:1 / -1; justify-self:start; } }
   .grid-2{ display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin:24px 0; }
   .sched{ display:flex; flex-direction:column; }
   .sched div{ display:grid; grid-template-columns:110px 1fr auto; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); font-size:13px; }
@@ -1104,6 +1128,11 @@
 
       <div class="kpis" id="kpis"></div>
 
+      <div class="grid-2 hm-row">
+        <div class="card" id="dHmEvents"></div>
+        <div class="card" id="dHmMail"></div>
+      </div>
+
       <div class="card">
         <div class="card-head">
           <h2>반별 현황</h2>
@@ -1133,6 +1162,20 @@
         <div class="alerts" id="alerts"></div>
       </div>
       <p class="sample-note">지금 보이는 반·학생·숫자는 모두 화면 확인용 예시예요. 구글 시트를 연결하면 실제 데이터로 바뀌어요.</p>
+    </section>
+
+    <!-- 선생님 홈 (오늘 한눈에) -->
+    <section id="view-thome" hidden>
+      <div class="greet"><div><h1 id="thHello">안녕하세요, 선생님</h1><p><span class="today"></span> · 오늘 할 일을 한눈에 봐요</p></div></div>
+      <div class="kpis" id="thKpis"></div>
+      <div class="grid-2 hm-row">
+        <div class="card" id="thClasses"></div>
+        <div class="card" id="tHmMail"></div>
+      </div>
+      <div class="grid-2 hm-row">
+        <div class="card" id="tHmEvents"></div>
+        <div class="card" id="tHmBoard"></div>
+      </div>
     </section>
 
     <!-- 선생님 업무 체크리스트 -->
@@ -1655,16 +1698,17 @@ function $(id){ return document.getElementById(id); }
 
 var MENU = {
   director: [
-    ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar']]],
+    ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
     ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult']]],
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly']]],
-    ['소통', [['mail','쪽지함','mail'],['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
+    ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
     ['', [['clock','태블릿 등원 화면','kiosk'],['bell','학부모·학생 알림 페이지','parent']]]
   ],
   teacher: [
-    ['내 수업', [['book','업무 체크리스트','journal'],['pen','수업 기록(진도·과제)','progress'],['stamp','교무일지','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['cal','일정','calendar']]],
-    ['소통', [['mail','쪽지함','mail'],['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
+    ['홈', [['grid','오늘 한눈에','thome'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
+    ['내 수업', [['book','업무 체크리스트','journal'],['pen','수업 기록(진도·과제)','progress'],['stamp','교무일지','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly']]],
+    ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
     ['', [['clock','태블릿 등원 화면','kiosk']]]
   ]
@@ -1694,11 +1738,12 @@ function setView(v, page){
   state.view = v;
   state.page = page || 'main';
   if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum') && v !== 'director') state.page = 'main';
-  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail';
+  if(state.page === 'thome' && v !== 'teacher') state.page = 'main';
+  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1712,6 +1757,7 @@ function setView(v, page){
   $('view-lcsum').hidden = !lcsum;
   $('view-gyomu').hidden = !gyomu;
   $('view-mail').hidden = !mail;
+  $('view-thome').hidden = !thome;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -1724,8 +1770,10 @@ function setView(v, page){
   else if(lcsum) renderLcSum();
   else if(gyomu) renderGyomu();
   else if(mail) renderMail();
+  else if(thome) renderTHome();
+  else if(v === 'director') hmDirector();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -1750,7 +1798,7 @@ function renderSide(){
 }
 
 $('noticeWrite').addEventListener('click', function(){ openBoard('comm', 'notice'); bd.id = null; bd.mode = 'write'; renderBoard(); $('bdT').focus(); });
-$('brandHome').addEventListener('click', function(e){ e.preventDefault(); if(!session) return; state.tpart = 'check'; setView(session.role === 'director' ? state.view : 'teacher'); window.scrollTo(0, 0); });
+$('brandHome').addEventListener('click', function(e){ e.preventDefault(); if(!session) return; state.tpart = 'check'; var hv = session.role === 'director' ? state.view : 'teacher'; setView(hv, hv === 'teacher' ? 'thome' : 'main'); window.scrollTo(0, 0); });
 $('side').addEventListener('click', function(e){
   var a = e.target.closest('a');
   if(a){
@@ -1758,6 +1806,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'journal'){ state.tpart = 'check'; return setView('teacher'); }
     if(a.dataset.key === 'progress'){ state.tpart = 'jr'; return setView('teacher'); }
     if(a.dataset.key === 'gyomu') return setView(state.view, 'gyomu');
+    if(a.dataset.key === 'thome') return setView('teacher', 'thome');
     if(a.dataset.key === 'mail'){ ml.mode = 'list'; ml.box = 'in'; return setView(state.view, 'mail'); }
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
@@ -1786,7 +1835,7 @@ $('side').addEventListener('keydown', function(e){
 });
 
 document.querySelector('.seg').addEventListener('click', function(e){
-  var b = e.target.closest('button'); if(b) setView(b.dataset.view, state.page === 'settings' ? 'main' : state.page);
+  var b = e.target.closest('button'); if(b) setView(b.dataset.view, state.page === 'settings' ? 'main' : (state.page === 'main' || state.page === 'thome') ? (b.dataset.view === 'teacher' ? 'thome' : 'main') : state.page);
 });
 document.addEventListener('click', function(e){
   var s = e.target.closest('[data-soon]'); if(s) soon(s.dataset.soon);
@@ -2477,6 +2526,7 @@ $('teacherPick').addEventListener('change', function(){
   else if(state.page === 'monthly'){ renderMonthly(); }
   else if(state.page === 'attend'){ renderAttend(); }
   else if(state.page === 'gyomu'){ gy.t = null; renderGyomu(); }
+  else if(state.page === 'thome') renderTHome();
   else renderTeacher();
 });
 $('myClasses').addEventListener('click', function(e){
@@ -3765,6 +3815,108 @@ $('bdBody').addEventListener('submit', function(ev){
   saveBd(); bd.id = p.id; bd.mode = 'view'; toast(bd.id && p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
 });
 
+/* ===== 홈 한눈에 보기 =====
+   원장님 대시보드와 선생님 '오늘 한눈에'에 다가오는 일정, 받은 쪽지, 새 글을 모아 보여 줘요. 누르면 그 화면으로 가요. */
+var HM_DAYS = 7;
+function hmWhen(ds){
+  var t = ymd(new Date()), d = parseYmd(ds), tm = new Date(); tm.setDate(tm.getDate() + 1);
+  return ds === t ? '오늘' : ds === ymd(tm) ? '내일' : (d.getMonth()+1) + '/' + d.getDate() + ' (' + DAYS[d.getDay()] + ')';
+}
+function hmEventsHtml(who){
+  var t = ymd(new Date()), e7 = new Date(); e7.setDate(e7.getDate() + HM_DAYS); var lim = ymd(e7);
+  var col = { consult:'#e8833a', common:'var(--accent)', mine:'var(--good)' };
+  var list = EVENTS.concat(consultEvents()).filter(function(e){
+    if(endOf(e) < t || e.date > lim) return false;
+    return e.kind === 'consult' || e.kind === 'common' || e.owner === who;
+  }).sort(function(a, b){ var da = a.date < t ? t : a.date, db = b.date < t ? t : b.date; return da !== db ? (da < db ? -1 : 1) : ((a.time || '99') < (b.time || '99') ? -1 : 1); });
+  var more = list.length > 6 ? list.length - 6 : 0;
+  return '<div class="card-head"><h2>다가오는 일정 <span class="muted" style="font-weight:500;font-size:12.5px">7일</span></h2><button type="button" class="linkish" data-hmgo="calendar">일정 전체 보기 →</button></div>' +
+    (list.length ? '<ul class="hm-list">' + list.slice(0, 6).map(function(e){
+      var ds = e.date < t ? t : e.date;
+      return '<li><button type="button" data-hmgo="calendar"><span class="when'+(ds === t ? ' today' : '')+'">'+hmWhen(ds)+'</span><span class="ttl"><i style="background:'+col[e.kind]+'"></i>'+esc(e.title)+'</span><span class="side-t">'+(e.time || '하루 종일')+(e.kind === 'mine' ? ' · 개인' : '')+'</span></button></li>';
+    }).join('') + '</ul>' + (more ? '<p class="hm-empty">그 밖에 '+more+'개 더 있어요.</p>' : '') : '<p class="hm-empty">7일 안에 잡힌 일정이 없어요.</p>');
+}
+function hmMailHtml(withBoard){
+  var inbox = mlIn(), un = mlUnread(), pend = mlPending();
+  var html = '<div class="card-head"><h2>쪽지함'+(un ? ' <span class="ml-read" style="background:var(--warn);color:#fff">수신 '+un+'</span>' : '')+(pend ? '<span class="ml-read">발신 '+pend+'</span>' : '')+'</h2><button type="button" class="linkish" data-hmgo="mail">쪽지함 열기 →</button></div>';
+  html += inbox.length ? '<ul class="hm-list mail">' + inbox.slice(0, 4).map(function(m){
+    return '<li class="'+(mlIsRead(m) ? '' : 'unread')+'"><button type="button" data-hmmail="'+m.id+'"><span class="when">'+esc(mlName(m.from))+'</span><span class="ttl">'+(mlIsRead(m) ? '' : '<i style="background:var(--accent)"></i>')+esc(m.subj)+'</span><span class="side-t">'+mlWhen(m.date)+'</span></button></li>';
+  }).join('') + '</ul>' : '<p class="hm-empty">받은 쪽지가 없어요.</p>';
+  if(withBoard) html += hmBoardChips();
+  return html;
+}
+function hmBoardChips(){
+  var chips = [];
+  Object.keys(BOARDS).forEach(function(b){ BOARDS[b].tabs.forEach(function(t){ var n = bdUnread(b, t[0]); if(n) chips.push('<button type="button" data-hmboard="'+b+':'+t[0]+'">'+esc(t[1])+'<b>'+n+'</b></button>'); }); });
+  return '<div class="hm-chips"><span>새 글</span>' + (chips.length ? chips.join('') : '<span>안 읽은 글이 없어요</span>') + '</div>';
+}
+function hmBoardHtml(){
+  var t0 = Date.now() - BD_NEW_DAYS * 864e5;
+  var recent = bdStore.posts.filter(function(p){ return p.date > t0; }).sort(function(a, b){ return b.date - a.date; }).slice(0, 5);
+  return '<div class="card-head"><h2>게시판 · 자료실 새 글</h2><button type="button" class="linkish" data-hmboard="comm:notice">게시판 열기 →</button></div>' +
+    (recent.length ? '<ul class="hm-list mail">' + recent.map(function(p){
+      return '<li class="'+(bdIsRead(p) ? '' : 'unread')+'"><button type="button" data-hmpost="'+p.id+'"><span class="when">'+esc(bdCatName(p.board, p.cat))+'</span><span class="ttl">'+(bdIsRead(p) ? '' : '<i style="background:var(--warn)"></i>')+esc(p.title)+'</span><span class="side-t">'+esc(p.author)+'</span></button></li>';
+    }).join('') + '</ul>' : '<p class="hm-empty">최근 7일 동안 올라온 글이 없어요.</p>') + hmBoardChips();
+}
+function hmDirector(){
+  if(!session || !$('dHmEvents')) return;
+  $('dHmEvents').innerHTML = hmEventsHtml('원장님');
+  $('dHmMail').innerHTML = hmMailHtml(true);
+}
+function renderTHome(){
+  fillTeacherPick();
+  var t = state.teacher, today = ymd(new Date());
+  document.querySelectorAll('.today').forEach(function(el){ el.textContent = fmtDate(new Date()).replace(/\((.)\)/, '$1요일'); });
+  $('thHello').textContent = '안녕하세요, ' + t + ' 선생님';
+  var mine = CLASSES.filter(function(c){ return c.teacher === t && c.today; }).sort(function(a, b){ return a.time < b.time ? -1 : 1; });
+  var lr = lcStore[t + '|' + today], lc = lr ? lcCount(lr) : [0, lcCount({ c:{}, closer:false })[1]];
+  var gr = gyRec(t, today), gst = !gr || !gr.st ? ['작성 전', '수업이 끝나면 확인하고 제출해요', true] : gr.st === 'sub' ? ['제출함', '원장님 결재를 기다려요'] : gr.st === 'ok' ? ['결재 완료', '원장님이 확인했어요'] : ['돌려받음', '사유를 보고 고쳐서 다시 제출해요', true];
+  var un = mlUnread();
+  var k = [
+    ['clock','var(--accent)','var(--accent-soft)', mine.length + '개', '오늘 내 수업', mine.length ? mine[0].time.split(/[–-]/)[0] + ' 첫 수업' : '오늘은 수업이 없어요', false, 'progress'],
+    ['book','var(--good)','var(--good-soft)', lc[0] + ' / ' + lc[1], '업무 체크리스트', lc[0] >= lc[1] ? '오늘 체크를 다 했어요' : '남은 항목 ' + (lc[1] - lc[0]) + '개', lc[0] < lc[1], 'journal'],
+    ['stamp','var(--warn)','var(--warn-soft)', gst[0], '오늘 교무일지', gst[1], !!gst[2], 'gyomu'],
+    ['mail','var(--accent)','var(--accent-soft)', un + '건', '안 읽은 쪽지', un ? '쪽지함에서 확인해 주세요' : '새 쪽지가 없어요', un > 0, 'mail']
+  ];
+  $('thKpis').innerHTML = k.map(function(x){
+    return '<button type="button" class="card kpi go" data-hmgo="'+x[7]+'"><div class="ic" style="background:'+x[2]+'">'+icon(x[0],17,x[1])+'</div><b>'+esc(x[3])+'</b><div class="label">'+x[4]+'</div><div class="sub'+(x[6] ? ' warn' : '')+'">'+esc(x[5])+'</div></button>';
+  }).join('');
+  $('thClasses').innerHTML = '<div class="card-head"><h2>오늘 내 수업</h2><button type="button" class="linkish" data-hmgo="progress">수업 기록 열기 →</button></div>' +
+    (mine.length ? mine.map(function(c){
+      var done = !!state.entries[c.id + '|' + today];
+      return '<div class="th-cls"><span class="t">'+esc(c.time)+'</span><span><b>'+esc(c.name)+'</b><small>'+esc(c.room)+' · '+c.students.length+'명</small></span><button type="button" class="btn soft" data-hmcls="'+c.id+'">'+(done ? '수업 기록 보기' : '수업 기록 쓰기')+'</button></div>';
+    }).join('') : '<p class="hm-empty">오늘은 맡은 수업이 없어요.</p>');
+  $('tHmMail').innerHTML = hmMailHtml(false);
+  $('tHmEvents').innerHTML = hmEventsHtml(t + ' 선생님');
+  $('tHmBoard').innerHTML = hmBoardHtml();
+}
+document.addEventListener('click', function(ev){
+  if(!ev.target.closest('#view-director, #view-thome')) return;
+  var g = ev.target.closest('[data-hmgo]');
+  if(g){
+    var to = g.dataset.hmgo;
+    if(to === 'journal'){ state.tpart = 'check'; return setView('teacher'); }
+    if(to === 'progress'){ state.tpart = 'jr'; return setView('teacher'); }
+    if(to === 'mail'){ ml.box = 'in'; ml.mode = 'list'; }
+    return setView(state.view, to);
+  }
+  var m = ev.target.closest('[data-hmmail]');
+  if(m){
+    ml.box = 'in'; ml.id = +m.dataset.hmmail; ml.mode = 'view';
+    var x = mlCur(); if(x && !mlIsRead(x)){ (x.read = x.read || {})[session.id] = Date.now(); saveMl(); }
+    return setView(state.view, 'mail');
+  }
+  var b = ev.target.closest('[data-hmboard]'); if(b){ var bk = b.dataset.hmboard.split(':'); return openBoard(bk[0], bk[1]); }
+  var p = ev.target.closest('[data-hmpost]');
+  if(p){
+    var post = bdStore.posts.find(function(x){ return x.id === +p.dataset.hmpost; }); if(!post) return;
+    post.views++; saveBd(); bdMarkRead(post);
+    bd.board = post.board; bd.tab = post.cat; bd.page = 1; bd.q = ''; bd.id = post.id; bd.mode = 'view'; bd.cedit = null;
+    return setView(state.view, 'board');
+  }
+  var c = ev.target.closest('[data-hmcls]'); if(c){ state.classId = c.dataset.hmcls; state.tpart = 'jr'; return setView('teacher'); }
+});
+
 /* ===== 쪽지함 =====
    원장님과 선생님이 서로 주고받는 쪽지예요. 받는 사람은 계정·권한에 등록된 사람 중에서 눌러서 골라요(1명 ~ 전체 선생님).
    지우기는 내 쪽지함에서만 지워져요(받은 사람·보낸 사람 쪽지함은 그대로).
@@ -4827,7 +4979,7 @@ function enter(acc){
     state.teacher = acc.name;
     var th = location.hash.replace('#teacher-', '').replace('#', '');
     if(/^board-(comm|data)$/.test(th)){ bd.board = th.slice(-4); setView('teacher', 'board'); }
-    else { if(th === 'progress') state.tpart = 'jr'; setView('teacher', ['calendar','daily','monthly','attend','manual','gyomu','mail'].indexOf(th) !== -1 ? th : 'main'); }
+    else { if(th === 'progress') state.tpart = 'jr'; setView('teacher', ['calendar','daily','monthly','attend','manual','gyomu','mail'].indexOf(th) !== -1 ? th : (th === 'journal' || th === 'progress') ? 'main' : 'thome'); }
   } else {
     var h = location.hash;
     if(h === '#calendar') setView('director', 'calendar');
@@ -4848,6 +5000,7 @@ function enter(acc){
     else if(/^#(teacher-)?board-(comm|data)$/.test(h)){ bd.board = h.slice(-4); setView(h.indexOf('teacher') !== -1 ? 'teacher' : 'director', 'board'); }
     else if(h === '#teacher-manual') setView('teacher', 'manual');
     else if(h === '#mail') setView('director', 'mail');
+    else if(h === '#teacher-home') setView('teacher', 'thome');
     else setView(h === '#teacher' ? 'teacher' : 'director');
   }
 }
