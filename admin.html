@@ -1098,6 +1098,8 @@
   .an-row small{ display:block; color:var(--ink-soft); font-size:12px; }
   .an-acts{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; } .an-acts .btn{ padding:5px 10px; font-size:12px; }
   .an-old{ margin-top:10px; font-size:13px; }
+  .an-tools{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; } .an-tools select{ flex:1 1 180px; min-width:0; padding:6px 10px !important; font-size:12.5px !important; }
+  .an-pbox textarea{ width:100%; box-sizing:border-box; }
   .an-to{ margin:0; font-size:13px; color:var(--ink-soft); } .an-to b{ color:var(--ink); }
   .an-file{ display:flex; flex-direction:column; gap:6px; } .an-pick{ position:relative; align-self:flex-start; cursor:pointer; flex-direction:row !important; color:var(--accent) !important; } .an-pick input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
   .an-post .bd-files{ margin-top:10px; }
@@ -6805,7 +6807,7 @@ function renderAnList(el, only, head, emptyMsg){
   var live = all.filter(anLive), old = all.filter(function(a){ return !anLive(a); });
   var row = function(a){
     return '<div class="an-row"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><div><b>' + esc(a.title) + '</b><small>' + esc(anScopeText(a)) + ' · ' + esc(anPeriod(a)) + ' · ' + esc(a.by || '') + (a.files && a.files.length ? ' · 📎 ' + a.files.length : '') + '</small></div>'
-      + '<span class="an-acts">' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
+      + '<span class="an-acts"><button type="button" class="btn soft" data-ancopy="' + a.id + '">가져와서 새로 쓰기</button>' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
   };
   el.innerHTML = '<div class="card-head"><h2>' + (head || '올린 학원 공지') + ' <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
     + (live.length ? live.map(row).join('') : '<p class="empty">' + (emptyMsg || '아직 올린 공지가 없어요. ‘학원 공지 등록’으로 행사·휴원·학원 소식을 알려 주세요.') + '</p>')
@@ -6818,6 +6820,8 @@ function anOpen(id, scope){
   $('anForm').innerHTML = '<h2>' + (id ? '학원 공지 고치기' : '학원 공지 등록') + '</h2>'
     + '<div class="kind an-kinds" role="radiogroup" aria-label="안내 종류">' + AN_KIND.map(function(k){ return '<label><input type="radio" name="anKind" value="' + k[0] + '"' + (a.kind === k[0] ? ' checked' : '') + '><span class="an-k ' + k[0] + '">' + k[1] + '</span></label>'; }).join('') + '</div>'
     + '<p class="an-to">받는 사람: <b>학원 전체 학부모님·학생</b></p>'
+    + '<div class="an-tools"><button type="button" class="mo-tb" data-anpaste>붙여넣기</button>' + (anAll().length ? '<select id="anLoad" aria-label="다른 공지 불러오기"><option value="">다른 공지 불러오기…</option>' + anAll().slice().sort(function(x, y){ return (y.at || 0) - (x.at || 0); }).filter(function(x){ return x.id !== (id || ''); }).map(function(x){ return '<option value="' + x.id + '">[' + anKind(x.kind) + '] ' + esc(x.title) + ' · ' + esc(x.by || '') + '</option>'; }).join('') + '</select>' : '') + '</div>'
+    + '<div class="mo-pbox an-pbox" id="anPBox" hidden><textarea id="anPT" rows="5" placeholder="다른 곳(카톡·문서·다른 AI 등)에서 만든 공지를 여기에 붙여넣어요(Ctrl+V / 길게 눌러 붙여넣기). 사진을 복사해 붙여넣으면 첨부로 들어가요. 첫 줄은 제목이 돼요."></textarea><div class="mo-bulk-btns"><button type="button" class="btn" data-anpin>넣기</button><button type="button" class="btn soft" data-anpx>닫기</button></div></div>'
     + '<label>제목<input type="text" id="anTitle" maxlength="40" value="' + esc(a.title) + '" placeholder="예: 핼러윈 파티 안내"></label>'
     + '<div class="row2"><label>날짜 <span class="hint">행사·보강·휴원 날짜</span><input type="date" id="anDate" value="' + esc(a.date || '') + '"></label><label>시간 (선택)<input type="time" id="anTime" value="' + esc(a.time || '') + '"></label></div>'
     + '<label>내용<textarea id="anText" rows="5" maxlength="600" placeholder="예: 10월 31일(토) 수업 시간에 핼러윈 파티를 해요. 간단한 분장 소품을 챙겨 와도 좋아요.">' + esc(a.text) + '</textarea></label>'
@@ -6829,7 +6833,24 @@ function anOpen(id, scope){
   $('anOv').hidden = false; $('anTitle').focus();
 }
 document.addEventListener('click', function(ev){ var b = ev.target.closest('[data-annew]'); if(b) anOpen(null, b.dataset.annew); });
+// 다른 사람이 만든 공지를 바탕으로 새로 써요 (원래 공지는 그대로 둬요)
+function anFill(src){
+  var r = $('anForm').querySelector('input[name=anKind][value="' + src.kind + '"]'); if(r) r.checked = true;
+  $('anTitle').value = src.title || ''; $('anText').value = src.text || ''; $('anDate').value = src.date || ''; $('anTime').value = src.time || '';
+  an.att = (src.files || []).map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; }); $('anAtt').innerHTML = anAttHtml();
+}
+function anImgs(dt){
+  var n = 0;
+  [].forEach.call((dt && dt.items) || [], function(it){
+    if(it.kind !== 'file') return; var f = it.getAsFile(); if(!f || f.size > BD_FILE_MAX) return;
+    an.att.push({ id:'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name:f.name && f.name !== 'image.png' ? f.name : '붙여넣은 사진 ' + (an.att.length + 1) + '.' + ((f.type.split('/')[1] || 'png').replace('jpeg', 'jpg')), size:f.size, type:f.type || '', blob:f }); n++;
+  });
+  if(n){ $('anAtt').innerHTML = anAttHtml(); toast('사진·파일 ' + n + '개를 첨부했어요.'); }
+  return n;
+}
+$('anForm').addEventListener('paste', function(ev){ if(ev.target.id === 'anPT' || ev.target.id === 'anText'){ if(anImgs(ev.clipboardData) && !(ev.clipboardData.getData('text') || '').trim()) ev.preventDefault(); } });
 $('anForm').addEventListener('change', function(ev){
+  if(ev.target.id === 'anLoad' && ev.target.value){ var src = anAll().find(function(x){ return x.id === ev.target.value; }); if(src){ anFill(src); toast('‘' + src.title + '’ 내용을 불러왔어요. 고쳐서 새 공지로 올려요.'); } ev.target.value = ''; }
   if(ev.target.id === 'anFile'){
     var big = [];
     [].forEach.call(ev.target.files || [], function(file){ if(file.size > BD_FILE_MAX){ big.push(file.name); return; } an.att.push({ id:'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name:file.name, size:file.size, type:file.type || '', blob:file }); });
@@ -6841,6 +6862,17 @@ $('anForm').addEventListener('change', function(ev){
 $('anForm').addEventListener('click', function(ev){
   if(ev.target.closest('[data-anclose]')) $('anOv').hidden = true;
   var d = ev.target.closest('[data-anattdel]'); if(d){ an.att.splice(+d.dataset.anattdel, 1); $('anAtt').innerHTML = anAttHtml(); }
+  if(ev.target.closest('[data-anpaste]')){ $('anPBox').hidden = false; $('anPT').focus(); }
+  if(ev.target.closest('[data-anpx]')) $('anPBox').hidden = true;
+  if(ev.target.closest('[data-anpin]')){
+    var lines = $('anPT').value.replace(/\r/g, '').split('\n'), body;
+    while(lines.length && !lines[0].trim()) lines.shift();
+    if(!lines.length){ $('anPBox').hidden = true; return; }
+    if(!$('anTitle').value.trim()){ $('anTitle').value = lines.shift().replace(/^[\s#*\[\]【】■□◆◇●○▶·-]+|[\s#*\[\]【】]+$/g, '').slice(0, 40); }
+    body = lines.join('\n').trim();
+    if(body) $('anText').value = ($('anText').value.trim() ? $('anText').value.trim() + '\n\n' : '') + body;
+    $('anPT').value = ''; $('anPBox').hidden = true; toast('붙여넣은 내용을 넣었어요. 확인하고 올려 주세요.');
+  }
 });
 $('anOv').addEventListener('click', function(ev){ if(ev.target === this) this.hidden = true; });
 $('anForm').addEventListener('submit', function(ev){
@@ -6863,6 +6895,7 @@ $('anForm').addEventListener('submit', function(ev){
 document.addEventListener('click', function(ev){
   var b = ev.target.closest('.an-box button'); if(!b) return;
   if(b.dataset.anedit) return anOpen(b.dataset.anedit);
+  if(b.dataset.ancopy){ var src = anAll().find(function(x){ return x.id === b.dataset.ancopy; }); anOpen(null, 'all'); if(src) anFill(src); return; }
   if(b.hasAttribute('data-anold')){ an.showOld = !an.showOld; return anRefresh(); }
   var list = anAll(), a = list.find(function(x){ return x.id === (b.dataset.andown || b.dataset.anup); }); if(!a) return;
   if(b.dataset.andown){ a.down = Date.now(); toast('안내를 내렸어요. 지난 안내에 남아 있어요.'); }
