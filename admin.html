@@ -71,6 +71,8 @@
   .side a{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; font-size:13.5px; font-weight:600; }
   .side a[aria-current="page"]{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
   .side a:not([aria-current="page"]):hover{ background:var(--surface-soft); }
+  .side .unread{ margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:99px; background:var(--warn); color:#fff; font-size:11.5px; font-weight:800; line-height:20px; text-align:center; font-variant-numeric:tabular-nums; }
+  .bd-table td.t.is-unread .bd-link{ font-weight:800; }
   .side svg{ flex:none; }
   .phrases{ margin-top:14px; padding:14px 12px; border-radius:12px; background:var(--surface-soft); display:flex; flex-direction:column; gap:4px; }
   .phrases span{ font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:0.04em; margin-bottom:2px; }
@@ -1670,7 +1672,8 @@ function renderSide(){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
     group[1].forEach(function(m){
       var cur = m[2] === current ? ' aria-current="page"' : '';
-      html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+'>'+icon(m[0])+m[1]+'</a>';
+      var un = m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
+      html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+(un ? ' aria-label="'+m[1]+', 안 읽은 글 '+un+'개"' : '')+'>'+icon(m[0])+m[1]+(un ? '<span class="unread">'+(un > 99 ? '99+' : un)+'</span>' : '')+'</a>';
     });
   });
   if(state.view === 'teacher'){
@@ -3536,6 +3539,18 @@ function saveBd(){ try{ localStorage.setItem(BD_KEY, JSON.stringify(bdStore)); }
 var bd = { board:'comm', tab:'all', page:1, mode:'list', id:null, q:'', qf:'tb', cedit:null };
 function bdCatName(b, c){ var t = BOARDS[b].tabs.find(function(x){ return x[0] === c; }); return t ? t[1] : ''; }
 function bdDate(ts){ return ymd(new Date(ts)); }
+/* 안 읽은 글: 로그인한 사람마다 읽은 글 번호를 따로 기억해요. 내가 쓴 글은 읽은 것으로 쳐요. */
+var BD_READ_KEY = 'beyond-board-read-v1';
+var bdRead = (function(){ try{ return JSON.parse(localStorage.getItem(BD_READ_KEY)) || {}; }catch(e){ return {}; } })();
+function bdIsRead(p){ if(!session) return true; return p.authorId === session.id || (!p.authorId && session.role === 'director') || !!(bdRead[session.id] || {})[p.id]; }
+function bdMarkRead(p){ if(!session || bdIsRead(p)) return; (bdRead[session.id] = bdRead[session.id] || {})[p.id] = 1; try{ localStorage.setItem(BD_READ_KEY, JSON.stringify(bdRead)); }catch(e){} }
+function bdUnread(b, c){ return bdStore.posts.filter(function(p){ return p.board === b && p.cat === c && !bdIsRead(p); }).length; }
+// 다른 창(다른 선생님 탭)에서 글이 올라오면 숫자를 바로 고쳐요. 공용 저장소를 붙이면 같은 자리에서 새 글 알림을 받아요.
+window.addEventListener('storage', function(e){
+  if(e.key !== BD_KEY || !session) return;
+  try{ bdStore = JSON.parse(e.newValue) || bdStore; }catch(err){}
+  if(state.page === 'board') renderBoard(); else renderSide();
+});
 function bdCanEdit(p){ return session && (session.role === 'director' || p.authorId === session.id); }
 function bdList(){
   var q = bd.q.trim().toLowerCase();
@@ -3568,7 +3583,7 @@ function bdListHtml(){
   var html = '<div class="bd-table-wrap"><table class="bd-table"><thead><tr><th class="n">번호</th><th class="t">제목</th><th class="a">작성자</th><th class="d">작성일</th><th class="v">조회수</th></tr></thead><tbody>';
   if(!rows.length) html += '<tr><td colspan="5" class="bd-empty">' + (bd.q ? '찾는 글이 없어요.' : '아직 글이 없어요. 아래 글쓰기로 첫 글을 남겨 주세요.') + '</td></tr>';
   rows.forEach(function(p){
-    html += '<tr><td class="n">'+p.id+'</td><td class="t"><button type="button" class="bd-link" data-bdopen="'+p.id+'">' +
+    html += '<tr><td class="n">'+p.id+'</td><td class="t'+(bdIsRead(p) ? '' : ' is-unread')+'"><button type="button" class="bd-link" data-bdopen="'+p.id+'">' +
       (bd.tab === 'all' ? '<span class="bd-cat">'+esc(bdCatName(p.board, p.cat))+'</span>' : '') + esc(p.title) + '</button>' +
       (p.comments && p.comments.length ? '<span class="bd-ccount" title="댓글">['+p.comments.length+']</span>' : '') +
       (p.link ? '<span class="bd-clip" title="링크 있음">🔗</span>' : '') + (p.date > fresh ? '<span class="bd-new">NEW</span>' : '') +
@@ -3628,7 +3643,7 @@ function bdFormHtml(){
 $('bdBody').addEventListener('click', function(ev){
   var t = ev.target.closest('[data-bdtab]'); if(t){ bd.tab = t.dataset.bdtab; bd.page = 1; bd.mode = 'list'; return renderBoard(); }
   var o = ev.target.closest('[data-bdopen]');
-  if(o){ var p = bdStore.posts.find(function(x){ return x.id === +o.dataset.bdopen; }); if(p){ p.views++; saveBd(); } bd.id = +o.dataset.bdopen; bd.mode = 'view'; bd.cedit = null; renderBoard(); return window.scrollTo(0, 0); }
+  if(o){ var p = bdStore.posts.find(function(x){ return x.id === +o.dataset.bdopen; }); if(p){ p.views++; saveBd(); bdMarkRead(p); } bd.id = +o.dataset.bdopen; bd.mode = 'view'; bd.cedit = null; renderBoard(); return window.scrollTo(0, 0); }
   var pg = ev.target.closest('[data-bdpage]'); if(pg){ bd.page = +pg.dataset.bdpage; return renderBoard(); }
   if(ev.target.closest('[data-bdwrite]')){ bd.id = null; bd.mode = 'write'; renderBoard(); return $('bdT').focus(); }
   var ed = ev.target.closest('[data-bdedit]'); if(ed){ bd.id = +ed.dataset.bdedit; bd.mode = 'write'; return renderBoard(); }
