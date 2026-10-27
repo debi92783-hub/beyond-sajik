@@ -536,6 +536,22 @@
   .bd-linkline{ font-size:13.5px; word-break:break-all; }
   .bd-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:20px; flex-wrap:wrap; }
   .bd-del{ color:var(--warn) !important; }
+  .bd-cmt{ margin-top:22px; border-top:1px solid var(--border); padding-top:16px; }
+  .bd-cmt h3{ margin:0 0 10px; font-size:15px; }
+  .bd-cmt h3 b{ color:var(--accent); }
+  .bd-cmt ul{ list-style:none; margin:0 0 14px; padding:0; }
+  .bd-cmt li{ padding:11px 0; border-bottom:1px solid var(--border); }
+  .bd-cmt-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-faint); }
+  .bd-cmt-head strong{ color:var(--ink); font-size:13.5px; margin-right:6px; }
+  .bd-cmt-txt{ white-space:pre-wrap; font-size:14px; line-height:1.65; margin-top:4px; word-break:break-word; }
+  .bd-cmt-btns button{ font:inherit; font-size:12.5px; background:none; border:0; color:var(--ink-soft); cursor:pointer; padding:2px 4px; }
+  .bd-cmt-btns button:hover{ text-decoration:underline; }
+  .bd-cmt-btns .bd-del{ color:var(--warn); }
+  .bd-cmt-none{ font-size:13px; color:var(--ink-faint); padding:6px 0 12px; }
+  .bd-cmt form{ display:flex; gap:8px; align-items:flex-end; margin-top:6px; }
+  .bd-cmt textarea{ flex:1; min-width:0; font:inherit; font-size:14px; border:1px solid var(--border); border-radius:8px; padding:9px 11px; background:var(--surface); color:var(--ink); resize:vertical; line-height:1.55; }
+  .bd-cmt .bd-cmt-edit{ margin-top:6px; }
+  .bd-ccount{ color:var(--accent); font-weight:800; font-size:12.5px; margin-left:6px; }
   .bd-form{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; max-width:900px; }
   .bd-form h2{ margin:0; font-size:18px; }
   .bd-form label{ display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:700; }
@@ -3517,7 +3533,7 @@ var bdStore = (function(){
   ] };
 })();
 function saveBd(){ try{ localStorage.setItem(BD_KEY, JSON.stringify(bdStore)); }catch(e){} }
-var bd = { board:'comm', tab:'all', page:1, mode:'list', id:null, q:'', qf:'tb' };
+var bd = { board:'comm', tab:'all', page:1, mode:'list', id:null, q:'', qf:'tb', cedit:null };
 function bdCatName(b, c){ var t = BOARDS[b].tabs.find(function(x){ return x[0] === c; }); return t ? t[1] : ''; }
 function bdDate(ts){ return ymd(new Date(ts)); }
 function bdCanEdit(p){ return session && (session.role === 'director' || p.authorId === session.id); }
@@ -3554,6 +3570,7 @@ function bdListHtml(){
   rows.forEach(function(p){
     html += '<tr><td class="n">'+p.id+'</td><td class="t"><button type="button" class="bd-link" data-bdopen="'+p.id+'">' +
       (bd.tab === 'all' ? '<span class="bd-cat">'+esc(bdCatName(p.board, p.cat))+'</span>' : '') + esc(p.title) + '</button>' +
+      (p.comments && p.comments.length ? '<span class="bd-ccount" title="댓글">['+p.comments.length+']</span>' : '') +
       (p.link ? '<span class="bd-clip" title="링크 있음">🔗</span>' : '') + (p.date > fresh ? '<span class="bd-new">NEW</span>' : '') +
       '</td><td class="a">'+esc(p.author)+'</td><td class="d">'+bdDate(p.date)+'</td><td class="v">'+p.views+'</td></tr>';
   });
@@ -3575,9 +3592,28 @@ function bdViewHtml(){
     '<p class="bd-meta">'+esc(p.author)+' · '+bdDate(p.date)+(p.edited ? ' (수정 '+bdDate(p.edited)+')' : '')+' · 조회 '+p.views+'</p></header>' +
     '<div class="bd-content">'+esc(p.body)+'</div>' +
     (p.link ? '<p class="bd-linkline">🔗 <a href="'+esc(p.link)+'" target="_blank" rel="noopener">'+esc(p.link)+'</a></p>' : '') +
+    bdCmtHtml(p) +
     '<div class="bd-actions"><button type="button" class="btn soft" data-bdback>목록</button>' +
     (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">삭제</button></span>' : '') + '</div></article>';
 }
+/* 댓글: 모든 게시판(소통·자료 전체)에 공통. 쓴 사람과 원장님만 고치고 지울 수 있어요. */
+function bdCmtHtml(p){
+  var cs = p.comments || [];
+  var html = '<section class="bd-cmt" aria-label="댓글"><h3>댓글 <b>'+cs.length+'</b></h3>';
+  if(!cs.length) html += '<p class="bd-cmt-none">첫 댓글을 남겨 주세요.</p>';
+  else html += '<ul>' + cs.map(function(c){
+    var mine = bdCanEdit(c);
+    if(bd.cedit === c.id && mine) return '<li><div class="bd-cmt-head"><span><strong>'+esc(c.author)+'</strong></span></div>' +
+      '<form class="bd-cmt-edit" data-cform="edit" data-cid="'+c.id+'"><textarea id="bdCE" rows="2" maxlength="500" aria-label="댓글 수정">'+esc(c.text)+'</textarea>' +
+      '<button type="button" class="btn soft" data-ccancel>취소</button><button type="submit" class="btn">저장</button></form></li>';
+    return '<li><div class="bd-cmt-head"><span><strong>'+esc(c.author)+'</strong>'+bdDate(c.date)+(c.edited ? ' (수정됨)' : '')+'</span>' +
+      (mine ? '<span class="bd-cmt-btns"><button type="button" data-cedit="'+c.id+'">수정</button><button type="button" class="bd-del" data-cdel="'+c.id+'">삭제</button></span>' : '') +
+      '</div><div class="bd-cmt-txt">'+esc(c.text)+'</div></li>';
+  }).join('') + '</ul>';
+  html += '<form data-cform="new"><textarea id="bdCN" rows="2" maxlength="500" placeholder="댓글을 적어 주세요" aria-label="댓글 쓰기"></textarea><button type="submit" class="btn">등록</button></form></section>';
+  return html;
+}
+function bdCur(){ return bdStore.posts.find(function(x){ return x.id === bd.id; }); }
 function bdFormHtml(){
   var p = bd.id ? bdStore.posts.find(function(x){ return x.id === bd.id; }) : null;
   var B = BOARDS[bd.board], cat = p ? p.cat : (bd.tab !== 'all' ? bd.tab : B.tabs[0][0]);
@@ -3592,7 +3628,7 @@ function bdFormHtml(){
 $('bdBody').addEventListener('click', function(ev){
   var t = ev.target.closest('[data-bdtab]'); if(t){ bd.tab = t.dataset.bdtab; bd.page = 1; bd.mode = 'list'; return renderBoard(); }
   var o = ev.target.closest('[data-bdopen]');
-  if(o){ var p = bdStore.posts.find(function(x){ return x.id === +o.dataset.bdopen; }); if(p){ p.views++; saveBd(); } bd.id = +o.dataset.bdopen; bd.mode = 'view'; renderBoard(); return window.scrollTo(0, 0); }
+  if(o){ var p = bdStore.posts.find(function(x){ return x.id === +o.dataset.bdopen; }); if(p){ p.views++; saveBd(); } bd.id = +o.dataset.bdopen; bd.mode = 'view'; bd.cedit = null; renderBoard(); return window.scrollTo(0, 0); }
   var pg = ev.target.closest('[data-bdpage]'); if(pg){ bd.page = +pg.dataset.bdpage; return renderBoard(); }
   if(ev.target.closest('[data-bdwrite]')){ bd.id = null; bd.mode = 'write'; renderBoard(); return $('bdT').focus(); }
   var ed = ev.target.closest('[data-bdedit]'); if(ed){ bd.id = +ed.dataset.bdedit; bd.mode = 'write'; return renderBoard(); }
@@ -3602,12 +3638,39 @@ $('bdBody').addEventListener('click', function(ev){
     bdStore.posts = bdStore.posts.filter(function(x){ return x.id !== +dl.dataset.bddel; }); saveBd();
     bd.mode = 'list'; toast('글을 삭제했어요.'); return renderBoard();
   }
+  var ce = ev.target.closest('[data-cedit]');
+  if(ce){ bd.cedit = +ce.dataset.cedit; renderBoard(); var ta = $('bdCE'); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } return; }
+  if(ev.target.closest('[data-ccancel]')){ bd.cedit = null; return renderBoard(); }
+  var cd = ev.target.closest('[data-cdel]');
+  if(cd){
+    var cp = bdCur(); if(!cp) return;
+    if(!confirm('이 댓글을 삭제할까요?')) return;
+    cp.comments = (cp.comments || []).filter(function(c){ return c.id !== +cd.dataset.cdel || !bdCanEdit(c); }); saveBd();
+    toast('댓글을 삭제했어요.'); return renderBoard();
+  }
   if(ev.target.closest('[data-bdback]')){ bd.mode = 'list'; return renderBoard(); }
   if(ev.target.closest('[data-bdcancel]')){ bd.mode = bd.id ? 'view' : 'list'; return renderBoard(); }
 });
 $('bdBody').addEventListener('submit', function(ev){
   ev.preventDefault();
   if(ev.target.id === 'bdSearch'){ bd.q = $('bdQ').value; bd.qf = $('bdQf').value; bd.page = 1; return renderBoard(); }
+  var cf = ev.target.dataset.cform;
+  if(cf){
+    var cp = bdCur(); if(!cp) return;
+    var ta = ev.target.querySelector('textarea'), txt = ta.value.trim();
+    if(!txt){ toast('댓글 내용을 적어 주세요.'); return ta.focus(); }
+    cp.comments = cp.comments || [];
+    if(cf === 'edit'){
+      var c = cp.comments.find(function(x){ return x.id === +ev.target.dataset.cid; });
+      if(c && bdCanEdit(c)){ c.text = txt; c.edited = Date.now(); toast('댓글을 고쳤어요.'); }
+      bd.cedit = null;
+    } else {
+      bdStore.cseq = (bdStore.cseq || 0) + 1;
+      cp.comments.push({ id:bdStore.cseq, text:txt, author:session ? session.name : '', authorId:session ? session.id : '', date:Date.now() });
+      toast('댓글을 남겼어요.');
+    }
+    saveBd(); return renderBoard();
+  }
   if(ev.target.id !== 'bdForm') return;
   var title = $('bdT').value.trim(), body = $('bdB').value.trim(), link = $('bdL') ? $('bdL').value.trim() : '';
   if(!title){ $('bdErr').textContent = '제목을 적어 주세요.'; return $('bdT').focus(); }
