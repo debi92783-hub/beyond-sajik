@@ -405,6 +405,20 @@
   .mo-cm label:last-child{ margin-bottom:0; }
   .mo-cm span{ font-size:11.5px; font-weight:700; color:var(--ink-soft); }
   .mo-table .mo-cm{ min-width:300px; }
+  .mo-card-tools{ padding:0 12px 4px; }
+  .mo-tools{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .mo-tb{ font:inherit; font-size:11.5px; font-weight:700; padding:4px 9px; border-radius:7px; border:1px solid var(--border); background:var(--surface); color:var(--accent); cursor:pointer; }
+  .mo-tb:hover{ background:var(--accent-soft); }
+  .mo-pbox{ display:flex; flex-direction:column; gap:6px; margin-top:8px; padding:10px; border:1px dashed var(--accent); border-radius:10px; background:var(--accent-soft); text-align:left; }
+  .mo-pbox p{ margin:0; font-size:12px; line-height:1.55; }
+  .mo-pbox textarea{ font:inherit; font-size:12.5px; width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:8px; padding:7px 9px; background:var(--surface); color:var(--ink); resize:vertical; }
+  .mo-pbox > div{ display:flex; justify-content:flex-end; gap:6px; }
+  .mo-pbox .btn{ padding:5px 12px; font-size:12.5px; }
+  .mo-bulk{ display:flex; align-items:center; gap:6px 12px; flex-wrap:wrap; margin:0 0 12px; padding:10px 12px; border-radius:10px; background:var(--surface-soft); font-size:12.5px; }
+  .mo-bulk b{ font-size:13px; }
+  .mo-bulk-btns{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; }
+  .mo-bulk-btns .btn{ padding:5px 11px; font-size:12.5px; }
+  #moTblBox{ margin:0 0 12px; }
   .rc .mo-sec td{ background:var(--accent-soft); color:var(--accent); font-weight:800; font-size:12px; padding:6px 10px; }
   .mo-edited{ display:inline-block; margin-top:6px; background:var(--hold-soft); color:var(--hold); }
   .rc .foot{ flex-wrap:wrap; }
@@ -1478,6 +1492,9 @@
         <div class="card">
           <div class="card-head"><h2>학생별 한 달 기록 — <span id="moClassName"></span></h2><span class="muted" id="moSaved"></span></div>
           <p class="muted" style="margin:0 0 10px">기록은 데일리 테스트에서 저장한 내용으로 자동으로 모여요. 선생님이 메모를 저장하고 '리포트 만들기 요청'을 누르면, 원장님이 클로드로 한 번에 리포트 글을 만들어요. 클로드에는 학생 이름 대신 OO만 보내요.</p>
+          <div class="mo-bulk"><b>코멘트 넣는 방법</b><span class="muted">칸에 직접 쓰기 · 학생마다 'AI 검토용 복사'와 '붙여넣기' · 반 전체를 파일이나 표로 한꺼번에</span>
+            <span class="mo-bulk-btns"><button type="button" class="btn soft" id="moTpl">양식 내려받기 (엑셀)</button><button type="button" class="btn soft" id="moFileBtn">파일로 넣기</button><button type="button" class="btn soft" id="moTblBtn">표 붙여넣기</button><input type="file" id="moFile" accept=".csv,.tsv,.txt,.xlsx,.xls" hidden></span></div>
+          <div class="mo-pbox" id="moTblBox" hidden><p class="muted">엑셀이나 구글 시트에서 '번호(또는 이름) · 강점 · 개선할 점 · 학원과 함께 보완할 내용' 칸을 첫 줄 제목까지 함께 복사해서 붙여넣어요. 다른 AI에 보낼 때는 이름 칸을 지우고 번호만 남겨도 번호로 맞춰 넣어져요.</p><textarea id="moTblT" rows="5" placeholder="여기에 붙여넣기 (Ctrl+V)"></textarea><div><button type="button" class="btn soft" id="moTblNo">취소</button><button type="button" class="btn" id="moTblOk">넣기</button></div></div>
           <div class="table-wrap">
             <table class="dt-table mo-table">
               <thead><tr>
@@ -3394,6 +3411,107 @@ function moPending(){
   return n;
 }
 
+/* 선생님 코멘트 넣는 여러 방법: 직접 쓰기, 학생마다 'AI 검토용 복사' → 다른 AI에서 다듬기 → '붙여넣기'(강점·개선할 점·보완할 내용 칸을 알아서 나눠요),
+   반 전체를 양식 파일(엑셀·CSV)이나 표 붙여넣기로 한꺼번에. 다른 AI로 가는 글에는 학생 이름 대신 OO를 써요. */
+function moToolsHtml(){ return '<div class="mo-tools"><button type="button" class="mo-tb" data-mocopy>AI 검토용 복사</button><button type="button" class="mo-tb" data-mopaste>붙여넣기</button></div>'; }
+function moCopy(text, msg){
+  var done = function(){ toast(msg); };
+  var fallback = function(){ var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); }catch(err){} t.remove(); done(); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+}
+function moAiText(s, vals){
+  var g = moAgg(s);
+  return ['아래는 영어학원 월말 리포트의 선생님 코멘트 초안이에요. 학부모님께 보내는 정중한 존댓말(~습니다체)로 칸마다 2~3문장으로 다듬어 주세요.',
+    '기록과 초안에 없는 사실은 더하지 말고, 학생 이름은 OO 그대로 두세요. 답은 아래 세 줄 제목을 그대로 써서 주세요.', '',
+    '[이달 기록] 진도: ' + g.progText + ' / 출결: ' + g.attText + ' / 교재 지참 ' + pct(g.book, g.in) + ' / 숙제 완료 ' + pct(g.hw, g.in) + ' / Speaking 완료 ' + pct(g.spk, g.in) + ' / 단어: ' + (g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음'), '']
+    .concat(MO_FIELDS.map(function(f){ return f[1] + ': ' + moHide(vals[f[0]] || '', s); })).join('\n');
+}
+// 붙여넣은 글을 세 칸으로 나눠요. 제목(강점/개선할 점/보완할 내용 등)이 없으면 null
+var MO_HEADS = [[/^(강점|장점)/, 'strength'], [/^(개선할\s*점|개선점|보완할\s*점|보완점|부족한\s*점)/, 'improve'], [/^(학원과\s*함께\s*보완할\s*내용|보완할\s*내용|보완\s*계획|지도\s*계획|학원\s*지도\s*계획)/, 'plan']];
+function moSplit(text){
+  var out = {}, cur = null, found = false;
+  String(text || '').replace(/\r/g, '').split('\n').forEach(function(line){
+    var l = line.replace(/^\s*(?:[-*·•▶■□◆◇#]+|\d+[.)]|[①②③])?\s*\**\s*[\[【(]?\s*/, ''), hit = null;
+    MO_HEADS.some(function(h){ var m = l.match(h[0]); if(m){ hit = [h[1], l.slice(m[0].length).replace(/^\s*[\]】)]?\s*\**\s*[:：\-–]?\s*\**\s*/, '')]; return true; } });
+    if(hit){ found = true; cur = hit[0]; out[cur] = (out[cur] ? out[cur] + '\n' : '') + hit[1]; }
+    else if(cur) out[cur] += (out[cur] ? '\n' : '') + line;
+  });
+  if(!found) return null;
+  Object.keys(out).forEach(function(k){ out[k] = out[k].replace(/\n{3,}/g, '\n\n').trim(); });
+  return out;
+}
+// 표(엑셀·CSV·탭 구분) 읽기
+function moParseDelim(text){
+  text = String(text || '').replace(/^\uFEFF/, '');
+  var first = text.split('\n')[0], d = first.indexOf('\t') !== -1 ? '\t' : ',', rows = [], row = [], cell = '', q = false;
+  for(var i = 0; i < text.length; i++){
+    var ch = text[i];
+    if(q){ if(ch === '"'){ if(text[i+1] === '"'){ cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if(ch === '"' && cell === '') q = true;
+    else if(ch === d){ row.push(cell); cell = ''; }
+    else if(ch === '\n' || ch === '\r'){ if(ch === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if(cell !== '' || row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(function(r){ return r.some(function(c){ return String(c).trim(); }); });
+}
+function moApplyTable(rows){
+  var c = moCls(), e = moEntry(); if(!rows.length){ toast('읽을 내용이 없어요.'); return; }
+  var h = rows[0].map(function(x){ return String(x).trim(); }), col = {}, hasHead = false;
+  h.forEach(function(x, i){
+    if(/^(번호|no\.?|#)$/i.test(x)){ col.no = i; hasHead = true; }
+    else if(/^(이름|학생|학생\s*이름)$/.test(x)){ col.name = i; hasHead = true; }
+    else MO_HEADS.forEach(function(m){ if(m[0].test(x.replace(/^\s*[\[(]/, ''))){ col[m[1]] = i; hasHead = true; } });
+  });
+  var body = hasHead ? rows.slice(1) : rows;
+  if(!hasHead){ var o = /^\d+$/.test(String(rows[0][0]).trim()) ? 1 : 0; col = o ? { no:0, strength:1, improve:2, plan:3 } : { name:0, strength:1, improve:2, plan:3 }; }
+  var n = 0, miss = 0;
+  body.forEach(function(r){
+    var nm = col.name != null ? String(r[col.name] || '').trim() : '', no = col.no != null ? parseInt(r[col.no], 10) : NaN;
+    var s = nm && c.students.indexOf(nm) !== -1 ? nm : (!isNaN(no) && c.students[no - 1]) || '';
+    if(!s){ miss++; return; }
+    var any = false;
+    MO_FIELDS.forEach(function(f){ if(col[f[0]] == null) return; var v = String(r[col[f[0]]] == null ? '' : r[col[f[0]]]).trim(); if(v){ e.rows[s][f[0]] = v.split('OO').join(s); any = true; } });
+    if(any){ e.rows[s].on = true; n++; }
+  });
+  if(n){ moEdit(false); renderMonthly(); }
+  toast(n ? n + '명 코멘트를 넣었어요.' + (miss ? ' 반에서 찾지 못한 줄 ' + miss + '개는 건너뛰었어요.' : '') + ' 확인하고 ①저장을 눌러 주세요.' : '넣을 수 있는 줄이 없어요. 첫 줄에 번호(또는 이름)·강점·개선할 점·학원과 함께 보완할 내용 제목이 있는지 확인해 주세요.');
+}
+function moXlsx(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  return new Promise(function(res, rej){ var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload = function(){ window.XLSX ? res(window.XLSX) : rej(); }; sc.onerror = rej; document.head.appendChild(sc); });
+}
+// 학생 한 명의 코멘트 칸(①단계 메모 또는 ④단계 클로드 글)을 읽고 써요
+function moVals(s, inCard){ var e = moEntry(), o = {}; MO_FIELDS.forEach(function(f){ o[f[0]] = inCard ? moComment(e, s, f[0]) || '' : e.rows[s][f[0]] || ''; }); return o; }
+function moPut(s, inCard, vals){
+  var e = moEntry();
+  if(inCard){ e.gen = e.gen || {}; e.gen[s] = e.gen[s] || moVals(s, true); MO_FIELDS.forEach(function(f){ if(vals[f[0]] != null) e.gen[s][f[0]] = vals[f[0]]; }); moSave(); renderMoFlow(); }
+  else { MO_FIELDS.forEach(function(f){ if(vals[f[0]] != null) e.rows[s][f[0]] = vals[f[0]]; }); moEdit(false); renderMonthly(); }
+}
+var moFocus = {};   // 학생별로 마지막에 누른 칸 (제목 없이 붙여넣으면 그 칸에 넣어요)
+function moToolClick(ev, inCard){
+  var box = ev.target.closest(inCard ? '.rc' : 'tr[data-name]'); if(!box) return false;
+  var s = box.dataset.name, b;
+  if(ev.target.closest('[data-mocopy]')){ moCopy(moAiText(s, moVals(s, inCard)), 'AI 검토용 글을 복사했어요. 학생 이름은 OO로 바꿨어요. 다른 AI에 붙여넣고, 다듬은 답을 \'붙여넣기\'로 넣어 주세요.'); return true; }
+  if(ev.target.closest('[data-mopaste]')){
+    var tools = ev.target.closest('.mo-tools'), old = box.querySelector('.mo-pbox');
+    if(old){ old.remove(); return true; }
+    tools.insertAdjacentHTML('afterend', '<div class="mo-pbox"><p>다른 AI의 답이나 다른 파일의 글을 붙여넣어요. \'강점 / 개선할 점 / 학원과 함께 보완할 내용\' 제목이 있으면 칸을 알아서 나눠 넣어요. 제목이 없으면 마지막에 누른 칸에 넣어요.</p><textarea rows="5" data-mopt placeholder="여기에 붙여넣기 (Ctrl+V)"></textarea><div><button type="button" class="btn soft" data-mopno>취소</button><button type="button" class="btn" data-mopok>넣기</button></div></div>');
+    box.querySelector('[data-mopt]').focus(); return true;
+  }
+  if(ev.target.closest('[data-mopno]')){ box.querySelector('.mo-pbox').remove(); return true; }
+  if((b = ev.target.closest('[data-mopok]'))){
+    var txt = box.querySelector('[data-mopt]').value.trim(); if(!txt){ toast('붙여넣은 글이 없어요.'); return true; }
+    txt = txt.split('OO').join(s);
+    var sp = moSplit(txt), v = {};
+    if(sp) v = sp; else v[moFocus[s] || 'strength'] = txt;
+    moPut(s, inCard, v);
+    toast(sp ? Object.keys(sp).length + '개 칸에 나눠 넣었어요.' : MO_FIELDS.find(function(f){ return f[0] === (moFocus[s] || 'strength'); })[1] + ' 칸에 넣었어요.');
+    return true;
+  }
+  return false;
+}
+
 function renderMonthly(){
   fillTeacherPick();
   var list = dtClasses();
@@ -3416,7 +3534,7 @@ function renderMonthly(){
       '<td>'+pct(g.book, g.in)+'</td><td>'+pct(g.hw, g.in)+'</td><td>'+pct(g.spk, g.in)+'</td>' +
       '<td>'+(g.wTaken ? g.wPass + ' / ' + g.wTaken + '회' : '–')+'</td>' +
       '<td class="mo-prog">'+esc(g.progText)+'</td>' +
-      '<td class="grp mo-cm">' + MO_FIELDS.map(function(f){ return '<label><span>'+f[1]+'</span><textarea data-f="'+f[0]+'" rows="2" placeholder="'+f[2]+'" aria-label="'+esc(s)+' '+f[1]+'">'+esc(r[f[0]])+'</textarea></label>'; }).join('') + '</td></tr>';
+      '<td class="grp mo-cm">' + MO_FIELDS.map(function(f){ return '<label><span>'+f[1]+'</span><textarea data-f="'+f[0]+'" rows="2" placeholder="'+f[2]+'" aria-label="'+esc(s)+' '+f[1]+'">'+esc(r[f[0]])+'</textarea></label>'; }).join('') + moToolsHtml() + '</td></tr>';
   }).join('');
   $('moAll').checked = c.students.every(function(s){ return e.rows[s].on; });
   renderMoFlow();
@@ -3449,7 +3567,7 @@ function moCard(s, e){
     '<tr><th>진도</th><td>'+esc(g.progText)+'</td></tr>' +
     '<tr class="mo-sec"><td colspan="2">선생님 코멘트'+(e.gen && e.gen[s] && e.gen[s].ai ? ' <span class="tag mo-ai">클로드로 만듦</span>' : '')+'</td></tr>' + cmRows +
     '<tr class="mo-sec"><td colspan="2">원장님 코멘트</td></tr><tr><th>원장님</th><td>'+dCell+'</td></tr>' +
-    '</table><div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button>'+tBtn+dBtn+'</div></div>';
+    '</table>'+(tEditable ? '<div class="mo-card-tools">'+moToolsHtml()+'</div>' : '')+'<div class="foot"><button class="btn soft" type="button" data-copy>문자용 복사</button>'+tBtn+dBtn+'</div></div>';
 }
 function moText(s, e){
   var c = moCls(), g = moAgg(s), L = [];
@@ -3511,6 +3629,25 @@ $('moRows').addEventListener('input', function(ev){
   if(f === 'on') $('moAll').checked = moCls().students.every(function(s){ return e.rows[s].on; });
   moEdit(f === 'on');
 });
+$('moRows').addEventListener('click', function(ev){ moToolClick(ev, false); });
+$('moRows').addEventListener('focusin', function(ev){ var f = ev.target.dataset && ev.target.dataset.f, tr = ev.target.closest('tr[data-name]'); if(f && f !== 'on' && tr) moFocus[tr.dataset.name] = f; });
+$('moMsgs').addEventListener('focusin', function(ev){ var f = ev.target.dataset && (ev.target.dataset.tedit || ev.target.dataset.dedit), rc = ev.target.closest('.rc'); if(f && rc) moFocus[rc.dataset.name] = f; });
+$('moTpl').addEventListener('click', function(){
+  var c = moCls(), e = moEntry(), q = function(v){ v = String(v == null ? '' : v); if(/^[=+\-@]/.test(v)) v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  var L = [['번호','이름'].concat(MO_FIELDS.map(function(f){ return f[1]; }))].concat(c.students.map(function(s, i){ return [i + 1, s].concat(MO_FIELDS.map(function(f){ return e.rows[s][f[0]] || ''; })); }));
+  rcSave(('월말코멘트_' + c.name + '_' + ym(moMonth) + '.csv').replace(/[\\/:*?"<>|\s]+/g, '_'), new Blob(['\uFEFF' + L.map(function(r){ return r.map(q).join(','); }).join('\r\n')], { type:'text/csv;charset=utf-8' }));
+});
+$('moFileBtn').addEventListener('click', function(){ $('moFile').click(); });
+$('moFile').addEventListener('change', function(){
+  var f = this.files && this.files[0]; this.value = ''; if(!f) return;
+  if(/\.xlsx?$/i.test(f.name)){
+    f.arrayBuffer().then(function(buf){ return moXlsx().then(function(X){ var wb = X.read(buf, { type:'array' }), ws = wb.Sheets[wb.SheetNames[0]]; moApplyTable(X.utils.sheet_to_json(ws, { header:1, defval:'' })); }); })
+      .catch(function(){ toast('엑셀 파일을 읽지 못했어요. 엑셀에서 \'다른 이름으로 저장 → CSV\'로 저장해서 올려 주세요.'); });
+  } else { var fr = new FileReader(); fr.onload = function(){ moApplyTable(moParseDelim(fr.result)); }; fr.readAsText(f); }
+});
+$('moTblBtn').addEventListener('click', function(){ $('moTblBox').hidden = !$('moTblBox').hidden; if(!$('moTblBox').hidden) $('moTblT').focus(); });
+$('moTblNo').addEventListener('click', function(){ $('moTblBox').hidden = true; $('moTblT').value = ''; });
+$('moTblOk').addEventListener('click', function(){ var v = $('moTblT').value; if(!v.trim()){ toast('붙여넣은 표가 없어요.'); return; } moApplyTable(moParseDelim(v)); $('moTblT').value = ''; $('moTblBox').hidden = true; });
 $('moAll').addEventListener('change', function(){
   var e = moEntry(), on = this.checked;
   moCls().students.forEach(function(s){ e.rows[s].on = on; });
@@ -3622,6 +3759,7 @@ $('moMsgs').addEventListener('input', function(ev){
 });
 $('moMsgs').addEventListener('click', function(ev){
   var e = moEntry(), card = ev.target.closest('.rc'); if(!card) return;
+  if(moToolClick(ev, true)) return;
   var s = card.dataset.name;
   if(ev.target.closest('[data-tok]')){ e.tOk[s] = !e.tOk[s]; moSave(); renderMoFlow(); renderSide(); return; }
   if(ev.target.closest('[data-dok]')){
