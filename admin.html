@@ -1090,7 +1090,7 @@
   .login-card p.sub{ margin:0; font-size:12.5px; color:var(--ink-soft); text-align:center; line-height:1.6; }
   .login-card form{ display:flex; flex-direction:column; gap:12px; }
   .login-card label, .reg label{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:var(--ink-soft); }
-  .login-card input, .reg input[type=text], .reg input[type=password]{ border:1px solid var(--border); border-radius:9px; padding:11px 12px; font-size:14px; background:var(--surface-soft); color:var(--ink); font-weight:400; }
+  .login-card input, .reg input[type=text], .reg input[type=password], .reg input[type=date], .reg select{ border:1px solid var(--border); border-radius:9px; padding:11px 12px; font-size:14px; background:var(--surface-soft); color:var(--ink); font-weight:400; }
   .login-card .btn{ justify-content:center; padding:12px; font-size:14px; }
   .login-note{ font-size:11.5px; color:var(--ink-faint); text-align:center; line-height:1.6; margin:4px 0 0; }
   .login-opts{ display:flex; gap:16px; margin-top:-2px; }
@@ -1103,13 +1103,26 @@
   /* 선생님 등록 */
   .set-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; align-items:start; }
   .reg{ display:flex; flex-direction:column; gap:12px; }
-  .reg .row2{ grid-template-columns:1fr 1fr; }
+  .reg .row2{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .reg .row2 input, .reg .row2 select{ width:100%; min-width:0; box-sizing:border-box; }
+  @media (max-width:480px){ .reg .row2{ grid-template-columns:minmax(0,1fr); } }
   .class-chips{ display:flex; flex-wrap:wrap; gap:6px; }
   .class-chips label{ flex-direction:row; align-items:center; gap:6px; border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:12.5px; color:var(--ink); background:var(--surface); cursor:pointer; font-weight:600; }
   .class-chips input{ accent-color:var(--accent); margin:0; }
   .class-chips small{ color:var(--ink-faint); font-weight:500; }
   .hint{ font-size:11.5px; color:var(--ink-faint); font-weight:500; }
-  .t-list{ font-size:13px; min-width:520px; }
+  .t-list{ font-size:13px; min-width:640px; }
+  .t-card{ margin-top:20px; }
+  .t-head-r{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .t-head-r .btn{ padding:5px 11px; font-size:12.5px; }
+  .t-part{ background:var(--hold-soft); color:var(--hold); }
+  .t-list .info-row select{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:6px 8px; background:var(--surface); color:var(--ink); }
+  .t-list td.dt{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .t-list .info-row td{ background:var(--surface-soft); }
+  .t-list .info-row form{ display:flex; gap:8px 14px; flex-wrap:wrap; align-items:flex-end; }
+  .t-list .info-row label{ display:flex; flex-direction:column; gap:3px; font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .t-list .info-row input{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:6px 8px; background:var(--surface); color:var(--ink); }
+  .t-list .info-row p{ flex-basis:100%; margin:0; font-size:12px; color:var(--ink-soft); }
   .t-list th{ padding:8px 10px; color:var(--ink-soft); font-weight:600; font-size:12px; border-bottom:1px solid var(--border); }
   .t-list td{ padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
   .t-list tr:last-child td{ border-bottom:0; }
@@ -1672,17 +1685,24 @@
 
     <!-- 선생님·설정 (원장님 전용) -->
     <section id="view-settings" hidden>
-      <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요.</p></div></div>
+      <div class="greet"><div><h1>선생님 계정·권한</h1><p>선생님 아이디와 비밀번호를 만들고 담당 반을 정해요. 입사일·교육청 등록일과 퇴사한 선생님 기록도 여기에서 관리해요.</p></div></div>
       <div class="set-grid">
         <div class="card">
           <div class="card-head"><h2>선생님 등록</h2></div>
           <form class="reg" id="regForm" novalidate>
-            <label>이름<input type="text" id="regName" placeholder="예: 박지은" maxlength="10"></label>
+            <div class="row2">
+              <label>이름<input type="text" id="regName" placeholder="예: 박지은" maxlength="10"></label>
+              <label>근무 형태<select id="regType"><option value="">정규</option><option value="part">아르바이트</option></select></label>
+            </div>
             <div class="row2">
               <label>아이디 <span class="hint">영문·숫자 4~20자</span><input type="text" id="regId" placeholder="예: jieun" autocapitalize="off" spellcheck="false" autocomplete="off"></label>
               <label>비밀번호 <span class="hint">6자 이상</span><input type="password" id="regPw" autocomplete="new-password"></label>
             </div>
             <label>비밀번호 확인<input type="password" id="regPw2" autocomplete="new-password"></label>
+            <div class="row2">
+              <label>입사일 <span class="hint">첫 근무일</span><input type="date" id="regHire"></label>
+              <label>교육청 등록일 <span class="hint">아직이면 비워 두세요</span><input type="date" id="regEdu"></label>
+            </div>
             <div>
               <span class="hint" style="display:block; margin-bottom:6px; font-size:12px; font-weight:600; color:var(--ink-soft)">담당 반 (선택)</span>
               <div class="class-chips" id="regClasses"></div>
@@ -1693,15 +1713,6 @@
           </form>
         </div>
         <div style="display:flex; flex-direction:column; gap:20px; min-width:0">
-          <div class="card">
-            <div class="card-head"><h2>등록된 선생님</h2><span class="muted" id="tCount"></span></div>
-            <div class="table-wrap">
-              <table class="t-list">
-                <thead><tr><th>이름</th><th>아이디</th><th>담당 반</th><th></th></tr></thead>
-                <tbody id="tRows"></tbody>
-              </table>
-            </div>
-          </div>
           <div class="card">
             <div class="card-head"><h2>원장님 비밀번호 바꾸기</h2></div>
             <form class="reg" id="myPwForm" novalidate>
@@ -1720,6 +1731,25 @@
             <div class="code-box" id="codeShow" hidden></div>
             <button class="btn soft" type="button" id="codeMake" style="margin-top:12px">복구 코드 새로 만들기</button>
           </div>
+        </div>
+      </div>
+      <div class="card t-card">
+        <div class="card-head"><h2>재직 선생님 명단</h2><span class="t-head-r"><span class="muted" id="tCount"></span><button type="button" class="btn soft" id="tCsv">명단 내려받기 (엑셀)</button></span></div>
+        <div class="table-wrap">
+          <table class="t-list">
+            <thead><tr><th>이름</th><th>근무 형태</th><th>아이디</th><th>담당 반</th><th>입사일</th><th>교육청 등록일</th><th></th></tr></thead>
+            <tbody id="tRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card t-card">
+        <div class="card-head"><h2>퇴사한 선생님</h2><span class="muted" id="tLeftCount"></span></div>
+        <p class="muted" style="margin:0 0 10px; font-size:12.5px">퇴사 처리하면 로그인할 수 없고 담당 반은 '미배정'이 돼요. 계정과 기록은 지우지 않고 여기에 남아요.</p>
+        <div class="table-wrap">
+          <table class="t-list">
+            <thead><tr><th>이름</th><th>근무 형태</th><th>아이디</th><th>입사일</th><th>교육청 등록일</th><th>퇴사일</th><th>교육청 등록 철회일</th><th></th></tr></thead>
+            <tbody id="tLeftRows"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -4825,7 +4855,7 @@ var ML_KEY = 'beyond-mail-v1';
 var mlStore = (function(){ try{ var raw = localStorage.getItem(ML_KEY); if(raw) return JSON.parse(raw); }catch(e){} return { seq:0, msgs:[] }; })();
 function saveMl(){ try{ localStorage.setItem(ML_KEY, JSON.stringify(mlStore)); }catch(e){} }
 var ml = { box:'in', mode:'list', id:null, to:[], subj:'', body:'' };
-function mlPeople(){ return store.accounts.filter(function(a){ return !session || a.id !== session.id; }).sort(function(a, b){ return (a.role === 'director' ? 0 : 1) - (b.role === 'director' ? 0 : 1) || a.name.localeCompare(b.name, 'ko'); }); }
+function mlPeople(){ return store.accounts.filter(function(a){ return (!session || a.id !== session.id) && !a.left; }).sort(function(a, b){ return (a.role === 'director' ? 0 : 1) - (b.role === 'director' ? 0 : 1) || a.name.localeCompare(b.name, 'ko'); }); }
 function mlName(id){ var a = findAcc(id); return a ? (a.role === 'director' ? '원장님' : a.name + ' 선생님') : '(삭제된 계정)'; }
 function mlIn(){ return session ? mlStore.msgs.filter(function(m){ return m.to.indexOf(session.id) !== -1 && !(m.delIn || {})[session.id]; }).sort(function(a, b){ return b.id - a.id; }) : []; }
 function mlOut(){ return session ? mlStore.msgs.filter(function(m){ return m.from === session.id && !m.delOut; }).sort(function(a, b){ return b.id - a.id; }) : []; }
@@ -5802,7 +5832,7 @@ function findAcc(id){ id = String(id).toLowerCase(); return store.accounts.find(
 function applyAssign(){ Object.keys(store.assign || {}).forEach(function(cid){ var c = CLASSES.find(function(x){ return x.id === cid; }); if(c) c.teacher = store.assign[cid]; }); }
 function teacherNames(){
   var names = TEACHERS.slice();
-  store.accounts.forEach(function(a){ if(a.role === 'teacher' && names.indexOf(a.name) === -1) names.push(a.name); });
+  store.accounts.forEach(function(a){ if(a.role === 'teacher' && !a.left && names.indexOf(a.name) === -1) names.push(a.name); });
   return names;
 }
 function fillTeacherPick(){
@@ -5948,6 +5978,7 @@ $('loginForm').addEventListener('submit', function(e){
   if(!acc) return fail();
   hashPw(pw, acc.salt).then(function(h){
     if(h !== acc.hash) return fail();
+    if(acc.left){ $('loginErr').textContent = '퇴사 처리된 계정이라 로그인할 수 없어요. 원장님께 문의해 주세요.'; $('loginPw').value = ''; return; }
     // 아이디 저장 / 자동 로그인 (이 기기 브라우저에만 기억해요)
     try{
       if($('saveId').checked) localStorage.setItem(ID_KEY, acc.id); else localStorage.removeItem(ID_KEY);
@@ -5970,19 +6001,58 @@ function renderSettings(){
   $('regClasses').innerHTML = CLASSES.map(function(c){
     return '<label><input type="checkbox" value="'+c.id+'">'+esc(c.name)+' <small>'+esc(c.teacher)+'</small></label>';
   }).join('');
-  var teachers = store.accounts.filter(function(a){ return a.role === 'teacher'; });
+  var teachers = store.accounts.filter(function(a){ return a.role === 'teacher' && !a.left; });
+  var gone = store.accounts.filter(function(a){ return a.role === 'teacher' && a.left; }).sort(function(a, b){ return (b.left || '').localeCompare(a.left || ''); });
   var req = store.resetReq || {}, reqN = teachers.filter(function(a){ return req[a.id]; }).length;
-  $('tCount').textContent = teachers.length + '명' + (reqN ? ' · 재설정 요청 ' + reqN + '건' : '');
+  var partN = teachers.filter(function(a){ return a.type === 'part'; }).length;
+  $('tCount').textContent = teachers.length + '명' + (partN ? ' (아르바이트 ' + partN + '명)' : '') + (reqN ? ' · 재설정 요청 ' + reqN + '건' : '');
   var me0 = session && findAcc(session.id);
   $('codeState').textContent = me0 && me0.rhash ? '만들어 둠' : '아직 없어요';
   $('codeShow').hidden = true;
   $('tRows').innerHTML = teachers.length ? teachers.map(function(a){
     var cl = CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; });
-    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
-      '<td class="acts"><button type="button" data-act="pw">비밀번호 바꾸기</button><button type="button" class="danger" data-act="del">삭제</button></td></tr>';
-  }).join('') : '<tr><td colspan="4" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 왼쪽에서 첫 선생님을 등록해 주세요.</td></tr>';
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+tType(a)+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
+      '<td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td>' +
+      '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 바꾸기</button><button type="button" class="danger" data-act="leave">퇴사 처리</button></td></tr>';
+  }).join('') : '<tr><td colspan="7" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 위에서 첫 선생님을 등록해 주세요.</td></tr>';
+  $('tLeftCount').textContent = gone.length + '명';
+  $('tLeftRows').innerHTML = gone.length ? gone.map(function(a){
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b></td><td>'+tType(a)+'</td><td>'+esc(a.id)+'</td><td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td><td class="dt">'+tDate(a.left)+'</td><td class="dt">'+tDate(a.eduOff)+'</td>' +
+      '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="back">재직으로 되돌리기</button></td></tr>';
+  }).join('') : '<tr><td colspan="8" class="muted" style="padding:16px 10px">퇴사한 선생님이 없어요.</td></tr>';
 }
 
+function tType(a){ return a.type === 'part' ? '<span class="tag t-part">아르바이트</span>' : '<span class="muted">정규</span>'; }
+function tDate(v){ return v ? esc(v.replace(/-/g, '.')) : '<span class="muted">–</span>'; }
+// 날짜 수정·퇴사 처리 칸 (표 아래에 열려요)
+function tInfoRow(tr, acc, mode){
+  var next = tr.nextElementSibling;
+  if(next && next.classList.contains('info-row')){ var same = next.dataset.mode === mode; next.remove(); if(same) return; }
+  var td = new Date(), today = ymd(td), cols = tr.children.length;
+  var f = function(k, l, v){ return '<label>'+l+'<input type="date" data-k="'+k+'" value="'+esc(v || '')+'"></label>'; };
+  var body = mode === 'leave'
+    ? '<p><b>'+esc(acc.name)+' 선생님 퇴사 처리</b> · 로그인이 막히고 담당 반은 미배정이 돼요. 계정과 기록은 지우지 않아요.</p>' + f('left', '퇴사일', today) + f('eduOff', '교육청 등록 철회일 (아직이면 비워 두세요)', acc.eduOff)
+    : '<label>근무 형태<select data-k="type"><option value="">정규</option><option value="part"'+(acc.type === 'part' ? ' selected' : '')+'>아르바이트</option></select></label>' + f('hire', '입사일', acc.hire) + f('edu', '교육청 등록일', acc.edu) + (acc.left ? f('left', '퇴사일', acc.left) + f('eduOff', '교육청 등록 철회일', acc.eduOff) : '');
+  tr.insertAdjacentHTML('afterend', '<tr class="info-row" data-mode="'+mode+'"><td colspan="'+cols+'"><form data-id="'+acc.id+'" data-mode="'+mode+'">'+body+'<button class="btn'+(mode === 'leave' ? '' : ' soft')+'" type="submit">'+(mode === 'leave' ? '퇴사 처리' : '저장')+'</button><button class="btn soft" type="button" data-act="close">취소</button><span class="form-err"></span></form></td></tr>');
+  tr.nextElementSibling.querySelector('input').focus();
+}
+function tInfoSubmit(e){
+  var f = e.target; if(!f.matches('.info-row form')) return;
+  e.preventDefault();
+  var acc = findAcc(f.dataset.id), v = {}; if(!acc) return;
+  f.querySelectorAll('[data-k]').forEach(function(i){ v[i.dataset.k] = i.value; });
+  if(f.dataset.mode === 'leave'){
+    if(!v.left){ f.querySelector('.form-err').textContent = '퇴사일을 골라 주세요.'; return; }
+    if(!confirm(acc.name + ' 선생님을 퇴사 처리할까요? 로그인이 막히고 담당 반은 미배정이 돼요. 계정과 기록은 남아요.')) return;
+    acc.left = v.left; acc.eduOff = v.eduOff || '';
+    CLASSES.forEach(function(c){ if(c.teacher === acc.name){ c.teacher = '미배정'; store.assign[c.id] = '미배정'; } });
+    toast(acc.name + ' 선생님을 퇴사 처리했어요. 퇴사한 선생님 목록에 남아요.');
+  } else {
+    ['type','hire','edu','left','eduOff'].forEach(function(k){ if(k in v){ if(k === 'left' && !v.left) return; acc[k] = v[k]; } });
+    toast(acc.name + ' 선생님 정보를 저장했어요.');
+  }
+  saveStore(); renderDirector(); renderSettings();
+}
 $('regForm').addEventListener('submit', function(e){
   e.preventDefault();
   $('regOk').textContent = '';
@@ -5994,7 +6064,7 @@ $('regForm').addEventListener('submit', function(e){
   var picked = Array.from(document.querySelectorAll('#regClasses input:checked')).map(function(i){ return i.value; });
   var salt = randSalt();
   hashPw(pw, salt).then(function(h){
-    store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', salt:salt, hash:h });
+    store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', salt:salt, hash:h, hire:$('regHire').value, edu:$('regEdu').value, type:$('regType').value });
     picked.forEach(function(cid){ store.assign[cid] = name; });
     saveStore(); applyAssign(); renderDirector();
     $('regForm').reset(); renderSettings();
@@ -6002,18 +6072,12 @@ $('regForm').addEventListener('submit', function(e){
   }).catch(function(){ $('regErr').textContent = '이 브라우저에서는 등록할 수 없어요. 최신 크롬이나 사파리로 열어 주세요.'; });
 });
 
-var pendingTDel = null;
+// 선생님 계정은 지우지 않아요(규칙: 원장님 승인 없이 삭제 금지). 그만두면 '퇴사 처리'로 로그인만 막고 기록은 남겨요.
 $('tRows').addEventListener('click', function(e){
   var b = e.target.closest('[data-act]'); if(!b) return;
-  var tr = b.closest('tr'), acc = findAcc(tr.dataset.id);
-  if(b.dataset.act === 'del'){
-    if(pendingTDel !== acc.id){ pendingTDel = acc.id; b.textContent = '정말 삭제?'; return; }
-    pendingTDel = null;
-    store.accounts = store.accounts.filter(function(a){ return a.id !== acc.id; });
-    CLASSES.forEach(function(c){ if(c.teacher === acc.name){ c.teacher = '미배정'; store.assign[c.id] = '미배정'; } });
-    saveStore(); renderDirector(); renderSettings(); toast(acc.name + ' 선생님 계정을 삭제했어요.');
-    return;
-  }
+  if(b.dataset.act === 'close'){ b.closest('.info-row').remove(); return; }
+  var tr = b.closest('tr'), acc = findAcc(tr.dataset.id); if(!acc) return;
+  if(b.dataset.act === 'info' || b.dataset.act === 'leave') return tInfoRow(tr, acc, b.dataset.act);
   if(b.dataset.act === 'pw'){
     var next = tr.nextElementSibling;
     if(next && next.classList.contains('pw-row')){ next.remove(); return; }
@@ -6021,7 +6085,27 @@ $('tRows').addEventListener('click', function(e){
     tr.nextElementSibling.querySelector('input').focus();
   }
 });
+$('tLeftRows').addEventListener('click', function(e){
+  var b = e.target.closest('[data-act]'); if(!b) return;
+  if(b.dataset.act === 'close'){ b.closest('.info-row').remove(); return; }
+  var tr = b.closest('tr'), acc = findAcc(tr.dataset.id); if(!acc) return;
+  if(b.dataset.act === 'info') return tInfoRow(tr, acc, 'info');
+  if(b.dataset.act === 'back'){
+    if(!confirm(acc.name + ' 선생님을 다시 재직으로 돌릴까요? 다시 로그인할 수 있어요. 퇴사일·철회일 기록은 지워져요.')) return;
+    delete acc.left; delete acc.eduOff; saveStore(); renderSettings(); toast(acc.name + ' 선생님을 재직으로 돌렸어요. 담당 반은 다시 정해 주세요.');
+  }
+});
+$('tLeftRows').addEventListener('submit', tInfoSubmit);
+$('tCsv').addEventListener('click', function(){
+  var q = function(v){ v = String(v == null ? '' : v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  var L = [['구분','이름','근무 형태','아이디','담당 반','입사일','교육청 등록일','퇴사일','교육청 등록 철회일']];
+  store.accounts.filter(function(a){ return a.role === 'teacher'; }).forEach(function(a){
+    L.push([a.left ? '퇴사' : '재직', a.name, a.type === 'part' ? '아르바이트' : '정규', a.id, a.left ? '' : CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; }).join(' / '), a.hire || '', a.edu || '', a.left || '', a.eduOff || '']);
+  });
+  rcSave('선생님명단_' + ymd(new Date()).replace(/-/g, '') + '.csv', new Blob(['\uFEFF' + L.map(function(r){ return r.map(q).join(','); }).join('\r\n')], { type:'text/csv;charset=utf-8' }));
+});
 $('tRows').addEventListener('submit', function(e){
+  if(e.target.matches('.info-row form')) return tInfoSubmit(e);
   e.preventDefault();
   var f = e.target, acc = findAcc(f.dataset.id), pw = f.querySelector('input').value;
   if(pw.length < 6){ f.querySelector('.form-err').textContent = '6자 이상으로 정해 주세요.'; return; }
@@ -6171,6 +6255,7 @@ loadSheetConsults();
     if(a2 && a2.hash === auto.hash) acc = a2;
     else if(auto){ try{ localStorage.removeItem(AUTO_KEY); }catch(e){} }
   }
+  if(acc && acc.left){ acc = null; try{ sessionStorage.removeItem(SES_KEY); localStorage.removeItem(AUTO_KEY); }catch(e){} }
   if(acc) return enter(acc);
   // 학부모 로그인 유지: 저장된 번호가 지금 기록과 맞을 때만 들어가요.
   var ps = null; try{ ps = JSON.parse(sessionStorage.getItem(PSES_KEY) || 'null') || JSON.parse(localStorage.getItem(PAUTO_KEY) || 'null'); }catch(e){}
