@@ -412,6 +412,8 @@
   .mo-table .mo-cm{ min-width:300px; }
   .mo-card-tools{ padding:0 12px 4px; }
   .mo-tools{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .mo-talk{ text-align:left; margin-top:6px; font-size:12px; border:1px solid var(--border); border-radius:8px; padding:5px 8px; background:var(--surface-soft); }
+  .mo-talk summary{ cursor:pointer; font-weight:700; color:var(--accent); } .mo-talk > div{ padding:3px 0; } .mo-talk .tag{ padding:1px 6px; font-size:10.5px; } .mo-talk .dt{ color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .mo-tb{ font:inherit; font-size:11.5px; font-weight:700; padding:4px 9px; border-radius:7px; border:1px solid var(--border); background:var(--surface); color:var(--accent); cursor:pointer; }
   .mo-tb:hover{ background:var(--accent-soft); }
   .mo-pbox{ display:flex; flex-direction:column; gap:6px; margin-top:8px; padding:10px; border:1px dashed var(--accent); border-radius:10px; background:var(--accent-soft); text-align:left; }
@@ -1145,6 +1147,13 @@
   .rs-modal .hint{ margin:0; }
   .rs-hist{ font-size:12.5px; background:var(--surface-soft); border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:4px; max-height:140px; overflow:auto; }
   .rs-hist .dt{ font-variant-numeric:tabular-nums; color:var(--ink-soft); }
+  .rs-talk{ display:flex; flex-direction:column; gap:6px; font-size:12.5px; border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .rs-talk > small{ font-size:11.5px; }
+  .rs-ti{ display:grid; grid-template-columns:auto auto minmax(0,1fr); gap:8px; align-items:start; padding:4px 0; border-top:1px solid var(--border); }
+  .rs-ti .dt{ font-variant-numeric:tabular-nums; color:var(--ink-soft); white-space:nowrap; } .rs-ti .tag{ padding:2px 7px; font-size:11px; white-space:nowrap; } .rs-tt{ white-space:pre-line; }
+  .tag.rs-good{ background:var(--good-soft); color:var(--good); }
+  .rs-tadd{ display:flex; flex-direction:column; gap:6px; margin-top:4px; } .rs-tadd textarea{ min-height:50px; }
+  .rs-tadd .rs-tg{ flex-direction:row !important; align-items:center; gap:6px !important; color:var(--ink) !important; } .rs-tadd .btn{ align-self:flex-start; }
   .rs-modal .modal-actions{ flex-wrap:wrap; } .rs-rec{ margin-right:auto; }
   @media (max-width:480px){ .rs-modal .row2{ grid-template-columns:minmax(0,1fr); } .rs-dcap{ margin-left:0; } }
   .reg{ display:flex; flex-direction:column; gap:12px; }
@@ -3601,6 +3610,16 @@ function moPending(){
 
 /* 선생님 코멘트 넣는 여러 방법: 직접 쓰기, 학생마다 'AI 검토용 복사' → 다른 AI에서 다듬기 → '붙여넣기'(강점·개선할 점·보완할 내용 칸을 알아서 나눠요),
    반 전체를 양식 파일(엑셀·CSV)이나 표 붙여넣기로 한꺼번에. 다른 AI로 가는 글에는 학생 이름 대신 OO를 써요. */
+function moStu(s){ return roster.list.find(function(x){ return x.cid === moClassId && x.name === s && x.status !== 'out'; }); }
+function moMonthKey(){ return moMonth.getFullYear() + '-' + ('0' + (moMonth.getMonth() + 1)).slice(-2); }
+function moTalks(s){ var st = moStu(s); return st ? rsTalks(st, moMonthKey()) : []; }
+function moTalkText(s){ return moTalks(s).slice().reverse().map(function(x){ return x.d.slice(5).replace('-', '/') + ' ' + (x.kind === '면담' ? '면담' : x.good ? '변화(개선됨)' : '변화') + ': ' + moHide(x.t, s); }); }
+function moTalkHtml(s){
+  var l = moTalks(s); if(!l.length) return '';
+  return '<details class="mo-talk"><summary>이번 달 면담·변화 ' + l.length + '건' + (l.some(function(x){ return x.good; }) ? ' · 개선 ' + l.filter(function(x){ return x.good; }).length : '') + '</summary>'
+    + l.slice().reverse().map(function(x){ return '<div><span class="dt">' + x.d.slice(5).replace('-', '/') + '</span> <span class="tag ' + (x.kind === '면담' ? 'info' : x.good ? 'rs-good' : 'warn') + '">' + (x.kind === '면담' ? '면담' : x.good ? '개선됨' : '변화') + '</span> ' + esc(x.t)
+      + (x.good ? ' <button type="button" class="mo-tb" data-mogood="' + esc(x.t) + '">강점에 넣기</button>' : '') + '</div>'; }).join('') + '</details>';
+}
 function moToolsHtml(){ return '<div class="mo-tools"><button type="button" class="mo-tb" data-mocopy>AI 검토용 복사</button><button type="button" class="mo-tb" data-mopaste>붙여넣기</button></div>'; }
 function moCopy(text, msg){
   var done = function(){ toast(msg); };
@@ -3612,6 +3631,7 @@ function moAiText(s, vals){
   return ['아래는 영어학원 월말 리포트의 선생님 코멘트 초안이에요. 학부모님께 보내는 정중한 존댓말(~습니다체)로 칸마다 2~3문장으로 다듬어 주세요.',
     '기록과 초안에 없는 사실은 더하지 말고, 학생 이름은 OO 그대로 두세요. 답은 아래 세 줄 제목을 그대로 써서 주세요.', '',
     '[이달 기록] 진도: ' + g.progText + ' / 출결: ' + g.attText + ' / 교재 지참 ' + pct(g.book, g.in) + ' / 숙제 완료 ' + pct(g.hw, g.in) + ' / Speaking 완료 ' + pct(g.spk, g.in) + ' / 단어: ' + (g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음'), '']
+    .concat(moTalkText(s).length ? ['[이달 면담·변화 기록] (개선됨으로 표시한 것은 강점에 반영해 주세요)'].concat(moTalkText(s), ['']) : [])
     .concat(MO_FIELDS.map(function(f){ return f[1] + ': ' + moHide(vals[f[0]] || '', s); })).join('\n');
 }
 // 붙여넣은 글을 세 칸으로 나눠요. 제목(강점/개선할 점/보완할 내용 등)이 없으면 null
@@ -3722,7 +3742,7 @@ function renderMonthly(){
       '<td>'+pct(g.book, g.in)+'</td><td>'+pct(g.hw, g.in)+'</td><td>'+pct(g.spk, g.in)+'</td>' +
       '<td>'+(g.wTaken ? g.wPass + ' / ' + g.wTaken + '회' : '–')+'</td>' +
       '<td class="mo-prog">'+esc(g.progText)+'</td>' +
-      '<td class="grp mo-cm">' + MO_FIELDS.map(function(f){ return '<label><span>'+f[1]+'</span><textarea data-f="'+f[0]+'" rows="2" placeholder="'+f[2]+'" aria-label="'+esc(s)+' '+f[1]+'">'+esc(r[f[0]])+'</textarea></label>'; }).join('') + moToolsHtml() + '</td></tr>';
+      '<td class="grp mo-cm">' + MO_FIELDS.map(function(f){ return '<label><span>'+f[1]+'</span><textarea data-f="'+f[0]+'" rows="2" placeholder="'+f[2]+'" aria-label="'+esc(s)+' '+f[1]+'">'+esc(r[f[0]])+'</textarea></label>'; }).join('') + moToolsHtml() + moTalkHtml(s) + '</td></tr>';
   }).join('');
   $('moAll').checked = c.students.every(function(s){ return e.rows[s].on; });
   renderMoFlow();
@@ -3817,7 +3837,16 @@ $('moRows').addEventListener('input', function(ev){
   if(f === 'on') $('moAll').checked = moCls().students.every(function(s){ return e.rows[s].on; });
   moEdit(f === 'on');
 });
-$('moRows').addEventListener('click', function(ev){ moToolClick(ev, false); });
+$('moRows').addEventListener('click', function(ev){
+  var g = ev.target.closest('[data-mogood]');
+  if(g){
+    var ta = g.closest('td').querySelector('textarea[data-f="strength"]'); if(!ta) return;
+    if(ta.value.indexOf(g.dataset.mogood) !== -1) return toast('이미 강점 칸에 들어 있어요.');
+    ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + g.dataset.mogood;
+    ta.dispatchEvent(new Event('input', { bubbles:true })); toast('강점 칸에 넣었어요. 문장은 다듬어 주세요.'); return;
+  }
+  moToolClick(ev, false);
+});
 $('moRows').addEventListener('focusin', function(ev){ var f = ev.target.dataset && ev.target.dataset.f, tr = ev.target.closest('tr[data-name]'); if(f && f !== 'on' && tr) moFocus[tr.dataset.name] = f; });
 $('moMsgs').addEventListener('focusin', function(ev){ var f = ev.target.dataset && (ev.target.dataset.tedit || ev.target.dataset.dedit), rc = ev.target.closest('.rc'); if(f && rc) moFocus[rc.dataset.name] = f; });
 $('moTpl').addEventListener('click', function(){
@@ -3876,6 +3905,7 @@ function moPrompt(list){
     '3. 학부모님께 드리는 정중한 존댓말(~습니다체)로 쓰고, 칸마다 2~3문장으로 쓰세요. 과장이나 감정적인 표현 대신 관찰한 사실과 계획을 쓰세요.',
     '4. 교재명과 단원명(예: STORY > (2-unit3))은 원문 그대로 쓰세요.',
     '5. 백분율과 횟수는 기록에 있는 숫자만 쓰세요.',
+    '6. 면담변화기록에서 "변화(개선됨)"인 내용은 강점에 반영하세요. 면담 내용은 개선할 점과 보완 계획을 쓸 때 참고하세요.',
     '반드시 JSON 배열 하나만 답하세요. 형식: [{"id":"s1","strength":"...","improve":"...","plan":"..."}]',
     '', '학생 기록:', JSON.stringify(list, null, 1)].join('\n');
 }
@@ -3884,7 +3914,7 @@ function moGenData(e, names){
     var g = moAgg(s), r = e.rows[s];
     return { id:'s' + (i + 1), 월:moMonth.getFullYear() + '년 ' + (moMonth.getMonth()+1) + '월', 진도:g.progText, 출결:g.attText,
       교재지참:pct(g.book, g.in), 숙제완료:pct(g.hw, g.in), Speaking완료:pct(g.spk, g.in), 단어:g.wTaken ? g.wTaken + '회 응시 중 ' + g.wPass + '회 통과' : '기록 없음',
-      선생님메모:{ 강점:moHide(r.strength, s), 개선할점:moHide(r.improve, s), 보완계획:moHide(r.plan, s) } };
+      선생님메모:{ 강점:moHide(r.strength, s), 개선할점:moHide(r.improve, s), 보완계획:moHide(r.plan, s) }, 면담변화기록:moTalkText(s) };
   });
 }
 function moSampler(){ return window.claude && typeof window.claude.use === 'function' ? window.claude.use('sample').catch(function(){ return null; }) : Promise.resolve(null); }
@@ -6472,6 +6502,7 @@ $('pvPrev').addEventListener('click', function(ev){ pvClick(ev, function(){ pvPr
    원장님: 반 카드 → 반 상세(학생 표) → 학생 카드. 등록·반 이동·휴원·퇴원·대기, 퇴원생 목록.
    선생님: 담당 반만 보고, 학교·학년·연락처는 고칠 수 있어요. 반 이동·상태 바꾸기는 원장님만. */
 var RS_ST = { on:'재원', wait:'대기', rest:'휴원', out:'퇴원' };
+var RS_SCHOOLS = ['창신초','남문초','여고초','거제초'];   // 그 밖의 학교는 '기타'에서 직접 써요
 var RS_GRADES = ['초1','초2','초3','초4','초5','초6','중1','중2','중3','고1'];
 var rs = { cid:'', q:'', showOut:false, edit:null };
 function rsPin(){
@@ -6496,6 +6527,27 @@ function rsLog(s, text){ s.hist = s.hist || []; s.hist.push({ d:ymd(new Date()),
 function rsCname(cid){ var c = CLASSES.find(function(x){ return x.id === cid; }); return c ? c.name : '반 없음'; }
 function rsBar(n){ var p = Math.min(100, Math.round(n / RS_CAP * 100)); return '<span class="rs-bar' + (n >= RS_CAP ? ' full' : '') + '"><i style="width:' + p + '%"></i></span>'; }
 
+/* 면담·변화 기록: 교무일지 '수업 중 면담 내용'(자동으로 모음) + 학생 카드에서 쓰는 변화 기록(s.notes, 지우지 않음).
+   '개선됨'으로 표시한 변화는 월말 리포트 강점에 넣을 수 있어요. */
+function rsTalks(st, month){
+  var out = [], cn = rsCname(st.cid);
+  Object.keys(gyStore).forEach(function(k){
+    var r = gyStore[k], i = k.lastIndexOf('|'), t = k.slice(0, i), d = k.slice(i + 1);
+    if(month && d.indexOf(month) !== 0) return;
+    ((r.snap ? r.snap.cs : r.cs) || []).forEach(function(x){
+      if(x.key || !x.note || String(x.name || '').trim() !== st.name || (x.cls && x.cls !== cn)) return;
+      out.push({ d:d, t:x.note, by:t, kind:'면담' });
+    });
+  });
+  (st.notes || []).forEach(function(n){ if(!month || n.d.indexOf(month) === 0) out.push({ d:n.d, t:n.t, by:n.by, kind:'변화', good:n.good }); });
+  return out.sort(function(a, b){ return a.d < b.d ? 1 : a.d > b.d ? -1 : 0; });
+}
+function rsTalkHtml(st){
+  var l = rsTalks(st);
+  return '<div class="rs-talk"><b>면담·변화 기록</b><small class="muted">교무일지의 수업 중 면담 내용이 날짜별로 자동으로 쌓여요. 이후에 달라진 점은 아래에 남겨요.</small>'
+    + (l.length ? l.map(function(x){ return '<div class="rs-ti ' + (x.kind === '면담' ? 'k1' : 'k2') + '"><span class="dt">' + esc(x.d) + '</span><span class="tag ' + (x.kind === '면담' ? 'info' : x.good ? 'rs-good' : 'warn') + '">' + (x.kind === '면담' ? '면담' : x.good ? '개선됨' : '변화') + '</span><span class="rs-tt">' + esc(x.t) + ' <small class="muted">' + esc(x.by || '') + '</small></span></div>'; }).join('') : '<p class="empty">아직 기록이 없어요.</p>')
+    + '<div class="rs-tadd"><textarea id="rsNoteT" rows="2" maxlength="200" placeholder="예: 단어장 먼저 하기로 한 뒤 숙제를 빠뜨리지 않음"></textarea><label class="rs-tg"><input type="checkbox" id="rsNoteGood"> 개선됨 (월말 리포트에 반영)</label><button type="button" class="btn soft" data-rsnote>변화 기록 남기기</button></div></div>';
+}
 function renderRoster(){
   var dir = rsDir(), cs = rsClasses();
   if(rs.cid && !cs.some(function(c){ return c.id === rs.cid; })) rs.cid = '';
@@ -6564,7 +6616,8 @@ function rsOpen(id, cid){
   $('rsForm').innerHTML = '<h2>' + (id ? esc(s.name) + ' 학생 카드' : '학생 등록') + '</h2>'
     + '<div class="row2"><label>이름<input type="text" id="rsName" maxlength="10" value="' + esc(s.name) + '"' + ro + '></label>'
     + '<label>반<select id="rsCls"' + ro + '><option value="">반 배정 전</option>' + cls + '</select></label></div>'
-    + '<div class="row2"><label>학교<input type="text" id="rsSchool" maxlength="20" placeholder="예: 사직초" value="' + esc(s.school) + '"></label>'
+    + '<div class="row2"><label>학교<select id="rsSchoolSel"><option value="">선택</option>' + RS_SCHOOLS.map(function(g){ return '<option' + (g === s.school ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '<option value="etc"' + (s.school && RS_SCHOOLS.indexOf(s.school) === -1 ? ' selected' : '') + '>기타 (직접 입력)</option></select>'
+    + '<input type="text" id="rsSchool" maxlength="20" placeholder="학교 이름 (예: 사직중)" value="' + esc(RS_SCHOOLS.indexOf(s.school) === -1 ? s.school : '') + '"' + (s.school && RS_SCHOOLS.indexOf(s.school) === -1 ? '' : ' hidden') + '></label>'
     + '<label>학년<select id="rsGrade"><option value="">선택</option>' + RS_GRADES.map(function(g){ return '<option' + (g === s.grade ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label></div>'
     + '<label>학생 연락처 <span class="hint">휴대폰이 없으면 비워 두세요</span><input type="tel" id="rsPhone" inputmode="numeric" placeholder="010-0000-0000" value="' + esc(s.phone) + '"></label>'
     + '<div class="row2"><label>학부모 연락처<input type="tel" id="rsPPhone" inputmode="numeric" placeholder="010-0000-0000" value="' + esc(s.pphone) + '"></label>'
@@ -6573,16 +6626,17 @@ function rsOpen(id, cid){
     + '<label>상태<select id="rsSt"' + ro + '>' + Object.keys(RS_ST).map(function(k){ return '<option value="' + k + '"' + (k === s.status ? ' selected' : '') + '>' + RS_ST[k] + '</option>'; }).join('') + '</select></label></div>'
     + '<label>메모 <span class="hint">알레르기·하원 방법 등 수업에 필요한 것만</span><textarea id="rsMemo" maxlength="300">' + esc(s.memo || '') + '</textarea></label>'
     + '<p class="hint">학부모 번호 뒷자리 4개는 학부모·학생 화면 로그인과 등원 태블릿에 쓰여요.' + (id && dir ? ' 이름을 바꾸면 지난 기록은 예전 이름으로 남아요.' : '') + '</p>'
+    + (id ? '<div id="rsTalk">' + rsTalkHtml(s) + '</div>' : '')
     + (s.hist && s.hist.length ? '<div class="rs-hist"><b>변경 기록</b>' + s.hist.slice().reverse().map(function(x){ return '<div><span class="dt">' + esc(x.d) + '</span> ' + esc(x.t) + ' <small class="muted">' + esc(x.by || '') + '</small></div>'; }).join('') + '</div>' : '')
     + '<p class="form-err" id="rsErr"></p>'
     + '<div class="modal-actions">' + (id && s.status !== 'out' && CLASSES.some(function(c){ return c.id === s.cid; }) ? '<button type="button" class="btn soft rs-rec" data-rsrec="' + s.id + '">기록 모아보기</button>' : '') + '<button type="button" class="btn soft" data-rsclose>닫기</button><button type="submit" class="btn">저장</button></div>';
   $('rsOv').hidden = false;
-  (dir ? $('rsName') : $('rsSchool')).focus();
+  (dir ? $('rsName') : $('rsSchoolSel')).focus();
 }
 function rsSubmit(){
   var dir = rsDir(), err = $('rsErr');
   var s = rs.edit ? rsFind(rs.edit) : null;
-  var v = { name:$('rsName').value.trim(), cid:$('rsCls').value, school:$('rsSchool').value.trim(), grade:$('rsGrade').value, phone:rsTel($('rsPhone').value), pphone:rsTel($('rsPPhone').value), prel:$('rsPRel').value, joined:$('rsJoin').value, status:$('rsSt').value, memo:$('rsMemo').value.trim() };
+  var v = { name:$('rsName').value.trim(), cid:$('rsCls').value, school:$('rsSchoolSel').value === 'etc' ? $('rsSchool').value.trim() : $('rsSchoolSel').value, grade:$('rsGrade').value, phone:rsTel($('rsPhone').value), pphone:rsTel($('rsPPhone').value), prel:$('rsPRel').value, joined:$('rsJoin').value, status:$('rsSt').value, memo:$('rsMemo').value.trim() };
   if(!dir){ v.name = s.name; v.cid = s.cid; v.joined = s.joined; v.status = s.status; }
   if(!v.name){ err.textContent = '이름을 써 주세요.'; return; }
   if(v.status !== 'out' && v.cid && roster.list.some(function(x){ return x !== s && x.cid === v.cid && x.name === v.name && x.status !== 'out'; })){ err.textContent = '이 반에 같은 이름 학생이 있어요. 이름 뒤에 구분(예: 김하준B)을 붙여 주세요.'; return; }
@@ -6648,10 +6702,17 @@ $('rsBody').addEventListener('input', function(ev){
 $('rsForm').addEventListener('submit', function(ev){ ev.preventDefault(); rsSubmit(); });
 $('rsForm').addEventListener('click', function(ev){
   if(ev.target.closest('[data-rsclose]')) $('rsOv').hidden = true;
+  if(ev.target.closest('[data-rsnote]')){
+    var st = rsFind(rs.edit), tx = $('rsNoteT').value.trim(); if(!st) return;
+    if(!tx){ $('rsNoteT').focus(); return toast('달라진 점을 써 주세요.'); }
+    st.notes = st.notes || []; st.notes.push({ d:ymd(new Date()), t:tx, by:state.view === 'director' ? '원장님' : state.teacher, good:$('rsNoteGood').checked });
+    rsSave(); $('rsTalk').innerHTML = rsTalkHtml(st); toast('변화 기록을 남겼어요.' + (st.notes[st.notes.length - 1].good ? ' 월말 리포트에서 강점에 넣을 수 있어요.' : ''));
+    return;
+  }
   var r = ev.target.closest('[data-rsrec]');
   if(r){ var s = rsFind(r.dataset.rsrec); $('rsOv').hidden = true; rc.cls = s.cid; rc.stu = s.name; setView(state.view, 'records'); }
 });
-$('rsForm').addEventListener('change', function(ev){ if(ev.target.type === 'tel') ev.target.value = rsTel(ev.target.value); });
+$('rsForm').addEventListener('change', function(ev){ if(ev.target.id === 'rsSchoolSel'){ var on = ev.target.value === 'etc'; $('rsSchool').hidden = !on; if(on) $('rsSchool').focus(); } if(ev.target.type === 'tel') ev.target.value = rsTel(ev.target.value); });
 $('rsOv').addEventListener('click', function(ev){ if(ev.target === this) this.hidden = true; });
 document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && !$('rsOv').hidden) $('rsOv').hidden = true; });
 
