@@ -1502,7 +1502,7 @@
 
     <!-- 게시판 · 자료실 (탭으로 분류) -->
     <section id="view-trash" hidden>
-      <div class="greet"><div><h1>삭제 요청 · 휴지통</h1><p>규칙: 모든 자료와 내용은 원장님 승인 없이 지워지지 않아요. 선생님이 지우면 삭제 요청이 오고, 승인해도 휴지통에 남아 언제든 되살릴 수 있어요.</p></div></div>
+      <div class="greet"><div><h1>삭제 요청 · 휴지통</h1><p>규칙: 모든 자료와 내용은 원장님 승인 없이 지워지지 않아요. 선생님이 쓴 글·댓글·쪽지는 선생님 화면에서만 지워지고 여기 휴지통에 남아요. 그 밖의 자료는 삭제 요청이 와요. 최종 삭제는 원장님만 해요.</p></div></div>
       <div id="trBody"></div>
     </section>
 
@@ -3847,7 +3847,7 @@ function bdViewHtml(){
     bdFilesHtml(p) +
     bdCmtHtml(p) +
     '<div class="bd-actions"><button type="button" class="btn soft" data-bdback>목록</button>' +
-    (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">'+(delIsDirector() ? '삭제' : delPending('post', { pid:p.id }) ? '삭제 요청됨' : '삭제 요청')+'</button></span>' : '') + '</div></article>';
+    (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">'+(delIsDirector() || p.authorId === (session && session.id) ? '삭제' : delPending('post', { pid:p.id }) ? '삭제 요청됨' : '삭제 요청')+'</button></span>' : '') + '</div></article>';
 }
 // Claude 미리보기 안에서는 일반 내려받기 링크가 막혀서, 미리보기일 때만 미리보기의 저장 기능으로 내려받아요(실제 운영 주소에서는 보통 링크로 받아요).
 document.addEventListener('click', function(ev){
@@ -3880,7 +3880,7 @@ function bdCmtHtml(p){
       '<form class="bd-cmt-edit" data-cform="edit" data-cid="'+c.id+'"><textarea id="bdCE" rows="2" maxlength="500" aria-label="댓글 수정">'+esc(c.text)+'</textarea>' +
       '<button type="button" class="btn soft" data-ccancel>취소</button><button type="submit" class="btn">저장</button></form></li>';
     return '<li><div class="bd-cmt-head"><span><strong>'+esc(c.author)+'</strong>'+bdDate(c.date)+(c.edited ? ' (수정됨)' : '')+(delPending('comment', { pid:p.id, cid:c.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '')+'</span>' +
-      (mine ? '<span class="bd-cmt-btns"><button type="button" data-cedit="'+c.id+'">수정</button><button type="button" class="bd-del" data-cdel="'+c.id+'">'+(delIsDirector() ? '삭제' : '삭제 요청')+'</button></span>' : '') +
+      (mine ? '<span class="bd-cmt-btns"><button type="button" data-cedit="'+c.id+'">수정</button><button type="button" class="bd-del" data-cdel="'+c.id+'">'+(delIsDirector() || c.authorId === (session && session.id) ? '삭제' : '삭제 요청')+'</button></span>' : '') +
       '</div><div class="bd-cmt-txt">'+esc(c.text)+'</div></li>';
   }).join('') + '</ul>';
   html += '<form data-cform="new"><textarea id="bdCN" rows="2" maxlength="500" placeholder="댓글을 적어 주세요" aria-label="댓글 쓰기"></textarea><button type="submit" class="btn">등록</button></form></section>';
@@ -4009,7 +4009,7 @@ $('bdBody').addEventListener('submit', function(ev){
     var meta = bd.att.map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; });
     // 뺀 첨부는 바로 지우지 않아요: 원장님은 휴지통으로, 선생님은 삭제 요청(승인 전까지 글에 남아요)
     if(p && removed.length){
-      if(delIsDirector()){ p.files = oldFiles.slice(); removed.forEach(function(f){ delDo('file', { pid:p.id, fid:f.id }); }); }
+      if(delIsDirector() || p.authorId === (session && session.id)){ p.files = oldFiles.slice(); removed.forEach(function(f){ delDo('file', { pid:p.id, fid:f.id }, delIsDirector() ? '' : session.name); }); }
       else { removed.forEach(function(f){ meta.push(f); if(!delPending('file', { pid:p.id, fid:f.id })) delStore.req.push({ id:++delStore.seq, key:delKey('file', { pid:p.id, fid:f.id }), kind:'file', ref:{ pid:p.id, fid:f.id }, label:f.name + ' (글: ' + p.title + ')', by:session ? session.name : '', byId:session ? session.id : '', at:Date.now(), st:'wait' }); }); saveDel(); setTimeout(function(){ toast('뺀 첨부 파일은 원장님께 삭제 요청을 보냈어요. 승인 전까지는 글에 남아 있어요.'); }, 1200); }
     }
     if(p){ p.cat = $('bdCat').value; p.title = title; p.body = body; p.link = link; p.files = meta; p.edited = Date.now(); }
@@ -4061,10 +4061,20 @@ function delDo(kind, ref, reqBy){
   delStore.req.forEach(function(r){ if(r.key === delKey(kind, ref) && r.st === 'wait'){ r.st = 'ok'; r.done = Date.now(); } });
   saveDel(); return true;
 }
+// 선생님이 직접 쓴 게시판 글·댓글·내 글의 첨부는 바로 화면에서 지워요(원장쌤 정리 2026-10-27). 최종 삭제는 원장님 휴지통에서.
+function delMine(kind, f){
+  if(!session) return false;
+  if(kind === 'post' || kind === 'comment') return f.item.authorId === session.id;
+  if(kind === 'file') return f.post.authorId === session.id;
+  return false;
+}
 // 화면의 '삭제' 버튼이 부르는 곳: 원장님은 휴지통으로, 선생님은 삭제 요청
 function delAsk(kind, ref, after){
   var f = delFind(kind, ref); if(!f) return;
-  if(delIsDirector()){
+  if(!delIsDirector() && delMine(kind, f)){
+    if(!confirm('이 ' + DEL_KIND[kind] + '을(를) 화면에서 지울까요?\n원장님 휴지통에 남아서, 최종 삭제는 원장님이 해요.')) return;
+    delDo(kind, ref, session.name); toast('화면에서 지웠어요. 최종 삭제는 원장님이 해요.');
+  } else if(delIsDirector()){
     if(!confirm(DEL_KIND[kind] + '을(를) 휴지통으로 옮길까요?\n휴지통(학원 운영 > 삭제 요청·휴지통)에서 언제든 되살릴 수 있어요.')) return;
     delDo(kind, ref); toast('휴지통으로 옮겼어요. 되살릴 수 있어요.');
   } else {
