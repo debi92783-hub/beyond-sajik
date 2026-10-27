@@ -1090,10 +1090,13 @@
   .pv-pill.an-event{ background:var(--good-soft); color:var(--good); } .pv-pill.an-mk{ background:var(--warn-soft); color:var(--warn); } .pv-pill.an-off{ background:var(--hold-soft); color:var(--hold); } .pv-pill.an-info{ background:var(--accent-soft); color:var(--accent); }
   .pv-pick #anNew{ margin-left:auto; padding:8px 14px; font-size:12.5px; }
   .an-card{ margin-bottom:16px; }
+  .an-jr{ margin-top:18px; border-top:1px solid var(--border); padding-top:14px; } .an-jr .card-head h2{ font-size:14px; }
+  #view-pnotice .greet{ align-items:flex-start; gap:12px; flex-wrap:wrap; }
   .an-row{ display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center; padding:9px 0; border-top:1px solid var(--border); font-size:13px; }
   .an-row small{ display:block; color:var(--ink-soft); font-size:12px; }
   .an-acts{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; } .an-acts .btn{ padding:5px 10px; font-size:12px; }
   .an-old{ margin-top:10px; font-size:13px; }
+  .an-to{ margin:0; font-size:13px; color:var(--ink-soft); } .an-to b{ color:var(--ink); }
   .an-file{ display:flex; flex-direction:column; gap:6px; } .an-pick{ position:relative; align-self:flex-start; cursor:pointer; flex-direction:row !important; color:var(--accent) !important; } .an-pick input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
   .an-post .bd-files{ margin-top:10px; }
   .modal.an-modal{ max-width:520px; }
@@ -1491,11 +1494,13 @@
           <div class="card" data-tp="jr">
             <div class="card-head">
               <h2>학부모 알림 미리보기</h2>
+              <button type="button" class="btn soft" data-annew="all">+ 학원 공지 등록</button>
             </div>
             <p class="muted" style="margin:0 0 12px;">여기 적은 학생별 진도·숙제는 <b>데일리 테스트 리포트에 함께 들어가서 한 번에 발송</b>돼요. 발송은 데일리 테스트 화면의 ①저장 → ②리포트 만들기 → ③확인 → ④발송 순서로 해요.</p>
             <div class="preview-head"><span class="muted">미리 볼 학생</span><select id="previewPick" aria-label="미리 볼 학생"></select></div>
             <div class="bubble" id="bubble"></div>
             <button class="btn" type="button" id="sendBtn">데일리 테스트에서 함께 발송하기 →</button>
+            <div class="an-box an-jr" id="anJr"></div>
           </div>
         </div>
 
@@ -1688,6 +1693,11 @@
       <div class="card rc-bk" id="rcBackup" data-only="director"></div>
     </section>
 
+    <section id="view-pnotice" hidden>
+      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보여요. 원장님·선생님 누구나 올릴 수 있고, 수업 기록 화면에서도 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
+      <div class="card an-card an-box" id="anList"></div>
+    </section>
+
     <section id="view-roster" hidden>
       <div class="greet"><div><h1 id="rsTitle">반·학생 관리</h1><p id="rsDesc"></p></div></div>
       <div id="rsBody"></div>
@@ -1700,8 +1710,7 @@
 
     <section id="view-pview" hidden>
       <div class="greet"><div><h1>학부모·학생 화면 미리보기</h1><p>학부모님이 로그인하면 보이는 화면이에요. 반과 학생을 골라 확인해요.</p></div></div>
-      <div class="card ls-bar pv-pick"><label>반 <select id="pvCls"></select></label><label>학생 <select id="pvStu"></select></label><span class="muted" id="pvPinInfo"></span><button type="button" class="btn" id="anNew">+ 학원 안내사항 넣기</button></div>
-      <div class="card an-card" id="anList"></div>
+      <div class="card ls-bar pv-pick"><label>반 <select id="pvCls"></select></label><label>학생 <select id="pvStu"></select></label><span class="muted" id="pvPinInfo"></span></div>
       <div class="pv-frame"><div class="pv-bar"><div class="pv-bar-in"><img src="logo.png" alt=""><div class="pv-bar-t"><b>비욘드잉글리쉬 사직어학원</b><small id="pvSub2"></small></div></div></div><div class="pv-main" id="pvPrev"></div></div>
     </section>
 
@@ -2063,7 +2072,7 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
-    ['학원 운영', [['users','반·학생 관리','roster'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['trash','삭제 요청·휴지통','trash']]],
+    ['학원 운영', [['users','반·학생 관리','roster'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','학원 공지','pnotice'],['trash','삭제 요청·휴지통','trash']]],
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지(자동) 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
@@ -2072,6 +2081,7 @@ var MENU = {
   teacher: [
     ['홈', [['grid','오늘 한눈에','thome'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
     ['내 수업', [['book','업무 체크리스트','journal'],['pen','수업 기록(진도·과제)','progress'],['stamp','교무일지(자동)','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records'],['users','반·학생 명단','roster']]],
+    ['학부모 알림', [['bell','학원 공지','pnotice']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
     ['', [['clock','태블릿 등원 화면','kiosk'],['bell','학부모·학생 화면 미리보기','pview']]]
@@ -2103,11 +2113,11 @@ function setView(v, page){
   state.page = page || 'main';
   if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum' || state.page === 'trash') && v !== 'director') state.page = 'main';
   if(state.page === 'thome' && v !== 'teacher') state.page = 'main';
-  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash', records = state.page === 'records', roster_ = state.page === 'roster';
+  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash', records = state.page === 'records', roster_ = state.page === 'roster', pnotice = state.page === 'pnotice';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome || pview || trash || records || roster_;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome || pview || trash || records || roster_ || pnotice;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -2126,6 +2136,7 @@ function setView(v, page){
   $('view-trash').hidden = !trash;
   $('view-records').hidden = !records;
   $('view-roster').hidden = !roster_;
+  $('view-pnotice').hidden = !pnotice;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -2143,9 +2154,10 @@ function setView(v, page){
   else if(trash) renderTrash();
   else if(records) renderRecords();
   else if(roster_) renderRoster();
+  else if(pnotice) renderAnList();
   else if(v === 'director') hmDirector();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : pview ? 'parent-view' : trash ? 'trash' : records ? 'records' : roster_ ? 'roster' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : pview ? 'parent-view' : trash ? 'trash' : records ? 'records' : roster_ ? 'roster' : pnotice ? 'notice' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' && tag !== 'trash' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -2189,6 +2201,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'kiosk') return $('atKiosk').click();
     if(a.dataset.key === 'pview') return setView(state.view, 'pview');
     if(a.dataset.key === 'records') return setView(state.view, 'records');
+    if(a.dataset.key === 'pnotice') return setView(state.view, 'pnotice');
     if(a.dataset.key === 'roster'){ rs.cid = ''; rs.q = ''; return setView(state.view, 'roster'); }
     if(a.dataset.key.indexOf('board:') === 0){ var bk = a.dataset.key.split(':'); return openBoard(bk[1], bk[2]); }
     if(a.dataset.key === 'daily' || a.dataset.key === 'monthly' || a.dataset.key === 'attend' || a.dataset.key === 'manual'){ if(a.dataset.key === 'manual') manOpen = null; return setView(state.view, a.dataset.key); }
@@ -2790,6 +2803,7 @@ function renderTeacher(){
   $('tGrid').hidden = mine.length === 0;
   if(!mine.length) return;
   if(!mine.some(function(c){ return c.id === state.classId; })) state.classId = mine[0].id;
+  setTimeout(renderAnJr, 0);   // 이 반 학원 안내 목록
   $('classPick').innerHTML = mine.map(function(c){ return '<option value="'+c.id+'"'+(c.id===state.classId?' selected':'')+'>'+esc(c.name)+'</option>'; }).join('');
 
   var html = '';
@@ -6515,7 +6529,6 @@ function renderPView(){
   pv.cid = c.id; pv.s = pvPrevSel.s;
   $('pvPrev').innerHTML = pvHtml(c.id, pvPrevSel.s, true);
   anLoadFiles(c.id, pvPrevSel.s);
-  renderAnList();
 }
 $('pvCls').addEventListener('change', function(){ pvPrevSel.cid = this.value; pvPrevSel.s = null; pv.tab = 'jr'; renderPView(); });
 $('pvStu').addEventListener('change', function(){ pvPrevSel.s = this.value; pv.tab = 'jr'; renderPView(); });
@@ -6746,8 +6759,8 @@ document.addEventListener('click', function(ev){
   try{ el.showPicker(); }catch(e){}
 });
 /* ===== 학원 안내사항 =====
-   행사·보강 수업·휴원/휴일 등. 학부모·학생 화면 맨 위 '학원 안내'에 보여요.
-   대상: 전체 / 초등부·중등부 / 반(학생을 고르면 그 학생만). 선생님은 담당 반에만 올려요.
+   행사·보강 수업·휴원/휴일 등 학원 전체 일을 모든 학부모님께. 학부모·학생 화면 맨 위 '학원 공지'에 보여요.
+   원장님·선생님 누구나 올려요(학원 공지 메뉴, 수업 기록 화면). 예전에 반·부서로 올린 것도 그대로 보여요(anFor).
    지우지 않고 '내리기'로 지난 안내에 남겨요(다시 올리기 가능). 저장: 'beyond-notice-v1'.ann */
 var AN_KIND = [['event','행사'],['mk','보강 수업'],['off','휴원·휴일'],['info','안내']];
 var an = { edit:null, showOld:false };
@@ -6772,7 +6785,7 @@ function anPeriod(a){ return a.to ? pvDate(a.from) + ' ~ ' + pvDate(a.to) : pvDa
 function anHtml(cid, s){
   var l = anAll().filter(function(a){ return anLive(a) && anFor(a, cid, s); }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
   if(!l.length) return '';
-  return '<section class="pv-ann" aria-label="학원 안내"><h3>학원 안내</h3>' + l.map(function(a){
+  return '<section class="pv-ann" aria-label="학원 공지"><h3>학원 공지</h3>' + l.map(function(a){
     return '<article class="pv-post an-post ' + a.kind + '"><div class="pv-post-h"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><b>' + esc(a.title) + '</b>' + (a.date ? '<time>' + esc(pvDate(a.date)) + (a.time ? ' ' + esc(korTime(a.time)) : '') + '</time>' : '') + '</div>' + (a.text ? '<pre>' + esc(a.text) + '</pre>' : '') + bdFilesHtml({ id:a.id, files:a.files || [] }) + '</article>';
   }).join('') + '</section>';
 }
@@ -6780,47 +6793,41 @@ function anLoadFiles(cid, s){ anAll().forEach(function(a){ if(a.files && a.files
 function anAttHtml(){
   return an.att.length ? '<ul class="bd-att">' + an.att.map(function(f, i){ return '<li><span aria-hidden="true">' + bdIcon(f) + '</span><span class="nm">' + esc(f.name) + '</span><span class="sz">' + bdSize(f.size) + '</span><button type="button" data-anattdel="' + i + '">빼기</button></li>'; }).join('') + '</ul>' : '';
 }
-function anCanEdit(a){ return state.view === 'director' || (a.scope.indexOf('cls:') === 0 && dtClasses().some(function(c){ return 'cls:' + c.id === a.scope; })); }
-function renderAnList(){
-  var all = anAll().filter(anCanEdit).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
+// 원장님·선생님 모두 학원 공지를 올릴 수 있어요. 고치기·내리기는 원장님과 쓴 사람만.
+function anCanEdit(a){ return state.view === 'director' || !!(a.byId && session && a.byId === session.id); }
+function anRefresh(){ if(state.page === 'pnotice') renderAnList(); if(state.page === 'pview') renderPView(); if(!$('anJr').closest('[hidden]')) renderAnJr(); }
+function renderAnJr(){ renderAnList($('anJr'), function(a){ return anLive(a); }, '지금 올라가 있는 학원 공지', '지금 올라가 있는 공지가 없어요. 행사·휴원·학원 소식을 알려 보세요.'); }
+function renderAnList(el, only, head, emptyMsg){
+  el = el || $('anList');
+  var all = anAll().filter(only || function(){ return true; }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
   var live = all.filter(anLive), old = all.filter(function(a){ return !anLive(a); });
   var row = function(a){
     return '<div class="an-row"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><div><b>' + esc(a.title) + '</b><small>' + esc(anScopeText(a)) + ' · ' + esc(anPeriod(a)) + ' · ' + esc(a.by || '') + (a.files && a.files.length ? ' · 📎 ' + a.files.length : '') + '</small></div>'
-      + '<span class="an-acts"><button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') + '</span></div>';
+      + '<span class="an-acts">' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
   };
-  $('anList').innerHTML = '<div class="card-head"><h2>올린 학원 안내 <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
-    + (live.length ? live.map(row).join('') : '<p class="empty">아직 올린 안내가 없어요. ‘학원 안내사항 넣기’로 행사·보강·휴일을 알려 주세요.</p>')
+  el.innerHTML = '<div class="card-head"><h2>' + (head || '올린 학원 공지') + ' <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
+    + (live.length ? live.map(row).join('') : '<p class="empty">' + (emptyMsg || '아직 올린 공지가 없어요. ‘학원 공지 등록’으로 행사·휴원·학원 소식을 알려 주세요.') + '</p>')
     + (an.showOld && old.length ? '<div class="an-old"><b>지난 안내</b> <small class="muted">기간이 끝났거나 내린 안내예요. 지워지지 않아요.</small>' + old.map(row).join('') + '</div>' : '');
 }
-function anOpen(id){
+function anOpen(id, scope){
   var dir = state.view === 'director', a = id ? anAll().find(function(x){ return x.id === id; }) : null;
   an.edit = a ? a.id : null; an.att = a && a.files ? a.files.slice() : [];
-  a = a || { kind:'event', title:'', text:'', scope:dir ? 'all' : 'cls:' + (pvPrevSel.cid || ''), names:[], date:'', time:'', from:ymd(new Date()), to:'' };
-  var cs = dir ? CLASSES : dtClasses();
-  var opts = (dir ? '<option value="all">전체 학부모</option><option value="dept:초등부">초등부 전체</option><option value="dept:중등부">중등부 전체</option>' : '')
-    + cs.map(function(c){ return '<option value="cls:' + c.id + '">' + esc(c.dept + ' · ' + c.name) + '</option>'; }).join('');
-  $('anForm').innerHTML = '<h2>' + (id ? '학원 안내 고치기' : '학원 안내사항 넣기') + '</h2>'
+  a = a || { kind:'info', title:'', text:'', scope:'all', names:[], date:'', time:'', from:ymd(new Date()), to:'' };
+  $('anForm').innerHTML = '<h2>' + (id ? '학원 공지 고치기' : '학원 공지 등록') + '</h2>'
     + '<div class="kind an-kinds" role="radiogroup" aria-label="안내 종류">' + AN_KIND.map(function(k){ return '<label><input type="radio" name="anKind" value="' + k[0] + '"' + (a.kind === k[0] ? ' checked' : '') + '><span class="an-k ' + k[0] + '">' + k[1] + '</span></label>'; }).join('') + '</div>'
-    + '<label>받는 학부모<select id="anScope">' + opts + '</select></label>'
-    + '<div id="anStuBox"></div>'
+    + '<p class="an-to">받는 사람: <b>학원 전체 학부모님·학생</b></p>'
     + '<label>제목<input type="text" id="anTitle" maxlength="40" value="' + esc(a.title) + '" placeholder="예: 핼러윈 파티 안내"></label>'
     + '<div class="row2"><label>날짜 <span class="hint">행사·보강·휴원 날짜</span><input type="date" id="anDate" value="' + esc(a.date || '') + '"></label><label>시간 (선택)<input type="time" id="anTime" value="' + esc(a.time || '') + '"></label></div>'
     + '<label>내용<textarea id="anText" rows="5" maxlength="600" placeholder="예: 10월 31일(토) 수업 시간에 핼러윈 파티를 해요. 간단한 분장 소품을 챙겨 와도 좋아요.">' + esc(a.text) + '</textarea></label>'
     + '<div class="an-file"><span class="ev-mk-h">첨부 <small>사진·안내문(PDF·한글·텍스트 파일 등), 한 파일 30MB까지</small></span><label class="btn soft an-pick">사진·파일 고르기<input type="file" id="anFile" multiple accept="image/*,.pdf,.txt,.hwp,.hwpx,.doc,.docx,.xls,.xlsx,.ppt,.pptx"></label><div id="anAtt">' + anAttHtml() + '</div></div>'
     + '<div class="row2"><label>게시 시작<input type="date" id="anFrom" value="' + esc(a.from) + '"></label><label>게시 끝 <span class="hint">비우면 내릴 때까지</span><input type="date" id="anTo" value="' + esc(a.to || '') + '"></label></div>'
-    + '<p class="hint">학생 이름·연락처 같은 개인 정보는 쓰지 말아 주세요. 반 전체가 보는 안내예요.</p>'
+    + '<p class="hint">모든 학부모님이 보는 공지라서 학생 이름·연락처 같은 개인 정보는 쓰지 말아 주세요.</p>'
     + '<p class="form-err" id="anErr"></p><div class="modal-actions"><button type="button" class="btn soft" data-anclose>닫기</button><button type="submit" class="btn">' + (id ? '저장' : '올리기') + '</button></div>';
-  $('anScope').value = a.scope; if(!$('anScope').value) $('anScope').selectedIndex = 0;
-  anStu(a.names || []);
+
   $('anOv').hidden = false; $('anTitle').focus();
 }
-function anStu(names){
-  var v = $('anScope').value, c = v.indexOf('cls:') === 0 && CLASSES.find(function(x){ return 'cls:' + x.id === v; });
-  $('anStuBox').innerHTML = c ? '<span class="ev-mk-h">학생 고르기 <small>고르지 않으면 반 전체에 보여요 (보강 안내는 해당 학생만 고르면 좋아요)</small></span><div class="class-chips">' + c.students.map(function(x){ return '<label><input type="checkbox" value="' + esc(x) + '"' + (names.indexOf(x) !== -1 ? ' checked' : '') + '> ' + esc(x) + '</label>'; }).join('') + '</div>' : '';
-}
-$('anNew').addEventListener('click', function(){ anOpen(null); });
+document.addEventListener('click', function(ev){ var b = ev.target.closest('[data-annew]'); if(b) anOpen(null, b.dataset.annew); });
 $('anForm').addEventListener('change', function(ev){
-  if(ev.target.id === 'anScope') anStu([]);
   if(ev.target.id === 'anFile'){
     var big = [];
     [].forEach.call(ev.target.files || [], function(file){ if(file.size > BD_FILE_MAX){ big.push(file.name); return; } an.att.push({ id:'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name:file.name, size:file.size, type:file.type || '', blob:file }); });
@@ -6837,8 +6844,8 @@ $('anOv').addEventListener('click', function(ev){ if(ev.target === this) this.hi
 $('anForm').addEventListener('submit', function(ev){
   ev.preventDefault();
   var k = $('anForm').querySelector('input[name=anKind]:checked'), v = {
-    kind:k ? k.value : 'info', scope:$('anScope').value, title:$('anTitle').value.trim(), text:$('anText').value.trim(), date:$('anDate').value, time:$('anTime').value, from:$('anFrom').value || ymd(new Date()), to:$('anTo').value,
-    names:[].slice.call($('anStuBox').querySelectorAll('input:checked')).map(function(x){ return x.value; })
+    kind:k ? k.value : 'info', scope:'all', title:$('anTitle').value.trim(), text:$('anText').value.trim(), date:$('anDate').value, time:$('anTime').value, from:$('anFrom').value || ymd(new Date()), to:$('anTo').value,
+    names:[]
   };
   if(!v.title){ $('anErr').textContent = '제목을 써 주세요.'; return; }
   if(v.to && v.to < v.from){ $('anErr').textContent = '게시 끝 날짜가 시작보다 빨라요.'; return; }
@@ -6847,18 +6854,18 @@ $('anForm').addEventListener('submit', function(ev){
   v.files = an.att.map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; });
   // 수정할 때 뺀 파일도 지우지 않고 고치기 전 기록(hist)에 남겨요
   if(a){ a.hist = a.hist || []; a.hist.push({ at:Date.now(), title:a.title, text:a.text, files:a.files || [] }); Object.assign(a, v); a.edAt = Date.now(); }
-  else { list.push(Object.assign({ id:'a' + Date.now(), at:Date.now(), by:state.view === 'director' ? '원장님' : state.teacher + ' 선생님' }, v)); }
-  var done = function(){ anSaveAll(list); $('anOv').hidden = true; renderPView(); toast(a ? '안내를 고쳤어요.' : '학부모·학생 화면에 안내를 올렸어요.'); };
+  else { list.push(Object.assign({ id:'a' + Date.now(), at:Date.now(), byId:session && session.id, by:state.view === 'director' ? '원장님' : state.teacher + ' 선생님' }, v)); }
+  var done = function(){ anSaveAll(list); $('anOv').hidden = true; anRefresh(); toast(a ? '공지를 고쳤어요.' : '학부모·학생 화면에 학원 공지를 올렸어요.'); };
   Promise.all(fresh.map(function(f){ return bdFile('put', f.id, f.blob); })).then(done, function(){ toast('첨부 파일을 저장하지 못했어요. 파일 없이 올렸어요.'); v.files = v.files.filter(function(f){ return !fresh.some(function(x){ return x.id === f.id; }); }); (a || list[list.length - 1]).files = v.files; done(); });
 });
-$('anList').addEventListener('click', function(ev){
-  var b = ev.target.closest('button'); if(!b) return;
+document.addEventListener('click', function(ev){
+  var b = ev.target.closest('.an-box button'); if(!b) return;
   if(b.dataset.anedit) return anOpen(b.dataset.anedit);
-  if(b.hasAttribute('data-anold')){ an.showOld = !an.showOld; return renderAnList(); }
+  if(b.hasAttribute('data-anold')){ an.showOld = !an.showOld; return anRefresh(); }
   var list = anAll(), a = list.find(function(x){ return x.id === (b.dataset.andown || b.dataset.anup); }); if(!a) return;
   if(b.dataset.andown){ a.down = Date.now(); toast('안내를 내렸어요. 지난 안내에 남아 있어요.'); }
   else { delete a.down; if(a.to && a.to < ymd(new Date())) a.to = ''; toast('안내를 다시 올렸어요.'); }
-  anSaveAll(list); renderPView();
+  anSaveAll(list); anRefresh();
 });
 
 /* ===== 시작 ===== */
