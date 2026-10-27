@@ -1498,13 +1498,11 @@
           <div class="card" data-tp="jr">
             <div class="card-head">
               <h2>학부모 알림 미리보기</h2>
-              <button type="button" class="btn soft" data-annew="all">+ 학원 공지 등록</button>
             </div>
             <p class="muted" style="margin:0 0 12px;">여기 적은 학생별 진도·숙제는 <b>데일리 테스트 리포트에 함께 들어가서 한 번에 발송</b>돼요. 발송은 데일리 테스트 화면의 ①저장 → ②리포트 만들기 → ③확인 → ④발송 순서로 해요.</p>
             <div class="preview-head"><span class="muted">미리 볼 학생</span><select id="previewPick" aria-label="미리 볼 학생"></select></div>
             <div class="bubble" id="bubble"></div>
             <button class="btn" type="button" id="sendBtn">데일리 테스트에서 함께 발송하기 →</button>
-            <div class="an-box an-jr" id="anJr"></div>
           </div>
         </div>
 
@@ -1698,7 +1696,7 @@
     </section>
 
     <section id="view-pnotice" hidden>
-      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보여요. 원장님·선생님 누구나 올릴 수 있고, 수업 기록 화면에서도 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
+      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보여요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
       <div class="card an-card an-box" id="anList"></div>
     </section>
 
@@ -2807,7 +2805,6 @@ function renderTeacher(){
   $('tGrid').hidden = mine.length === 0;
   if(!mine.length) return;
   if(!mine.some(function(c){ return c.id === state.classId; })) state.classId = mine[0].id;
-  setTimeout(renderAnJr, 0);   // 이 반 학원 안내 목록
   $('classPick').innerHTML = mine.map(function(c){ return '<option value="'+c.id+'"'+(c.id===state.classId?' selected':'')+'>'+esc(c.name)+'</option>'; }).join('');
 
   var html = '';
@@ -6799,8 +6796,7 @@ function anAttHtml(){
 }
 // 원장님·선생님 모두 학원 공지를 올릴 수 있어요. 고치기·내리기는 원장님과 쓴 사람만.
 function anCanEdit(a){ return state.view === 'director' || !!(a.byId && session && a.byId === session.id); }
-function anRefresh(){ if(state.page === 'pnotice') renderAnList(); if(state.page === 'pview') renderPView(); if(!$('anJr').closest('[hidden]')) renderAnJr(); }
-function renderAnJr(){ renderAnList($('anJr'), function(a){ return anLive(a); }, '지금 올라가 있는 학원 공지', '지금 올라가 있는 공지가 없어요. 행사·휴원·학원 소식을 알려 보세요.'); }
+function anRefresh(){ if(state.page === 'pnotice') renderAnList(); if(state.page === 'pview') renderPView(); }
 function renderAnList(el, only, head, emptyMsg){
   el = el || $('anList');
   var all = anAll().filter(only || function(){ return true; }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
