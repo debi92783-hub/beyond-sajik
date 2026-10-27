@@ -566,6 +566,15 @@
   .bd-drop.over{ border-color:var(--accent); background:var(--accent-soft); }
   .bd-drop-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; font-weight:500; color:var(--ink-soft); }
   .bd-drop-top .btn{ font-weight:700; }
+  .del-tag{ display:inline-block; font-size:11px; font-weight:800; color:var(--hold); background:var(--hold-soft); border-radius:6px; padding:1px 7px; margin-left:6px; vertical-align:1px; }
+  .tr-list{ list-style:none; margin:0; padding:0; }
+  .tr-list li{ display:grid; grid-template-columns:110px minmax(0,1fr) auto; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .tr-list li:last-child{ border-bottom:0; }
+  .tr-kind{ font-size:12px; font-weight:800; color:var(--ink-soft); background:var(--surface-soft); border-radius:6px; padding:2px 8px; justify-self:start; }
+  .tr-lbl{ min-width:0; } .tr-lbl b{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .tr-lbl small{ color:var(--ink-faint); }
+  .tr-acts{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+  .tr-empty{ color:var(--ink-faint); font-size:13px; padding:12px 0; margin:0; }
+  @media (max-width:640px){ .tr-list li{ grid-template-columns:minmax(0,1fr); gap:6px; } .tr-acts{ justify-content:flex-start; } }
   .bd-guide{ list-style:none; margin:0; padding:10px 12px; background:var(--surface); border:1px solid var(--border); border-radius:10px; display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:500; color:var(--ink-soft); }
   .bd-guide li{ display:flex; gap:8px; } .bd-guide li::before{ content:'✓'; color:var(--good); font-weight:800; }
   .bd-guide b{ color:var(--ink); font-weight:700; min-width:104px; }
@@ -1492,6 +1501,11 @@
     </section>
 
     <!-- 게시판 · 자료실 (탭으로 분류) -->
+    <section id="view-trash" hidden>
+      <div class="greet"><div><h1>삭제 요청 · 휴지통</h1><p>규칙: 모든 자료와 내용은 원장님 승인 없이 지워지지 않아요. 선생님이 지우면 삭제 요청이 오고, 승인해도 휴지통에 남아 언제든 되살릴 수 있어요.</p></div></div>
+      <div id="trBody"></div>
+    </section>
+
     <section id="view-pview" hidden>
       <div class="greet"><div><h1>학부모·학생 화면 미리보기</h1><p>학부모님이 로그인하면 보이는 화면이에요. 반과 학생을 골라 확인해요.</p></div></div>
       <div class="card ls-bar pv-pick"><label>반 <select id="pvCls"></select></label><label>학생 <select id="pvStu"></select></label><span class="muted" id="pvPinInfo"></span></div>
@@ -1774,6 +1788,7 @@ var ICON = {
   bell:'<path d="M6 17h12l-1.5-2.5V10a4.5 4.5 0 00-9 0v4.5z"/><path d="M10.3 20a1.8 1.8 0 003.4 0"/>',
   doc:'<path d="M6 3h8l4 4v14H6z"/><polyline points="14,3 14,7 18,7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/>',
   video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',
+  trash:'<polyline points="4,7 20,7"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
   box:'<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><polyline points="3,7 12,11 21,7"/><line x1="12" y1="11" x2="12" y2="21"/>',
   dict:'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h11"/><path d="M9 7.5l1.6 4 1.6-4"/>',
   clock:'<circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15.5,14"/>',
@@ -1789,7 +1804,7 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
-    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult']]],
+    ['학원 운영', [['users','반·학생 관리'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['trash','삭제 요청·휴지통','trash']]],
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
@@ -1827,13 +1842,13 @@ function setView(v, page){
   if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'consult' || page === 'lcsum') page = 'main'; }
   state.view = v;
   state.page = page || 'main';
-  if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum') && v !== 'director') state.page = 'main';
+  if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum' || state.page === 'trash') && v !== 'director') state.page = 'main';
   if(state.page === 'thome' && v !== 'teacher') state.page = 'main';
-  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview';
+  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome || pview;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome || pview || trash;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -1849,6 +1864,7 @@ function setView(v, page){
   $('view-mail').hidden = !mail;
   $('view-thome').hidden = !thome;
   $('view-pview').hidden = !pview;
+  $('view-trash').hidden = !trash;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -1863,10 +1879,11 @@ function setView(v, page){
   else if(mail) renderMail();
   else if(thome) renderTHome();
   else if(pview) renderPView();
+  else if(trash) renderTrash();
   else if(v === 'director') hmDirector();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : pview ? 'parent-view' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
-  try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' ? 'teacher-' + tag : tag) : v)); }catch(e){}
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : pview ? 'parent-view' : trash ? 'trash' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
+  try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' && tag !== 'trash' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
 
@@ -1877,7 +1894,7 @@ function renderSide(){
     if(group[0]) html += '<h3>' + group[0] + '</h3>';
     group[1].forEach(function(m){
       var cur = m[2] === current ? ' aria-current="page"' : '';
-      var un = m[2] === 'mail' ? 0 : m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
+      var un = m[2] === 'trash' ? delWaiting().length : m[2] === 'mail' ? 0 : m[2] && m[2].indexOf('board:') === 0 ? bdUnread(m[2].split(':')[1], m[2].split(':')[2]) : 0;
       html += '<a href="#" data-key="'+(m[2]||'')+'" data-name="'+m[1]+'"'+cur+(un ? ' aria-label="'+m[1]+', 안 읽은 '+(m[2] === 'mail' ? '쪽지' : '글')+' '+un+'개"' : '')+'>'+icon(m[0])+m[1]+(un ? '<span class="unread">'+(un > 99 ? '99+' : un)+'</span>' : '')+(m[2] === 'mail' ? mlSideBadge() : '')+'</a>';
     });
   });
@@ -1899,6 +1916,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'progress'){ state.tpart = 'jr'; return setView('teacher'); }
     if(a.dataset.key === 'gyomu') return setView(state.view, 'gyomu');
     if(a.dataset.key === 'thome') return setView('teacher', 'thome');
+    if(a.dataset.key === 'trash') return setView('director', 'trash');
     if(a.dataset.key === 'mail'){ ml.mode = 'list'; ml.box = 'in'; return setView(state.view, 'mail'); }
     if(a.dataset.key === 'dashboard') return setView('director');
     if(a.dataset.key === 'calendar') return setView(state.view, 'calendar');
@@ -2824,7 +2842,7 @@ function renderDay(){
     return '<div class="day-item"><span class="bar-v" style="background:var('+color+')"></span><div class="body">' +
       '<b>'+esc(e.title)+'</b><small>'+label+(spanDays(e)>1?' · '+rangeText(e):'')+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
       (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') + '</div>' +
-      (e.kind === 'consult' ? '' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">삭제</button>') + '</div>';
+      (e.kind === 'consult' ? '' : (delPending('event', { eid:e.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">'+(delIsDirector() || (e.kind === 'mine' && e.owner === me()) ? '삭제' : '삭제 요청')+'</button>')) + '</div>';
   }).join('') : '<div class="empty">이 날은 일정이 없어요.</div>';
 }
 
@@ -2851,12 +2869,13 @@ $('dayAdd').addEventListener('click', function(){ openEvForm(selDate); });
 var pendingDel = null;
 $('dayList').addEventListener('click', function(e){
   var b = e.target.closest('[data-del]'); if(!b) return;
-  if(pendingDel !== b.dataset.del){
-    pendingDel = b.dataset.del; b.textContent = '정말 삭제?'; b.style.color = 'var(--warn)';
-    return;
+  var ev0 = EVENTS.find(function(x){ return x.id === b.dataset.del; }); if(!ev0) return;
+  // 내 개인일정은 바로 휴지통으로, 그 밖의 일정은 원장님 규칙(delAsk)을 따라요
+  if(!delIsDirector() && ev0.kind === 'mine' && ev0.owner === me()){
+    if(pendingDel !== b.dataset.del){ pendingDel = b.dataset.del; b.textContent = '정말 삭제?'; b.style.color = 'var(--warn)'; return; }
+    pendingDel = null; delDo('event', { eid:ev0.id }, me()); renderCalendar(); toast('개인일정을 지웠어요. 원장님 휴지통에 남아요.'); return;
   }
-  EVENTS = EVENTS.filter(function(x){ return x.id !== pendingDel; });
-  pendingDel = null; saveEvents(); renderCalendar(); toast('일정을 삭제했어요.');
+  delAsk('event', { eid:ev0.id }, renderCalendar);
 });
 
 function openEvForm(dateStr){
@@ -3822,13 +3841,13 @@ function bdViewHtml(){
   var p = bdStore.posts.find(function(x){ return x.id === bd.id; });
   if(!p){ bd.mode = 'list'; return bdListHtml(); }
   return '<article class="bd-view"><header><span class="bd-cat">'+esc(bdCatName(p.board, p.cat))+'</span><h2>'+esc(p.title)+'</h2>' +
-    '<p class="bd-meta">'+esc(p.author)+' · '+bdDate(p.date)+(p.edited ? ' (수정 '+bdDate(p.edited)+')' : '')+' · 조회 '+p.views+'</p></header>' +
+    '<p class="bd-meta">'+esc(p.author)+' · '+bdDate(p.date)+(p.edited ? ' (수정 '+bdDate(p.edited)+')' : '')+' · 조회 '+p.views+(delPending('post', { pid:p.id }) ? '<span class="del-tag">삭제 요청 중 · 원장님 승인 대기</span>' : '')+'</p></header>' +
     '<div class="bd-content">'+esc(p.body)+'</div>' +
     (p.link ? '<p class="bd-linkline">🔗 <a href="'+esc(p.link)+'" target="_blank" rel="noopener">'+esc(p.link)+'</a></p>' : '') +
     bdFilesHtml(p) +
     bdCmtHtml(p) +
     '<div class="bd-actions"><button type="button" class="btn soft" data-bdback>목록</button>' +
-    (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">삭제</button></span>' : '') + '</div></article>';
+    (bdCanEdit(p) ? '<span><button type="button" class="btn soft" data-bdedit="'+p.id+'">수정</button> <button type="button" class="btn soft bd-del" data-bddel="'+p.id+'">'+(delIsDirector() ? '삭제' : delPending('post', { pid:p.id }) ? '삭제 요청됨' : '삭제 요청')+'</button></span>' : '') + '</div></article>';
 }
 // Claude 미리보기 안에서는 일반 내려받기 링크가 막혀서, 미리보기일 때만 미리보기의 저장 기능으로 내려받아요(실제 운영 주소에서는 보통 링크로 받아요).
 document.addEventListener('click', function(ev){
@@ -3847,7 +3866,7 @@ function bdFilesHtml(p){
   return '<section class="bd-files" aria-label="첨부 파일"><h3>📎 첨부 파일 '+fs.length+'개</h3>' +
     (imgs.length ? '<div class="imgs">' + imgs.map(function(f){ return '<a data-bdf="'+f.id+'" target="_blank" rel="noopener" title="'+esc(f.name)+'"><img alt="'+esc(f.name)+'"></a>'; }).join('') + '</div>' : '') +
     '<ul class="bd-att">' + fs.map(function(f){
-      return '<li><span aria-hidden="true">'+bdIcon(f)+'</span><span class="nm">'+esc(f.name)+'</span><span class="sz">'+bdSize(f.size)+'</span><a data-bdf="'+f.id+'" target="_blank" rel="noopener">열기</a><a data-bdf="'+f.id+'" download="'+esc(f.name)+'">내려받기</a></li>';
+      return '<li><span aria-hidden="true">'+bdIcon(f)+'</span><span class="nm">'+esc(f.name)+(delPending('file', { pid:p.id, fid:f.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '')+'</span><span class="sz">'+bdSize(f.size)+'</span><a data-bdf="'+f.id+'" target="_blank" rel="noopener">열기</a><a data-bdf="'+f.id+'" download="'+esc(f.name)+'">내려받기</a></li>';
     }).join('') + '</ul></section>';
 }
 /* 댓글: 모든 게시판(소통·자료 전체)에 공통. 쓴 사람과 원장님만 고치고 지울 수 있어요. */
@@ -3860,8 +3879,8 @@ function bdCmtHtml(p){
     if(bd.cedit === c.id && mine) return '<li><div class="bd-cmt-head"><span><strong>'+esc(c.author)+'</strong></span></div>' +
       '<form class="bd-cmt-edit" data-cform="edit" data-cid="'+c.id+'"><textarea id="bdCE" rows="2" maxlength="500" aria-label="댓글 수정">'+esc(c.text)+'</textarea>' +
       '<button type="button" class="btn soft" data-ccancel>취소</button><button type="submit" class="btn">저장</button></form></li>';
-    return '<li><div class="bd-cmt-head"><span><strong>'+esc(c.author)+'</strong>'+bdDate(c.date)+(c.edited ? ' (수정됨)' : '')+'</span>' +
-      (mine ? '<span class="bd-cmt-btns"><button type="button" data-cedit="'+c.id+'">수정</button><button type="button" class="bd-del" data-cdel="'+c.id+'">삭제</button></span>' : '') +
+    return '<li><div class="bd-cmt-head"><span><strong>'+esc(c.author)+'</strong>'+bdDate(c.date)+(c.edited ? ' (수정됨)' : '')+(delPending('comment', { pid:p.id, cid:c.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '')+'</span>' +
+      (mine ? '<span class="bd-cmt-btns"><button type="button" data-cedit="'+c.id+'">수정</button><button type="button" class="bd-del" data-cdel="'+c.id+'">'+(delIsDirector() ? '삭제' : '삭제 요청')+'</button></span>' : '') +
       '</div><div class="bd-cmt-txt">'+esc(c.text)+'</div></li>';
   }).join('') + '</ul>';
   html += '<form data-cform="new"><textarea id="bdCN" rows="2" maxlength="500" placeholder="댓글을 적어 주세요" aria-label="댓글 쓰기"></textarea><button type="submit" class="btn">등록</button></form></section>';
@@ -3944,22 +3963,14 @@ $('bdBody').addEventListener('click', function(ev){
   if(ev.target.closest('[data-bdwrite]')){ bd.attFor = null; bd.id = null; bd.mode = 'write'; renderBoard(); return $('bdT').focus(); }
   var ed = ev.target.closest('[data-bdedit]'); if(ed){ bd.id = +ed.dataset.bdedit; bd.mode = 'write'; return renderBoard(); }
   var dl = ev.target.closest('[data-bddel]');
-  if(dl){
-    if(!confirm('이 글을 삭제할까요? 삭제하면 되돌릴 수 없어요.')) return;
-    var gone = bdStore.posts.find(function(x){ return x.id === +dl.dataset.bddel; });
-    if(gone && gone.files) gone.files.forEach(function(f){ bdFile('del', f.id).catch(function(){}); });
-    bdStore.posts = bdStore.posts.filter(function(x){ return x.id !== +dl.dataset.bddel; }); saveBd();
-    bd.mode = 'list'; toast('글을 삭제했어요.'); return renderBoard();
-  }
+  if(dl){ return delAsk('post', { pid:+dl.dataset.bddel }, function(){ if(delIsDirector()) bd.mode = 'list'; renderBoard(); }); }
   var ce = ev.target.closest('[data-cedit]');
   if(ce){ bd.cedit = +ce.dataset.cedit; renderBoard(); var ta = $('bdCE'); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } return; }
   if(ev.target.closest('[data-ccancel]')){ bd.cedit = null; return renderBoard(); }
   var cd = ev.target.closest('[data-cdel]');
   if(cd){
     var cp = bdCur(); if(!cp) return;
-    if(!confirm('이 댓글을 삭제할까요?')) return;
-    cp.comments = (cp.comments || []).filter(function(c){ return c.id !== +cd.dataset.cdel || !bdCanEdit(c); }); saveBd();
-    toast('댓글을 삭제했어요.'); return renderBoard();
+    return delAsk('comment', { pid:cp.id, cid:+cd.dataset.cdel }, renderBoard);
   }
   if(ev.target.closest('[data-bdback]')){ bd.mode = 'list'; return renderBoard(); }
   if(ev.target.closest('[data-bdcancel]')){ bd.attFor = null; bd.mode = bd.id ? 'view' : 'list'; return renderBoard(); }
@@ -3994,8 +4005,13 @@ $('bdBody').addEventListener('submit', function(ev){
   var fresh = bd.att.filter(function(f){ return f.blob; });
   var btn = ev.target.querySelector('button[type=submit]'); btn.disabled = true; if(fresh.length) btn.textContent = '파일 저장 중…';
   Promise.all(fresh.map(function(f){ return bdFile('put', f.id, f.blob); })).then(function(){
-    oldFiles.forEach(function(f){ if(keep.indexOf(f.id) === -1) bdFile('del', f.id).catch(function(){}); });
+    var removed = oldFiles.filter(function(f){ return keep.indexOf(f.id) === -1; });
     var meta = bd.att.map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; });
+    // 뺀 첨부는 바로 지우지 않아요: 원장님은 휴지통으로, 선생님은 삭제 요청(승인 전까지 글에 남아요)
+    if(p && removed.length){
+      if(delIsDirector()){ p.files = oldFiles.slice(); removed.forEach(function(f){ delDo('file', { pid:p.id, fid:f.id }); }); }
+      else { removed.forEach(function(f){ meta.push(f); if(!delPending('file', { pid:p.id, fid:f.id })) delStore.req.push({ id:++delStore.seq, key:delKey('file', { pid:p.id, fid:f.id }), kind:'file', ref:{ pid:p.id, fid:f.id }, label:f.name + ' (글: ' + p.title + ')', by:session ? session.name : '', byId:session ? session.id : '', at:Date.now(), st:'wait' }); }); saveDel(); setTimeout(function(){ toast('뺀 첨부 파일은 원장님께 삭제 요청을 보냈어요. 승인 전까지는 글에 남아 있어요.'); }, 1200); }
+    }
     if(p){ p.cat = $('bdCat').value; p.title = title; p.body = body; p.link = link; p.files = meta; p.edited = Date.now(); }
     else { p = { id:++bdStore.seq, board:bd.board, cat:$('bdCat').value, title:title, body:body, link:link, files:meta, author:session ? session.name : '', authorId:session ? session.id : '', date:Date.now(), views:0 }; bdStore.posts.push(p); }
     saveBd(); bd.attFor = null; bd.id = p.id; bd.mode = 'view'; toast(p.edited ? '글을 고쳤어요.' : '글을 올렸어요.'); renderBoard();
@@ -4003,6 +4019,113 @@ $('bdBody').addEventListener('submit', function(ev){
     btn.disabled = false; btn.textContent = p ? '수정 완료' : '등록';
     $('bdErr').textContent = '파일을 저장하지 못했어요. 기기 저장 공간이 부족하거나 개인정보 보호 모드일 수 있어요. 큰 파일은 구글 드라이브 링크로 붙여 주세요.';
   });
+});
+
+/* ===== 삭제 규칙 (원장쌤 지시 2026-10-27) =====
+   모든 자료와 내용은 관리자(원장님) 승인 없이 지우지 않아요.
+   - 선생님이 지우기를 누르면 '삭제 요청'만 남고 내용은 그대로 있어요. 원장님이 승인해야 지워져요.
+   - 원장님이 지우거나 승인한 것도 바로 없어지지 않고 휴지통에 들어가요. 휴지통에서 되살리거나, 원장님이 '완전 삭제'할 때만 사라져요.
+   - 선생님 본인만 보는 개인일정은 본인이 지울 수 있지만 이것도 휴지통에 남아요. 쪽지 '지우기'는 내 쪽지함에서 숨기기라 원본은 남아요. */
+var DEL_KEY = 'beyond-delete-v1';
+var delStore = (function(){ try{ var o = JSON.parse(localStorage.getItem(DEL_KEY) || 'null'); if(o && o.req && o.trash) return o; }catch(e){} return { seq:0, req:[], trash:[] }; })();
+function saveDel(){ try{ localStorage.setItem(DEL_KEY, JSON.stringify(delStore)); }catch(e){} }
+var DEL_KIND = { post:'게시글', comment:'댓글', file:'첨부 파일', event:'일정', consult:'상담 기록', reserve:'상담 예약' };
+function delKey(kind, ref){ return kind + ':' + JSON.stringify(ref); }
+function delWaiting(){ return delStore.req.filter(function(r){ return r.st === 'wait'; }); }
+function delPending(kind, ref){ var k = delKey(kind, ref); return delWaiting().some(function(r){ return r.key === k; }); }
+function delIsDirector(){ return !!session && session.role === 'director'; }
+function delFind(kind, ref){
+  if(kind === 'post' || kind === 'comment' || kind === 'file'){
+    var p = bdStore.posts.find(function(x){ return x.id === ref.pid; }); if(!p) return null;
+    if(kind === 'post') return { item:p, label:'[' + bdCatName(p.board, p.cat) + '] ' + p.title };
+    if(kind === 'comment'){ var c = (p.comments || []).find(function(x){ return x.id === ref.cid; }); return c ? { item:c, post:p, label:c.text.slice(0, 40) + ' (글: ' + p.title + ')' } : null; }
+    var f = (p.files || []).find(function(x){ return x.id === ref.fid; }); return f ? { item:f, post:p, label:f.name + ' (글: ' + p.title + ')' } : null;
+  }
+  if(kind === 'event'){ var e = EVENTS.find(function(x){ return x.id === ref.eid; }); return e ? { item:e, label:e.title + ' (' + e.date + ')' } : null; }
+  if(kind === 'consult'){ var r = csStore.items.find(function(x){ return x.id === ref.id; }); return r ? { item:r, label:(r.data && r.data.name || '이름 없음') } : null; }
+  if(kind === 'reserve'){ var v = resStore.items.find(function(x){ return x.id === ref.id; }); return v ? { item:v, label:v.date + ' ' + v.time + ' · ' + (v.grade || '') } : null; }
+  return null;
+}
+// 실제로 빼서 휴지통에 넣기 (원장님만)
+function delDo(kind, ref, reqBy){
+  var f = delFind(kind, ref); if(!f) return false;
+  var data = JSON.parse(JSON.stringify(f.item));
+  if(kind === 'post') bdStore.posts = bdStore.posts.filter(function(x){ return x.id !== ref.pid; });
+  else if(kind === 'comment') f.post.comments = f.post.comments.filter(function(x){ return x.id !== ref.cid; });
+  else if(kind === 'file') f.post.files = f.post.files.filter(function(x){ return x.id !== ref.fid; });
+  else if(kind === 'event'){ EVENTS = EVENTS.filter(function(x){ return x.id !== ref.eid; }); saveEvents(); }
+  else if(kind === 'consult'){ csStore.items = csStore.items.filter(function(x){ return x.id !== ref.id; }); saveCs(); }
+  else if(kind === 'reserve'){ resStore.items = resStore.items.filter(function(x){ return x.id !== ref.id; }); saveRes(); }
+  if(kind === 'post' || kind === 'comment' || kind === 'file') saveBd();
+  delStore.trash.push({ id:++delStore.seq, kind:kind, ref:ref, label:f.label, data:data, at:Date.now(), by:session ? session.name : '', reqBy:reqBy || '' });
+  delStore.req.forEach(function(r){ if(r.key === delKey(kind, ref) && r.st === 'wait'){ r.st = 'ok'; r.done = Date.now(); } });
+  saveDel(); return true;
+}
+// 화면의 '삭제' 버튼이 부르는 곳: 원장님은 휴지통으로, 선생님은 삭제 요청
+function delAsk(kind, ref, after){
+  var f = delFind(kind, ref); if(!f) return;
+  if(delIsDirector()){
+    if(!confirm(DEL_KIND[kind] + '을(를) 휴지통으로 옮길까요?\n휴지통(학원 운영 > 삭제 요청·휴지통)에서 언제든 되살릴 수 있어요.')) return;
+    delDo(kind, ref); toast('휴지통으로 옮겼어요. 되살릴 수 있어요.');
+  } else {
+    if(delPending(kind, ref)){ toast('이미 삭제 요청을 보냈어요. 원장님 승인을 기다려요.'); return; }
+    if(!confirm('원장님께 이 ' + DEL_KIND[kind] + ' 삭제를 요청할까요?\n원장님이 승인하기 전까지는 그대로 남아 있어요.')) return;
+    delStore.req.push({ id:++delStore.seq, key:delKey(kind, ref), kind:kind, ref:ref, label:f.label, by:session ? session.name : '', byId:session ? session.id : '', at:Date.now(), st:'wait' });
+    saveDel(); toast('삭제 요청을 보냈어요. 원장님이 승인하면 휴지통으로 옮겨져요.');
+  }
+  if(after) after();
+  renderSide();
+}
+function delRestore(t){
+  var d = t.data, ok = true;
+  if(t.kind === 'post'){ if(bdStore.posts.some(function(x){ return x.id === d.id; })) d.id = ++bdStore.seq; bdStore.posts.push(d); saveBd(); }
+  else if(t.kind === 'comment' || t.kind === 'file'){
+    var p = bdStore.posts.find(function(x){ return x.id === t.ref.pid; });
+    if(!p) ok = false; else { if(t.kind === 'comment'){ p.comments = p.comments || []; p.comments.push(d); p.comments.sort(function(a, b){ return a.id - b.id; }); } else { p.files = p.files || []; p.files.push(d); } saveBd(); }
+  }
+  else if(t.kind === 'event'){ EVENTS.push(d); saveEvents(); }
+  else if(t.kind === 'consult'){ csStore.items.push(d); saveCs(); }
+  else if(t.kind === 'reserve'){ resStore.items.push(d); saveRes(); }
+  if(!ok){ toast('원래 글이 휴지통에 있어요. 글을 먼저 되살려 주세요.'); return false; }
+  delStore.trash = delStore.trash.filter(function(x){ return x.id !== t.id; }); saveDel(); return true;
+}
+function delPurge(t){
+  if(t.kind === 'file') bdFile('del', t.data.id).catch(function(){});
+  if(t.kind === 'post') (t.data.files || []).forEach(function(f){ bdFile('del', f.id).catch(function(){}); });
+  delStore.trash = delStore.trash.filter(function(x){ return x.id !== t.id; }); saveDel();
+}
+function delWhen(ts){ var d = new Date(ts); return (d.getMonth()+1) + '/' + d.getDate() + ' ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2); }
+function renderTrash(){
+  var w = delWaiting().slice().reverse(), tr = delStore.trash.slice().reverse();
+  var done = delStore.req.filter(function(r){ return r.st !== 'wait'; }).slice(-8).reverse();
+  $('trBody').innerHTML =
+    '<div class="card"><div class="card-head"><h2>승인 대기 ' + w.length + '건</h2><span class="muted">승인하면 휴지통으로 옮겨져요</span></div>' +
+    (w.length ? '<ul class="tr-list">' + w.map(function(r){
+      return '<li><span class="tr-kind">' + DEL_KIND[r.kind] + '</span><span class="tr-lbl"><b>' + esc(r.label) + '</b><small>' + esc(r.by) + ' 선생님 요청 · ' + delWhen(r.at) + '</small></span>' +
+        '<span class="tr-acts"><button type="button" class="btn soft" data-trgo="' + r.id + '">보기</button><button type="button" class="btn" data-trok="' + r.id + '">승인</button><button type="button" class="btn soft" data-trno="' + r.id + '">거절</button></span></li>';
+    }).join('') + '</ul>' : '<p class="tr-empty">기다리는 삭제 요청이 없어요.</p>') + '</div>' +
+    '<div class="card" style="margin-top:20px"><div class="card-head"><h2>휴지통 ' + tr.length + '개</h2><span class="muted">되살리면 원래 자리로 돌아가요</span></div>' +
+    (tr.length ? '<ul class="tr-list">' + tr.map(function(t){
+      return '<li><span class="tr-kind">' + DEL_KIND[t.kind] + '</span><span class="tr-lbl"><b>' + esc(t.label) + '</b><small>' + delWhen(t.at) + ' · ' + esc(t.by) + (t.reqBy ? ' (요청: ' + esc(t.reqBy) + ')' : '') + '</small></span>' +
+        '<span class="tr-acts"><button type="button" class="btn" data-trback="' + t.id + '">되살리기</button><button type="button" class="btn soft bd-del" data-trpurge="' + t.id + '">완전 삭제</button></span></li>';
+    }).join('') + '</ul>' : '<p class="tr-empty">휴지통이 비어 있어요.</p>') + '</div>' +
+    (done.length ? '<div class="card" style="margin-top:20px"><div class="card-head"><h2>최근 처리한 요청</h2></div><ul class="tr-list">' + done.map(function(r){
+      return '<li><span class="tr-kind">' + (r.st === 'ok' ? '승인' : '거절') + '</span><span class="tr-lbl"><b>' + esc(r.label) + '</b><small>' + esc(r.by) + ' 선생님 · ' + delWhen(r.done || r.at) + '</small></span><span></span></li>';
+    }).join('') + '</ul></div>' : '');
+  renderSide();
+}
+$('trBody').addEventListener('click', function(ev){
+  if(!delIsDirector()) return;
+  var b;
+  if((b = ev.target.closest('[data-trok]'))){ var r = delStore.req.find(function(x){ return x.id === +b.dataset.trok; }); if(r){ if(!delDo(r.kind, r.ref, r.by)){ r.st = 'ok'; r.done = Date.now(); saveDel(); } toast('승인했어요. 휴지통에 들어갔어요.'); } return renderTrash(); }
+  if((b = ev.target.closest('[data-trno]'))){ var r2 = delStore.req.find(function(x){ return x.id === +b.dataset.trno; }); if(r2){ r2.st = 'no'; r2.done = Date.now(); saveDel(); toast('거절했어요. 내용은 그대로 남아요.'); } return renderTrash(); }
+  if((b = ev.target.closest('[data-trback]'))){ var t = delStore.trash.find(function(x){ return x.id === +b.dataset.trback; }); if(t && delRestore(t)) toast('되살렸어요.'); return renderTrash(); }
+  if((b = ev.target.closest('[data-trpurge]'))){ var t2 = delStore.trash.find(function(x){ return x.id === +b.dataset.trpurge; }); if(t2 && confirm('완전 삭제하면 되살릴 수 없어요. 정말 지울까요?')){ delPurge(t2); toast('완전 삭제했어요.'); } return renderTrash(); }
+  if((b = ev.target.closest('[data-trgo]'))){
+    var r3 = delStore.req.find(function(x){ return x.id === +b.dataset.trgo; }); if(!r3) return;
+    if(r3.ref.pid){ var pp = bdStore.posts.find(function(x){ return x.id === r3.ref.pid; }); if(pp){ bd.board = pp.board; bd.tab = pp.cat; bd.id = pp.id; bd.mode = 'view'; bd.cedit = null; return setView('director', 'board'); } }
+    if(r3.kind === 'event'){ var e = EVENTS.find(function(x){ return x.id === r3.ref.eid; }); if(e){ selDate = e.date; calMonth = new Date(parseYmd(e.date).getFullYear(), parseYmd(e.date).getMonth(), 1); return setView('director', 'calendar'); } }
+  }
 });
 
 /* ===== 홈 한눈에 보기 =====
@@ -4540,14 +4663,14 @@ $('csBody').addEventListener('click', function(ev){
   var o = ev.target.closest('[data-csopen]'); if(o){ cs.mode = 'form'; cs.id = +o.dataset.csopen; renderConsult(); return window.scrollTo(0, 0); }
   if(ev.target.closest('[data-csback]')){ cs.mode = 'list'; cs.prefill = null; cs.fromRes = null; return renderConsult(); }
   var d = ev.target.closest('[data-csdel]');
-  if(d){ if(!confirm('이 상담 기록을 삭제할까요? 되돌릴 수 없어요.')) return; csStore.items = csStore.items.filter(function(x){ return x.id !== +d.dataset.csdel; }); saveCs(); cs.mode = 'list'; toast('상담 기록을 삭제했어요.'); return renderConsult(); }
+  if(d){ return delAsk('consult', { id:+d.dataset.csdel }, function(){ cs.mode = 'list'; renderConsult(); }); }
   var sb = ev.target.closest('[data-rssrc]'); if(sb){ rs.src = sb.dataset.rssrc; return renderConsult(); }
   if(ev.target.closest('[data-rspaste]')){ rs.paste = true; rs.form = false; renderConsult(); return $('rsPasteT').focus(); }
   if(ev.target.closest('[data-rsadd]')){ rs.form = true; rs.paste = false; rs.edit = null; renderConsult(); return $('rsForm').querySelector('[name="time"]').focus(); }
   var ed = ev.target.closest('[data-rsedit]'); if(ed){ rs.form = true; rs.edit = ed.dataset.rsedit; renderConsult(); return $('rsForm').scrollIntoView({ block:'center' }); }
   if(ev.target.closest('[data-rscancel]')){ rs.form = false; rs.paste = false; return renderConsult(); }
   var rd = ev.target.closest('[data-rsdel]');
-  if(rd){ if(!confirm('이 예약을 삭제할까요?')) return; resStore.items = resStore.items.filter(function(x){ return x.id !== +rd.dataset.rsdel; }); saveRes(); rs.form = false; toast('예약을 삭제했어요.'); return renderConsult(); }
+  if(rd){ return delAsk('reserve', { id:+rd.dataset.rsdel }, function(){ rs.form = false; renderConsult(); }); }
   var rc = ev.target.closest('[data-rscs]');
   if(rc){
     var r = resFind(rc.dataset.rscs); if(!r) return;
