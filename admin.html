@@ -1182,6 +1182,10 @@
   .rs-st.rest{ background:var(--hold-soft); color:var(--hold); } .rs-st.out{ background:var(--surface-soft); color:var(--ink-soft); }
   .rs-note{ margin:0 0 10px; font-size:12.5px; }
   #view-roster .card{ margin-bottom:16px; }
+  .pay-cls{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; } .pay-crow{ display:flex; gap:10px; align-items:flex-start; } .pay-crow > b{ flex:none; width:52px; font-size:12.5px; color:var(--ink-soft); padding-top:8px; }
+  .pay-un{ font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--warn); border-radius:99px; padding:1px 6px; margin-left:4px; }
+  .pay-gh th{ background:var(--accent-soft); color:var(--accent); text-align:left; font-size:13.5px; font-weight:900; padding:8px 12px; } .pay-gh th small{ font-weight:600; color:var(--ink-soft); margin-left:6px; }
+  .pay-f input{ font:inherit; border:1px solid var(--border); border-radius:8px; padding:6px 10px; background:var(--surface); color:var(--ink); width:180px; }
   .pay-f{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; } .pay-f select{ font:inherit; border:1px solid var(--border); border-radius:8px; padding:6px 8px; background:var(--surface); color:var(--ink); max-width:220px; }
   .pay-tools{ display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; } .pay-tools .btn[aria-pressed="true"]{ background:var(--warn); color:#fff; }
   .ls-bar .pay-tools .btn.soft{ margin-left:0; }
@@ -1739,9 +1743,10 @@
       <div class="greet"><div><h1>수강료·교재비</h1><p>달마다 학생별 수강료·교재비 결제를 적어요. 결제일은 년·월·일로, 결제 방법은 카드·동백전·제로페이·현금영수증 가운데 ▼로 골라요. 결제 칸을 누르면 고치거나 ‘결제 취소’로 표시해요(지워지지 않아요).</p></div></div>
       <div class="card ls-bar">
         <div class="nav"><button class="sq" type="button" id="payPrev" aria-label="지난 달"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button><span id="payLabel"></span><button class="sq" type="button" id="payNext" aria-label="다음 달"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button><button class="btn soft" type="button" id="payThis">이번 달</button></div>
-        <label class="pay-f">반 <select id="payCls"></select></label>
+        <label class="pay-f"><input type="search" id="payQ" placeholder="학생 이름 찾기" autocomplete="off"></label>
         <span class="pay-tools"><button type="button" class="btn soft" data-payonly="unpaid" aria-pressed="false">미납만 보기</button><button type="button" class="btn soft" id="payCsv">엑셀로 내려받기</button></span>
       </div>
+      <div class="card pay-cls" id="payCls"></div>
       <div class="pay-sum" id="paySum"></div>
       <div class="card"><div class="table-wrap"><table class="t-list pay-t"><thead><tr><th>학생</th><th>수강료</th><th>교재비</th></tr></thead><tbody id="payRows"></tbody></table></div></div>
     </section>
@@ -7268,7 +7273,8 @@ document.addEventListener('click', function(ev){
    지우지 않고 '결제 취소'로 남겨요(목록에 줄 그어 보이고 합계에서 빠져요). 저장: 'beyond-pay-v1'. */
 var PAY_KEY = 'beyond-pay-v1', PAY_METHODS = ['카드','동백전','제로페이','현금영수증'], PAY_ITEMS = ['수강료','교재비'];
 var payStore = (function(){ try{ var o = JSON.parse(localStorage.getItem(PAY_KEY) || 'null'); if(o && o.list) return o; }catch(e){} return { list:[], seq:0 }; })();
-var pay = { month:ym(new Date()), cls:'', only:'', edit:null };
+var pay = { month:ym(new Date()), cls:'', only:'', q:'', edit:null };
+function payPaid(s){ return payOf(s.id, '수강료').some(function(p){ return !p.void; }); }
 function paySave(){ try{ localStorage.setItem(PAY_KEY, JSON.stringify(payStore)); }catch(e){} }
 function payDate(d){ if(!d) return ''; var x = parseYmd(d); return x.getFullYear() + '년 ' + (x.getMonth() + 1) + '월 ' + x.getDate() + '일'; }
 function payWon(n){ return (+n || 0).toLocaleString('ko-KR') + '원'; }
@@ -7277,8 +7283,15 @@ function payLast(sid, item){ var l = payStore.list.filter(function(p){ return p.
 function renderPay(){
   var y = +pay.month.slice(0, 4), m = +pay.month.slice(5);
   $('payLabel').textContent = y + '년 ' + m + '월';
-  $('payCls').innerHTML = '<option value="">전체 반</option>' + CLASSES.map(function(c){ return '<option value="' + c.id + '"' + (c.id === pay.cls ? ' selected' : '') + '>' + esc(c.dept + ' · ' + c.name) + '</option>'; }).join('');
-  var studs = roster.list.filter(function(s){ return (s.status === 'on' || s.status === 'rest' || payOf(s.id).length) && (!pay.cls || s.cid === pay.cls); })
+  var inMonth = function(s){ return s.status === 'on' || s.status === 'rest' || payOf(s.id).length; };
+  var chip = function(id, label, l){ var on = l.filter(function(s){ return s.status === 'on'; }), un = on.filter(function(s){ return !payPaid(s); }).length;
+    return '<button type="button" data-paycls="' + id + '" aria-pressed="' + (pay.cls === id) + '">' + esc(label) + ' <small>' + (on.length - un) + '/' + on.length + '</small>' + (un ? '<em class="pay-un">미납 ' + un + '</em>' : '') + '</button>'; };
+  var depts = []; CLASSES.forEach(function(c){ if(depts.indexOf(c.dept) < 0) depts.push(c.dept); });
+  $('payCls').innerHTML = '<div class="pay-crow"><b>전체</b><div class="rs-chips">' + chip('', '전체 반', roster.list.filter(inMonth)) + '</div></div>' + depts.map(function(d){
+    return '<div class="pay-crow"><b>' + esc(d) + '</b><div class="rs-chips">' + CLASSES.filter(function(c){ return c.dept === d; }).map(function(c){ return chip(c.id, c.name, roster.list.filter(function(s){ return s.cid === c.id && inMonth(s); })); }).join('') + '</div></div>';
+  }).join('');
+  var q = pay.q.trim();
+  var studs = roster.list.filter(function(s){ return inMonth(s) && (!pay.cls || s.cid === pay.cls); })
     .sort(function(a, b){ return CLASSES.findIndex(function(c){ return c.id === a.cid; }) - CLASSES.findIndex(function(c){ return c.id === b.cid; }); });
   var all = payStore.list.filter(function(p){ return p.month === pay.month && !p.void && (!pay.cls || p.cid === pay.cls); });
   var paidN = studs.filter(function(s){ return payOf(s.id, '수강료').some(function(p){ return !p.void; }); }).length;
@@ -7287,7 +7300,8 @@ function renderPay(){
   $('paySum').innerHTML = '<div class="pay-k"><b>' + paidN + ' / ' + onN + '명</b><span>수강료 납부</span></div><div class="pay-k warn"><b>' + Math.max(0, onN - studs.filter(function(s){ return s.status === 'on' && payOf(s.id, '수강료').some(function(p){ return !p.void; }); }).length) + '명</b><span>수강료 미납 (재원생)</span></div>'
     + '<div class="pay-k"><b>' + payWon(sum(all.filter(function(p){ return p.item === '수강료'; }))) + '</b><span>수강료 합계</span></div><div class="pay-k"><b>' + payWon(sum(all.filter(function(p){ return p.item === '교재비'; }))) + '</b><span>교재비 합계</span></div>'
     + '<div class="pay-k wide"><span>결제 방법별</span><p>' + PAY_METHODS.map(function(mt){ return esc(mt) + ' <b>' + payWon(sum(all.filter(function(p){ return p.method === mt; }))) + '</b>'; }).join(' · ') + '</p></div>';
-  if(pay.only === 'unpaid') studs = studs.filter(function(s){ return s.status === 'on' && !payOf(s.id, '수강료').some(function(p){ return !p.void; }); });
+  if(pay.only === 'unpaid') studs = studs.filter(function(s){ return s.status === 'on' && !payPaid(s); });
+  if(q) studs = studs.filter(function(s){ return s.name.indexOf(q) >= 0; });
   document.querySelectorAll('[data-payonly]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.payonly === pay.only); });
   var cell = function(s, item){
     var l = payOf(s.id, item);
@@ -7295,9 +7309,13 @@ function renderPay(){
     var paid = l.some(function(p){ return !p.void; });
     return h + (item === '수강료' && !paid ? (s.status === 'on' ? '<span class="tag warn">미납</span> ' : '<span class="tag rs-st rest">' + RS_ST[s.status] + '</span> ') : '') + ((item === '교재비' || !paid) ? '<button type="button" class="mo-tb" data-paynew="' + s.id + '|' + item + '">+ ' + item + '</button>' : '');
   };
+  var lastC = null;
   $('payRows').innerHTML = studs.length ? studs.map(function(s){
-    return '<tr><td><b>' + esc(s.name) + '</b><small class="muted">' + esc(rsCname(s.cid)) + '</small></td><td class="pay-c">' + cell(s, '수강료') + '</td><td class="pay-c">' + cell(s, '교재비') + '</td></tr>';
-  }).join('') : '<tr><td colspan="3" class="empty">' + (pay.only ? '이번 달 수강료 미납 학생이 없어요.' : '학생이 없어요. 반·학생 관리에서 학생을 등록해 주세요.') + '</td></tr>';
+    var h = '';
+    if(s.cid !== lastC){ lastC = s.cid; var cl = studs.filter(function(x){ return x.cid === s.cid; }), c = CLASSES.find(function(x){ return x.id === s.cid; });
+      h = '<tr class="pay-gh"><th colspan="3">' + esc(rsCname(s.cid)) + (c && c.teacher ? ' <small>' + esc(c.teacher) + ' 선생님</small>' : '') + ' <small>' + cl.length + '명 · 수강료 납부 ' + cl.filter(payPaid).length + '명</small></th></tr>'; }
+    return h + '<tr><td><b>' + esc(s.name) + '</b>' + (s.status !== 'on' ? ' <span class="tag rs-st ' + s.status + '">' + RS_ST[s.status] + '</span>' : '') + (s.grade ? '<small class="muted">' + esc(s.grade) + '</small>' : '') + '</td><td class="pay-c">' + cell(s, '수강료') + '</td><td class="pay-c">' + cell(s, '교재비') + '</td></tr>';
+  }).join('') : '<tr><td colspan="3" class="empty">' + (q ? '\'' + esc(q) + '\' 학생을 찾지 못했어요.' : pay.only ? '이번 달 수강료 미납 학생이 없어요.' : '학생이 없어요. 반·학생 관리에서 학생을 등록해 주세요.') + '</td></tr>';
 }
 function payOpt(a, b, v, suf){ var h = ''; for(var i = a; i <= b; i++) h += '<option value="' + i + '"' + (i === v ? ' selected' : '') + '>' + i + suf + '</option>'; return h; }
 function payYmdHtml(d){
@@ -7365,12 +7383,13 @@ $('view-pay').addEventListener('click', function(ev){
   else if(b.id === 'payThis'){ pay.month = ym(new Date()); renderPay(); }
   else if(b.dataset.payonly != null){ pay.only = pay.only === b.dataset.payonly ? '' : b.dataset.payonly; renderPay(); }
   else if(b.id === 'payCsv'){
-    var rows = [['결제월','이름','반','항목','교재명','금액','결제일','결제 방법','메모','상태']].concat(payStore.list.filter(function(p){ return p.month === pay.month && (!pay.cls || p.cid === pay.cls); }).map(function(p){ return [p.month, p.name, rsCname(p.cid), p.item, p.book || '', p.amount, payDate(p.date), p.method, p.memo || '', p.void ? '결제 취소' : '결제']; }));
+    var rows = [['결제월','이름','반','항목','교재명','금액','결제일','결제 방법','메모','상태']].concat(payStore.list.filter(function(p){ return p.month === pay.month && (!pay.cls || p.cid === pay.cls); }).sort(function(a, b){ return CLASSES.findIndex(function(c){ return c.id === a.cid; }) - CLASSES.findIndex(function(c){ return c.id === b.cid; }); }).map(function(p){ return [p.month, p.name, rsCname(p.cid), p.item, p.book || '', p.amount, payDate(p.date), p.method, p.memo || '', p.void ? '결제 취소' : '결제']; }));
     var txt = rows.map(function(r){ return r.map(function(x){ x = String(x == null ? '' : x); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(','); }).join('\r\n');
     rcSave('수강료교재비_' + pay.month + '.csv', new Blob(['﻿' + txt], { type:'text/csv;charset=utf-8' }));
   }
 });
-$('payCls').addEventListener('change', function(){ pay.cls = this.value; renderPay(); });
+$('payCls').addEventListener('click', function(ev){ var b = ev.target.closest('[data-paycls]'); if(!b) return; pay.cls = b.dataset.paycls; renderPay(); });
+$('payQ').addEventListener('input', function(){ pay.q = this.value; renderPay(); });
 
 /* ===== 시작 ===== */
 applyAssign();
