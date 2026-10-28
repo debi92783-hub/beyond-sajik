@@ -964,7 +964,17 @@
   .ms-path span{ background:var(--surface-soft); border-radius:8px; padding:4px 9px; font-weight:700; }
   .ms-path span.key{ background:var(--warn); color:#fff; }
   .ms-path b{ color:var(--ink-faint); font-weight:700; }
-  .iv-ol{ margin:0; padding-left:22px; display:flex; flex-direction:column; gap:4px; font-size:12.5px; } .iv-ol small{ display:block; color:var(--ink-soft); font-size:11.5px; } .iv-ol .iv-hint{ color:var(--warn); font-weight:700; }
+  .iv-ol{ margin:0; padding-left:22px; display:flex; flex-direction:column; gap:4px; font-size:12.5px; }
+  .iv-ol li > div{ display:inline; } .iv-ol li{ position:relative; } .iv-qt{ display:block !important; padding-right:128px; min-height:22px; }
+  .iv-sc{ position:absolute; right:0; top:0; display:inline-flex; gap:3px; }
+  .iv-sc button{ font:inherit; font-size:11px; font-weight:800; width:22px; height:22px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); cursor:pointer; padding:0; }
+  .iv-sc button[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .iv-foot{ display:flex; gap:10px; align-items:flex-end; } .iv-foot .ms-ex{ flex:1; } .iv-sub{ margin:4px 0 0; white-space:nowrap; text-align:right; font-size:12px; color:var(--ink-soft); } .iv-sub b{ color:var(--accent); font-size:14px; }
+  .iv-total{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; background:var(--accent-soft); border-radius:12px; padding:10px 14px; }
+  .iv-total label{ display:flex; align-items:center; gap:6px; font-weight:800; font-size:13px; } .iv-total input{ font:inherit; border:1px solid var(--border); border-radius:8px; padding:5px 8px; width:120px; background:var(--surface); color:var(--ink); }
+  .iv-total span{ font-weight:800; font-size:14px; } .iv-total span b{ font-size:20px; color:var(--accent); } .iv-total small{ color:var(--ink-soft); font-size:11.5px; flex:1; min-width:200px; }
+  @media print{ .ms:has(.iv-total){ gap:7px; } .ms:has(.iv-total) .ms-rules div{ padding:5px 10px; font-size:11.5px; } .ms:has(.iv-total) .ms-box{ padding:7px 10px; } .iv-note{ display:none; } .iv-total{ padding:6px 12px; } .ms .iv-ol li{ line-height:1.35; }
+    .iv-total .btn{ display:none; } .iv-sc{ gap:2px; } .iv-sc button{ width:15px; height:15px; font-size:8.5px; } .iv-qt{ padding-right:86px; min-height:15px; } .ms:has(.iv-total) .ms-hd p{ display:none; } } .iv-ol small{ display:block; color:var(--ink-soft); font-size:11.5px; } .iv-ol .iv-hint{ color:var(--warn); font-weight:700; }
   @media print{ .ms .iv-ol{ font-size:10.5px; gap:1px; } .ms .iv-ol small{ font-size:9.5px; } .iv-paper .iv-ln{ height:58px; } }
   .iv-who{ width:100%; border-collapse:collapse; font-size:13px; } .iv-who th, .iv-who td{ border:1px solid var(--border); padding:8px 10px; } .iv-who th{ background:var(--accent-soft); color:var(--accent); width:70px; font-weight:800; }
   .iv-sec h3{ margin:4px 0 6px; font-size:15px; font-weight:900; color:var(--accent); }
@@ -5973,15 +5983,29 @@ var IV_SECS = [
     ['전 직장 원장님이 나를 한마디로 뭐라고 하실까요?', '', '장점만 말하는 사람인지, 아쉬운 점까지 아는 사람인지 들어요.']
   ] }
 ];
+var ivSc = { name:'', s:{} };
+function ivScore(n){ var h = '<span class="iv-sc" role="group" aria-label="' + n + '번 점수">'; for(var k = 1; k <= 5; k++) h += '<button type="button" data-ivq="' + n + '" data-ivv="' + k + '" aria-pressed="' + (ivSc.s[n] === k) + '">' + k + '</button>'; return h + '</span>'; }
+function ivSecSum(i){ var start = 0; for(var j = 0; j < i; j++) start += IV_SECS[j].qs.length; var t = 0; for(var q = start + 1; q <= start + IV_SECS[i].qs.length; q++) t += ivSc.s[q] || 0; return t; }
+function ivTot(){ return Object.keys(ivSc.s).reduce(function(a, k){ return a + ivSc.s[k]; }, 0); }
+$('manBody').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-ivv]');
+  if(b){ var q = +b.dataset.ivq, v = +b.dataset.ivv; if(ivSc.s[q] === v) delete ivSc.s[q]; else ivSc.s[q] = v;
+    document.querySelectorAll('[data-ivq="' + q + '"]').forEach(function(x){ x.setAttribute('aria-pressed', ivSc.s[q] === +x.dataset.ivv); });
+    IV_SECS.forEach(function(_, i){ var e = document.querySelector('[data-ivsec="' + i + '"]'); if(e) e.textContent = ivSecSum(i); }); $('ivTot').textContent = ivTot(); return; }
+  if(ev.target.closest('[data-ivreset]') && confirm('점수와 지원자 이름을 비우고 새로 매길까요?')){ ivSc = { name:'', s:{} }; renderManual(); }
+});
+$('manBody').addEventListener('input', function(ev){ if(ev.target.id === 'ivName') ivSc.name = ev.target.value; });
 function ivSheet(m){
   var n = 0;
   return msHead(m, '면접 전에 지원자에게 지필 면접지(20분)를 먼저 쓰게 하고, 면접에서는 답을 보며 아래 순서대로 더 물어봐요.') +
     msRules(['모든 지원자에게 같은 질문', '답보다 이유와 실제 경험을 더 물어보기', '면접지는 원장님만 보관 · 외부 공유 금지']) +
     '<div class="ms-two">' + IV_SECS.map(function(sec, i){
       return '<div class="ms-box' + (sec.last ? ' no' : '') + '"><h4>' + (i + 1) + '. ' + esc(sec.t) + '</h4><ol class="iv-ol" start="' + (n + 1) + '">' +
-        sec.qs.map(function(q){ n++; return '<li>' + esc(q[0]) + (q[1] ? '<small>' + esc(q[1]) + '</small>' : '') + (q[2] ? '<small class="iv-hint">→ ' + esc(q[2]) + '</small>' : '') + '</li>'; }).join('') +
-        '</ol><p class="ms-ex">👂 ' + esc(sec.listen) + '</p></div>';
+        sec.qs.map(function(q){ n++; return '<li><div class="iv-qt">' + esc(q[0]) + (q[1] ? '<small>' + esc(q[1]) + '</small>' : '') + (q[2] ? '<small class="iv-hint">→ ' + esc(q[2]) + '</small>' : '') + '</div>' + ivScore(n) + '</li>'; }).join('') +
+        '</ol><div class="iv-foot"><p class="ms-ex">👂 ' + esc(sec.listen) + '</p><p class="iv-sub"><b data-ivsec="' + i + '">' + ivSecSum(i) + '</b> / ' + sec.qs.length * 5 + '점</p></div></div>';
     }).join('') + '</div>' +
+    '<div class="iv-total"><label>지원자 <input type="text" id="ivName" maxlength="20" placeholder="이름" value="' + esc(ivSc.name) + '"></label><span>총점 <b id="ivTot">' + ivTot() + '</b> / ' + n * 5 + '점</span><small>5 아주 좋음 · 4 좋음 · 3 보통 · 2 아쉬움 · 1 맞지 않음</small><button type="button" class="btn soft" data-ivreset>점수 새로 매기기</button></div>' +
+    '<p class="ms-ex iv-note">점수는 이 화면에서만 계산되고 저장되지 않아요. 인쇄해서 펜으로 체크해도 돼요. 지원자 개인정보라 외부에 공유하지 않아요.</p>' +
     '<div class="ms-ft"><button type="button" class="btn soft" data-mantab="paper">지원자용 지필 면접지 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
 }
 function ivPaper(){
