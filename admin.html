@@ -1165,6 +1165,18 @@
   .rs-st.rest{ background:var(--hold-soft); color:var(--hold); } .rs-st.out{ background:var(--surface-soft); color:var(--ink-soft); }
   .rs-note{ margin:0 0 10px; font-size:12.5px; }
   #view-roster .card{ margin-bottom:16px; }
+  .pay-f{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; } .pay-f select{ font:inherit; border:1px solid var(--border); border-radius:8px; padding:6px 8px; background:var(--surface); color:var(--ink); max-width:220px; }
+  .pay-tools{ display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; } .pay-tools .btn[aria-pressed="true"]{ background:var(--warn); color:#fff; }
+  .ls-bar .pay-tools .btn.soft{ margin-left:0; }
+  .pay-sum{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+  .pay-k{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; gap:2px; } .pay-k b{ font-size:18px; } .pay-k span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .pay-k.warn b{ color:var(--warn); } .pay-k.wide{ grid-column:1 / -1; } .pay-k.wide p{ margin:2px 0 0; font-size:13px; } .pay-k.wide p b{ font-size:13px; }
+  .pay-t{ min-width:620px; } .pay-t td small{ display:block; } .pay-c{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .pay-t td.pay-c{ display:table-cell; } .pay-c > *{ margin:0 6px 6px 0; vertical-align:middle; }
+  .pay-ymd{ display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:8px; margin-top:-6px; } .pay-ymd select{ width:100%; }
+  .pay-chip{ font:inherit; text-align:left; border:1px solid var(--good); background:var(--good-soft); color:var(--ink); border-radius:9px; padding:5px 9px; cursor:pointer; font-size:12.5px; display:inline-block; }
+  .pay-chip small{ display:block; color:var(--ink-soft); font-size:11px; } .pay-chip.void{ border-color:var(--border); background:var(--surface-soft); text-decoration:line-through; color:var(--ink-faint); }
+  @media (max-width:700px){ .pay-sum{ grid-template-columns:repeat(2, minmax(0,1fr)); } .pay-tools{ margin-left:0; } }
   .rs-bk-btns{ display:flex; gap:8px; flex-wrap:wrap; } .rs-bk-btns .btn{ padding:6px 12px; font-size:12.5px; }
   .rs-bk-sum{ margin:12px 0 8px; font-size:13px; } .rs-bk-err{ color:var(--warn); font-weight:700; }
   .rs-bk-t{ min-width:640px; } .rs-bk-t tr.bk-err td{ background:var(--warn-soft); }
@@ -1706,6 +1718,17 @@
       <div class="card an-card an-box" id="anList"></div>
     </section>
 
+    <section id="view-pay" hidden>
+      <div class="greet"><div><h1>수강료·교재비</h1><p>달마다 학생별 수강료·교재비 결제를 적어요. 결제일은 년·월·일로, 결제 방법은 카드·동백전·제로페이·현금영수증 가운데 ▼로 골라요. 결제 칸을 누르면 고치거나 ‘결제 취소’로 표시해요(지워지지 않아요).</p></div></div>
+      <div class="card ls-bar">
+        <div class="nav"><button class="sq" type="button" id="payPrev" aria-label="지난 달"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15,5 8,12 15,19"/></svg></button><span id="payLabel"></span><button class="sq" type="button" id="payNext" aria-label="다음 달"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button><button class="btn soft" type="button" id="payThis">이번 달</button></div>
+        <label class="pay-f">반 <select id="payCls"></select></label>
+        <span class="pay-tools"><button type="button" class="btn soft" data-payonly="unpaid" aria-pressed="false">미납만 보기</button><button type="button" class="btn soft" id="payCsv">엑셀로 내려받기</button></span>
+      </div>
+      <div class="pay-sum" id="paySum"></div>
+      <div class="card"><div class="table-wrap"><table class="t-list pay-t"><thead><tr><th>학생</th><th>수강료</th><th>교재비</th></tr></thead><tbody id="payRows"></tbody></table></div></div>
+    </section>
+
     <section id="view-roster" hidden>
       <div class="greet"><div><h1 id="rsTitle">반·학생 관리</h1><p id="rsDesc"></p></div></div>
       <div id="rsBody"></div>
@@ -1911,6 +1934,7 @@
 </div>
 
 <div class="overlay" id="anOv" hidden><form class="modal an-modal" id="anForm" novalidate></form></div>
+<div class="overlay" id="payOv" hidden><form class="modal rs-modal" id="payForm" novalidate></form></div>
 <div class="overlay" id="rsOv" hidden><form class="modal rs-modal" id="rsForm" novalidate></form></div>
 <div class="overlay" id="lcEditOv" hidden>
   <form class="modal lc-edit" id="lcEditForm" novalidate>
@@ -2080,7 +2104,7 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
-    ['학원 운영', [['users','반·학생 관리','roster'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비'],['msg','상담 관리','consult'],['bell','학원 공지','pnotice'],['trash','삭제 요청·휴지통','trash']]],
+    ['학원 운영', [['users','반·학생 관리','roster'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비','pay'],['msg','상담 관리','consult'],['bell','학원 공지','pnotice'],['trash','삭제 요청·휴지통','trash']]],
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지(자동) 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
@@ -2119,13 +2143,13 @@ function setView(v, page){
   if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'consult' || page === 'lcsum') page = 'main'; }
   state.view = v;
   state.page = page || 'main';
-  if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum' || state.page === 'trash') && v !== 'director') state.page = 'main';
+  if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum' || state.page === 'trash' || state.page === 'pay') && v !== 'director') state.page = 'main';
   if(state.page === 'thome' && v !== 'teacher') state.page = 'main';
-  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash', records = state.page === 'records', roster_ = state.page === 'roster', pnotice = state.page === 'pnotice';
+  var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash', records = state.page === 'records', roster_ = state.page === 'roster', pnotice = state.page === 'pnotice', payp = state.page === 'pay';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
   document.querySelectorAll('[data-only]').forEach(function(el){ el.hidden = el.dataset.only !== v; });
-  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome || pview || trash || records || roster_ || pnotice;
+  var sub = cal || set || daily || monthly || attend || manual || board || consult || lcsum || gyomu || mail || thome || pview || trash || records || roster_ || pnotice || payp;
   $('view-director').hidden = sub || v !== 'director';
   $('view-teacher').hidden = sub || v !== 'teacher';
   $('view-calendar').hidden = !cal;
@@ -2145,6 +2169,7 @@ function setView(v, page){
   $('view-records').hidden = !records;
   $('view-roster').hidden = !roster_;
   $('view-pnotice').hidden = !pnotice;
+  $('view-pay').hidden = !payp;
   renderSide();
   if(cal) renderCalendar();
   else if(set) renderSettings();
@@ -2163,9 +2188,10 @@ function setView(v, page){
   else if(records) renderRecords();
   else if(roster_) renderRoster();
   else if(pnotice) renderAnList();
+  else if(payp) renderPay();
   else if(v === 'director') hmDirector();
   else if(v === 'teacher') renderTeacher();
-  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : pview ? 'parent-view' : trash ? 'trash' : records ? 'records' : roster_ ? 'roster' : pnotice ? 'notice' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
+  var tag = set ? 'settings' : cal ? 'calendar' : daily ? 'daily' : monthly ? 'monthly' : attend ? 'attend' : manual ? 'manual' : board ? 'board-' + bd.board : consult ? 'consult' : lcsum ? 'lesson-check' : gyomu ? 'gyomu' : mail ? 'mail' : thome ? 'home' : pview ? 'parent-view' : trash ? 'trash' : records ? 'records' : roster_ ? 'roster' : pnotice ? 'notice' : payp ? 'pay' : (v === 'teacher' && state.tpart === 'jr') ? 'progress' : '';
   try{ history.replaceState(null, '', '#' + (tag ? (v === 'teacher' && tag !== 'settings' && tag !== 'consult' && tag !== 'trash' ? 'teacher-' + tag : tag) : v)); }catch(e){}
   window.scrollTo(0, 0);
 }
@@ -2209,6 +2235,7 @@ $('side').addEventListener('click', function(e){
     if(a.dataset.key === 'kiosk') return $('atKiosk').click();
     if(a.dataset.key === 'pview') return setView(state.view, 'pview');
     if(a.dataset.key === 'records') return setView(state.view, 'records');
+    if(a.dataset.key === 'pay') return setView('director', 'pay');
     if(a.dataset.key === 'pnotice') return setView(state.view, 'pnotice');
     if(a.dataset.key === 'roster'){ rs.cid = ''; rs.q = ''; return setView(state.view, 'roster'); }
     if(a.dataset.key.indexOf('board:') === 0){ var bk = a.dataset.key.split(':'); return openBoard(bk[1], bk[2]); }
@@ -7140,6 +7167,115 @@ document.addEventListener('click', function(ev){
   else { delete a.down; if(a.to && a.to < ymd(new Date())) a.to = ''; toast('안내를 다시 올렸어요.'); }
   anSaveAll(list); anRefresh();
 });
+
+/* ===== 수강료·교재비 (원장님) =====
+   달마다 학생별로 수강료·교재비 결제를 적어요. 결제일(년·월·일)과 결제 방법(카드·동백전·제로페이·현금영수증)을 ▼로 골라요.
+   지우지 않고 '결제 취소'로 남겨요(목록에 줄 그어 보이고 합계에서 빠져요). 저장: 'beyond-pay-v1'. */
+var PAY_KEY = 'beyond-pay-v1', PAY_METHODS = ['카드','동백전','제로페이','현금영수증'], PAY_ITEMS = ['수강료','교재비'];
+var payStore = (function(){ try{ var o = JSON.parse(localStorage.getItem(PAY_KEY) || 'null'); if(o && o.list) return o; }catch(e){} return { list:[], seq:0 }; })();
+var pay = { month:ym(new Date()), cls:'', only:'', edit:null };
+function paySave(){ try{ localStorage.setItem(PAY_KEY, JSON.stringify(payStore)); }catch(e){} }
+function payDate(d){ if(!d) return ''; var x = parseYmd(d); return x.getFullYear() + '년 ' + (x.getMonth() + 1) + '월 ' + x.getDate() + '일'; }
+function payWon(n){ return (+n || 0).toLocaleString('ko-KR') + '원'; }
+function payOf(sid, item){ return payStore.list.filter(function(p){ return p.sid === sid && p.month === pay.month && (!item || p.item === item); }); }
+function payLast(sid, item){ var l = payStore.list.filter(function(p){ return p.sid === sid && p.item === item && !p.void; }).sort(function(a, b){ return a.month < b.month ? 1 : -1; }); return l[0]; }
+function renderPay(){
+  var y = +pay.month.slice(0, 4), m = +pay.month.slice(5);
+  $('payLabel').textContent = y + '년 ' + m + '월';
+  $('payCls').innerHTML = '<option value="">전체 반</option>' + CLASSES.map(function(c){ return '<option value="' + c.id + '"' + (c.id === pay.cls ? ' selected' : '') + '>' + esc(c.dept + ' · ' + c.name) + '</option>'; }).join('');
+  var studs = roster.list.filter(function(s){ return (s.status === 'on' || s.status === 'rest' || payOf(s.id).length) && (!pay.cls || s.cid === pay.cls); })
+    .sort(function(a, b){ return CLASSES.findIndex(function(c){ return c.id === a.cid; }) - CLASSES.findIndex(function(c){ return c.id === b.cid; }); });
+  var all = payStore.list.filter(function(p){ return p.month === pay.month && !p.void && (!pay.cls || p.cid === pay.cls); });
+  var paidN = studs.filter(function(s){ return payOf(s.id, '수강료').some(function(p){ return !p.void; }); }).length;
+  var onN = studs.filter(function(s){ return s.status === 'on'; }).length;
+  var sum = function(l){ return l.reduce(function(a, p){ return a + (+p.amount || 0); }, 0); };
+  $('paySum').innerHTML = '<div class="pay-k"><b>' + paidN + ' / ' + onN + '명</b><span>수강료 납부</span></div><div class="pay-k warn"><b>' + Math.max(0, onN - studs.filter(function(s){ return s.status === 'on' && payOf(s.id, '수강료').some(function(p){ return !p.void; }); }).length) + '명</b><span>수강료 미납 (재원생)</span></div>'
+    + '<div class="pay-k"><b>' + payWon(sum(all.filter(function(p){ return p.item === '수강료'; }))) + '</b><span>수강료 합계</span></div><div class="pay-k"><b>' + payWon(sum(all.filter(function(p){ return p.item === '교재비'; }))) + '</b><span>교재비 합계</span></div>'
+    + '<div class="pay-k wide"><span>결제 방법별</span><p>' + PAY_METHODS.map(function(mt){ return esc(mt) + ' <b>' + payWon(sum(all.filter(function(p){ return p.method === mt; }))) + '</b>'; }).join(' · ') + '</p></div>';
+  if(pay.only === 'unpaid') studs = studs.filter(function(s){ return s.status === 'on' && !payOf(s.id, '수강료').some(function(p){ return !p.void; }); });
+  document.querySelectorAll('[data-payonly]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.payonly === pay.only); });
+  var cell = function(s, item){
+    var l = payOf(s.id, item);
+    var h = l.map(function(p){ return '<button type="button" class="pay-chip' + (p.void ? ' void' : '') + '" data-payed="' + p.id + '"><b>' + payWon(p.amount) + '</b>' + (p.book ? ' ' + esc(p.book) : '') + '<small>' + esc(payDate(p.date)) + ' · ' + esc(p.method) + (p.void ? ' · 결제 취소' : '') + '</small></button>'; }).join('');
+    var paid = l.some(function(p){ return !p.void; });
+    return h + (item === '수강료' && !paid ? (s.status === 'on' ? '<span class="tag warn">미납</span> ' : '<span class="tag rs-st rest">' + RS_ST[s.status] + '</span> ') : '') + ((item === '교재비' || !paid) ? '<button type="button" class="mo-tb" data-paynew="' + s.id + '|' + item + '">+ ' + item + '</button>' : '');
+  };
+  $('payRows').innerHTML = studs.length ? studs.map(function(s){
+    return '<tr><td><b>' + esc(s.name) + '</b><small class="muted">' + esc(rsCname(s.cid)) + '</small></td><td class="pay-c">' + cell(s, '수강료') + '</td><td class="pay-c">' + cell(s, '교재비') + '</td></tr>';
+  }).join('') : '<tr><td colspan="3" class="empty">' + (pay.only ? '이번 달 수강료 미납 학생이 없어요.' : '학생이 없어요. 반·학생 관리에서 학생을 등록해 주세요.') + '</td></tr>';
+}
+function payOpt(a, b, v, suf){ var h = ''; for(var i = a; i <= b; i++) h += '<option value="' + i + '"' + (i === v ? ' selected' : '') + '>' + i + suf + '</option>'; return h; }
+function payYmdHtml(d){
+  var x = parseYmd(d), y = x.getFullYear(), now = new Date().getFullYear(), last = new Date(y, x.getMonth() + 1, 0).getDate();
+  return '<div class="pay-ymd"><select id="payY" aria-label="결제 년도">' + payOpt(Math.min(y, now - 1), Math.max(y, now + 1), y, '년') + '</select>'
+    + '<select id="payM" aria-label="결제 월">' + payOpt(1, 12, x.getMonth() + 1, '월') + '</select>'
+    + '<select id="payD" aria-label="결제 일">' + payOpt(1, last, x.getDate(), '일') + '</select></div>';
+}
+function payYmdVal(){ var y = +$('payY').value, m = +$('payM').value, d = +$('payD').value; return y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0'); }
+function payOpen(id, sid, item){
+  var p = id ? payStore.list.find(function(x){ return x.id === id; }) : null, s = rsFind(p ? p.sid : sid);
+  pay.edit = p ? p.id : null;
+  var last = !p && s ? payLast(s.id, item) : null;
+  p = p || { sid:s.id, item:item, amount:last ? last.amount : '', date:ymd(new Date()), method:last ? last.method : '카드', book:'', memo:'' };
+  $('payForm').innerHTML = '<h2>' + esc(s ? s.name : '') + ' · ' + (pay.edit ? '결제 고치기' : '결제 입력') + '</h2>'
+    + '<p class="muted" style="margin:0">' + esc(rsCname(s.cid)) + ' · ' + esc(+pay.month.slice(5) + '월') + ' 분</p>'
+    + '<div class="row2"><label>항목<select id="payItem">' + PAY_ITEMS.map(function(x){ return '<option' + (x === p.item ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>'
+    + '<label>금액 (원)<input type="text" id="payAmt" inputmode="numeric" placeholder="예: 250000" value="' + esc(p.amount ? (+p.amount).toLocaleString('ko-KR') : '') + '"></label></div>'
+    + '<label id="payBookL"' + (p.item === '교재비' ? '' : ' hidden') + '>교재명<input type="text" id="payBook" maxlength="30" placeholder="예: FUN PHONICS 2" value="' + esc(p.book || '') + '"></label>'
+    + '<label>결제일</label>' + payYmdHtml(p.date)
+    + '<label>결제 방법<select id="payMethod">' + PAY_METHODS.map(function(x){ return '<option' + (x === p.method ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>'
+    + '<label>메모 (선택)<input type="text" id="payMemo" maxlength="60" placeholder="예: 형제 할인, 2개월분" value="' + esc(p.memo || '') + '"></label>'
+    + (pay.edit && p.hist && p.hist.length ? '<div class="rs-hist"><b>고친 기록</b>' + p.hist.slice().reverse().map(function(h){ return '<div><span class="dt">' + esc(h.d) + '</span> ' + esc(h.t) + '</div>'; }).join('') + '</div>' : '')
+    + '<p class="form-err" id="payErr"></p><div class="modal-actions">' + (pay.edit ? '<button type="button" class="btn soft rs-rec" data-payvoid>' + (p.void ? '결제 취소 되돌리기' : '결제 취소') + '</button>' : '') + '<button type="button" class="btn soft" data-payclose>닫기</button><button type="submit" class="btn">저장</button></div>';
+  $('payOv').hidden = false; $('payAmt').focus();
+}
+$('payForm').addEventListener('input', function(ev){
+  if(ev.target.id === 'payAmt'){ var d = ev.target.value.replace(/\D/g, ''); ev.target.value = d ? (+d).toLocaleString('ko-KR') : ''; }
+});
+$('payForm').addEventListener('change', function(ev){
+  if(ev.target.id === 'payItem') $('payBookL').hidden = ev.target.value !== '교재비';
+  if(ev.target.id === 'payY' || ev.target.id === 'payM'){ var last = new Date(+$('payY').value, +$('payM').value, 0).getDate(), d = Math.min(+$('payD').value, last); $('payD').innerHTML = payOpt(1, last, d, '일'); }
+});
+$('payForm').addEventListener('click', function(ev){
+  if(ev.target.closest('[data-payclose]')) $('payOv').hidden = true;
+  if(ev.target.closest('[data-payvoid]')){
+    var p = payStore.list.find(function(x){ return x.id === pay.edit; }); if(!p) return;
+    if(!p.void && !confirm('이 결제를 취소로 표시할까요? 지워지지 않고 줄 그어 남아요.')) return;
+    p.hist = p.hist || []; p.hist.push({ d:ymd(new Date()), t:p.void ? '결제 취소 되돌림' : '결제 취소' }); p.void = !p.void;
+    paySave(); $('payOv').hidden = true; renderPay(); toast(p.void ? '결제 취소로 표시했어요.' : '결제 취소를 되돌렸어요.');
+  }
+});
+$('payForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var amt = +$('payAmt').value.replace(/\D/g, ''), date = payYmdVal();
+  if(!amt){ $('payErr').textContent = '금액을 써 주세요.'; return; }
+  var v = { item:$('payItem').value, amount:amt, date:date, method:$('payMethod').value, book:$('payItem').value === '교재비' ? $('payBook').value.trim() : '', memo:$('payMemo').value.trim() };
+  var p = pay.edit ? payStore.list.find(function(x){ return x.id === pay.edit; }) : null;
+  if(p){
+    var ch = []; if(p.amount !== v.amount) ch.push('금액 ' + payWon(p.amount) + ' → ' + payWon(v.amount)); if(p.date !== v.date) ch.push('결제일 ' + payDate(p.date) + ' → ' + payDate(v.date)); if(p.method !== v.method) ch.push('방법 ' + p.method + ' → ' + v.method); if(p.item !== v.item) ch.push('항목 ' + p.item + ' → ' + v.item);
+    if(ch.length){ p.hist = p.hist || []; p.hist.push({ d:ymd(new Date()), t:ch.join(' · ') }); }
+    Object.assign(p, v);
+  } else {
+    payStore.seq = (payStore.seq || 0) + 1;
+    payStore.list.push(Object.assign({ id:'p' + payStore.seq, sid:pay.sid, name:rsFind(pay.sid).name, cid:rsFind(pay.sid).cid, month:pay.month, at:Date.now() }, v));
+  }
+  paySave(); $('payOv').hidden = true; renderPay(); toast('저장했어요.');
+});
+$('payOv').addEventListener('click', function(ev){ if(ev.target === this) this.hidden = true; });
+$('view-pay').addEventListener('click', function(ev){
+  var b = ev.target.closest('button'); if(!b) return;
+  if(b.dataset.paynew){ var k = b.dataset.paynew.split('|'); pay.sid = k[0]; payOpen(null, k[0], k[1]); }
+  else if(b.dataset.payed) payOpen(b.dataset.payed);
+  else if(b.id === 'payPrev' || b.id === 'payNext'){ var d = new Date(+pay.month.slice(0, 4), +pay.month.slice(5) - 1 + (b.id === 'payNext' ? 1 : -1), 1); pay.month = ym(d); renderPay(); }
+  else if(b.id === 'payThis'){ pay.month = ym(new Date()); renderPay(); }
+  else if(b.dataset.payonly != null){ pay.only = pay.only === b.dataset.payonly ? '' : b.dataset.payonly; renderPay(); }
+  else if(b.id === 'payCsv'){
+    var rows = [['결제월','이름','반','항목','교재명','금액','결제일','결제 방법','메모','상태']].concat(payStore.list.filter(function(p){ return p.month === pay.month && (!pay.cls || p.cid === pay.cls); }).map(function(p){ return [p.month, p.name, rsCname(p.cid), p.item, p.book || '', p.amount, payDate(p.date), p.method, p.memo || '', p.void ? '결제 취소' : '결제']; }));
+    var txt = rows.map(function(r){ return r.map(function(x){ x = String(x == null ? '' : x); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(','); }).join('\r\n');
+    rcSave('수강료교재비_' + pay.month + '.csv', new Blob(['﻿' + txt], { type:'text/csv;charset=utf-8' }));
+  }
+});
+$('payCls').addEventListener('change', function(){ pay.cls = this.value; renderPay(); });
 
 /* ===== 시작 ===== */
 applyAssign();
