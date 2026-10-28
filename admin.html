@@ -5969,11 +5969,9 @@ var IV_SECS = [
     ['"우리 아이 성적이 안 올라요"라는 전화를 받으면 어떻게 응대할 건가요?'],
     ['우리 학원은 매일 데일리 리포트를, 매달 월말 리포트를 보내요. 학생 피드백을 쓸 때 무엇을 가장 신경 쓰나요?']
   ] },
-  { t:'함께 일하기', listen:'정해진 규칙(업무 체크리스트·매뉴얼)을 지키면서 의견은 따로 전하는지 들어요.', qs:[
+  { t:'함께 일하기·근무 조건·목표', listen:'정해진 규칙(업무 체크리스트·매뉴얼)을 지키면서 의견은 따로 전하는지 들어요. 출근 거리와 서울 본사 2박 3일 필수 교육 참석 여부는 정확히 확인해요.', qs:[
     ['함께 일하는 선생님들과 잘 지내기 위해 어떤 노력을 하나요?'],
-    ['우리 학원은 업무 체크리스트와 매뉴얼대로 일해요. 정해진 방식과 내 방식이 다를 때 어떻게 하나요?']
-  ] },
-  { t:'근무 조건·앞으로의 목표', listen:'출근 거리, 서울 본사 2박 3일 필수 교육 참석 여부를 정확히 확인해요.', qs:[
+    ['우리 학원은 업무 체크리스트와 매뉴얼대로 일해요. 정해진 방식과 내 방식이 다를 때 어떻게 하나요?'],
     ['학원까지 출근 시간은 얼마나 걸리나요?', '도보 / 자가용 / 버스 · 지하철'],
     ['채용되면 서울 본사에서 2박 3일 교육을 꼭 받아야 해요. 참석할 수 있나요?', '참석 가능 / 어려움 (어렵다면 이유도 써 주세요)'],
     ['앞으로 이루고 싶은 목표와, 채용된다면 학원에 바라는 점을 써 주세요.']
@@ -6001,7 +5999,7 @@ function ivSheet(m){
   return msHead(m, '면접 전에 지원자에게 지필 면접지(20분)를 먼저 쓰게 하고, 면접에서는 답을 보며 아래 순서대로 더 물어봐요.') +
     msRules(['모든 지원자에게 같은 질문', '답보다 이유와 실제 경험을 더 물어보기', '면접지는 원장님만 보관 · 외부 공유 금지']) +
     '<div class="ms-two">' + IV_SECS.map(function(sec, i){
-      return '<div class="ms-box' + (sec.last ? ' no' : '') + '"><h4>' + (i + 1) + '. ' + esc(sec.t) + '</h4><ol class="iv-ol" start="' + (n + 1) + '">' +
+      return '<div class="ms-box' + (sec.last ? ' no' : '') + (IV_SECS.length % 2 && i === IV_SECS.length - 1 ? ' ms-check-wide' : '') + '"><h4>' + (i + 1) + '. ' + esc(sec.t) + '</h4><ol class="iv-ol" start="' + (n + 1) + '">' +
         sec.qs.map(function(q){ n++; return '<li><div class="iv-qt">' + esc(q[0]) + (q[1] ? '<small>' + esc(q[1]) + '</small>' : '') + (q[2] ? '<small class="iv-hint">→ ' + esc(q[2]) + '</small>' : '') + '</div>' + ivScore(n) + '</li>'; }).join('') +
         '</ol><div class="iv-foot"><p class="ms-ex">👂 ' + esc(sec.listen) + '</p><p class="iv-sub"><b data-ivsec="' + i + '">' + ivSecSum(i) + '</b> / ' + sec.qs.length * 5 + '점</p></div></div>';
     }).join('') + '</div>' +
@@ -6020,7 +6018,7 @@ function ivPaper(){
     '<div class="ms-ft"><button type="button" class="btn soft" data-mantab="sheet">← 면접관용 한 장</button><button type="button" class="btn soft" onclick="window.print()">지필 면접지 인쇄하기 (A4 3장)</button></div>';
 }
 MANUALS.push({ id:'interview', group:'채용', title:'직원 면접 질문지', tag:'채용', updated:'2026-10-28',
-  summary:'지원 동기·교육관, 수업·경력, 학생·학부모 관리, 함께 일하기, 근무 조건, 마지막으로 사람을 보는 질문 3개까지 우리 학원에 맞춘 질문 18개(90점)예요. 면접관용 한 장과 지원자용 지필 면접지가 있어요.',
+  summary:'지원 동기·교육관, 수업·경력, 학생·학부모 관리, 함께 일하기·근무 조건, 마지막으로 사람을 보는 질문 3개까지 우리 학원에 맞춘 질문 18개(90점)예요. 면접관용 한 장과 지원자용 지필 면접지가 있어요.',
   sheet:function(){ return ivSheet(this); }, paper:ivPaper });
 var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생'], ['채용','채용 · 직원 면접']];
 var manOpen = null;
