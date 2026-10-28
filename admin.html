@@ -6746,7 +6746,7 @@ function rsBulkHtml(){
   var b = rs.bulk;
   var h = '<div class="card rs-bulk"><div class="card-head"><h2>학생 한 번에 입력 <small class="muted">엑셀 양식</small></h2>'
     + '<span class="rs-bk-btns"><button type="button" class="btn soft" data-rsbk="tpl">① 양식 내려받기</button><label class="btn soft an-pick">② 채운 파일 넣기<input type="file" id="rsBkFile" accept=".xlsx,.xls,.csv,.tsv,.txt"></label><button type="button" class="btn soft" data-rsbk="paste">또는 표 붙여넣기</button></span></div>'
-    + '<p class="muted rs-note">양식에는 지금 학생이 미리 들어 있어요. 빈 칸(학교·연락처 등)을 채우고, 새 학생은 아래 줄에 이어 써요. 반은 반 이름 그대로(예: ' + esc(CLASSES[0] ? CLASSES[0].name : '파닉스 A') + '), 학년은 초1~중3·고1, 상태는 재원·대기·휴원·퇴원 가운데 하나로 써요. 빈 칸은 지금 정보를 지우지 않고 그대로 둬요.</p>'
+    + '<p class="muted rs-note">양식에는 지금 학생이 미리 들어 있어요. 빈 칸(학교·연락처 등)을 채우고, 새 학생은 아래 줄에 이어 써요. 부서·반·학교·학년·관계·상태는 노란 칸을 누르면 ▼로 골라요. 반은 반 이름 그대로(예: ' + esc(CLASSES[0] ? CLASSES[0].name : '파닉스 A') + '), 학년은 초1~중3·고1, 상태는 재원·대기·휴원·퇴원 가운데 하나로 써요. 빈 칸은 지금 정보를 지우지 않고 그대로 둬요.</p>'
     + '<div class="mo-pbox" id="rsBkBox"' + (b && b.paste ? '' : ' hidden') + '><textarea id="rsBkT" rows="6" placeholder="엑셀에서 제목 줄(이름·반·학교…)까지 같이 복사해서 붙여넣어요."></textarea><div class="mo-bulk-btns"><button type="button" class="btn" data-rsbk="read">미리 보기</button><button type="button" class="btn soft" data-rsbk="pclose">닫기</button></div></div>';
   if(b && b.list){
     var cnt = function(k){ return b.list.filter(function(x){ return x.act === k; }).length; };
@@ -6847,24 +6847,83 @@ function rsBulkApply(){
   rsSave(); rs.bulk = null; renderRoster();
   toast(todo.length + '명을 반영했어요.');
 }
+/* 아주 작은 엑셀(xlsx) 만들기: 선택 목록(▼)·글자 형식 칸·제목 줄 고정을 넣으려고 직접 만들어요 (SheetJS 무료판은 선택 목록을 못 써요). */
+var XW_CRC = (function(){ var t = []; for(var n = 0; n < 256; n++){ var c = n; for(var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function xwCrc(b){ var c = 0xFFFFFFFF; for(var i = 0; i < b.length; i++) c = XW_CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function xwZip(files){   // files: [[이름, 글]] → 압축 없이 묶은 zip (Uint8Array)
+  var enc = new TextEncoder(), parts = [], cen = [], off = 0;
+  var u16 = function(v){ return [v & 255, (v >>> 8) & 255]; }, u32 = function(v){ return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; };
+  files.forEach(function(f){
+    var nm = enc.encode(f[0]), data = enc.encode(f[1]), crc = xwCrc(data);
+    var head = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(nm.length), u16(0));
+    parts.push(new Uint8Array(head), nm, data);
+    cen.push([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(nm.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off)), nm);
+    off += head.length + nm.length + data.length;
+  });
+  var cs = 0; cen.forEach(function(c, i){ if(i % 2 === 0){ parts.push(new Uint8Array(c)); cs += c.length; } else { parts.push(c); cs += c.length; } });
+  parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cs), u32(off), u16(0))));
+  var len = parts.reduce(function(a, p){ return a + p.length; }, 0), out = new Uint8Array(len), at = 0;
+  parts.forEach(function(p){ out.set(p, at); at += p.length; });
+  return out;
+}
+function xwEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''); }
+function xwCol(i){ var s = ''; i++; while(i){ var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = (i - m - 1) / 26; } return s; }
+/* sheets: [{ name, rows:[[...]], widths:[..], head:true, text:[열 번호], lists:[{ col, ref:'목록!$A$1:$A$5', free:true }], hidden:true }] */
+function xwBook(sheets){
+  var x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  var files = [];
+  files.push(['[Content_Types].xml', x + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+    + sheets.map(function(s, i){ return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; }).join('') + '</Types>']);
+  files.push(['_rels/.rels', x + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>']);
+  files.push(['xl/workbook.xml', x + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>'
+    + sheets.map(function(s, i){ return '<sheet name="' + xwEsc(s.name) + '" sheetId="' + (i + 1) + '"' + (s.hidden ? ' state="hidden"' : '') + ' r:id="rId' + (i + 1) + '"/>'; }).join('') + '</sheets></workbook>']);
+  files.push(['xl/_rels/workbook.xml.rels', x + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + sheets.map(function(s, i){ return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>'; }).join('')
+    + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>']);
+  // 스타일: 0 기본 / 1 제목(굵게·연한 배경) / 2 글자 형식(@) / 3 선택 칸(연한 노랑, 글자 형식)
+  files.push(['xl/styles.xml', x + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="맑은 고딕"/></font><font><b/><sz val="11"/><name val="맑은 고딕"/></font></fonts>'
+    + '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEAF0FE"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFF8E1"/><bgColor indexed="64"/></patternFill></fill></fills>'
+    + '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + '<cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="49" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyNumberFormat="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="49" fontId="0" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFill="1"/></cellXfs>'
+    + '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>']);
+  sheets.forEach(function(s, si){
+    var listCols = (s.lists || []).map(function(l){ return l.col; });
+    var st = function(c, r){ return s.head && r === 0 ? 1 : listCols.indexOf(c) !== -1 ? 3 : (s.text || []).indexOf(c) !== -1 ? 2 : 0; };
+    var cols = (s.widths || []).map(function(w, i){ return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"' + (st(i, 1) ? ' style="' + st(i, 1) + '"' : '') + '/>'; }).join('');
+    var rows = s.rows.map(function(r, ri){
+      return '<row r="' + (ri + 1) + '">' + r.map(function(v, ci){
+        var ref = xwCol(ci) + (ri + 1), sx = st(ci, ri);
+        if(v === '' || v == null) return sx ? '<c r="' + ref + '" s="' + sx + '"/>' : '';
+        return '<c r="' + ref + '" t="inlineStr"' + (sx ? ' s="' + sx + '"' : '') + '><is><t xml:space="preserve">' + xwEsc(v) + '</t></is></c>';
+      }).join('') + '</row>';
+    }).join('');
+    var dv = (s.lists || []).map(function(l){
+      var c = xwCol(l.col), last = Math.max(500, s.rows.length + 200);
+      return '<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1"' + (l.free ? ' errorStyle="information" errorTitle="목록에 없는 값" error="목록에 없는 값이에요. 그대로 쓰려면 [확인]을 누르세요."' : ' errorTitle="목록에서 골라 주세요" error="▼를 눌러 목록에서 골라 주세요."') + (l.prompt ? ' promptTitle="' + xwEsc(l.title || '') + '" prompt="' + xwEsc(l.prompt) + '"' : '') + ' sqref="' + c + '2:' + c + last + '"><formula1>' + xwEsc(l.ref) + '</formula1></dataValidation>';
+    }).join('');
+    files.push(['xl/worksheets/sheet' + (si + 1) + '.xml', x + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+      + '<sheetViews><sheetView workbookViewId="0"' + (si === 0 ? ' tabSelected="1"' : '') + '>' + (s.head ? '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>' : '') + '</sheetView></sheetViews>'
+      + '<sheetFormatPr defaultRowHeight="16.5"/>' + (cols ? '<cols>' + cols + '</cols>' : '') + '<sheetData>' + rows + '</sheetData>'
+      + (dv ? '<dataValidations count="' + s.lists.length + '">' + dv + '</dataValidations>' : '') + '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>']);
+  });
+  return xwZip(files);
+}
 function rsBulkTpl(){
   var head = RS_COLS.map(function(k){ return k[1]; });
   var list = roster.list.filter(function(s){ return s.status !== 'out'; }).sort(function(a, b){ var ia = CLASSES.findIndex(function(c){ return c.id === a.cid; }), ib = CLASSES.findIndex(function(c){ return c.id === b.cid; }); return ia - ib; });
   var rows = [head].concat(list.map(function(s){ var c = CLASSES.find(function(x){ return x.id === s.cid; }); return [s.name, c ? c.dept : '', c ? c.name : '', s.school, s.grade, s.phone, s.pphone, s.prel, s.joined, RS_ST[s.status], s.memo || '']; }));
-  var name = '학생명단_입력양식_' + ymd(new Date());
-  moXlsx().then(function(X){
-    var ws = X.utils.aoa_to_sheet(rows);
-    Object.keys(ws).forEach(function(k){ if(k[0] !== '!' && ws[k].t === 'n'){ ws[k].t = 's'; ws[k].v = String(ws[k].v); } });
-    ws['!cols'] = [8, 7, 16, 10, 6, 15, 15, 7, 12, 7, 24].map(function(w){ return { wch:w }; });
-    var wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, '학생 명단');
-    var g = [['적는 방법'], ['반', '반 이름 그대로: ' + CLASSES.map(function(c){ return c.name; }).join(', ')], ['학교', RS_SCHOOLS.join(', ') + ' 또는 다른 학교 이름'], ['학년', RS_GRADES.join(', ')], ['상태', '재원, 대기, 휴원, 퇴원 (비우면 재원)'], ['등록일', '예: 2026-03-02'], ['빈 칸', '지금 정보를 지우지 않고 그대로 둬요'], ['정원', RS_CAP + '명이 넘으면 대기로 들어가요']];
-    var ws2 = X.utils.aoa_to_sheet(g); ws2['!cols'] = [{ wch:10 }, { wch:70 }]; X.utils.book_append_sheet(wb, ws2, '적는 방법');
-    var out = X.write(wb, { bookType:'xlsx', type:'array' });
-    rcSave(name + '.xlsx', new Blob([out], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-  }).catch(function(){
-    var txt = rows.map(function(r){ return r.map(function(x){ x = String(x == null ? '' : x); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(','); }).join('\r\n');
-    rcSave(name + '.csv', new Blob(['﻿' + txt], { type:'text/csv;charset=utf-8' }));
-  });
+  // 선택 목록은 숨긴 '목록' 시트에 두고 칸마다 ▼로 골라요 (학교는 목록에 없는 학교도 쓸 수 있어요)
+  var L = [['초등부','중등부'], CLASSES.map(function(c){ return c.name; }), RS_SCHOOLS, RS_GRADES, ['어머니','아버지','보호자'], ['재원','대기','휴원','퇴원']];
+  var lrows = []; for(var r = 0; r < Math.max.apply(null, L.map(function(l){ return l.length; })); r++) lrows.push(L.map(function(l){ return l[r] || ''; }));
+  var ref = function(i){ return "'목록'!$" + xwCol(i) + '$1:$' + xwCol(i) + '$' + L[i].length; };
+  var guide = [['적는 방법', ''], ['노란 칸', '칸을 누르면 오른쪽에 ▼가 나와요. 눌러서 목록에서 골라요.'], ['부서', '초등부, 중등부'], ['반', CLASSES.map(function(c){ return c.name; }).join(', ')], ['학교', RS_SCHOOLS.join(', ') + ' 가운데 고르거나, 다른 학교는 직접 써요'], ['학년', RS_GRADES.join(', ')], ['관계', '어머니, 아버지, 보호자'], ['상태', '재원, 대기, 휴원, 퇴원 (비우면 재원)'], ['연락처', '010-1234-5678처럼 써요 (숫자만 써도 돼요)'], ['등록일', '예: 2026-03-02'], ['빈 칸', '지금 정보를 지우지 않고 그대로 둬요'], ['정원', RS_CAP + '명이 넘으면 대기로 들어가요']];
+  var data = xwBook([
+    { name:'학생 명단', rows:rows, head:true, widths:[10, 9, 20, 12, 8, 16, 16, 9, 13, 8, 28], text:[0, 5, 6, 8, 10],
+      lists:[{ col:1, ref:ref(0), title:'부서', prompt:'▼를 눌러 골라요' }, { col:2, ref:ref(1), title:'반', prompt:'▼를 눌러 반을 골라요' }, { col:3, ref:ref(2), free:true, title:'학교', prompt:'▼로 고르거나 다른 학교는 직접 써요' }, { col:4, ref:ref(3), title:'학년', prompt:'▼를 눌러 골라요' }, { col:7, ref:ref(4), title:'관계', prompt:'▼를 눌러 골라요' }, { col:9, ref:ref(5), title:'상태', prompt:'비우면 재원' }] },
+    { name:'적는 방법', rows:guide, widths:[12, 80] },
+    { name:'목록', rows:lrows, hidden:true, widths:[10, 20, 12, 8, 10, 8] }
+  ]);
+  rcSave('학생명단_입력양식_' + ymd(new Date()) + '.xlsx', new Blob([data], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
 }
 function rsCsv(){
   var rows = [['이름','부서','반','담당 선생님','학교','학년','학생 연락처','학부모 연락처','관계','등록일','상태','퇴원일','메모']];
