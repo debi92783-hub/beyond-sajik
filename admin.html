@@ -964,6 +964,13 @@
   .ms-path span{ background:var(--surface-soft); border-radius:8px; padding:4px 9px; font-weight:700; }
   .ms-path span.key{ background:var(--warn); color:#fff; }
   .ms-path b{ color:var(--ink-faint); font-weight:700; }
+  .iv-ol{ margin:0; padding-left:22px; display:flex; flex-direction:column; gap:4px; font-size:12.5px; } .iv-ol small{ display:block; color:var(--ink-soft); font-size:11.5px; } .iv-ol .iv-hint{ color:var(--warn); font-weight:700; }
+  @media print{ .ms .iv-ol{ font-size:10.5px; gap:1px; } .ms .iv-ol small{ font-size:9.5px; } .iv-paper .iv-ln{ height:58px; } }
+  .iv-who{ width:100%; border-collapse:collapse; font-size:13px; } .iv-who th, .iv-who td{ border:1px solid var(--border); padding:8px 10px; } .iv-who th{ background:var(--accent-soft); color:var(--accent); width:70px; font-weight:800; }
+  .iv-sec h3{ margin:4px 0 6px; font-size:15px; font-weight:900; color:var(--accent); }
+  .iv-q{ display:flex; gap:10px; border-bottom:1px solid var(--border); padding:8px 0 0; break-inside:avoid; } .iv-q > b{ flex:none; font-size:15px; font-weight:900; color:var(--accent); width:24px; } .iv-q > div{ flex:1; min-width:0; }
+  .iv-q p{ margin:0; font-weight:700; font-size:13.5px; } .iv-q small{ display:block; color:var(--ink-soft); font-size:12px; margin-top:2px; } .iv-ln{ height:64px; }
+  .iv-end{ text-align:center; font-weight:700; color:var(--ink-soft); margin:8px 0 0; }
   .ms-ex{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); }
   .ms-ex code{ font-family:inherit; background:var(--surface-soft); border-radius:6px; padding:1px 6px; color:var(--ink); }
   .ms-who{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; margin-bottom:10px; }
@@ -5927,25 +5934,89 @@ function manCheckHtml(m){
     '<div class="ms-ft">' + (MAN_CS[m.id] && state.view === 'director' ? '<button type="button" class="btn soft" data-mancs="'+MAN_CS[m.id]+'">상담 관리에서 기록하기 →</button>' : '') +
     '<button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
 }
-var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생']];
+/* 직원 면접 질문지 (채용). 같은 질문으로 '면접관용 한 장'과 '지원자용 지필 면접지' 두 가지를 보여 줘요.
+   질문을 고치려면 IV_SECS만 고치면 두 화면에 함께 반영돼요. */
+var IV_EXP = ['파닉스', '리딩', '문법', '중등 내신', '레벨테스트', '신규 상담', '재원생 상담', '성적 상담', '시험지·교재 제작', '부진 학생 개별 지도', '월말 리포트 작성'];
+var IV_SECS = [
+  { t:'지원 동기·교육관', listen:'우리 학원을 알아보고 왔는지, 아이들을 대하는 마음이 진심인지 들어요.', qs:[
+    ['강사가 되기로 한 동기는 무엇인가요?'],
+    ['비욘드잉글리쉬 사직어학원에 대해 알고 있는 것과 지원한 이유를 써 주세요.'],
+    ['어떤 교육이 진정한 영어 교육이라고 생각하나요?'],
+    ['강사로서 나의 장점과 보완하고 싶은 점을 써 주세요.']
+  ] },
+  { t:'수업·경력', listen:'우리 학원 레벨(초1 파닉스 ~ 중등 문법)을 실제로 가르쳐 봤는지, 쉬운 말로 설명하는지 들어요.', qs:[
+    ['가르쳐 본 학년·레벨·교재·수업 방식을 써 주세요.', '경험이 있는 것에 O표: ' + IV_EXP.join(' · ')],
+    ['초등 1~2학년 파닉스 수업에서 집중하지 못하는 아이가 있으면 어떻게 수업을 이끌어 가나요?'],
+    ['아래 문장을 현재완료를 처음 배우는 중1 학생에게 설명해 주세요.', 'I have lived in Busan for five years. (written) — 나는 5년 동안 부산에 살아 왔다.'],
+    ['중학교 내신 시험을 준비해 본 경험이 있다면, 어떤 순서로 준비했는지 써 주세요.']
+  ] },
+  { t:'학생·학부모 관리', listen:'감정이 아니라 사실(기록)로 이야기하는지, 학부모님께 먼저 연락하는지 들어요.', qs:[
+    ['숙제를 꾸준히 하지 않는 학생이 있다면 어떻게 할 건가요?', '학생에게 / 학부모님께 나눠서 써 주세요.'],
+    ['학부모 상담에서 가장 중요하다고 생각하는 것은 무엇인가요?'],
+    ['"우리 아이 성적이 안 올라요"라는 전화를 받으면 어떻게 응대할 건가요?'],
+    ['우리 학원은 매일 데일리 리포트를, 매달 월말 리포트를 보내요. 학생 피드백을 쓸 때 무엇을 가장 신경 쓰나요?']
+  ] },
+  { t:'함께 일하기', listen:'정해진 규칙(업무 체크리스트·매뉴얼)을 지키면서 의견은 따로 전하는지, 개인정보 의식이 있는지 들어요.', qs:[
+    ['함께 일하는 선생님들과 잘 지내기 위해 어떤 노력을 하나요?'],
+    ['우리 학원은 업무 체크리스트와 매뉴얼대로 일해요. 정해진 방식과 내 방식이 다를 때 어떻게 하나요?'],
+    ['학생·학부모님의 연락처나 상담 내용을 다룰 때 꼭 지켜야 할 것은 무엇이라고 생각하나요?'],
+    ['이전 학원의 좋았던 점과 아쉬웠던 점을 써 주세요.']
+  ] },
+  { t:'근무 조건·앞으로의 목표', listen:'출근 거리, 가능한 요일·시간(보강 포함), 시작 날짜를 정확히 확인해요.', qs:[
+    ['학원까지 출근 시간은 얼마나 걸리나요?', '도보 / 자가용 / 버스 · 지하철'],
+    ['출근 가능한 날짜와, 근무 가능한 요일·시간을 써 주세요.', '보강 수업이 있는 날도 가능한지 함께 써 주세요.'],
+    ['앞으로 이루고 싶은 목표와, 채용된다면 학원에 바라는 점을 써 주세요.']
+  ] },
+  { t:'마지막 질문 — 사람을 보는 질문', last:true, listen:'사람은 잘 바뀌지 않아요. 좋은 사람은 스펙이 아니라 자기 이야기를 어떻게 말하는지에서 보여요.', qs:[
+    ['전 직장에서 가장 힘들었던 순간은 언제였나요?', '', '이야기가 \'남 탓\'으로 끝나는지, \'그래서 저는\'으로 끝나는지 들어요.'],
+    ['전 직장을 그만둔 이유는 무엇인가요?', '', '같은 이유가 반복된다면 우리 학원에서도 똑같이 떠나요.'],
+    ['전 직장 원장님이 나를 한마디로 뭐라고 하실까요?', '', '장점만 말하는 사람인지, 아쉬운 점까지 아는 사람인지 들어요.']
+  ] }
+];
+function ivSheet(m){
+  var n = 0;
+  return msHead(m, '면접 전에 지원자에게 지필 면접지(20분)를 먼저 쓰게 하고, 면접에서는 답을 보며 아래 순서대로 더 물어봐요.') +
+    msRules(['모든 지원자에게 같은 질문', '답보다 이유와 실제 경험을 더 물어보기', '면접지는 원장님만 보관 · 외부 공유 금지']) +
+    '<div class="ms-two">' + IV_SECS.map(function(sec, i){
+      return '<div class="ms-box' + (sec.last ? ' no' : '') + '"><h4>' + (i + 1) + '. ' + esc(sec.t) + '</h4><ol class="iv-ol" start="' + (n + 1) + '">' +
+        sec.qs.map(function(q){ n++; return '<li>' + esc(q[0]) + (q[1] ? '<small>' + esc(q[1]) + '</small>' : '') + (q[2] ? '<small class="iv-hint">→ ' + esc(q[2]) + '</small>' : '') + '</li>'; }).join('') +
+        '</ol><p class="ms-ex">👂 ' + esc(sec.listen) + '</p></div>';
+    }).join('') + '</div>' +
+    '<div class="ms-ft"><button type="button" class="btn soft" data-mantab="paper">지원자용 지필 면접지 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+}
+function ivPaper(){
+  var n = 0;
+  return '<div class="ms-hd"><div><h2>비욘드잉글리쉬 사직어학원 강사 지필 면접</h2><p>강사로서의 생각과 경험을 알기 위한 질문이에요. 정답은 없으니 솔직하고 성실하게 써 주세요.</p></div></div>' +
+    '<table class="iv-who"><tr><th>날짜</th><td></td><th>이름</th><td></td><th>연락처</th><td></td></tr></table>' +
+    IV_SECS.map(function(sec, i){
+      return '<div class="iv-sec"><h3>' + (i + 1) + '. ' + esc(sec.t) + '</h3>' + sec.qs.map(function(q){ n++; return '<div class="iv-q"><b>' + String(n).padStart(2, '0') + '</b><div><p>' + esc(q[0]) + '</p>' + (q[1] ? '<small>' + esc(q[1]) + '</small>' : '') + '<div class="iv-ln"></div></div></div>'; }).join('') + '</div>';
+    }).join('') +
+    '<p class="iv-end">성실하게 답해 주셔서 감사합니다. 수고하셨습니다.</p>' +
+    '<div class="ms-ft"><button type="button" class="btn soft" data-mantab="sheet">← 면접관용 한 장</button><button type="button" class="btn soft" onclick="window.print()">지필 면접지 인쇄하기 (A4 3장)</button></div>';
+}
+MANUALS.push({ id:'interview', group:'채용', title:'직원 면접 질문지', tag:'채용', updated:'2026-10-28',
+  summary:'지원 동기·교육관, 수업·경력, 학생·학부모 관리, 함께 일하기, 근무 조건, 마지막으로 사람을 보는 질문 3개까지 우리 학원에 맞춘 질문 22개예요. 면접관용 한 장과 지원자용 지필 면접지가 있어요.',
+  sheet:function(){ return ivSheet(this); }, paper:ivPaper });
+var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생'], ['채용','채용 · 직원 면접']];
 var manOpen = null;
 function renderManual(){
   if(!manOpen){
-    $('manBody').innerHTML = MAN_GROUPS.map(function(g){
+    $('manBody').innerHTML = MAN_GROUPS.filter(function(g){ return g[0] !== '채용' || state.view === 'director'; }).map(function(g){
       return '<h3 class="man-group">'+g[1]+'</h3><div class="man-list">' + MANUALS.filter(function(m){ return (m.group || '업무') === g[0]; }).map(function(m){
         return '<button type="button" class="card man-item" data-man="'+m.id+'"><span class="tag">'+esc(m.tag)+'</span>'+(MAN_CHECK[m.id] ? '<span class="ck">✓ 체크리스트</span>' : '')+'<b>'+esc(m.title)+'</b><span class="muted">'+esc(m.summary)+'</span><small>최종 수정 '+m.updated+'</small></button>';
       }).join('') + (g[0] === '업무' ? '<div class="card man-item soon"><b>다른 매뉴얼</b><span class="muted">데일리 테스트 매뉴얼은 원장님과 내용을 정한 뒤 올릴 예정이에요.</span></div>' : '') + '</div>';
     }).join('');
     return;
   }
-  var m = MANUALS.find(function(x){ return x.id === manOpen; }), ck = !!MAN_CHECK[m.id] && manTab === 'check';
+  var m = MANUALS.find(function(x){ return x.id === manOpen; }), ck = !!MAN_CHECK[m.id] && manTab === 'check', pp = !!m.paper && manTab === 'paper';
   $('manBody').innerHTML = '<div class="man-top"><button type="button" class="linkish" data-man-back>← 매뉴얼 목록</button>' + (m.id === 'lesson' && lcCanEdit() ? ' <button type="button" class="btn soft" data-manedit>체크리스트 항목 고치기</button>' : '') +
     (MAN_CHECK[m.id] ? '<span class="man-tabs" role="group" aria-label="보기"><button type="button" data-mantab="sheet" aria-pressed="'+!ck+'">매뉴얼</button><button type="button" data-mantab="check" aria-pressed="'+ck+'">✓ 체크리스트</button></span>' : '') +
-    '</div><article class="card ms">' + (ck ? manCheckHtml(m) : m.sheet()) + '</article>';
+    (m.paper ? '<span class="man-tabs" role="group" aria-label="보기"><button type="button" data-mantab="sheet" aria-pressed="'+!pp+'">면접관용 한 장</button><button type="button" data-mantab="paper" aria-pressed="'+pp+'">지원자용 지필 면접지</button></span>' : '') +
+    '</div><article class="card ms' + (pp ? ' iv-paper' : '') + '">' + (ck ? manCheckHtml(m) : pp ? m.paper() : m.sheet()) + '</article>';
 }
 $('manBody').addEventListener('click', function(ev){
   var it = ev.target.closest('[data-man]'); if(it){ manOpen = it.dataset.man; manTab = 'sheet'; renderManual(); window.scrollTo(0, 0); return; }
-  var mt = ev.target.closest('[data-mantab]'); if(mt){ manTab = mt.dataset.mantab; renderManual(); return; }
+  var mt = ev.target.closest('[data-mantab]'); if(mt){ manTab = mt.dataset.mantab; renderManual(); window.scrollTo(0, 0); return; }
   var mc = ev.target.closest('[data-mancs]'); if(mc){ csOpenType(mc.dataset.mancs); return; }
   if(ev.target.closest('[data-man-back]')){ manOpen = null; renderManual(); return; }
   var go = ev.target.closest('[data-go]');
