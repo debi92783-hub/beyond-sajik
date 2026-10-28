@@ -1164,7 +1164,11 @@
   .rs-st.on{ background:var(--good-soft); color:var(--good); } .rs-st.wait{ background:var(--accent-soft); color:var(--accent); }
   .rs-st.rest{ background:var(--hold-soft); color:var(--hold); } .rs-st.out{ background:var(--surface-soft); color:var(--ink-soft); }
   .rs-note{ margin:0 0 10px; font-size:12.5px; }
-  #view-roster .card{ margin-bottom:16px; } #view-roster .rs-grid .card{ margin-bottom:0; }
+  #view-roster .card{ margin-bottom:16px; }
+  .rs-bk-btns{ display:flex; gap:8px; flex-wrap:wrap; } .rs-bk-btns .btn{ padding:6px 12px; font-size:12.5px; }
+  .rs-bk-sum{ margin:12px 0 8px; font-size:13px; } .rs-bk-err{ color:var(--warn); font-weight:700; }
+  .rs-bk-t{ min-width:640px; } .rs-bk-t tr.bk-err td{ background:var(--warn-soft); }
+  .rs-bk-act{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; font-size:12.5px; } #view-roster .rs-grid .card{ margin-bottom:0; }
   .modal.rs-modal{ max-width:520px; }
   .rs-modal select{ border:1px solid var(--border); border-radius:9px; padding:10px 12px; font-size:13.5px; background:var(--surface-soft); color:var(--ink); font-family:inherit; font-weight:400; }
   .rs-modal .row2{ grid-template-columns:repeat(2, minmax(0,1fr)); }
@@ -6626,6 +6630,7 @@ function rsListHtml(cs){
     h += '<div class="card"><div class="card-head"><h2>찾은 학생 <small class="muted">' + hit.length + '명</small></h2></div>' + (hit.length ? rsTable(hit, true) : '<p class="empty">찾는 학생이 없어요.</p>') + '</div>';
     return h;
   }
+  if(dir) h += rsBulkHtml();
   h += '<div class="rs-grid">' + cs.map(function(c){
     var on = rsOf(c.id, 'on').length, w = rsOf(c.id, 'wait').length, r = rsOf(c.id, 'rest').length;
     return '<button type="button" class="card rs-cls" data-rscls="' + c.id + '"><span class="rs-dept">' + esc(c.dept) + '</span><b>' + esc(c.name) + '</b><small>' + esc(c.teacher) + ' · ' + esc(c.time) + ' · ' + esc(c.room || '') + '</small>'
@@ -6732,6 +6737,135 @@ function rsTo(id, st){
   rsLog(s, '상태 ' + RS_ST[s.status] + ' → ' + RS_ST[st]); s.status = st; delete s.outAt;
   rsSave(); renderRoster(); toast(s.name + ' 학생이 ' + RS_ST[st] + ' 학생이 됐어요.');
 }
+/* 학생 한 번에 입력 (원장님): 양식(엑셀) 내려받기 → 채워서 파일로 넣기 또는 표 붙여넣기 → 미리 보기 → 적용.
+   같은 반·같은 이름은 정보 수정(빈 칸은 그대로 둬요, 지우지 않아요), 다른 반에 같은 이름 한 명이면 반 이동, 없으면 새로 등록.
+   정원(12명)이 차면 대기로 넣어요. 파일에 없는 학생은 그대로 둬요. */
+var RS_COLS = [['name','이름',/^(학생\s*)?이름$|^학생$|^성명$/],['dept','부서',/^부서$/],['cls','반',/^반(\s*이름|명)?$/],['school','학교',/^학교/],['grade','학년',/^학년$/],
+  ['phone','학생 연락처',/^학생\s*(연락처|전화|휴대폰|번호)/],['pphone','학부모 연락처',/^(학부모|보호자|부모님?)\s*(연락처|전화|휴대폰|번호)?$/],['prel','관계',/^관계$/],['joined','등록일',/^(등록일|입학일|등원\s*시작일?)$/],['status','상태',/^상태$/],['memo','메모',/^(메모|비고)$/]];
+function rsBulkHtml(){
+  var b = rs.bulk;
+  var h = '<div class="card rs-bulk"><div class="card-head"><h2>학생 한 번에 입력 <small class="muted">엑셀 양식</small></h2>'
+    + '<span class="rs-bk-btns"><button type="button" class="btn soft" data-rsbk="tpl">① 양식 내려받기</button><label class="btn soft an-pick">② 채운 파일 넣기<input type="file" id="rsBkFile" accept=".xlsx,.xls,.csv,.tsv,.txt"></label><button type="button" class="btn soft" data-rsbk="paste">또는 표 붙여넣기</button></span></div>'
+    + '<p class="muted rs-note">양식에는 지금 학생이 미리 들어 있어요. 빈 칸(학교·연락처 등)을 채우고, 새 학생은 아래 줄에 이어 써요. 반은 반 이름 그대로(예: ' + esc(CLASSES[0] ? CLASSES[0].name : '파닉스 A') + '), 학년은 초1~중3·고1, 상태는 재원·대기·휴원·퇴원 가운데 하나로 써요. 빈 칸은 지금 정보를 지우지 않고 그대로 둬요.</p>'
+    + '<div class="mo-pbox" id="rsBkBox"' + (b && b.paste ? '' : ' hidden') + '><textarea id="rsBkT" rows="6" placeholder="엑셀에서 제목 줄(이름·반·학교…)까지 같이 복사해서 붙여넣어요."></textarea><div class="mo-bulk-btns"><button type="button" class="btn" data-rsbk="read">미리 보기</button><button type="button" class="btn soft" data-rsbk="pclose">닫기</button></div></div>';
+  if(b && b.list){
+    var cnt = function(k){ return b.list.filter(function(x){ return x.act === k; }).length; };
+    h += '<div class="rs-bk-sum"><b>미리 보기</b> 새로 등록 ' + cnt('new') + '명 · 정보 수정 ' + cnt('upd') + '명 · 반 이동 ' + cnt('move') + '명 · 바뀐 것 없음 ' + cnt('same') + '명' + (cnt('err') ? ' · <span class="rs-bk-err">확인 필요 ' + cnt('err') + '줄</span>' : '') + '</div>'
+      + '<div class="table-wrap"><table class="t-list rs-t rs-bk-t"><thead><tr><th>줄</th><th>이름</th><th>반</th><th>처리</th><th>바뀌는 내용</th></tr></thead><tbody>'
+      + b.list.filter(function(x){ return x.act !== 'same'; }).map(function(x){
+        var lab = { 'new':'새로 등록', upd:'정보 수정', move:'반 이동', err:'확인 필요' }[x.act];
+        return '<tr class="bk-' + x.act + '"><td class="dt">' + x.line + '</td><td><b>' + esc(x.name || '–') + '</b></td><td>' + esc(x.clsName || '–') + '</td><td><span class="tag ' + (x.act === 'err' ? 'warn' : x.act === 'new' ? 'rs-good' : 'info') + '">' + lab + '</span>' + (x.wait ? ' <span class="tag rs-st wait">정원 차서 대기</span>' : '') + '</td><td>' + esc(x.msg || '') + '</td></tr>';
+      }).join('') + '</tbody></table></div>'
+      + '<div class="rs-bk-act"><button type="button" class="btn" data-rsbk="apply"' + (cnt('new') + cnt('upd') + cnt('move') ? '' : ' disabled') + '>적용하기</button><button type="button" class="btn soft" data-rsbk="cancel">취소</button>' + (cnt('err') ? '<span class="muted">확인 필요한 줄은 빼고 적용해요. 고쳐서 다시 넣으면 돼요.</span>' : '') + '</div>';
+  }
+  return h + '</div>';
+}
+function rsCellStr(v){ return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); }
+function rsDate(v){
+  v = rsCellStr(v); if(!v) return '';
+  var m = v.match(/^(\d{4})[.\-\/년\s]+(\d{1,2})[.\-\/월\s]+(\d{1,2})/); if(m) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+  m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ var y = m[3].length === 2 ? '20' + m[3] : m[3]; return y + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2); }
+  if(/^\d{5}$/.test(v)){ var d = new Date(Date.UTC(1899, 11, 30) + (+v) * 86400000); return d.toISOString().slice(0, 10); }
+  return null;
+}
+function rsFindCls(name){
+  var n = rsCellStr(name).replace(/\s/g, ''); if(!n) return null;
+  return CLASSES.find(function(c){ return c.name.replace(/\s/g, '') === n; }) || CLASSES.find(function(c){ return c.id === name; }) || null;
+}
+function rsBulkRead(rows){
+  if(!rows || rows.length < 2){ toast('제목 줄과 학생 줄이 있어야 해요.'); return; }
+  var head = rows[0].map(rsCellStr), col = {};
+  head.forEach(function(x, i){ RS_COLS.forEach(function(k){ if(col[k[0]] == null && k[2].test(x)) col[k[0]] = i; }); });
+  if(col.name == null){ toast('첫 줄에 ‘이름’ 칸이 없어요. 양식의 제목 줄을 그대로 두고 채워 주세요.'); return; }
+  var ST = { '재원':'on', '대기':'wait', '휴원':'rest', '퇴원':'out' }, seen = {}, out = [];
+  var plan = {}; CLASSES.forEach(function(c){ plan[c.id] = rsOf(c.id, 'on').length; });
+  rows.slice(1).forEach(function(r, i){
+    var g = function(k){ return col[k] == null ? '' : rsCellStr(r[col[k]]); };
+    var x = { line:i + 2, name:g('name') }, errs = [], v = {};
+    if(!x.name){ if(r.some(function(c){ return rsCellStr(c); })){ x.act = 'err'; x.msg = '이름이 비어 있어요.'; out.push(x); } return; }
+    var c = g('cls') ? rsFindCls(g('cls')) : null;
+    if(g('cls') && !c) errs.push('‘' + g('cls') + '’ 반을 찾지 못했어요');
+    x.clsName = c ? c.name : g('cls');
+    if(g('school')) v.school = g('school');
+    if(g('grade')){ var gr = g('grade').replace(/\s/g, '').replace(/^초등?(\d)(학년)?$/, '초$1').replace(/^중학?(\d)(학년)?$/, '중$1').replace(/^고등?(\d)(학년)?$/, '고$1'); if(RS_GRADES.indexOf(gr) !== -1) v.grade = gr; else errs.push('학년 ‘' + g('grade') + '’은 초1~중3·고1로 써 주세요'); }
+    if(g('phone')) v.phone = rsTel(g('phone'));
+    if(g('pphone')) v.pphone = rsTel(g('pphone'));
+    if(g('prel')) v.prel = g('prel');
+    if(g('joined')){ var jd = rsDate(g('joined')); if(jd) v.joined = jd; else errs.push('등록일 ‘' + g('joined') + '’을 읽지 못했어요 (예: 2026-03-02)'); }
+    if(g('status')){ if(ST[g('status')]) v.status = ST[g('status')]; else errs.push('상태는 재원·대기·휴원·퇴원으로 써 주세요'); }
+    if(g('memo')) v.memo = g('memo');
+    var key = (c ? c.id : '?') + '|' + x.name;
+    if(seen[key]) errs.push(seen[key] + '번째 줄과 같은 학생이에요');
+    seen[key] = x.line;
+    if(errs.length){ x.act = 'err'; x.msg = errs.join(' · '); out.push(x); return; }
+    var live = roster.list.filter(function(s){ return s.name === x.name && s.status !== 'out'; });
+    var same = c ? live.find(function(s){ return s.cid === c.id; }) : (live.length === 1 ? live[0] : null);
+    if(!c && live.length > 1){ x.act = 'err'; x.msg = '같은 이름 학생이 여러 반에 있어요. 반을 써 주세요.'; out.push(x); return; }
+    if(!same && c && live.length === 1){ same = live[0]; x.act = 'move'; }
+    if(!same){
+      var outOne = roster.list.filter(function(s){ return s.name === x.name && s.status === 'out' && (!c || s.cid === c.id); });
+      if(outOne.length === 1 && v.status && v.status !== 'out'){ same = outOne[0]; x.act = 'upd'; }
+    }
+    if(!same){
+      if(!c){ x.act = 'err'; x.msg = '새 학생은 반을 써 주세요.'; out.push(x); return; }
+      x.act = 'new'; v.status = v.status || 'on'; v.cid = c.id;
+      if(v.status === 'on'){ if(plan[c.id] >= RS_CAP){ v.status = 'wait'; x.wait = true; } else plan[c.id]++; }
+      x.v = v; x.msg = [v.school, v.grade, v.pphone ? '학부모 ' + v.pphone : ''].filter(Boolean).join(' · ') || '이름·반만';
+      out.push(x); return;
+    }
+    x.id = same.id; x.act = x.act || 'upd';
+    if(x.act === 'move'){ v.cid = c.id; if((v.status || same.status) === 'on'){ if(plan[c.id] >= RS_CAP){ v.status = 'wait'; x.wait = true; } else { plan[c.id]++; if(same.status === 'on') plan[same.cid]--; } } }
+    var ch = Object.keys(v).filter(function(k){ return String(same[k] || '') !== String(v[k]); });
+    if(!ch.length){ x.act = 'same'; out.push(x); return; }
+    var lab = { school:'학교', grade:'학년', phone:'학생 연락처', pphone:'학부모 연락처', prel:'관계', joined:'등록일', status:'상태', memo:'메모', cid:'반' };
+    x.msg = ch.map(function(k){ return lab[k] + ' ' + (k === 'cid' ? rsCname(same.cid) + ' → ' + rsCname(v.cid) : k === 'status' ? RS_ST[same.status] + ' → ' + RS_ST[v.status] : (same[k] ? same[k] + ' → ' : '') + v[k]); }).join(' · ');
+    var vv = {}; ch.forEach(function(k){ vv[k] = v[k]; }); x.v = vv;
+    out.push(x);
+  });
+  rs.bulk = { list:out }; renderRoster();
+  var el = document.querySelector('.rs-bk-sum'); if(el) el.scrollIntoView({ block:'center' });
+}
+function rsBulkApply(){
+  var b = rs.bulk; if(!b || !b.list) return;
+  var todo = b.list.filter(function(x){ return x.act === 'new' || x.act === 'upd' || x.act === 'move'; });
+  var outs = todo.filter(function(x){ return x.v && x.v.status === 'out'; }).length;
+  if(outs && !confirm('퇴원으로 바뀌는 학생이 ' + outs + '명 있어요. 지워지지 않고 퇴원생 목록으로 옮겨져요. 적용할까요?')) return;
+  todo.forEach(function(x){
+    if(x.act === 'new'){
+      roster.seq = (roster.seq || roster.list.length) + 1;
+      var s = { id:'s' + roster.seq, name:x.name, cid:x.v.cid, school:'', grade:'', phone:'', pphone:'', prel:'', joined:'', status:'on', hist:[], memo:'' };
+      Object.keys(x.v).forEach(function(k){ s[k] = x.v[k]; });
+      rsLog(s, '한 번에 입력으로 등록 · ' + rsCname(s.cid) + ' · ' + RS_ST[s.status]); roster.list.push(s);
+    } else {
+      var t = rsFind(x.id); if(!t) return;
+      if(x.v.status === 'out' && t.status !== 'out') t.outAt = ymd(new Date());
+      if(x.v.status && x.v.status !== 'out') delete t.outAt;
+      Object.keys(x.v).forEach(function(k){ t[k] = x.v[k]; });
+      rsLog(t, '한 번에 입력 · ' + x.msg);
+    }
+  });
+  rsSave(); rs.bulk = null; renderRoster();
+  toast(todo.length + '명을 반영했어요.');
+}
+function rsBulkTpl(){
+  var head = RS_COLS.map(function(k){ return k[1]; });
+  var list = roster.list.filter(function(s){ return s.status !== 'out'; }).sort(function(a, b){ var ia = CLASSES.findIndex(function(c){ return c.id === a.cid; }), ib = CLASSES.findIndex(function(c){ return c.id === b.cid; }); return ia - ib; });
+  var rows = [head].concat(list.map(function(s){ var c = CLASSES.find(function(x){ return x.id === s.cid; }); return [s.name, c ? c.dept : '', c ? c.name : '', s.school, s.grade, s.phone, s.pphone, s.prel, s.joined, RS_ST[s.status], s.memo || '']; }));
+  var name = '학생명단_입력양식_' + ymd(new Date());
+  moXlsx().then(function(X){
+    var ws = X.utils.aoa_to_sheet(rows);
+    Object.keys(ws).forEach(function(k){ if(k[0] !== '!' && ws[k].t === 'n'){ ws[k].t = 's'; ws[k].v = String(ws[k].v); } });
+    ws['!cols'] = [8, 7, 16, 10, 6, 15, 15, 7, 12, 7, 24].map(function(w){ return { wch:w }; });
+    var wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, '학생 명단');
+    var g = [['적는 방법'], ['반', '반 이름 그대로: ' + CLASSES.map(function(c){ return c.name; }).join(', ')], ['학교', RS_SCHOOLS.join(', ') + ' 또는 다른 학교 이름'], ['학년', RS_GRADES.join(', ')], ['상태', '재원, 대기, 휴원, 퇴원 (비우면 재원)'], ['등록일', '예: 2026-03-02'], ['빈 칸', '지금 정보를 지우지 않고 그대로 둬요'], ['정원', RS_CAP + '명이 넘으면 대기로 들어가요']];
+    var ws2 = X.utils.aoa_to_sheet(g); ws2['!cols'] = [{ wch:10 }, { wch:70 }]; X.utils.book_append_sheet(wb, ws2, '적는 방법');
+    var out = X.write(wb, { bookType:'xlsx', type:'array' });
+    rcSave(name + '.xlsx', new Blob([out], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+  }).catch(function(){
+    var txt = rows.map(function(r){ return r.map(function(x){ x = String(x == null ? '' : x); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(','); }).join('\r\n');
+    rcSave(name + '.csv', new Blob(['﻿' + txt], { type:'text/csv;charset=utf-8' }));
+  });
+}
 function rsCsv(){
   var rows = [['이름','부서','반','담당 선생님','학교','학년','학생 연락처','학부모 연락처','관계','등록일','상태','퇴원일','메모']];
   roster.list.forEach(function(s){
@@ -6751,6 +6885,20 @@ $('rsBody').addEventListener('click', function(ev){
   else if(t.dataset.rsre){ var s = rsFind(t.dataset.rsre); if(s){ rsOpen(s.id); $('rsSt').value = 'on'; } }
   else if(t.hasAttribute('data-rsout')){ rs.showOut = !rs.showOut; renderRoster(); }
   else if(t.hasAttribute('data-rscsv')) rsCsv();
+  else if(t.dataset.rsbk === 'tpl') rsBulkTpl();
+  else if(t.dataset.rsbk === 'paste'){ $('rsBkBox').hidden = false; $('rsBkT').focus(); }
+  else if(t.dataset.rsbk === 'pclose') $('rsBkBox').hidden = true;
+  else if(t.dataset.rsbk === 'read'){ var tv = $('rsBkT').value; if(!tv.trim()) return toast('붙여넣은 표가 없어요.'); rsBulkRead(moParseDelim(tv)); }
+  else if(t.dataset.rsbk === 'apply') rsBulkApply();
+  else if(t.dataset.rsbk === 'cancel'){ rs.bulk = null; renderRoster(); }
+});
+$('rsBody').addEventListener('change', function(ev){
+  if(ev.target.id !== 'rsBkFile') return;
+  var f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if(!f) return;
+  if(/\.xlsx?$/i.test(f.name)){
+    f.arrayBuffer().then(function(buf){ return moXlsx().then(function(X){ var wb = X.read(buf, { type:'array' }), ws = wb.Sheets[wb.SheetNames[0]]; rsBulkRead(X.utils.sheet_to_json(ws, { header:1, defval:'', raw:false })); }); })
+      .catch(function(){ toast('엑셀 파일을 읽지 못했어요. 엑셀에서 ‘다른 이름으로 저장 → CSV’로 저장해서 올리거나, 표를 복사해 ‘표 붙여넣기’로 넣어 주세요.'); });
+  } else { var fr = new FileReader(); fr.onload = function(){ rsBulkRead(moParseDelim(fr.result)); }; fr.readAsText(f); }
 });
 $('rsBody').addEventListener('input', function(ev){
   if(ev.target.id !== 'rsQ') return;
