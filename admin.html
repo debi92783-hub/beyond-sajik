@@ -409,7 +409,8 @@
   .dt-table input.att-note{ min-width:0; width:46px; margin-top:4px; padding:4px; text-align:center; }
   .dt-table select{ font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; background:var(--surface); color:var(--ink); font-weight:700; }
   .dt-table select.dt-sc{ width:50px; font-size:12.5px; padding:6px 2px; text-align:center; font-variant-numeric:tabular-nums; }
-  .qs-sc select.dt-sc{ width:64px; }
+  .qs-sc select.dt-sc{ width:64px; } .qs-pg{ width:72px; font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 8px; background:var(--surface); color:var(--ink); font-weight:400; } .qs-sub{ width:100%; font-size:12px; color:var(--ink-soft); }
+  .dt-table input.dt-pg[type=text]{ width:54px; min-width:0; text-align:center; padding:6px 4px; }
   .dt-table .of{ color:var(--ink-faint); font-size:11.5px; margin-left:2px; font-variant-numeric:tabular-nums; }
   .dt-table td:has(> .of){ white-space:nowrap; }
   .dt-table .low input{ border-color:var(--warn); color:var(--warn); font-weight:700; }
@@ -1628,14 +1629,11 @@
                   <th rowspan="2" class="stick"><input type="checkbox" id="dtAll" checked aria-label="전체 선택"></th>
                   <th rowspan="2" class="stick2" style="text-align:left;padding-left:8px">이름</th>
                   <th rowspan="2" class="grp">출결</th><th rowspan="2">교재</th><th rowspan="2">숙제</th><th rowspan="2">Speaking</th><th rowspan="2">클래스<br>카드</th>
-                  <th rowspan="2" class="grp">flash<br><small>만점 <input type="number" data-max="flash" aria-label="flash 만점"></small></th>
-                  <th rowspan="2">self<br><small>만점 <input type="number" data-max="self" aria-label="self 만점"></small></th>
-                  <th rowspan="2">inter<br><small>만점 <input type="number" data-max="inter" aria-label="inter 만점"></small></th>
-                  <th rowspan="2">본문<br><small>만점 <input type="number" data-max="text" aria-label="본문 만점"></small></th>
-                  <th colspan="4" class="grp">단어 <small>만점 <input type="number" data-max="word" aria-label="단어 만점"> · 통과 <input type="number" id="dtPass" aria-label="단어 통과 점수"></small></th>
+                  <th colspan="4" class="grp">Speaking 점검 <small>page</small></th>
+                  <th colspan="2" class="grp">단어 <small>만점 <input type="number" data-max="word" aria-label="단어 만점"> · 통과 <input type="number" id="dtPass" aria-label="단어 통과 점수"></small></th>
                   <th rowspan="2" class="grp">NOTE (기타사항)</th>
                 </tr>
-                <tr><th class="grp">1회</th><th>2회</th><th>3회</th><th>완료</th></tr>
+                <tr><th class="grp">flash</th><th>self</th><th>inter</th><th>본문</th><th class="grp">점수</th><th>완료</th></tr>
               </thead>
               <tbody id="dtRows"></tbody>
             </table>
@@ -3343,7 +3341,10 @@ var DT_OPT = {
   cc:   ['완료','일부완료','미완료']   // 클래스카드 (2026-10-30 추가)
 };
 var DT_TONE = { '출석':'good','지참':'good','완료':'good', '지각':'mid','조퇴':'mid','기타':'mid','일부지참':'mid','일부완료':'mid', '결석':'bad','미지참':'bad','미완료':'bad' };
+// Speaking 점검 항목: 점수가 아니라 점검한 페이지를 적어요(2026-10-30 원장쌤). 이름은 예전 그대로 둬요.
 var DT_SCORES = ['flash','self','inter','text'];
+function dtPg(v){ return String(v == null ? '' : v).replace(/[^0-9,~\- ]/g, '').trim(); }
+function dtPgText(r){ return DT_SCORES.map(function(f){ return r[f] ? DT_LABEL[f] + ' p.' + r[f] : ''; }).filter(Boolean).join(' · '); }
 /* 진도: 교재명 > 책진도. PHONICS는 BEYOND PHONICS 1~6 월간 수업계획표의 [단원]이에요. */
 var DT_BOOKS = (function(){
   var range = function(prefix, fmt){ var out = []; for(var v = 1; v <= 3; v++){ var g = []; for(var i = 1; i <= 10; i++) g.push(fmt(v, i)); out.push([v + '권', g]); } return out; };
@@ -3416,7 +3417,7 @@ function dtStats(e, names){
     st.cc[r.cc]++; if(r.cc !== '완료') st.ccMiss.push(s + (r.cc === '일부완료' ? '(일부)' : ''));
     if(r.book !== '지참') st.noBook.push(s + (r.book === '일부지참' ? '(일부)' : ''));
     if(r.hw !== '완료') st.hwMiss.push(s + (r.hw === '일부완료' ? '(일부)' : ''));
-    DT_SCORES.forEach(function(f){ var v = num(r[f]); if(v !== null) st.avg[f].push(v); });
+    if(dtPgText(r)) st.pgN = (st.pgN || 0) + 1; else (st.pgMiss = st.pgMiss || []).push(s);
     var w1 = num(r.w1); if(w1 !== null) st.w1.push(w1);
     if(r.wDone) st.wordDone++; else if(wordTries(r).length) st.wordTodo.push(s);
   });
@@ -3457,8 +3458,8 @@ function renderDaily(){
       '<td class="nm stick2">'+esc(s)+'</td>' +
       '<td class="grp keep">'+sel('att', r.att, s)+(note?'<br><input type="text" class="att-note" data-f="attNote" value="'+esc(r.attNote)+'" placeholder="'+(r.att==='지각'?'분':'사유')+'" aria-label="'+esc(s)+' 출결 메모">':'')+'</td>' +
       '<td>'+sel('book', r.book, s)+'</td><td>'+sel('hw', r.hw, s)+'</td><td>'+sel('spk', r.spk, s)+'</td><td>'+sel('cc', r.cc || '완료', s)+'</td>' +
-      score('flash', r, s, e.max.flash, true) + score('self', r, s, e.max.self) + score('inter', r, s, e.max.inter) + score('text', r, s, e.max.text) +
-      score('w1', r, s, e.max.word, true) + score('w2', r, s, e.max.word) + score('w3', r, s, e.max.word) +
+      DT_SCORES.map(function(f, i){ return '<td class="'+(i?'':'grp')+'"><input type="text" class="dt-pg" data-f="'+f+'" inputmode="numeric" value="'+esc(r[f])+'" placeholder="p." aria-label="'+esc(s)+' '+DT_LABEL[f]+' 페이지"></td>'; }).join('') +
+      score('w1', r, s, e.max.word, true) +   // 단어 시험은 1회만 봐요(2026-10-30). 예전 2·3회 기록은 지우지 않고 리포트에만 남아요.
       '<td><input type="checkbox" data-f="wDone"'+(r.wDone?' checked':'')+' aria-label="'+esc(s)+' 단어 완료"></td>' +
       '<td class="grp keep"><input type="text" data-f="memo" value="'+esc(r.memo)+'" placeholder="기타사항" aria-label="'+esc(s)+' NOTE"></td></tr>';
   }).join('');
@@ -3474,16 +3475,16 @@ function renderDtTodo(){
   var d = ymd(dtDay), re = [], hw = [], none = [];
   dtClasses().forEach(function(c){
     var e = dtStore[c.id + '|' + d];
-    var filled = e && c.students.some(function(s){ var r = e.rows[s]; return r && (wordTries(r).length || DT_SCORES.some(function(f){ return num(r[f]) !== null; })); });
+    var filled = e && c.students.some(function(s){ var r = e.rows[s]; return r && (wordTries(r).length || dtPgText(r)); });
     if(!filled){ none.push(c); return; }
     c.students.forEach(function(s){ var r = e.rows[s]; if(!r || r.att === '결석') return;
-      if(!r.wDone && wordTries(r).length) re.push([c, s, wordTries(r).length + '회 · 최고 ' + Math.max.apply(null, wordTries(r)) + '/' + e.max.word]);
+      if(!r.wDone && wordTries(r).length) re.push([c, s, Math.max.apply(null, wordTries(r)) + '/' + e.max.word]);
       if(r.hw !== '완료') hw.push([c, s, r.hw]);
     });
   });
   var chip = function(x){ return '<button type="button" class="dt-chip" data-dtgo="' + x[0].id + '|' + esc(x[1]) + '"><b>' + esc(x[1]) + '</b> <small>' + esc(x[0].name) + ' · ' + esc(x[2]) + '</small></button>'; };
   $('dtTodo').innerHTML = '<div class="card-head"><h2>' + esc(dtDateText()) + ' 남은 일 <small class="muted">' + (state.view === 'director' ? '전체 반' : '내가 맡은 반') + '</small></h2></div>'
-    + '<div class="dt-todo-g"><div><h4>단어 재시험 <span class="tag warn">' + re.length + '명</span></h4>' + (re.length ? re.map(chip).join('') : '<p class="muted">없어요</p>') + '</div>'
+    + '<div class="dt-todo-g"><div><h4>단어 미완료 <span class="tag warn">' + re.length + '명</span></h4>' + (re.length ? re.map(chip).join('') : '<p class="muted">없어요</p>') + '</div>'
     + '<div><h4>숙제 미완료 <span class="tag warn">' + hw.length + '명</span></h4>' + (hw.length ? hw.map(chip).join('') : '<p class="muted">없어요</p>') + '</div>'
     + '<div><h4>아직 점수를 안 넣은 반 <span class="tag">' + none.length + '반</span></h4>' + (none.length ? none.map(function(c){ return '<button type="button" class="dt-chip" data-dtgo="' + c.id + '|"><b>' + esc(c.name) + '</b> <small>' + c.students.length + '명</small></button>'; }).join('') : '<p class="muted">모두 넣었어요</p>') + '</div></div>';
 }
@@ -3495,7 +3496,7 @@ function renderDtOne(){
   var on = rows.filter(function(x){ return x.r.att !== '결석'; }), tried = on.filter(function(x){ return wordTries(x.r).length; });
   var pct = function(a, b){ return b ? Math.round(a / b * 100) + '%' : '–'; };
   box.innerHTML = '<div class="card-head"><h2>' + esc(dtOnly) + ' · 최근 기록 <small class="muted">' + esc(c.name) + ' · 최근 ' + rows.length + '번</small></h2></div>'
-    + '<div class="dt-one-k"><span>출석 <b>' + on.length + '/' + rows.length + '</b></span><span>숙제 완료 <b>' + pct(on.filter(function(x){ return x.r.hw === '완료'; }).length, on.length) + '</b></span><span>단어 통과 <b>' + pct(tried.filter(function(x){ return x.r.wDone; }).length, tried.length) + '</b></span><span>재시험 남음 <b>' + tried.filter(function(x){ return !x.r.wDone; }).length + '번</b></span></div>'
+    + '<div class="dt-one-k"><span>출석 <b>' + on.length + '/' + rows.length + '</b></span><span>숙제 완료 <b>' + pct(on.filter(function(x){ return x.r.hw === '완료'; }).length, on.length) + '</b></span><span>단어 통과 <b>' + pct(tried.filter(function(x){ return x.r.wDone; }).length, tried.length) + '</b></span><span>단어 미완료 <b>' + tried.filter(function(x){ return !x.r.wDone; }).length + '번</b></span></div>'
     + (rows.length ? '<div class="table-wrap"><table class="t-list"><thead><tr><th>날짜</th><th>출결</th><th>숙제</th><th>단어</th><th>진도</th></tr></thead><tbody>' + rows.map(function(x){ return x.html; }).join('') + '</tbody></table></div>' : '<p class="muted">아직 기록이 없어요.</p>');
 }
 $('dtQ').addEventListener('input', function(){
@@ -3524,8 +3525,8 @@ function renderDtSum(){
     [rate(st.hw), '숙제 완료율', st.hwMiss.length ? st.hwMiss.join(', ') : '모두 완료', st.hwMiss.length > 0],
     [rate(st.spk), 'Speaking 완료율', st.spk['미완료'] ? '미완료 ' + st.spk['미완료'] + '명' : '모두 완료', st.spk['미완료'] > 0],
     [rate(st.cc), '클래스카드 완료율', st.ccMiss.length ? st.ccMiss.join(', ') : '모두 완료', st.ccMiss.length > 0],
-    [DT_SCORES.map(function(f){ return one(avg(st.avg[f])); }).join(' · '), 'flash · self · inter · 본문 평균', DT_SCORES.map(function(f){ var a = avg(st.avg[f]); return DT_LABEL[f] + ' ' + one(a) + '/' + e.max[f]; }).join(' · '), false],
-    [st.wordDone + ' / ' + n + '명', '단어 완료 (1회 평균 ' + one(avg(st.w1)) + '/' + e.max.word + ')', st.wordTodo.length ? '재시험: ' + st.wordTodo.join(', ') : '재시험 대상 없음', st.wordTodo.length > 0]
+    [(st.pgN || 0) + ' / ' + n + '명', 'Speaking 점검 페이지 입력', st.pgMiss && st.pgMiss.length ? '아직: ' + st.pgMiss.join(', ') : '모두 입력', false],
+    [st.wordDone + ' / ' + n + '명', '단어 완료 (평균 ' + one(avg(st.w1)) + '/' + e.max.word + ')', st.wordTodo.length ? '미완료: ' + st.wordTodo.join(', ') : '모두 완료', st.wordTodo.length > 0]
   ];
   $('dtSum').innerHTML = cards.map(function(k){
     return '<div class="card"><b>'+k[0]+'</b><span>'+k[1]+'</span><small'+(k[3]?' class="warn"':'')+'>'+esc(k[2])+'</small></div>';
@@ -3536,8 +3537,10 @@ function renderDtSum(){
 function dtDateText(){ return (dtDay.getMonth()+1) + '월 ' + dtDay.getDate() + '일'; }
 function attText(r){ return r.att + (r.attNote && (r.att === '지각' || r.att === '기타') ? '(' + r.attNote + (r.att === '지각' && /^\d+$/.test(r.attNote) ? '분' : '') + ')' : ''); }
 function wordText(r, e){
-  var parts = [r.w1, r.w2, r.w3].map(function(v, i){ return num(v) === null ? null : (i+1) + '회 ' + v + '/' + e.max.word; }).filter(Boolean);
-  return (parts.join(', ') || '응시 전') + (r.wDone ? ' → 완료' : parts.length ? ' → 재시험 예정' : '');
+  // 지금은 1회만 봐요. 예전에 2·3회까지 본 기록은 그대로 보여 줘요.
+  var many = num(r.w2) !== null || num(r.w3) !== null;
+  var parts = [r.w1, r.w2, r.w3].map(function(v, i){ return num(v) === null ? null : (many ? (i+1) + '회 ' : '') + v + '/' + e.max.word; }).filter(Boolean);
+  return (parts.join(', ') || '응시 전') + (r.wDone ? ' → 완료' : parts.length ? ' → 미완료' : '');
 }
 function hwRange(e){ return [e.sb ? 'SB: page ' + e.sb : '', e.pb ? 'PB: page ' + e.pb : ''].filter(Boolean).join('  '); }
 // 수업 기록(진도·과제)에 적은 학생별 진도·숙제를 리포트에 넣어요. 비어 있으면 데일리 테스트 반 공통 값을 써요.
@@ -3561,6 +3564,7 @@ function dtCard(s, e){
     ['교재', opts('book', r.book)],
     ['숙제', opts('hw', r.hw) + ' // Speaking (' + opts('spk', r.spk) + ')'],
     ['클래스<br>카드', opts('cc', r.cc || '완료')],
+    ['Speaking<br>점검', esc(dtPgText(r) || '–')],
     ['단어', esc(wordText(r, e))],
     ['진도', esc(jx.prog || '–')],
     ['숙제', esc(jx.hw || '–')],
@@ -3583,6 +3587,7 @@ function dtText(s, e){
     L.push('교재: ' + r.book);
     L.push('숙제: ' + r.hw + ' / Speaking: ' + r.spk);
     L.push('클래스카드: ' + (r.cc || '완료'));
+    if(dtPgText(r)) L.push('Speaking 점검: ' + dtPgText(r));
     L.push('단어: ' + wordText(r, e));
   }
   if(jx.prog) L.push('진도: ' + jx.prog);
@@ -3609,8 +3614,9 @@ $('dtRows').addEventListener('input', function(ev){
   r[f] = el.type === 'checkbox' ? el.checked : el.value;
   if(DT_OPT[f]) el.className = tone(el.value);
   if(f === 'att'){ dtEdit(); renderDaily(); return; }
-  if(/^w[123]$/.test(f) || DT_SCORES.indexOf(f) !== -1){
-    var v = num(el.value), max = /^w/.test(f) ? e.max.word : e.max[f];
+  if(DT_SCORES.indexOf(f) !== -1){ var pg = dtPg(el.value); if(pg !== el.value) el.value = pg; r[f] = pg; }
+  if(/^w[123]$/.test(f)){
+    var v = num(el.value), max = e.max.word;
     el.parentNode.classList.toggle('low', v !== null && v / max < 0.7);
   }
   if(/^w[123]$/.test(f)){
@@ -4872,7 +4878,7 @@ $('trBody').addEventListener('click', function(ev){
    수업 기록(진도·숙제), 데일리 테스트('저장'한 날), 출결, 월말 리포트를 반·학생·기간·교재로 골라 모아 봐요.
    인쇄(PDF)와 엑셀(CSV) 내려받기. 선생님은 담당 반만, 원장님은 모든 반을 봐요. */
 var rc = { cls:'', stu:'', book:'', from:'', to:'', view:'day', cols:{ att:true, prog:true, hw:true, chk:true, score:true, memo:true } };
-var RC_COLS = [['att','출결'],['prog','진도'],['hw','숙제'],['chk','데일리 점검(교재·숙제·Speaking)'],['score','점수(단어·flash 등)'],['memo','메모']];
+var RC_COLS = [['att','출결'],['prog','진도'],['hw','숙제'],['chk','데일리 점검(교재·숙제·Speaking)'],['score','점수(단어·Speaking 점검 page)'],['memo','메모']];
 function rcClasses(){ return dtClasses(); }
 function rcRange(q){
   var t = new Date(); t.setHours(0,0,0,0);
@@ -4907,7 +4913,7 @@ function rcDay(c, s, d){
   if(dr && o.att !== '결석'){
     var mx = dt.max || {}, tr = wordTries(dr);
     o.word = tr.length ? tr.join('·') + '/' + (mx.word || 20) + (dr.wDone ? ' 통과' : '') : '';
-    o.scores = DT_SCORES.map(function(f){ return num(dr[f]) !== null ? DT_LABEL[f] + ' ' + dr[f] + '/' + (mx[f] || 10) : ''; }).filter(Boolean).join(', ');
+    o.scores = dtPgText(dr);
   } else { o.word = ''; o.scores = ''; }
   o.memo = [dr ? (dr.memo || '').trim() : '', jr && jr.rows[s] ? (jr.rows[s].memo || '').trim() : ''].filter(Boolean).join(' / ');
   o.wPass = !!(dr && dr.wDone); o.wTaken = !!(dr && wordTries(dr).length);
@@ -4958,7 +4964,7 @@ function rcDayCols(){
   if(rc.cols.prog) L.push(['진도', function(o){ return o.prog; }, '']);
   if(rc.cols.hw) L.push(['숙제', function(o){ return o.hw; }, '']);
   if(rc.cols.chk){ L.push(['교재', function(o){ return o.book; }, 'c', function(o){ return tone(o.book); }]); L.push(['숙제 상태', function(o){ return o.hwSt; }, 'c', function(o){ return tone(o.hwSt); }]); L.push(['Speaking', function(o){ return o.spk; }, 'c', function(o){ return tone(o.spk); }]); }
-  if(rc.cols.score){ L.push(['단어', function(o){ return o.word; }, 'n']); L.push(['점수', function(o){ return o.scores; }, '']); }
+  if(rc.cols.score){ L.push(['단어', function(o){ return o.word; }, 'n']); L.push(['Speaking 점검', function(o){ return o.scores; }, '']); }
   if(rc.cols.memo) L.push(['메모', function(o){ return o.memo; }, 'txt']);
   return L;
 }
@@ -7523,8 +7529,8 @@ function qsOpen(cid, s){
     + '<div class="qs-row"><label>숙제 SB page<input type="text" data-qj="sb" value="' + esc(jr.sb) + '" placeholder="' + esc(en.sb || '반 공통') + '"></label><label>숙제 PB page<input type="text" data-qj="pb" value="' + esc(jr.pb) + '" placeholder="' + esc(en.pb || '반 공통') + '"></label><label class="qs-grow">수업 메모<input type="text" data-qj="memo" maxlength="60" value="' + esc(jr.memo || '') + '" placeholder="이 학생만 따로 적을 내용"></label></div>'
     + '<p class="hint">비워 두면 반 공통 진도·숙제가 들어가요. 지금: ' + esc(jrProgText(x) || '진도 없음') + (jrHwText(x) ? ' · ' + esc(jrHwText(x)) : '') + '</p></section>'
     + '<section class="qs-sec"><h3>③ 데일리 테스트</h3>' + sentNote + '<div class="qs-row"><label>교재<select data-qd="book">' + qsOpt(DT_OPT.book, dr.book) + '</select></label><label>숙제<select data-qd="hw">' + qsOpt(DT_OPT.hw, dr.hw) + '</select></label><label>Speaking<select data-qd="spk">' + qsOpt(DT_OPT.spk, dr.spk) + '</select></label><label>클래스카드<select data-qd="cc">' + qsOpt(DT_OPT.cc, dr.cc || '완료') + '</select></label></div>'
-    + '<div class="qs-row">' + DT_SCORES.map(function(f){ return sc(f, de.max[f], DT_LABEL[f]); }).join('') + '</div>'
-    + '<div class="qs-row">' + sc('w1', de.max.word, '단어 1회') + sc('w2', de.max.word, '2회') + sc('w3', de.max.word, '3회') + '<label class="qs-ck"><input type="checkbox" data-qd="wDone"' + (dr.wDone ? ' checked' : '') + '> 단어 완료 <small class="muted">(통과 ' + de.pass + '점)</small></label></div>'
+    + '<div class="qs-row"><b class="qs-sub">Speaking 점검 page</b>' + DT_SCORES.map(function(f){ return '<label class="qs-sc">' + esc(DT_LABEL[f]) + '<input type="text" class="qs-pg" data-qd="' + f + '" inputmode="numeric" placeholder="p." value="' + esc(dr[f]) + '"></label>'; }).join('') + '</div>'
+    + '<div class="qs-row">' + sc('w1', de.max.word, '단어') + '<label class="qs-ck"><input type="checkbox" data-qd="wDone"' + (dr.wDone ? ' checked' : '') + '> 단어 완료 <small class="muted">(통과 ' + de.pass + '점)</small></label></div>'
     + '<div class="qs-row"><label class="qs-grow">NOTE (기타사항)<input type="text" data-qd="memo" maxlength="60" value="' + esc(dr.memo) + '"></label></div></section>'
     + '<div class="qs-ft"><span class="muted" id="qsSaved">고치면 바로 저장돼요.</span>' + (dtClasses().some(function(x){ return x.id === cid; }) ? '<button type="button" class="btn soft" data-qsgo="daily">데일리 테스트 화면으로</button>' : '') + '<button type="button" class="btn" data-qsclose>다 했어요</button></div>';
   $('qsOv').hidden = false;
@@ -7539,7 +7545,7 @@ function qsChange(el){
       if(f === 'book'){ r.prog = bookItems(v)[0] || ''; } saveJr(); });
     if(el.dataset.qj === 'book') return qsOpen(cid, s);
   } else if(el.dataset.qd){
-    qsWith(cid, function(){ var e = dtEntry(), r = e.rows[s], f = el.dataset.qd; r[f] = v;
+    qsWith(cid, function(){ var e = dtEntry(), r = e.rows[s], f = el.dataset.qd; if(DT_SCORES.indexOf(f) >= 0){ v = dtPg(v); el.value = v; } r[f] = v;
       if(/^w[123]$/.test(f)){ r.wDone = wordTries(r).some(function(n){ return n >= e.pass; }); var ck = $('qsForm').querySelector('[data-qd=wDone]'); if(ck) ck.checked = r.wDone; }
       if(e.stage && e.stage !== 'draft' && e.stage !== 'sent') e.stage = 'draft'; dtSave(); });
   }
