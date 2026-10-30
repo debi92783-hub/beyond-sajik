@@ -3337,7 +3337,7 @@ var DT_OPT = {
   att:  ['출석','지각','결석','조퇴','기타'],
   book: ['지참','일부지참','미지참'],
   hw:   ['완료','일부완료','미완료'],
-  spk:  ['완료','미완료'],
+  spk:  ['완료','일부완료','미완료'],
   cc:   ['완료','일부완료','미완료']   // 클래스카드 (2026-10-30 추가)
 };
 var DT_TONE = { '출석':'good','지참':'good','완료':'good', '지각':'mid','조퇴':'mid','기타':'mid','일부지참':'mid','일부완료':'mid', '결석':'bad','미지참':'bad','미완료':'bad' };
@@ -3522,7 +3522,7 @@ function renderDtSum(){
     [st.att['출석'] + ' / ' + c.students.length + '명', '출석', ['지각','결석','조퇴','기타'].filter(function(o){ return st.att[o]; }).map(function(o){ return o + ' ' + st.att[o]; }).join(' · ') || '모두 출석', false],
     [st.noBook.length + '명', '교재 미지참', st.noBook.join(', ') || '모두 지참', st.noBook.length > 0],
     [rate(st.hw), '숙제 완료율', st.hwMiss.length ? st.hwMiss.join(', ') : '모두 완료', st.hwMiss.length > 0],
-    [rate(st.spk), 'Speaking 완료율', st.spk['미완료'] ? '미완료 ' + st.spk['미완료'] + '명' : '모두 완료', st.spk['미완료'] > 0],
+    [rate(st.spk), 'Speaking 완료율', ['일부완료','미완료'].filter(function(o){ return st.spk[o]; }).map(function(o){ return o + ' ' + st.spk[o] + '명'; }).join(' · ') || '모두 완료', st.spk['미완료'] + st.spk['일부완료'] > 0],
     [rate(st.cc), '클래스카드 완료율', st.ccMiss.length ? st.ccMiss.join(', ') : '모두 완료', st.ccMiss.length > 0],
     [(st.pgN || 0) + ' / ' + n + '명', 'Speaking 점검 페이지 입력', st.pgMiss && st.pgMiss.length ? '아직: ' + st.pgMiss.join(', ') : '모두 입력', false],
     [st.wordDone + ' / ' + n + '명', '단어 완료 (평균 ' + one(avg(st.w1)) + '/' + e.max.word + ')', st.wordTodo.length ? '미완료: ' + st.wordTodo.join(', ') : '모두 완료', st.wordTodo.length > 0]
