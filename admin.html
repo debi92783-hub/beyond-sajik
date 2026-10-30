@@ -54,6 +54,21 @@
   .seg button{ border:0; background:none; padding:8px 16px; border-radius:7px; font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; }
   .seg button[aria-pressed="true"]{ background:var(--surface); color:var(--ink); font-weight:700; box-shadow:0 1px 2px rgba(32,36,43,0.08); }
   .search{ display:flex; align-items:center; gap:8px; background:var(--surface-soft); border:1px solid var(--border); border-radius:10px; padding:9px 12px; width:240px; max-width:100%; }
+  .tt-head{ flex-wrap:wrap; gap:10px; } .tt-tools{ display:flex; gap:8px; align-items:center; margin-left:auto; font-size:12.5px; font-weight:700; color:var(--ink-soft); } .tt-tools[hidden]{ display:none; } .tt-tools select{ font:inherit; border:1px solid var(--border); border-radius:8px; padding:5px 6px; background:var(--surface); color:var(--ink); }
+  .tt-grid{ display:grid; grid-template-columns:44px repeat(6, minmax(96px,1fr)); min-width:640px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .tt-dh{ height:34px; display:flex; align-items:center; justify-content:center; gap:4px; font-size:13px; font-weight:800; border-bottom:1px solid var(--border); background:var(--surface-soft); } .tt-dh small{ font-size:10.5px; color:var(--accent); }
+  .tt-times .tt-h{ font-size:11px; color:var(--ink-soft); text-align:right; padding:2px 6px 0 0; box-sizing:border-box; border-top:1px solid var(--border); } .tt-times .tt-h:first-of-type{ border-top:0; }
+  .tt-col{ border-left:1px solid var(--border); } .tt-col.today .tt-dh{ background:var(--accent-soft); color:var(--accent); } .tt-col.today .tt-body{ background-color:color-mix(in srgb, var(--accent) 4%, transparent); }
+  .tt-body{ position:relative; background-image:repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--tth) - 1px), var(--border) calc(var(--tth) - 1px), var(--border) var(--tth)); }
+  .tt-b{ position:absolute; font:inherit; text-align:left; border:0; border-left:3px solid var(--tc); background:color-mix(in srgb, var(--tc) 15%, var(--surface)); color:var(--ink); border-radius:7px; padding:3px 6px; cursor:pointer; overflow:hidden; display:flex; flex-direction:column; gap:0; line-height:1.25; box-sizing:border-box; }
+  .tt-b:hover{ background:color-mix(in srgb, var(--tc) 25%, var(--surface)); } .tt-b b{ font-size:12px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .tt-b span{ font-size:11px; color:var(--tc); font-weight:700; } .tt-b small{ font-size:10.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tt-legend{ display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; font-size:12px; } .tt-legend span{ display:flex; align-items:center; gap:5px; } .tt-legend i{ width:12px; height:12px; border-radius:3px; background:var(--tc); }
+  .tt-note{ margin:6px 0 0; font-size:12px; }
+  .tt-modal{ max-width:680px; width:calc(100% - 32px); } .tt-ed{ display:flex; flex-direction:column; gap:6px; max-height:56vh; overflow:auto; }
+  .tt-er{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; } .tt-er > div{ min-width:130px; display:flex; flex-direction:column; } .tt-er > div small{ font-size:11.5px; }
+  .tt-days{ display:flex; gap:4px; } .tt-days input{ position:absolute; opacity:0; pointer-events:none; } .tt-days span{ display:inline-grid; place-items:center; width:30px; height:30px; border-radius:8px; border:1px solid var(--border); font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft); } .tt-days input:checked + span{ background:var(--accent); border-color:var(--accent); color:#fff; } .tt-days input:focus-visible + span{ outline:2px solid var(--accent); }
+  .tt-tm{ display:flex; align-items:center; gap:4px; margin-left:auto; } .tt-tm input{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:5px 6px; background:var(--surface); color:var(--ink); }
+  @media (max-width:700px){ .tt-tools{ margin-left:0; } .tt-tm{ margin-left:0; } }
   .search-wrap{ position:relative; } .search-res{ left:0; right:auto; min-width:260px; }
   .qs-modal{ max-width:720px; width:calc(100% - 32px); } .qs-hd{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; } .qs-hd h2{ margin:0; } .qs-hd p{ margin:2px 0 0; font-size:12.5px; }
   .qs-sec{ border:1px solid var(--border); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:8px; } .qs-sec h3{ margin:0; font-size:14px; font-weight:900; color:var(--accent); }
@@ -1453,12 +1468,14 @@
         <div class="card" id="dHmMail"></div>
       </div>
 
-      <div class="card">
-        <div class="card-head">
+      <div class="card" id="ttCard">
+        <div class="card-head tt-head">
           <h2>반별 현황</h2>
-          <span class="muted">반을 누르면 그 반 수업 기록(진도·과제)으로 가요</span>
+          <span class="man-tabs" role="group" aria-label="보기"><button type="button" data-tttab="grid" aria-pressed="true">주간 시간표</button><button type="button" data-tttab="table" aria-pressed="false">반별 표</button></span>
+          <span class="tt-tools" id="ttTools"><label>시간 <select id="ttFrom" aria-label="시작 시간"></select> ~ <select id="ttTo" aria-label="끝 시간"></select></label><button type="button" class="btn soft" data-ttedit>반 시간 정하기</button></span>
         </div>
-        <div class="table-wrap">
+        <div id="ttWrap"><div class="table-wrap"><div class="tt-grid" id="ttGrid"></div></div><div class="tt-legend" id="ttLegend"></div><p class="muted tt-note">반을 누르면 그 반 수업 기록(진도·과제)으로 가요. 시간이 겹치는 반은 나란히 보여요.</p></div>
+        <div class="table-wrap" id="ttTableWrap" hidden>
           <table class="classes">
             <thead><tr><th>구분</th><th>반 이름</th><th>담당 선생님</th><th>출석 / 정원</th><th>오늘 숙제 완료율</th><th></th></tr></thead>
             <tbody id="classRows"></tbody>
@@ -1980,6 +1997,7 @@
 </div>
 
 <div class="overlay" id="anOv" hidden><form class="modal an-modal" id="anForm" novalidate></form></div>
+<div class="overlay" id="ttOv" hidden><form class="modal rs-modal tt-modal" id="ttForm" novalidate></form></div>
 <div class="overlay" id="qsOv" hidden><form class="modal rs-modal qs-modal" id="qsForm" novalidate onsubmit="return false"></form></div>
 <div class="overlay" id="payOv" hidden><form class="modal rs-modal" id="payForm" novalidate></form></div>
 <div class="overlay" id="rsOv" hidden><form class="modal rs-modal" id="rsForm" novalidate></form></div>
@@ -2334,7 +2352,7 @@ function renderDirector(){
       '<b>'+k[3]+'</b><div class="label">'+k[4]+'</div><div class="sub'+(k[6]?' warn':'')+'">'+esc(k[5])+'</div></div>';
   }).join('');
 
-  renderClassRows('');
+  renderClassRows(''); renderTimetable();
 
   $('sched').innerHTML = CLASSES.filter(function(c){ return c.today; })
     .sort(function(a,b){ return a.time < b.time ? -1 : 1; })
@@ -7533,6 +7551,70 @@ $('search').addEventListener('input', function(){
 $('search').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ var b = $('searchRes').querySelector('[data-qsopen]'); if(b) b.click(); } else if(ev.key === 'Escape'){ this.value = ''; $('searchRes').hidden = true; } });
 $('searchRes').addEventListener('click', function(ev){ var b = ev.target.closest('[data-qsopen]'); if(!b) return; var k = b.dataset.qsopen.split('|'); $('search').value = ''; this.hidden = true; if(state.view === 'director' && !state.page) renderClassRows(''); qsOpen(k[0], k[1]); });
 document.addEventListener('click', function(ev){ if(!ev.target.closest('.search')) $('searchRes').hidden = true; });
+
+/* ===== 대시보드 주간 시간표 =====
+   가로 월~토, 세로 시간(기본 13시~21시, 원장님이 바꿀 수 있어요). 반마다 수업 요일·시간을 정해 두면 선생님 색으로 칸이 그려져요.
+   반 시간은 '반 시간 정하기'에서 고쳐요. 저장: 'beyond-timetable-v1'. 처음 값은 예시 반 시간(c.time)과 예시 요일이에요. */
+var TT_KEY = 'beyond-timetable-v1', TT_DAYS = ['월','화','수','목','금','토'], TT_COLORS = ['#3b6fd8','#d9774b','#2f9e75','#a05fc6','#c9a227','#d0487c','#3a9fb5','#7a7f3a'];
+var ttStore = (function(){ try{ var o = JSON.parse(localStorage.getItem(TT_KEY) || 'null'); if(o && o.cls) return o; }catch(e){} return { from:13, to:21, cls:{}, tab:'grid' }; })();
+function ttSave(){ try{ localStorage.setItem(TT_KEY, JSON.stringify(ttStore)); }catch(e){} }
+function ttOf(c){
+  if(!ttStore.cls[c.id]){ var p = (c.time || '15:00–15:50').split(/[–-]/); ttStore.cls[c.id] = { days:c.today ? [1,3,5] : [2,4], from:(p[0] || '15:00').trim(), to:(p[1] || '15:50').trim() }; }
+  return ttStore.cls[c.id];
+}
+function ttMin(hm){ var p = String(hm || '0:0').split(':'); return (+p[0]) * 60 + (+p[1] || 0); }
+function ttColor(t){ var i = TEACHERS.indexOf(t); if(i < 0) i = TEACHERS.length + Object.keys(ttStore.cls).length; return TT_COLORS[i % TT_COLORS.length]; }
+function renderTimetable(){
+  var box = $('ttGrid'); if(!box) return;
+  var grid = ttStore.tab !== 'table';
+  document.querySelectorAll('[data-tttab]').forEach(function(b){ b.setAttribute('aria-pressed', (b.dataset.tttab === 'grid') === grid); });
+  $('ttWrap').hidden = !grid; $('ttTableWrap').hidden = grid; $('ttTools').hidden = !grid;
+  $('ttFrom').innerHTML = payOpt(6, 22, ttStore.from, '시'); $('ttTo').innerHTML = payOpt(7, 23, ttStore.to, '시');
+  if(!grid) return;
+  var H = 54, from = ttStore.from * 60, to = Math.max(ttStore.to, ttStore.from + 1) * 60, wd = new Date().getDay();
+  var cols = TT_DAYS.map(function(dn, i){
+    var dnum = i + 1, list = CLASSES.map(function(c){ var t = ttOf(c); return { c:c, s:ttMin(t.from), e:ttMin(t.to), on:t.days.indexOf(dnum) >= 0 }; }).filter(function(x){ return x.on && x.e > from && x.s < to; }).sort(function(a, b){ return a.s - b.s || a.e - b.e; });
+    // 같은 시간에 겹치는 반은 칸을 나눠서 나란히 보여 줘요
+    var lanes = []; list.forEach(function(x){ var l = 0; while(lanes[l] && lanes[l] > x.s) l++; lanes[l] = x.e; x.lane = l; });
+    list.forEach(function(x){ x.n = 1 + Math.max.apply(null, list.filter(function(y){ return y.s < x.e && y.e > x.s; }).map(function(y){ return y.lane; })); });
+    var blocks = list.map(function(x){
+      var top = (Math.max(x.s, from) - from) / 60 * H, h = (Math.min(x.e, to) - Math.max(x.s, from)) / 60 * H, t = TODAY[x.c.id];
+      return '<button type="button" class="tt-b" data-class="' + x.c.id + '" style="--tc:' + ttColor(x.c.teacher) + ';top:' + top + 'px;height:' + Math.max(h - 2, 18) + 'px;left:calc(' + (x.lane / x.n * 100) + '% + 2px);width:calc(' + (100 / x.n) + '% - 4px)" title="' + esc(x.c.name + ' · ' + x.c.teacher + ' · ' + ttOf(x.c).from + '–' + ttOf(x.c).to + (x.c.room ? ' · ' + x.c.room : '')) + '"><b>' + esc(x.c.name) + '</b><span>' + esc(x.c.teacher) + '</span><small>' + esc(ttOf(x.c).from + '–' + ttOf(x.c).to) + (dnum === wd && t ? ' · 출석 ' + t[0] + '/' + x.c.students.length : '') + '</small></button>';
+    }).join('');
+    return '<div class="tt-col' + (dnum === wd ? ' today' : '') + '"><div class="tt-dh">' + dn + (dnum === wd ? ' <small>오늘</small>' : '') + '</div><div class="tt-body" style="height:' + ((to - from) / 60 * H) + 'px">' + blocks + '</div></div>';
+  }).join('');
+  var hours = ''; for(var h = from / 60; h < to / 60; h++) hours += '<div class="tt-h" style="height:' + H + 'px">' + h + '시</div>';
+  box.innerHTML = '<div class="tt-times"><div class="tt-dh"></div>' + hours + '</div>' + cols;
+  box.style.setProperty('--tth', H + 'px');
+  $('ttLegend').innerHTML = TEACHERS.map(function(t){ return '<span style="--tc:' + ttColor(t) + '"><i></i>' + esc(t) + ' 선생님</span>'; }).join('');
+}
+function ttEdit(){
+  $('ttForm').innerHTML = '<h2>반 수업 시간 정하기</h2><p class="muted" style="margin:0">반마다 수업 요일과 시간을 골라요. 시간표에 바로 그려져요.</p><div class="tt-ed">' + CLASSES.map(function(c){
+    var t = ttOf(c);
+    return '<div class="tt-er" data-ttc="' + c.id + '"><div><b>' + esc(c.name) + '</b><small class="muted">' + esc(c.teacher) + '</small></div><span class="tt-days">' + TT_DAYS.map(function(d, i){ return '<label><input type="checkbox" value="' + (i + 1) + '"' + (t.days.indexOf(i + 1) >= 0 ? ' checked' : '') + '><span>' + d + '</span></label>'; }).join('') + '</span><span class="tt-tm"><input type="time" step="600" data-ttf value="' + esc(t.from) + '" aria-label="' + esc(c.name) + ' 시작"> ~ <input type="time" step="600" data-ttt value="' + esc(t.to) + '" aria-label="' + esc(c.name) + ' 끝"></span></div>';
+  }).join('') + '</div><p class="form-err" id="ttErr"></p><div class="modal-actions"><button type="button" class="btn soft" data-ttclose>닫기</button><button type="submit" class="btn">저장</button></div>';
+  $('ttOv').hidden = false;
+}
+$('ttForm').addEventListener('submit', function(ev){
+  ev.preventDefault(); var bad = '';
+  var next = {};
+  this.querySelectorAll('[data-ttc]').forEach(function(r){
+    var f = r.querySelector('[data-ttf]').value, t = r.querySelector('[data-ttt]').value;
+    if(!f || !t || ttMin(t) <= ttMin(f)) bad = bad || r.querySelector('b').textContent;
+    next[r.dataset.ttc] = { days:[].slice.call(r.querySelectorAll('.tt-days input:checked')).map(function(i){ return +i.value; }), from:f, to:t };
+  });
+  if(bad){ $('ttErr').textContent = bad + ': 끝 시간이 시작보다 늦어야 해요.'; return; }
+  Object.keys(next).forEach(function(k){ ttStore.cls[k] = next[k]; });
+  ttSave(); $('ttOv').hidden = true; renderTimetable(); toast('반 수업 시간을 저장했어요.');
+});
+$('ttForm').addEventListener('click', function(ev){ if(ev.target.closest('[data-ttclose]')) $('ttOv').hidden = true; });
+$('ttOv').addEventListener('click', function(ev){ if(ev.target === this) this.hidden = true; });
+$('ttCard').addEventListener('click', function(ev){
+  var tb = ev.target.closest('[data-tttab]'); if(tb){ ttStore.tab = tb.dataset.tttab; ttSave(); renderTimetable(); return; }
+  if(ev.target.closest('[data-ttedit]')) return ttEdit();
+  var b = ev.target.closest('.tt-b'); if(b){ var c = CLASSES.find(function(x){ return x.id === b.dataset.class; }); state.teacher = c.teacher; state.classId = c.id; state.tpart = 'jr'; setView('teacher'); }
+});
+['ttFrom','ttTo'].forEach(function(id){ $(id).addEventListener('change', function(){ var f = +$('ttFrom').value, t = +$('ttTo').value; if(t <= f){ toast('끝 시간이 시작보다 늦어야 해요.'); renderTimetable(); return; } ttStore.from = f; ttStore.to = t; ttSave(); renderTimetable(); }); });
 
 /* ===== 시작 ===== */
 applyAssign();
