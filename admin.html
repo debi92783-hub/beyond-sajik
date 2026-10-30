@@ -54,6 +54,15 @@
   .seg button{ border:0; background:none; padding:8px 16px; border-radius:7px; font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; }
   .seg button[aria-pressed="true"]{ background:var(--surface); color:var(--ink); font-weight:700; box-shadow:0 1px 2px rgba(32,36,43,0.08); }
   .search{ display:flex; align-items:center; gap:8px; background:var(--surface-soft); border:1px solid var(--border); border-radius:10px; padding:9px 12px; width:240px; max-width:100%; }
+  .search-wrap{ position:relative; } .search-res{ left:0; right:auto; min-width:260px; }
+  .qs-modal{ max-width:720px; width:calc(100% - 32px); } .qs-hd{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; } .qs-hd h2{ margin:0; } .qs-hd p{ margin:2px 0 0; font-size:12.5px; }
+  .qs-sec{ border:1px solid var(--border); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:8px; } .qs-sec h3{ margin:0; font-size:14px; font-weight:900; color:var(--accent); }
+  .qs-row{ display:flex; flex-wrap:wrap; gap:8px 10px; align-items:flex-end; } .qs-row > label{ display:flex; flex-direction:column; gap:3px; font-size:12px; font-weight:700; min-width:96px; } .qs-grow{ flex:1 1 200px; }
+  .qs-row input[type=text], .qs-row input[type=time], .qs-row select{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 9px; background:var(--surface); color:var(--ink); font-weight:400; }
+  .qs-prog{ display:flex; gap:6px; } .qs-prog select{ flex:1; min-width:0; }
+  .qs-sc{ min-width:84px !important; } .qs-sc span{ display:flex; align-items:center; gap:3px; } .qs-sc input{ width:56px; font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 6px; } .qs-sc small{ color:var(--ink-soft); }
+  .qs-ck{ flex-direction:row !important; align-items:center; gap:6px !important; padding-bottom:8px; } .qs-warn{ margin:0; font-size:12px; color:var(--warn); font-weight:700; }
+  .qs-ft{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } .qs-ft .muted{ margin-right:auto; font-size:12px; }
   .search input{ border:0; background:none; outline:none; font-size:13px; width:100%; }
   .icon-btn{ position:relative; width:36px; height:36px; border-radius:10px; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-soft); }
   .icon-btn .dot{ position:absolute; top:7px; right:8px; width:7px; height:7px; border-radius:50%; background:var(--warn); }
@@ -1271,7 +1280,7 @@
 
   @media (max-width: 860px){
     .topbar{ padding:12px 16px; position:static; }
-    .search{ width:100%; order:3; }
+    .search-wrap{ width:100%; order:3; } .search{ width:100%; }
     .layout{ flex-direction:column; align-items:stretch; }
     .side{ flex:none; position:static; min-height:0; max-height:none; width:100%; flex-direction:row; align-items:center; overflow-x:auto; padding:10px 16px; border-right:0; border-bottom:1px solid var(--border); gap:4px; }
     .side h3, .phrases{ display:none; }
@@ -1400,10 +1409,10 @@
     </div>
   </div>
   <div class="topbar-right">
-    <label class="search" data-only="director">
+    <div class="search-wrap"><label class="search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5"/></svg>
-      <input type="search" id="search" placeholder="학생명으로 검색" aria-label="학생명으로 검색">
-    </label>
+      <input type="search" id="search" placeholder="학생명으로 검색" aria-label="학생명으로 검색" autocomplete="off">
+    </label><span class="dt-qres search-res" id="searchRes" hidden></span></div>
     <button class="icon-btn" type="button" data-only="director" data-soon="알림" aria-label="알림">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 17h12l-1.5-2.5V10a4.5 4.5 0 00-9 0v4.5z"/><path d="M10.3 20a1.8 1.8 0 003.4 0"/></svg>
       <span class="dot"></span>
@@ -1969,6 +1978,7 @@
 </div>
 
 <div class="overlay" id="anOv" hidden><form class="modal an-modal" id="anForm" novalidate></form></div>
+<div class="overlay" id="qsOv" hidden><form class="modal rs-modal qs-modal" id="qsForm" novalidate onsubmit="return false"></form></div>
 <div class="overlay" id="payOv" hidden><form class="modal rs-modal" id="payForm" novalidate></form></div>
 <div class="overlay" id="rsOv" hidden><form class="modal rs-modal" id="rsForm" novalidate></form></div>
 <div class="overlay" id="lcEditOv" hidden>
@@ -2355,7 +2365,7 @@ function renderClassRows(q){
   }).join('') : '<tr><td colspan="6" class="muted" style="padding:18px 10px">‘'+esc(q)+'’ 학생을 찾지 못했어요.</td></tr>';
 }
 
-$('search').addEventListener('input', function(){ renderClassRows(this.value.trim()); });
+$('search').addEventListener('input', function(){ if(state.view === 'director') renderClassRows(this.value.trim()); });
 $('classRows').addEventListener('click', function(e){
   var tr = e.target.closest('tr[data-class]'); if(!tr) return;
   var c = CLASSES.find(function(x){ return x.id === tr.dataset.class; });
@@ -7449,6 +7459,75 @@ $('view-pay').addEventListener('click', function(ev){
 });
 $('payCls').addEventListener('click', function(ev){ var b = ev.target.closest('[data-paycls]'); if(!b) return; pay.cls = b.dataset.paycls; renderPay(); });
 $('payQ').addEventListener('input', function(){ pay.q = this.value; renderPay(); });
+
+/* ===== 상단 학생 찾기 → 오늘 한 번에 입력 =====
+   이름을 찾아 누르면 그 학생의 오늘 출결·지각 / 수업 기록(진도·숙제) / 데일리 테스트를 한 창에서 보고 고쳐요.
+   값은 각 화면과 같은 곳에 저장돼서, 출결·수업 기록·데일리 테스트 화면에도 그대로 보여요.
+   선생님은 맡은 반(아르바이트 선생님은 파트 반) 학생만 찾아져요. 선생님들과 의논해서 필요 없는 칸은 나중에 빼요. */
+var qs = { cid:null, s:null };
+function qsWith(cid, fn){
+  // 각 화면의 '오늘 기록 만들기' 함수를 그대로 쓰려고, 잠깐 반·날짜를 바꿨다가 되돌려요.
+  var a = [atClassId, atDay, dtClassId, dtDay, state.classId, day];
+  var t = new Date(); t.setHours(0,0,0,0);
+  atClassId = dtClassId = state.classId = cid; atDay = new Date(t); dtDay = new Date(t); day = new Date(t);
+  try{ return fn(); } finally { atClassId = a[0]; atDay = a[1]; dtClassId = a[2]; dtDay = a[3]; state.classId = a[4]; day = a[5]; }
+}
+function qsFind(q){ var out = []; if(q) dtClasses().forEach(function(c){ c.students.forEach(function(s){ if(s.indexOf(q) >= 0) out.push([c, s]); }); }); return out; }
+function qsOpt(list, v){ return list.map(function(o){ return '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join(''); }
+function qsOpen(cid, s){
+  qs.cid = cid; qs.s = s;
+  var c = CLASSES.find(function(x){ return x.id === cid; }), t = new Date();
+  var at = qsWith(cid, function(){ return atEntry().rows[s]; });
+  var en = qsWith(cid, function(){ return entry(); }), jr = en.rows[s];
+  var de = qsWith(cid, function(){ return dtEntry(); }), dr = de.rows[s];
+  var x = effJr(jr, en), sc = function(f, max, lab){ return '<label class="qs-sc">' + esc(lab) + '<span><input type="number" min="0" max="' + max + '" inputmode="numeric" data-qd="' + f + '" value="' + esc(dr[f]) + '"><small>/' + max + '</small></span></label>'; };
+  var sentNote = de.stage === 'sent' ? '<p class="qs-warn">오늘 데일리 리포트는 이미 보냈어요. 고치면 데일리 테스트 화면에서 다시 저장하고 보내야 해요.</p>' : '';
+  $('qsForm').innerHTML = '<div class="qs-hd"><div><h2>' + esc(s) + '</h2><p class="muted">' + esc(c.dept + ' · ' + c.name + ' · ' + c.teacher + ' 선생님') + ' · ' + (t.getMonth() + 1) + '월 ' + t.getDate() + '일 (' + DAYS[t.getDay()] + ') 오늘</p></div><button type="button" class="btn soft" data-qsclose>닫기</button></div>'
+    + '<section class="qs-sec"><h3>① 출결·지각</h3><div class="qs-row"><label>출결<select data-qa="st"><option value="">아직 안 함</option>' + qsOpt(AT_ST, at.st) + '</select></label>'
+    + '<label class="qs-grow">사유 <small class="muted">지각·결석·조퇴</small><input type="text" data-qa="reason" maxlength="40" value="' + esc(at.reason) + '" placeholder="예: 학교 행사로 10분 늦음"></label>'
+    + '<label>등원 시간<input type="time" data-qa="inAt" value="' + esc(at.inAt) + '"></label></div><p class="hint">등원·결석 카톡은 출결·지각 화면에서 저장할 때 만들어져요.</p></section>'
+    + '<section class="qs-sec"><h3>② 수업 기록 (진도·숙제)</h3><div class="qs-row"><label class="qs-grow">진도<span class="qs-prog"><select data-qj="book"><option value="">반 공통' + (en.book ? ' (' + esc(en.book) + ')' : '') + '</option>' + DT_BOOKS.map(function(b){ return '<option' + (b[0] === jr.book ? ' selected' : '') + '>' + esc(b[0]) + '</option>'; }).join('') + '</select><select data-qj="prog"' + (jr.book ? '' : ' disabled') + '>' + (jr.book ? bookItems(jr.book).map(function(it){ return '<option' + (it === jr.prog ? ' selected' : '') + '>' + esc(it) + '</option>'; }).join('') : '<option>' + esc(en.prog || '반 공통 진도') + '</option>') + '</select></span></label></div>'
+    + '<div class="qs-row"><label>숙제 SB page<input type="text" data-qj="sb" value="' + esc(jr.sb) + '" placeholder="' + esc(en.sb || '반 공통') + '"></label><label>숙제 PB page<input type="text" data-qj="pb" value="' + esc(jr.pb) + '" placeholder="' + esc(en.pb || '반 공통') + '"></label><label class="qs-grow">수업 메모<input type="text" data-qj="memo" maxlength="60" value="' + esc(jr.memo || '') + '" placeholder="이 학생만 따로 적을 내용"></label></div>'
+    + '<p class="hint">비워 두면 반 공통 진도·숙제가 들어가요. 지금: ' + esc(jrProgText(x) || '진도 없음') + (jrHwText(x) ? ' · ' + esc(jrHwText(x)) : '') + '</p></section>'
+    + '<section class="qs-sec"><h3>③ 데일리 테스트</h3>' + sentNote + '<div class="qs-row"><label>교재<select data-qd="book">' + qsOpt(DT_OPT.book, dr.book) + '</select></label><label>숙제<select data-qd="hw">' + qsOpt(DT_OPT.hw, dr.hw) + '</select></label><label>Speaking<select data-qd="spk">' + qsOpt(DT_OPT.spk, dr.spk) + '</select></label></div>'
+    + '<div class="qs-row">' + DT_SCORES.map(function(f){ return sc(f, de.max[f], DT_LABEL[f]); }).join('') + '</div>'
+    + '<div class="qs-row">' + sc('w1', de.max.word, '단어 1회') + sc('w2', de.max.word, '2회') + sc('w3', de.max.word, '3회') + '<label class="qs-ck"><input type="checkbox" data-qd="wDone"' + (dr.wDone ? ' checked' : '') + '> 단어 완료 <small class="muted">(통과 ' + de.pass + '점)</small></label></div>'
+    + '<div class="qs-row"><label class="qs-grow">NOTE (기타사항)<input type="text" data-qd="memo" maxlength="60" value="' + esc(dr.memo) + '"></label></div></section>'
+    + '<div class="qs-ft"><span class="muted" id="qsSaved">고치면 바로 저장돼요.</span><button type="button" class="btn soft" data-qsgo="daily">데일리 테스트 화면으로</button><button type="button" class="btn" data-qsclose>다 했어요</button></div>';
+  $('qsOv').hidden = false;
+}
+function qsChange(el){
+  var cid = qs.cid, s = qs.s, v = el.type === 'checkbox' ? el.checked : el.value;
+  if(el.dataset.qa){
+    qsWith(cid, function(){ var r = atEntry().rows[s]; r[el.dataset.qa] = v; if(el.dataset.qa === 'st' && (v === '출석' || v === '지각' || v === '보강') && !r.inAt){ r.inAt = nowHM(); $('qsForm').querySelector('[data-qa=inAt]').value = r.inAt; } atSave();
+      var de = dtEntry(); if(el.dataset.qa === 'st' && v){ de.rows[s].att = v === '보강' ? '출석' : v; dtSave(); } });
+  } else if(el.dataset.qj){
+    qsWith(cid, function(){ var r = entry().rows[s], f = el.dataset.qj; r[f] = f === 'sb' || f === 'pb' ? v.replace(/[^0-9,~\- ]/g, '').trim() : v;
+      if(f === 'book'){ r.prog = bookItems(v)[0] || ''; } saveJr(); });
+    if(el.dataset.qj === 'book') return qsOpen(cid, s);
+  } else if(el.dataset.qd){
+    qsWith(cid, function(){ var e = dtEntry(), r = e.rows[s], f = el.dataset.qd; r[f] = v;
+      if(/^w[123]$/.test(f)){ r.wDone = wordTries(r).some(function(n){ return n >= e.pass; }); var ck = $('qsForm').querySelector('[data-qd=wDone]'); if(ck) ck.checked = r.wDone; }
+      if(e.stage && e.stage !== 'draft' && e.stage !== 'sent') e.stage = 'draft'; dtSave(); });
+  }
+  $('qsSaved').textContent = '저장했어요 · ' + nowHM();
+}
+$('qsForm').addEventListener('change', function(ev){ if(ev.target.matches('[data-qa],[data-qj],[data-qd]')) qsChange(ev.target); });
+$('qsForm').addEventListener('click', function(ev){
+  if(ev.target.closest('[data-qsclose]')){ $('qsOv').hidden = true; qsRefresh(); }
+  var g = ev.target.closest('[data-qsgo]'); if(g){ $('qsOv').hidden = true; dtClassId = qs.cid; dtOnly = qs.s; dtDay = new Date(); dtDay.setHours(0,0,0,0); setView(state.view, 'daily'); }
+});
+$('qsOv').addEventListener('click', function(ev){ if(ev.target === this){ this.hidden = true; qsRefresh(); } });
+// 닫으면 지금 보고 있는 화면을 새로 그려서 방금 고친 값이 보이게 해요
+function qsRefresh(){ if(state.page === 'daily') renderDaily(); else if(state.page === 'attend' && typeof renderAttend === 'function') renderAttend(); else if(state.view === 'teacher' && !state.page) renderTeacher(); }
+$('search').addEventListener('input', function(){
+  var q = this.value.trim(), out = qsFind(q);
+  $('searchRes').hidden = !q;
+  $('searchRes').innerHTML = out.length ? out.slice(0, 12).map(function(x){ return '<button type="button" data-qsopen="' + x[0].id + '|' + esc(x[1]) + '"><b>' + esc(x[1]) + '</b> <small>' + esc(x[0].dept + ' · ' + x[0].name) + '</small></button>'; }).join('') : '<span class="muted">' + (state.view === 'director' ? '' : '내가 맡은 반에 ') + '\'' + esc(q) + '\' 학생이 없어요.</span>';
+});
+$('search').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ var b = $('searchRes').querySelector('[data-qsopen]'); if(b) b.click(); } else if(ev.key === 'Escape'){ this.value = ''; $('searchRes').hidden = true; } });
+$('searchRes').addEventListener('click', function(ev){ var b = ev.target.closest('[data-qsopen]'); if(!b) return; var k = b.dataset.qsopen.split('|'); $('search').value = ''; this.hidden = true; if(state.view === 'director' && !state.page) renderClassRows(''); qsOpen(k[0], k[1]); });
+document.addEventListener('click', function(ev){ if(!ev.target.closest('.search')) $('searchRes').hidden = true; });
 
 /* ===== 시작 ===== */
 applyAssign();
