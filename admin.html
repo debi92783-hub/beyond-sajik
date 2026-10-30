@@ -393,6 +393,8 @@
   .dt-table input[type=text]{ width:100%; min-width:120px; font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface); color:var(--ink); }
   .dt-table input.att-note{ min-width:0; width:46px; margin-top:4px; padding:4px; text-align:center; }
   .dt-table select{ font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 3px; background:var(--surface); color:var(--ink); font-weight:700; }
+  .dt-table select.dt-sc{ width:50px; font-size:12.5px; padding:6px 2px; text-align:center; font-variant-numeric:tabular-nums; }
+  .qs-sc select.dt-sc{ width:64px; }
   .dt-table .of{ color:var(--ink-faint); font-size:11.5px; margin-left:2px; font-variant-numeric:tabular-nums; }
   .dt-table td:has(> .of){ white-space:nowrap; }
   .dt-table .low input{ border-color:var(--warn); color:var(--warn); font-weight:700; }
@@ -3373,6 +3375,8 @@ function dtEntry(){
   });
   return e;
 }
+// 점수는 ▼ 목록에서 골라요. 목록은 만점(10·20점)부터 아래로 내려가요. 안 고른 칸은 '–'(아직 안 봄)로 둬요.
+function dtScOpts(max, v){ var h = '<option value=""' + (v === '' || v == null ? ' selected' : '') + '>–</option>'; for(var i = max; i >= 0; i--) h += '<option value="' + i + '"' + (String(v) === String(i) ? ' selected' : '') + '>' + i + '</option>'; if(v !== '' && v != null && (+v > max || +v % 1)) h += '<option value="' + esc(v) + '" selected>' + esc(v) + '</option>'; return h; }
 function num(v){ return v === '' || v == null || isNaN(+v) ? null : +v; }
 function avg(list){ return list.length ? list.reduce(function(a, b){ return a + b; }, 0) / list.length : null; }
 function one(n){ return n === null ? '–' : (Math.round(n * 10) / 10).toString(); }
@@ -3419,7 +3423,7 @@ function renderDaily(){
   var sel = function(f, v, s){ return '<select data-f="'+f+'" class="'+tone(v)+'" aria-label="'+esc(s)+' '+f+'">'+DT_OPT[f].map(function(o){ return '<option'+(o===v?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'; };
   var score = function(f, r, s, max, first){
     var v = num(r[f]), low = v !== null && v / max < 0.7;
-    return '<td class="'+(first?'grp':'')+(low?' low':'')+'"><input type="number" data-f="'+f+'" min="0" max="'+max+'" inputmode="numeric" value="'+esc(r[f])+'" aria-label="'+esc(s)+' '+(DT_LABEL[f]||f)+'"><span class="of">/'+max+'</span></td>';
+    return '<td class="'+(first?'grp':'')+(low?' low':'')+'"><select class="dt-sc" data-f="'+f+'" aria-label="'+esc(s)+' '+(DT_LABEL[f]||f)+'">'+dtScOpts(max, r[f])+'</select><span class="of">/'+max+'</span></td>';
   };
   if(dtOnly && c.students.indexOf(dtOnly) < 0) dtOnly = null;
   $('dtOnlyBar').hidden = !dtOnly;
@@ -7481,7 +7485,7 @@ function qsOpen(cid, s){
   var at = qsWith(cid, function(){ return atEntry().rows[s]; });
   var en = qsWith(cid, function(){ return entry(); }), jr = en.rows[s];
   var de = qsWith(cid, function(){ return dtEntry(); }), dr = de.rows[s];
-  var x = effJr(jr, en), sc = function(f, max, lab){ return '<label class="qs-sc">' + esc(lab) + '<span><input type="number" min="0" max="' + max + '" inputmode="numeric" data-qd="' + f + '" value="' + esc(dr[f]) + '"><small>/' + max + '</small></span></label>'; };
+  var x = effJr(jr, en), sc = function(f, max, lab){ return '<label class="qs-sc">' + esc(lab) + '<span><select class="dt-sc" data-qd="' + f + '">' + dtScOpts(max, dr[f]) + '</select><small>/' + max + '</small></span></label>'; };
   var sentNote = de.stage === 'sent' ? '<p class="qs-warn">오늘 데일리 리포트는 이미 보냈어요. 고치면 데일리 테스트 화면에서 다시 저장하고 보내야 해요.</p>' : '';
   $('qsForm').innerHTML = '<div class="qs-hd"><div><h2>' + esc(s) + '</h2><p class="muted">' + esc(c.dept + ' · ' + c.name + ' · ' + c.teacher + ' 선생님') + ' · ' + (t.getMonth() + 1) + '월 ' + t.getDate() + '일 (' + DAYS[t.getDay()] + ') 오늘</p></div><button type="button" class="btn soft" data-qsclose>닫기</button></div>'
     + '<section class="qs-sec"><h3>① 출결·지각</h3><div class="qs-row"><label>출결<select data-qa="st"><option value="">아직 안 함</option>' + qsOpt(AT_ST, at.st) + '</select></label>'
