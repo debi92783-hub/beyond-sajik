@@ -7463,7 +7463,7 @@ $('payQ').addEventListener('input', function(){ pay.q = this.value; renderPay();
 /* ===== 상단 학생 찾기 → 오늘 한 번에 입력 =====
    이름을 찾아 누르면 그 학생의 오늘 출결·지각 / 수업 기록(진도·숙제) / 데일리 테스트를 한 창에서 보고 고쳐요.
    값은 각 화면과 같은 곳에 저장돼서, 출결·수업 기록·데일리 테스트 화면에도 그대로 보여요.
-   선생님은 맡은 반(아르바이트 선생님은 파트 반) 학생만 찾아져요. 선생님들과 의논해서 필요 없는 칸은 나중에 빼요. */
+   지금은 원장님·선생님 모두 전체 학생을 찾아요. 선생님들과 의논해서 필요 없는 칸은 나중에 빼요. */
 var qs = { cid:null, s:null };
 function qsWith(cid, fn){
   // 각 화면의 '오늘 기록 만들기' 함수를 그대로 쓰려고, 잠깐 반·날짜를 바꿨다가 되돌려요.
@@ -7472,7 +7472,8 @@ function qsWith(cid, fn){
   atClassId = dtClassId = state.classId = cid; atDay = new Date(t); dtDay = new Date(t); day = new Date(t);
   try{ return fn(); } finally { atClassId = a[0]; atDay = a[1]; dtClassId = a[2]; dtDay = a[3]; state.classId = a[4]; day = a[5]; }
 }
-function qsFind(q){ var out = []; if(q) dtClasses().forEach(function(c){ c.students.forEach(function(s){ if(s.indexOf(q) >= 0) out.push([c, s]); }); }); return out; }
+// 2026-10-30 원장쌤: 우선 선생님도 모든 학생을 찾을 수 있게 해요.
+function qsFind(q){ var out = []; if(q) CLASSES.forEach(function(c){ c.students.forEach(function(s){ if(s.indexOf(q) >= 0) out.push([c, s]); }); }); return out; }
 function qsOpt(list, v){ return list.map(function(o){ return '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join(''); }
 function qsOpen(cid, s){
   qs.cid = cid; qs.s = s;
@@ -7493,7 +7494,7 @@ function qsOpen(cid, s){
     + '<div class="qs-row">' + DT_SCORES.map(function(f){ return sc(f, de.max[f], DT_LABEL[f]); }).join('') + '</div>'
     + '<div class="qs-row">' + sc('w1', de.max.word, '단어 1회') + sc('w2', de.max.word, '2회') + sc('w3', de.max.word, '3회') + '<label class="qs-ck"><input type="checkbox" data-qd="wDone"' + (dr.wDone ? ' checked' : '') + '> 단어 완료 <small class="muted">(통과 ' + de.pass + '점)</small></label></div>'
     + '<div class="qs-row"><label class="qs-grow">NOTE (기타사항)<input type="text" data-qd="memo" maxlength="60" value="' + esc(dr.memo) + '"></label></div></section>'
-    + '<div class="qs-ft"><span class="muted" id="qsSaved">고치면 바로 저장돼요.</span><button type="button" class="btn soft" data-qsgo="daily">데일리 테스트 화면으로</button><button type="button" class="btn" data-qsclose>다 했어요</button></div>';
+    + '<div class="qs-ft"><span class="muted" id="qsSaved">고치면 바로 저장돼요.</span>' + (dtClasses().some(function(x){ return x.id === cid; }) ? '<button type="button" class="btn soft" data-qsgo="daily">데일리 테스트 화면으로</button>' : '') + '<button type="button" class="btn" data-qsclose>다 했어요</button></div>';
   $('qsOv').hidden = false;
 }
 function qsChange(el){
@@ -7523,7 +7524,7 @@ function qsRefresh(){ if(state.page === 'daily') renderDaily(); else if(state.pa
 $('search').addEventListener('input', function(){
   var q = this.value.trim(), out = qsFind(q);
   $('searchRes').hidden = !q;
-  $('searchRes').innerHTML = out.length ? out.slice(0, 12).map(function(x){ return '<button type="button" data-qsopen="' + x[0].id + '|' + esc(x[1]) + '"><b>' + esc(x[1]) + '</b> <small>' + esc(x[0].dept + ' · ' + x[0].name) + '</small></button>'; }).join('') : '<span class="muted">' + (state.view === 'director' ? '' : '내가 맡은 반에 ') + '\'' + esc(q) + '\' 학생이 없어요.</span>';
+  $('searchRes').innerHTML = out.length ? out.slice(0, 12).map(function(x){ return '<button type="button" data-qsopen="' + x[0].id + '|' + esc(x[1]) + '"><b>' + esc(x[1]) + '</b> <small>' + esc(x[0].dept + ' · ' + x[0].name) + '</small></button>'; }).join('') : '<span class="muted">\'' + esc(q) + '\' 학생이 없어요.</span>';
 });
 $('search').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ var b = $('searchRes').querySelector('[data-qsopen]'); if(b) b.click(); } else if(ev.key === 'Escape'){ this.value = ''; $('searchRes').hidden = true; } });
 $('searchRes').addEventListener('click', function(ev){ var b = ev.target.closest('[data-qsopen]'); if(!b) return; var k = b.dataset.qsopen.split('|'); $('search').value = ''; this.hidden = true; if(state.view === 'director' && !state.page) renderClassRows(''); qsOpen(k[0], k[1]); });
