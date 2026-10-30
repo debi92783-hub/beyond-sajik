@@ -343,6 +343,15 @@
   .dt-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; margin-bottom:16px; }
   .dt-head .nav{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:700; }
   .dt-head .tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .dt-find{ position:relative; } .dt-find input{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); color:var(--ink); width:190px; }
+  .dt-qres{ position:absolute; right:0; top:calc(100% + 4px); z-index:20; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.12); padding:6px; display:flex; flex-direction:column; min-width:230px; max-height:320px; overflow:auto; }
+  .dt-qres[hidden]{ display:none; } .dt-qres button{ font:inherit; text-align:left; border:0; background:none; padding:8px 10px; border-radius:8px; cursor:pointer; color:var(--ink); font-size:13px; } .dt-qres button:hover{ background:var(--accent-soft); } .dt-qres small{ color:var(--ink-soft); } .dt-qres .muted{ padding:8px 10px; font-size:12.5px; }
+  .dt-todo{ margin-bottom:16px; } .dt-todo h2 small{ font-size:12px; font-weight:600; margin-left:6px; }
+  .dt-todo-g{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; } .dt-todo-g h4{ margin:0 0 8px; font-size:13px; display:flex; gap:6px; align-items:center; } .dt-todo-g p{ margin:0; font-size:12.5px; }
+  .dt-chip{ font:inherit; font-size:12.5px; border:1px solid var(--border); background:var(--surface); border-radius:99px; padding:5px 11px; margin:0 6px 6px 0; cursor:pointer; color:var(--ink); } .dt-chip small{ color:var(--ink-soft); } .dt-chip:hover{ border-color:var(--accent); }
+  .dt-only{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--accent-soft); border-radius:10px; padding:8px 12px; margin:0 0 10px; font-size:13px; } .dt-only .btn{ margin-left:auto; }
+  .dt-one{ margin-top:20px; } .dt-one-k{ display:flex; flex-wrap:wrap; gap:8px 18px; font-size:13px; color:var(--ink-soft); margin-bottom:10px; } .dt-one-k b{ color:var(--ink); font-size:15px; margin-left:4px; } .dt-one tr.now td{ background:var(--accent-soft); }
+  @media (max-width:700px){ .dt-todo-g{ grid-template-columns:1fr; } .dt-find, .dt-find input{ width:100%; } .dt-qres{ left:0; right:auto; } }
   .dt-head select{ font-size:13px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface); }
   .dt-lesson{ display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; padding:16px 18px; margin-bottom:16px; }
   .dt-lesson label{ min-width:0; display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--ink-soft); font-weight:600; }
@@ -1568,8 +1577,10 @@
           <span id="dtDay"></span>
           <button class="sq" type="button" id="dtNext" aria-label="다음 날짜"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg></button>
         </div>
-        <div class="tools"><label>반 <select id="dtClass" aria-label="반 선택"></select></label></div>
+        <div class="tools"><label>반 <select id="dtClass" aria-label="반 선택"></select></label>
+          <span class="dt-find"><input type="search" id="dtQ" placeholder="학생 이름으로 찾기" autocomplete="off" aria-label="학생 이름으로 찾기"><span class="dt-qres" id="dtQRes" hidden></span></span></div>
       </div>
+      <div class="card dt-todo" id="dtTodo"></div>
       <div class="card" id="dtEmpty" hidden><h2>담당 반이 없어요</h2><p class="muted" style="margin:8px 0 0">원장님이 담당 반을 정해 주면 여기에서 입력할 수 있어요.</p></div>
       <div id="dtBody">
         <div class="card dt-lesson">
@@ -1580,6 +1591,7 @@
         <div class="dt-sum" id="dtSum"></div>
         <div class="card">
           <div class="card-head"><h2>학생별 점검표 — <span id="dtClassName"></span></h2><span class="muted" id="dtSaved"></span></div>
+          <div class="dt-only" id="dtOnlyBar" hidden></div>
           <p class="muted" style="margin:0 0 10px">점수는 '획득점수 / 만점'으로 적어요. 만점은 맨 윗줄에서 바꿀 수 있고, 단어는 통과 점수 이상이면 '완료'가 자동으로 체크돼요.</p>
           <div class="table-wrap">
             <table class="dt-table">
@@ -1613,6 +1625,7 @@
             <button type="button" class="step" id="dtSend"><span class="n">4</span><span><b>발송</b><small id="dtStep4">확인한 리포트만 보내요</small></span></button>
           </div>
         </div>
+        <div class="card dt-one" id="dtOne" hidden></div>
         <div class="card" id="dtMsgCard" hidden style="margin-top:20px">
           <div class="card-head"><h2>개인 리포트</h2><span class="muted" id="dtOkCount"></span></div>
           <p class="muted" style="margin:0">리포트를 읽어 보고 '확인'을 눌러 주세요. 확인한 리포트만 발송돼요. 점검표를 고치면 다시 저장하고 리포트를 새로 만들어야 해요.</p>
@@ -1735,7 +1748,7 @@
     </section>
 
     <section id="view-pnotice" hidden>
-      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보이고, <b>각 반 데일리 리포트를 보낼 때 아직 안 보낸 공지가 리포트 끝에 같이 붙어 나가요.</b> 공지마다 미발송·발송 중·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
+      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보이고, <b>공지는 데일리 리포트와 따로, 목록의 ‘학부모님께 발송’으로 보내요.</b> 공지마다 미발송·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
       <div class="card an-card an-box" id="anList"></div>
     </section>
 
@@ -3324,7 +3337,7 @@ function progText(e){ return e.book && e.prog ? e.book + ' > ' + e.prog : (e.uni
 var DT_LABEL = { flash:'flash', self:'self', inter:'inter', text:'본문' };
 var dtStore = (function(){ try{ return JSON.parse(localStorage.getItem(DT_KEY) || '{}'); }catch(e){ return {}; } })();
 var dtDay = new Date(); dtDay.setHours(0,0,0,0);
-var dtClassId = null;
+var dtClassId = null, dtOnly = null;
 function dtSave(){ try{ localStorage.setItem(DT_KEY, JSON.stringify(dtStore)); }catch(e){} }
 // 선생님은 담당 반, 아르바이트 선생님은 테스트·숙제 파트를 맡은 반을 봐요
 function dtClasses(){ var pt = ptClassIds(state.teacher); return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher || pt.indexOf(c.id) !== -1; }); }
@@ -3398,7 +3411,10 @@ function renderDaily(){
     var v = num(r[f]), low = v !== null && v / max < 0.7;
     return '<td class="'+(first?'grp':'')+(low?' low':'')+'"><input type="number" data-f="'+f+'" min="0" max="'+max+'" inputmode="numeric" value="'+esc(r[f])+'" aria-label="'+esc(s)+' '+(DT_LABEL[f]||f)+'"><span class="of">/'+max+'</span></td>';
   };
-  $('dtRows').innerHTML = c.students.map(function(s){
+  if(dtOnly && c.students.indexOf(dtOnly) < 0) dtOnly = null;
+  $('dtOnlyBar').hidden = !dtOnly;
+  if(dtOnly) $('dtOnlyBar').innerHTML = '<b>' + esc(dtOnly) + '</b> 학생만 보고 있어요. 여기서 입력하면 반 점검표에 그대로 저장돼요.<button type="button" class="btn soft" data-dtall>반 전체 보기</button>';
+  $('dtRows').innerHTML = (dtOnly ? [dtOnly] : c.students).map(function(s){
     var r = e.rows[s], note = r.att === '지각' || r.att === '기타';
     return '<tr data-name="'+esc(s)+'"'+(r.att==='결석'?' class="absent"':'')+'>' +
       '<td class="stick"><input type="checkbox" data-f="on"'+(r.on?' checked':'')+' aria-label="'+esc(s)+' 선택"></td>' +
@@ -3413,7 +3429,51 @@ function renderDaily(){
   $('dtAll').checked = c.students.every(function(s){ return e.rows[s].on; });
   renderDtSum();
   renderFlow();
+  renderDtTodo(); renderDtOne();
 }
+/* 학생 찾기 · 오늘 남은 일 · 학생 한 명 기록
+   아르바이트 선생님처럼 여러 반을 오가며 체크할 때, 반을 찾지 않고 이름으로 바로 들어가요. */
+function dtGo(cid, name){ dtClassId = cid; dtOnly = name || null; $('dtQ').value = ''; $('dtQRes').hidden = true; renderDaily(); if(name) $('dtRows').scrollIntoView({ block:'center' }); }
+function renderDtTodo(){
+  var d = ymd(dtDay), re = [], hw = [], none = [];
+  dtClasses().forEach(function(c){
+    var e = dtStore[c.id + '|' + d];
+    var filled = e && c.students.some(function(s){ var r = e.rows[s]; return r && (wordTries(r).length || DT_SCORES.some(function(f){ return num(r[f]) !== null; })); });
+    if(!filled){ none.push(c); return; }
+    c.students.forEach(function(s){ var r = e.rows[s]; if(!r || r.att === '결석') return;
+      if(!r.wDone && wordTries(r).length) re.push([c, s, wordTries(r).length + '회 · 최고 ' + Math.max.apply(null, wordTries(r)) + '/' + e.max.word]);
+      if(r.hw !== '완료') hw.push([c, s, r.hw]);
+    });
+  });
+  var chip = function(x){ return '<button type="button" class="dt-chip" data-dtgo="' + x[0].id + '|' + esc(x[1]) + '"><b>' + esc(x[1]) + '</b> <small>' + esc(x[0].name) + ' · ' + esc(x[2]) + '</small></button>'; };
+  $('dtTodo').innerHTML = '<div class="card-head"><h2>' + esc(dtDateText()) + ' 남은 일 <small class="muted">' + (state.view === 'director' ? '전체 반' : '내가 맡은 반') + '</small></h2></div>'
+    + '<div class="dt-todo-g"><div><h4>단어 재시험 <span class="tag warn">' + re.length + '명</span></h4>' + (re.length ? re.map(chip).join('') : '<p class="muted">없어요</p>') + '</div>'
+    + '<div><h4>숙제 미완료 <span class="tag warn">' + hw.length + '명</span></h4>' + (hw.length ? hw.map(chip).join('') : '<p class="muted">없어요</p>') + '</div>'
+    + '<div><h4>아직 점수를 안 넣은 반 <span class="tag">' + none.length + '반</span></h4>' + (none.length ? none.map(function(c){ return '<button type="button" class="dt-chip" data-dtgo="' + c.id + '|"><b>' + esc(c.name) + '</b> <small>' + c.students.length + '명</small></button>'; }).join('') : '<p class="muted">모두 넣었어요</p>') + '</div></div>';
+}
+function renderDtOne(){
+  var box = $('dtOne'); box.hidden = !dtOnly; if(!dtOnly) return;
+  var c = dtCls(), keys = Object.keys(dtStore).filter(function(k){ return k.indexOf(c.id + '|') === 0 && dtStore[k].rows[dtOnly]; }).sort().reverse().slice(0, 10);
+  var rows = keys.map(function(k){ var e = dtStore[k], r = e.rows[dtOnly], d = parseYmd(k.split('|')[1]);
+    return { d:d, e:e, r:r, html:'<tr' + (ymd(d) === ymd(dtDay) ? ' class="now"' : '') + '><td>' + (d.getMonth() + 1) + '/' + d.getDate() + ' (' + '일월화수목금토'[d.getDay()] + ')</td><td>' + esc(attText(r)) + '</td><td class="' + tone(r.hw) + '">' + esc(r.att === '결석' ? '–' : r.hw) + '</td><td>' + esc(r.att === '결석' ? '–' : wordText(r, e)) + '</td><td>' + esc(e.book && e.prog ? e.book + ' > ' + e.prog : '') + '</td></tr>' }; });
+  var on = rows.filter(function(x){ return x.r.att !== '결석'; }), tried = on.filter(function(x){ return wordTries(x.r).length; });
+  var pct = function(a, b){ return b ? Math.round(a / b * 100) + '%' : '–'; };
+  box.innerHTML = '<div class="card-head"><h2>' + esc(dtOnly) + ' · 최근 기록 <small class="muted">' + esc(c.name) + ' · 최근 ' + rows.length + '번</small></h2></div>'
+    + '<div class="dt-one-k"><span>출석 <b>' + on.length + '/' + rows.length + '</b></span><span>숙제 완료 <b>' + pct(on.filter(function(x){ return x.r.hw === '완료'; }).length, on.length) + '</b></span><span>단어 통과 <b>' + pct(tried.filter(function(x){ return x.r.wDone; }).length, tried.length) + '</b></span><span>재시험 남음 <b>' + tried.filter(function(x){ return !x.r.wDone; }).length + '번</b></span></div>'
+    + (rows.length ? '<div class="table-wrap"><table class="t-list"><thead><tr><th>날짜</th><th>출결</th><th>숙제</th><th>단어</th><th>진도</th></tr></thead><tbody>' + rows.map(function(x){ return x.html; }).join('') + '</tbody></table></div>' : '<p class="muted">아직 기록이 없어요.</p>');
+}
+$('dtQ').addEventListener('input', function(){
+  var q = this.value.trim(), out = [];
+  if(q) dtClasses().forEach(function(c){ c.students.forEach(function(s){ if(s.indexOf(q) >= 0) out.push([c, s]); }); });
+  $('dtQRes').hidden = !q;
+  $('dtQRes').innerHTML = out.length ? out.slice(0, 12).map(function(x){ return '<button type="button" data-dtgo="' + x[0].id + '|' + esc(x[1]) + '"><b>' + esc(x[1]) + '</b> <small>' + esc(x[0].dept + ' · ' + x[0].name) + '</small></button>'; }).join('') : '<span class="muted">' + (state.view === 'director' ? '' : '내가 맡은 반에 ') + '\'' + esc(q) + '\' 학생이 없어요.</span>';
+});
+$('dtQ').addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ var b = $('dtQRes').querySelector('[data-dtgo]'); if(b) b.click(); } else if(ev.key === 'Escape'){ this.value = ''; $('dtQRes').hidden = true; } });
+$('view-daily').addEventListener('click', function(ev){
+  var g = ev.target.closest('[data-dtgo]'); if(g){ var k = g.dataset.dtgo.split('|'); dtGo(k[0], k[1]); return; }
+  if(ev.target.closest('[data-dtall]')){ dtOnly = null; renderDaily(); }
+  if(!ev.target.closest('.dt-find')) $('dtQRes').hidden = true;
+});
 function fillProg(e){
   var b = DT_BOOKS.find(function(x){ return x[0] === e.book; });
   $('dtProg').disabled = !b;
@@ -3493,13 +3553,12 @@ function dtText(s, e){
   if(ans.length){ L.push('', '[학원 공지]'); ans.forEach(function(a){ L.push(anLine(a)); }); }
   return L.join('\n');
 }
-/* 데일리 리포트에 같이 나가는 학원 공지: 이 학생에게 아직 안 보낸, 지금 올라가 있는 공지.
-   발송하면 공지마다 받은 학생을 기록(sentTo)해서 다음 리포트에는 다시 붙지 않아요. 보낸 리포트는 그때 붙은 공지 그대로 보여요. */
+/* 학원 공지는 2026-10-30부터 학원 공지 화면에서 따로 발송해요. 데일리 리포트에는 붙지 않아요.
+   예전에 리포트와 함께 보낸 기록(anSent)만 그때 모습 그대로 보여 줘요. */
 function dtAnOf(s, e){
+  if(e.stage !== 'sent' || !e.anSent) return [];
   var all = anAll();
-  if(e.stage === 'sent') return ((e.anSent || {})[s] || []).map(function(id){ return all.find(function(a){ return a.id === id; }); }).filter(Boolean);
-  var k = dtClassId + '|' + s, today = ymd(new Date());
-  return all.filter(function(a){ return anLive(a) && a.from <= today && anFor(a, dtClassId, s) && !(a.sentTo && a.sentTo[k]); }).sort(function(x, y){ return (x.at || 0) - (y.at || 0); });
+  return (e.anSent[s] || []).map(function(id){ return all.find(function(a){ return a.id === id; }); }).filter(Boolean);
 }
 function anLine(a){
   return '· [' + anKind(a.kind) + '] ' + a.title + (a.date ? ' · ' + pvDate(a.date) + (a.time ? ' ' + korTime(a.time) : '') : '') + (a.text ? '\n' + a.text : '') + (a.files && a.files.length ? '\n※ 사진·첨부 파일은 학부모·학생 화면에서 볼 수 있어요.' : '');
@@ -3520,7 +3579,7 @@ $('dtRows').addEventListener('input', function(ev){
     tr.querySelector('[data-f=wDone]').checked = r.wDone;
   }
   if(f === 'on') $('dtAll').checked = dtCls().students.every(function(s){ return e.rows[s].on; });
-  dtEdit(f === 'on'); renderDtSum();
+  dtEdit(f === 'on'); renderDtSum(); renderDtTodo(); renderDtOne();
 });
 $('dtAll').addEventListener('change', function(){
   var e = dtEntry(), on = this.checked;
@@ -3562,7 +3621,7 @@ $('dtProg').addEventListener('change', function(){ dtEntry().prog = this.value; 
     dtEntry()[x[1]] = clean.trim(); dtEdit();
   });
 });
-$('dtClass').addEventListener('change', function(){ dtClassId = this.value; renderDaily(); });
+$('dtClass').addEventListener('change', function(){ dtClassId = this.value; dtOnly = null; renderDaily(); });
 $('dtPrev').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() - 1); renderDaily(); });
 $('dtNext').addEventListener('click', function(){ dtDay.setDate(dtDay.getDate() + 1); renderDaily(); });
 /* 흐름: 저장 → 리포트 만들기 → 확인 → 발송.
@@ -3637,11 +3696,7 @@ $('dtSend').addEventListener('click', function(){
   var e = dtEntry(); if(e.stage !== 'made') return;
   var names = (e.made || []).filter(function(s){ return e.ok && e.ok[s]; });
   if(!names.length){ toast('먼저 리포트를 확인해 주세요.'); return; }
-  // 같이 나가는 학원 공지를 먼저 정해 두고(받은 학생 기록), 리포트 글에 그대로 넣어요
-  var anList = anAll(), anN = 0; e.anSent = {};
-  names.forEach(function(st){ var l = dtAnOf(st, e); e.anSent[st] = l.map(function(a){ return a.id; }); anN += l.length;
-    l.forEach(function(a){ var x = anList.find(function(y){ return y.id === a.id; }); x.sentTo = x.sentTo || {}; x.sentTo[dtClassId + '|' + st] = Date.now(); }); });
-  if(anN) anSaveAll(anList);
+  delete e.anSent;
   e.made = names; e.sent = names.length; e.sentAt = Date.now(); e.stage = 'sent';
   ntPost(names.map(function(st){ return { type:'daily', cid:dtClassId, s:st, date:ymd(dtDay), title:dtDateText() + ' (' + DAYS[dtDay.getDay()] + ') 데일리 리포트', text:dtText(st, e) }; }));
   dtSave(); renderFlow();
@@ -7146,25 +7201,26 @@ function anAttHtml(){
 // 원장님·선생님 모두 학원 공지를 올릴 수 있어요. 고치기·내리기는 원장님과 쓴 사람만.
 function anCanEdit(a){ return state.view === 'director' || !!(a.byId && session && a.byId === session.id); }
 function anRefresh(){ if(state.page === 'pnotice') renderAnList(); if(state.page === 'pview') renderPView(); }
-// 발송 현황: 데일리 리포트로 공지를 받은 학생 수 / 지금 재원생 수
+// 발송: 학원 공지 화면에서 공지마다 '학부모님께 발송'을 눌러 따로 보내요(a.sentAt). 예전 데일리 리포트로 보낸 기록(sentTo)은 '일부 발송'으로만 보여요.
 function anSendState(a){
   var tot = 0, got = 0;
   CLASSES.forEach(function(c){ c.students.forEach(function(st){ if(!anFor(a, c.id, st)) return; tot++; if(a.sentTo && a.sentTo[c.id + '|' + st]) got++; }); });
   return { tot:tot, got:got };
 }
 function anSendTag(a){
+  if(a.sentAt){ var d = new Date(a.sentAt); return '<span class="tag rs-good an-st">발송 완료 ' + (a.sentN || 0) + '명 · ' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + hm(a.sentAt) + '</span>'; }
   var x = anSendState(a);
   if(!x.got) return '<span class="tag warn an-st">미발송</span>';
-  if(x.got >= x.tot) return '<span class="tag rs-good an-st">발송 완료 ' + x.got + '명</span>';
-  return '<span class="tag info an-st">발송 중 ' + x.got + ' / ' + x.tot + '명</span>';
+  return '<span class="tag info an-st">일부 발송 ' + x.got + ' / ' + x.tot + '명</span>';
 }
+function anMsg(a){ return '[비욘드잉글리쉬 사직어학원 공지]\n' + anLine(a).replace(/^· /, '') + '\n\n학부모·학생 화면에서도 확인하실 수 있어요.'; }
 function renderAnList(el, only, head, emptyMsg){
   el = el || $('anList');
   var all = anAll().filter(only || function(){ return true; }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
   var live = all.filter(anLive), old = all.filter(function(a){ return !anLive(a); });
   var row = function(a){
     return '<div class="an-row"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><div><b>' + esc(a.title) + '</b> ' + anSendTag(a) + '<small>' + esc(anScopeText(a)) + ' · ' + esc(anPeriod(a)) + ' · ' + esc(a.by || '') + (a.files && a.files.length ? ' · 📎 ' + a.files.length : '') + '</small></div>'
-      + '<span class="an-acts"><button type="button" class="btn soft" data-ancopy="' + a.id + '">가져와서 새로 쓰기</button>' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
+      + '<span class="an-acts">' + (anLive(a) && anCanEdit(a) ? '<button type="button" class="btn' + (a.sentAt ? ' soft' : '') + '" data-ansend="' + a.id + '">' + (a.sentAt ? '다시 발송' : '학부모님께 발송') + '</button>' : '') + '<button type="button" class="btn soft" data-ancopy="' + a.id + '">가져와서 새로 쓰기</button>' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
   };
   el.innerHTML = '<div class="card-head"><h2>' + (head || '올린 학원 공지') + ' <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
     + (live.length ? live.map(row).join('') : '<p class="empty">' + (emptyMsg || '아직 올린 공지가 없어요. ‘학원 공지 등록’으로 행사·휴원·학원 소식을 알려 주세요.') + '</p>')
@@ -7245,10 +7301,9 @@ $('anForm').addEventListener('submit', function(ev){
   v.files = an.att.map(function(f){ return { id:f.id, name:f.name, size:f.size, type:f.type }; });
   // 수정할 때 뺀 파일도 지우지 않고 고치기 전 기록(hist)에 남겨요
   if(a){ a.hist = a.hist || []; a.hist.push({ at:Date.now(), title:a.title, text:a.text, files:a.files || [], sentTo:a.sentTo });
-    if(a.sentTo && Object.keys(a.sentTo).length && confirm('이미 데일리 리포트로 보낸 공지예요. 고친 내용을 다음 데일리 리포트에 다시 붙여 보낼까요?\n\n[확인] 다시 보내기 · [취소] 고친 내용만 저장')) a.sentTo = {};
     Object.assign(a, v); a.edAt = Date.now(); }
   else { list.push(Object.assign({ id:'a' + Date.now(), at:Date.now(), byId:session && session.id, by:state.view === 'director' ? '원장님' : state.teacher + ' 선생님' }, v)); }
-  var done = function(){ anSaveAll(list); $('anOv').hidden = true; anRefresh(); toast(a ? '공지를 고쳤어요.' : '학부모·학생 화면에 학원 공지를 올렸어요.'); };
+  var done = function(){ anSaveAll(list); $('anOv').hidden = true; anRefresh(); toast(a ? (a.sentAt ? '공지를 고쳤어요. 고친 내용을 알리려면 \'다시 발송\'을 눌러 주세요.' : '공지를 고쳤어요. 목록에서 \'학부모님께 발송\'을 누르면 보내져요.') : '학부모·학생 화면에 올렸어요. 목록에서 \'학부모님께 발송\'을 누르면 보내져요.'); };
   Promise.all(fresh.map(function(f){ return bdFile('put', f.id, f.blob); })).then(done, function(){ toast('첨부 파일을 저장하지 못했어요. 파일 없이 올렸어요.'); v.files = v.files.filter(function(f){ return !fresh.some(function(x){ return x.id === f.id; }); }); (a || list[list.length - 1]).files = v.files; done(); });
 });
 document.addEventListener('click', function(ev){
@@ -7256,6 +7311,16 @@ document.addEventListener('click', function(ev){
   if(b.dataset.anedit) return anOpen(b.dataset.anedit);
   if(b.dataset.ancopy){ var src = anAll().find(function(x){ return x.id === b.dataset.ancopy; }); anOpen(null, 'all'); if(src) anFill(src); return; }
   if(b.hasAttribute('data-anold')){ an.showOld = !an.showOld; return anRefresh(); }
+  if(b.dataset.ansend){
+    var L = anAll(), x = L.find(function(y){ return y.id === b.dataset.ansend; }); if(!x) return;
+    var n = anSendState(x).tot;
+    if(!confirm((x.sentAt ? '이 공지를 다시 보낼까요?' : '이 공지를 보낼까요?') + '\n\n받는 사람: 학원 전체 학부모님 ' + n + '명\n데일리 리포트와는 따로 나가요.')) return;
+    x.sendLog = x.sendLog || []; x.sendLog.push({ at:Date.now(), n:n, by:state.view === 'director' ? '원장님' : state.teacher + ' 선생님' });
+    x.sentAt = Date.now(); x.sentN = n; anSaveAll(L); anRefresh();
+    var msg = anMsg(x);
+    (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject()).then(function(){ toast('시안이라 실제 문자는 가지 않아요. 발송으로 기록하고 카톡 문구를 복사했어요.'); }, function(){ toast('시안이라 실제 문자는 가지 않아요. ' + n + '명에게 보낸 것으로 기록했어요.'); });
+    return;
+  }
   var list = anAll(), a = list.find(function(x){ return x.id === (b.dataset.andown || b.dataset.anup); }); if(!a) return;
   if(b.dataset.andown){ a.down = Date.now(); toast('안내를 내렸어요. 지난 안내에 남아 있어요.'); }
   else { delete a.down; if(a.to && a.to < ymd(new Date())) a.to = ''; toast('안내를 다시 올렸어요.'); }
