@@ -1021,6 +1021,12 @@
   @media print{ .ha-tabs{ display:none; } .ms .ha-msg{ columns:2; column-gap:18px; } }
   .ha-msg{ white-space:pre-wrap; font-size:12px; line-height:1.5; } .ha-cp{ margin-top:8px; }
   @media print{ .ha-cp{ display:none; } .ms:has(.ha-msg){ gap:6px; } .ms:has(.ha-msg) .ms-hd p{ display:none; } .ms .ha-msg{ font-size:9px; line-height:1.25; padding:6px 8px; } .ms .ha-tip{ display:none; } .ms:has(.ha-msg) .ms-box{ padding:6px 9px; } .ms:has(.ha-msg) .ms-box ul{ font-size:10.5px; gap:0; } .ms:has(.ha-msg) .ms-step{ padding:6px 8px; } .ms:has(.ha-msg) .ms-step span{ font-size:10.5px; } .ms:has(.ha-msg) .ms-step em{ font-size:9.5px; margin-top:2px; } .ms:has(.ha-msg) .ms-rules div{ padding:5px 10px; font-size:11.5px; } }
+  .cloud-chip{ position:fixed; left:12px; bottom:12px; z-index:90; font-size:12px; font-weight:700; padding:5px 10px; border-radius:99px; background:var(--surface); border:1px solid var(--border); color:var(--ink-soft); box-shadow:0 2px 8px rgba(0,0,0,.08); }
+  .cloud-chip.ok{ color:var(--good); } .cloud-chip.wait{ color:var(--ink-soft); } .cloud-chip.bad{ color:#fff; background:var(--warn); border-color:var(--warn); }
+  .cloud-stale, .cloud-off{ position:fixed; left:50%; transform:translateX(-50%); top:10px; z-index:95; background:var(--ink); color:var(--surface); padding:8px 14px; border-radius:12px; font-size:13px; font-weight:700; box-shadow:0 4px 14px rgba(0,0,0,.2); max-width:calc(100% - 32px); }
+  .cloud-off{ background:var(--warn); color:#fff; top:auto; bottom:12px; }
+  .cloud-stale button{ font:inherit; margin-left:8px; border:0; border-radius:8px; padding:4px 10px; background:var(--accent); color:#fff; cursor:pointer; }
+  @media print{ .cloud-chip, .cloud-stale, .cloud-off{ display:none !important; } }
   .ms-ex{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); }
   .ms-ex code{ font-family:inherit; background:var(--surface-soft); border-radius:6px; padding:1px 6px; color:var(--ink); }
   .ms-who{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; margin-bottom:10px; }
@@ -2083,7 +2089,10 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script>
+<div id="cloudStale" class="cloud-stale" hidden>다른 선생님이 고친 내용이 있어요. <button type="button" id="cloudReload">새로고침해서 보기</button></div>
+<div id="cloudChip" class="cloud-chip" hidden></div>
+<div id="cloudOff" class="cloud-off" hidden>학원 서버에 연결되지 않아 시연 모드로 열었어요. 여기서 입력한 내용은 이 브라우저에만 남고 학원 서버에는 저장되지 않아요.</div>
+<script type="text/x-beyond" id="mainJs">
 /* ===== 설정 ===== */
 // 안내 페이지(index.html)와 같은 구글 Apps Script 웹 앱 주소. 넣으면 상담 예약이 공통 일정표에 자동으로 떠요.
 var SHEET_URL = '';
@@ -6333,7 +6342,26 @@ var store = (function(){
   return { accounts:[], assign:{} };
 })();
 var session = null;
-function saveStore(){ try{ localStorage.setItem(ACC_KEY, JSON.stringify(store)); }catch(e){} }
+function saveStore(){ try{ localStorage.setItem(ACC_KEY, JSON.stringify(store)); }catch(e){} if(CLOUD.ok) CLOUD.syncStaff(store.accounts); }
+function cloudFirst(){ return CLOUD.ok ? !CLOUD.ownerExists : !store.accounts.some(function(a){ return a.role === 'director'; }); }
+function tempPw(){ var a = new Uint32Array(1); crypto.getRandomValues(a); return String(100000 + a[0] % 900000); }
+function cloudTag(a){ return CLOUD.ok && !a.cloud ? ' <span class="tag warn">로그인 준비 전 · 비밀번호 초기화를 눌러 주세요</span>' : ''; }
+// 원장님이 선생님 계정을 Firebase에 만들고 임시 비밀번호를 정해요. 선생님은 처음 로그인할 때 새 비밀번호로 바꿔요.
+function cloudIssue(acc, pw, done){
+  toast('선생님 로그인 계정을 만드는 중이에요…');
+  return CLOUD.makeStaff(acc, pw).then(function(){ if(store.resetReq) delete store.resetReq[acc.id]; saveStore(); renderSettings(); done(pw); },
+    function(e){ toast('계정을 만들지 못했어요. ' + CLOUD.errMsg(e)); });
+}
+var cloudAskN = 0;
+function cloudAskPw(){
+  if(++cloudAskN > 3){ cloudAskN = 0; return toast('새 비밀번호는 다음에 들어올 때 다시 정해요.'); }
+  var pw = prompt(session.name + (session.role === 'teacher' ? ' 선생님' : '') + ', 임시 비밀번호로 들어왔어요. 앞으로 쓸 새 비밀번호를 6자 이상으로 정해 주세요.');
+  if(pw == null) return toast('다음에 들어올 때 다시 물어볼게요.');
+  if(pw.length < 6){ alert('6자 이상으로 정해 주세요.'); return cloudAskPw(); }
+  if(prompt('확인을 위해 한 번 더 입력해 주세요.') !== pw){ alert('두 번 입력한 비밀번호가 달라요. 다시 정해 주세요.'); return cloudAskPw(); }
+  cloudAskN = 0;
+  CLOUD.changePw(pw).then(function(){ toast('새 비밀번호를 정했어요. 다음부터 이 비밀번호로 들어와요.'); }, function(e){ alert(CLOUD.errMsg(e)); });
+}
 function findAcc(id){ id = String(id).toLowerCase(); return store.accounts.find(function(a){ return a.id === id; }); }
 function applyAssign(){ Object.keys(store.assign || {}).forEach(function(cid){ var c = CLASSES.find(function(x){ return x.id === cid; }); if(c) c.teacher = store.assign[cid]; }); }
 function teacherNames(){
@@ -6371,7 +6399,7 @@ function showLogin(){
   $('loginScreen').hidden = false;
   document.querySelector('.topbar').hidden = true;
   $('appLayout').hidden = true;
-  var first = !store.accounts.some(function(a){ return a.role === 'director'; });
+  var first = cloudFirst();
   $('setupBox').hidden = !first;
   $('loginBox').hidden = first;
   $('resetBox').hidden = true;
@@ -6381,6 +6409,8 @@ function showLogin(){
   $('parentScreen').hidden = true; $('parentBox').hidden = true; $('staffNote').hidden = false;
   document.querySelectorAll('[data-lt]').forEach(function(b){ b.setAttribute('aria-selected', b.dataset.lt === 'staff'); });
   (first ? $('setupId') : savedId ? $('loginPw') : $('loginId')).focus();
+  if(CLOUD.ok){ $('staffNote').textContent = '학원 서버(Firebase)에 안전하게 저장돼요. 학원 공용 컴퓨터에서는 자동 로그인을 켜지 말고, 다 쓰면 꼭 로그아웃해 주세요.'; if(CLOUD.bootErr){ $('loginErr').textContent = CLOUD.bootErr; CLOUD.bootErr = ''; } }
+  if(CLOUD.offline) $('cloudOff').hidden = false;
 }
 
 /* 비밀번호 재설정: 선생님은 원장님께 요청, 원장님은 복구 코드로 */
@@ -6397,6 +6427,7 @@ $('toLogin').addEventListener('click', function(){ showLogin(); });
 $('resetForm').addEventListener('submit', function(e){
   e.preventDefault();
   $('resetErr').textContent = ''; $('resetOk').textContent = '';
+  if(CLOUD.ok){ $('resetOk').textContent = '선생님은 원장님께 말씀해 주세요. 원장님이 임시 비밀번호를 새로 정해 드려요. 원장님 비밀번호를 잊으셨다면 관리를 도와주는 Claude에게 말씀해 주세요.'; $('resetBtn').hidden = true; return; }
   var acc = findAcc($('resetId').value.trim());
   if(!acc){ $('resetErr').textContent = '등록된 아이디가 아니에요. 다시 확인해 주세요.'; return; }
   if(acc.role === 'teacher'){
@@ -6428,7 +6459,7 @@ function enter(acc){
   ml.box = 'in'; ml.mode = 'list'; ml.to = []; ml.subj = ''; ml.body = '';
   try{ sessionStorage.setItem(SES_KEY, JSON.stringify(session)); }catch(e){}
   $('loginScreen').hidden = true;
-  if(acc.role === 'director' && !acc.rhash) setTimeout(function(){ toast('선생님 계정·권한 화면에서 원장님 복구 코드를 만들어 두세요.'); }, 2800);
+  if(!CLOUD.ok && acc.role === 'director' && !acc.rhash) setTimeout(function(){ toast('선생님 계정·권한 화면에서 원장님 복구 코드를 만들어 두세요.'); }, 2800);
   document.querySelector('.topbar').hidden = false;
   $('appLayout').hidden = false;
   document.querySelector('.seg').hidden = acc.role === 'teacher';
@@ -6470,6 +6501,22 @@ $('setupForm').addEventListener('submit', function(e){
   e.preventDefault();
   var id = $('setupId').value.trim(), pw = $('setupPw').value, err = checkId(id) || checkPw(pw, $('setupPw2').value);
   if(err){ $('setupErr').textContent = err; return; }
+  if(CLOUD.ok){
+    $('setupErr').textContent = '';
+    var btn = $('setupForm').querySelector('button'); btn.disabled = true;
+    var had = CLOUD.keys.filter(function(k){ return localStorage.getItem(k) != null; });
+    CLOUD.setupOwner(id, pw).then(function(){
+      var move = had.length && confirm('이 브라우저에 지금까지 입력한 기록(' + had.length + '가지)이 있어요. 학원 서버로 옮길까요?\n\n옮기지 않으면 서버는 빈 상태로 시작해요.');
+      if(!move){ had.forEach(function(k){ localStorage.removeItem(k); }); store = { accounts:[], assign:{} }; }
+      store.accounts = store.accounts.filter(function(a){ return a.role !== 'director'; });
+      store.accounts.forEach(function(a){ delete a.cloud; delete a.gen; });
+      store.accounts.push({ id:id.toLowerCase(), name:'원장님', role:'director', cloud:true, gen:0 });
+      try{ Storage.prototype.setItem.call(localStorage, ACC_KEY, JSON.stringify(store)); }catch(x){}
+      CLOUD.user = { id:id.toLowerCase(), gen:0, role:'director', name:'원장님' };
+      return CLOUD.uploadLocal(move ? had.concat([ACC_KEY]).filter(function(k, i, a){ return a.indexOf(k) === i; }) : [ACC_KEY]);
+    }).then(function(){ location.reload(); }, function(e2){ btn.disabled = false; $('setupErr').textContent = /EMAIL_EXISTS|ALREADY_EXISTS|PERMISSION/.test(e2.message) || e2.status === 403 || e2.status === 409 ? '이미 원장님 계정이 있어요. 새로고침한 뒤 로그인해 주세요.' : CLOUD.errMsg(e2); });
+    return;
+  }
   var salt = randSalt();
   hashPw(pw, salt).then(function(h){
     var acc = { id:id.toLowerCase(), name:'원장님', role:'director', salt:salt, hash:h };
@@ -6479,6 +6526,16 @@ $('setupForm').addEventListener('submit', function(e){
 });
 $('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
+  if(CLOUD.ok){
+    var cid = $('loginId').value.trim().toLowerCase(), cpw = $('loginPw').value, lb = $('loginForm').querySelector('button[type=submit]') || $('loginForm').querySelector('button');
+    if(!cid || !cpw){ $('loginErr').textContent = '아이디와 비밀번호를 넣어 주세요.'; return; }
+    $('loginErr').textContent = ''; if(lb) lb.disabled = true;
+    CLOUD.signIn(cid, cpw, $('autoLogin').checked).then(function(){
+      try{ if($('saveId').checked) localStorage.setItem(ID_KEY, cid); else localStorage.removeItem(ID_KEY); }catch(x){}
+      location.reload();
+    }, function(e2){ if(lb) lb.disabled = false; $('loginErr').textContent = CLOUD.errMsg(e2); $('loginPw').value = ''; $('loginPw').focus(); });
+    return;
+  }
   var acc = findAcc($('loginId').value.trim()), pw = $('loginPw').value;
   var fail = function(){ $('loginErr').textContent = '아이디 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요.'; $('loginPw').value = ''; $('loginPw').focus(); };
   if(!acc) return fail();
@@ -6508,6 +6565,7 @@ $('logoutBtn').addEventListener('click', function(e){
   session = null;
   try{ sessionStorage.removeItem(SES_KEY); localStorage.removeItem(AUTO_KEY); }catch(err){}
   try{ history.replaceState(null, '', location.pathname); }catch(err){}
+  if(CLOUD.ok){ toast('저장을 마무리하고 로그아웃할게요…'); CLOUD.logout().then(function(){ location.reload(); }); return; }
   showLogin();
 });
 
@@ -6521,7 +6579,7 @@ function renderSettings(){
   $('ptParts').innerHTML = ptPartsHtml({});
   $('ptCount').textContent = parts.length + '명';
   $('ptRows').innerHTML = parts.length ? parts.map(function(a){
-    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+((store.resetReq || {})[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+esc(a.id)+'</td><td>'+ptPartsText(a)+'</td><td class="dt">'+tDate(a.hire)+'</td>' +
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+((store.resetReq || {})[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+cloudTag(a)+'</td><td>'+esc(a.id)+'</td><td>'+ptPartsText(a)+'</td><td class="dt">'+tDate(a.hire)+'</td>' +
       '<td class="dt"><input type="date" class="t-lv" data-lv="left" value="'+esc(a.left || '')+'" aria-label="'+esc(a.name)+' 퇴사일"></td><td class="dt"><input type="date" class="t-lv" data-lv="eduOff" value="'+esc(a.eduOff || '')+'" aria-label="'+esc(a.name)+' 교육청 등록 철회일"></td>' +
       '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 초기화</button></td></tr>';
   }).join('') : '<tr><td colspan="7" class="muted" style="padding:16px 10px">등록된 아르바이트 선생님이 없어요.</td></tr>';
@@ -6533,7 +6591,7 @@ function renderSettings(){
   $('codeShow').hidden = true;
   $('tRows').innerHTML = teachers.length ? teachers.map(function(a){
     var cl = CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; });
-    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
+    return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+cloudTag(a)+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
       '<td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td>' +
       '<td class="dt"><input type="date" class="t-lv" data-lv="left" value="'+esc(a.left || '')+'" aria-label="'+esc(a.name)+' 퇴사일"></td><td class="dt"><input type="date" class="t-lv" data-lv="eduOff" value="'+esc(a.eduOff || '')+'" aria-label="'+esc(a.name)+' 교육청 등록 철회일"></td>' +
       '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 초기화</button></td></tr>';
@@ -6564,6 +6622,10 @@ function ptPartsText(a){
 function ptClassIds(name){ var a = store.accounts.find(function(x){ return x.role === 'teacher' && x.name === name && x.type === 'part' && !x.left; }); return a && a.parts ? Object.keys(a.parts).filter(function(k){ return a.parts[k].length; }) : []; }
 // 비밀번호 초기화: 선생님이 다음에 로그인할 때 새 비밀번호를 직접 정해요
 function tPwReset(acc){
+  if(CLOUD.ok){
+    if(!confirm(acc.name + ' 선생님 비밀번호를 초기화할까요? 임시 비밀번호를 새로 만들어요. 예전 비밀번호로는 더 이상 들어올 수 없어요.')) return;
+    return cloudIssue(acc, tempPw(), function(pw){ alert(acc.name + ' 선생님 임시 비밀번호: ' + pw + '\n\n선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'); });
+  }
   if(!confirm(acc.name + ' 선생님 비밀번호를 초기화할까요? 다음에 로그인할 때 선생님이 새 비밀번호를 정해요.')) return;
   acc.salt = ''; acc.hash = ''; if(store.resetReq) delete store.resetReq[acc.id];
   saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 초기화했어요. 아이디로 로그인하면서 새 비밀번호를 정하면 돼요.');
@@ -6610,10 +6672,12 @@ $('regForm').addEventListener('submit', function(e){
   if(err){ $('regErr').textContent = err; return; }
   $('regErr').textContent = '';
   var picked = Array.from(document.querySelectorAll('#regClasses input:checked')).map(function(i){ return i.value; });
-  store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', salt:'', hash:'', hire:$('regHire').value, edu:$('regEdu').value });
+  var nacc = { id:id.toLowerCase(), name:name, role:'teacher', salt:'', hash:'', hire:$('regHire').value, edu:$('regEdu').value };
+  store.accounts.push(nacc);
   picked.forEach(function(cid){ store.assign[cid] = name; });
   saveStore(); applyAssign(); renderDirector();
   $('regForm').reset(); renderSettings();
+  if(CLOUD.ok) return cloudIssue(nacc, tempPw(), function(pw){ $('regOk').textContent = name + ' 선생님을 등록했어요. 아이디 ' + nacc.id + ' · 임시 비밀번호 ' + pw + ' 를 선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'; });
   $('regOk').textContent = name + ' 선생님을 등록했어요. 아이디는 ' + id.toLowerCase() + '예요. 선생님께 알려 주세요. 처음 로그인할 때 선생님이 비밀번호를 정해요.';
 });
 
@@ -6638,9 +6702,11 @@ $('ptForm').addEventListener('submit', function(e){
   var err = !name ? '이름을 입력해 주세요.' : dupName ? '같은 이름의 선생님 계정이 이미 있어요. 이름 뒤에 구분을 붙여 주세요. (예: 김하늘B)' : checkId(id);
   if(err){ $('ptErr').textContent = err; return; }
   $('ptErr').textContent = '';
-  store.accounts.push({ id:id.toLowerCase(), name:name, role:'teacher', type:'part', salt:'', hash:'', hire:$('ptHire').value, parts:ptPartsRead($('ptParts')) });
+  var pacc = { id:id.toLowerCase(), name:name, role:'teacher', type:'part', salt:'', hash:'', hire:$('ptHire').value, parts:ptPartsRead($('ptParts')) };
+  store.accounts.push(pacc);
   saveStore(); renderDirector();
   $('ptForm').reset(); renderSettings();
+  if(CLOUD.ok) return cloudIssue(pacc, tempPw(), function(pw){ $('ptOk').textContent = name + ' 선생님(아르바이트)을 등록했어요. 아이디 ' + pacc.id + ' · 임시 비밀번호 ' + pw + ' 를 선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'; });
   $('ptOk').textContent = name + ' 선생님(아르바이트)을 등록했어요. 아이디는 ' + id.toLowerCase() + '예요. 선생님께 알려 주세요. 로그인 화면의 \'원장님·선생님\'에서 처음 들어올 때 비밀번호를 정하면 선생님 화면이 열려요.';
 });
 $('ptRows').addEventListener('click', function(e){
@@ -6655,6 +6721,7 @@ $('ptRows').addEventListener('submit', function(e){
   e.preventDefault();
   var f = e.target, acc = findAcc(f.dataset.id), pw = f.querySelector('input').value;
   if(pw.length < 6){ f.querySelector('.form-err').textContent = '6자 이상으로 정해 주세요.'; return; }
+  if(CLOUD.ok) return cloudIssue(acc, pw, function(){ toast(acc.name + ' 선생님 임시 비밀번호를 정했어요. 선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'); });
   var salt = randSalt();
   hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; if(store.resetReq) delete store.resetReq[acc.id]; saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 바꿨어요.'); });
 });
@@ -6690,6 +6757,7 @@ $('tRows').addEventListener('submit', function(e){
   e.preventDefault();
   var f = e.target, acc = findAcc(f.dataset.id), pw = f.querySelector('input').value;
   if(pw.length < 6){ f.querySelector('.form-err').textContent = '6자 이상으로 정해 주세요.'; return; }
+  if(CLOUD.ok) return cloudIssue(acc, pw, function(){ toast(acc.name + ' 선생님 임시 비밀번호를 정했어요. 선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'); });
   var salt = randSalt();
   hashPw(pw, salt).then(function(h){ acc.salt = salt; acc.hash = h; if(store.resetReq) delete store.resetReq[acc.id]; saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 바꿨어요. 새 비밀번호를 선생님께 알려 주세요.'); });
 });
@@ -6786,7 +6854,7 @@ $('pvLogout').addEventListener('click', function(){
 });
 function loginTab(w){
   document.querySelectorAll('[data-lt]').forEach(function(b){ b.setAttribute('aria-selected', b.dataset.lt === w); });
-  var par = w === 'parent', first = !store.accounts.some(function(a){ return a.role === 'director'; });
+  var par = w === 'parent', first = cloudFirst();
   $('parentBox').hidden = !par; $('staffNote').hidden = par;
   $('loginBox').hidden = par || first; $('setupBox').hidden = par || !first; $('resetBox').hidden = true;
   if(par){
@@ -6798,6 +6866,7 @@ function loginTab(w){
 document.querySelector('.login-tabs').addEventListener('click', function(ev){ var b = ev.target.closest('[data-lt]'); if(b) loginTab(b.dataset.lt); });
 $('pLoginForm').addEventListener('submit', function(ev){
   ev.preventDefault();
+  if(CLOUD.ok){ $('pErr').textContent = '학부모 화면은 더 안전한 로그인으로 바꾸는 중이에요. 곧 열어 드릴게요. 궁금한 점은 학원으로 연락 주세요.'; return; }
   var name = $('pName').value.replace(/\s/g, ''), pin = $('pPin').value.trim();
   if(!name){ $('pErr').textContent = '학생 이름을 적어 주세요.'; return $('pName').focus(); }
   if(!/^\d{4}$/.test(pin)){ $('pErr').textContent = '번호 뒷자리 숫자 4개를 넣어 주세요.'; return $('pPin').focus(); }
@@ -7675,7 +7744,15 @@ $('ttCard').addEventListener('click', function(ev){
 /* ===== 시작 ===== */
 applyAssign();
 loadSheetConsults();
+$('cloudReload').addEventListener('click', function(){ CLOUD.flush().then(function(){ location.reload(); }); });
 (function(){
+  if(CLOUD.ok){
+    if(!CLOUD.user){ showLogin(); return; }
+    var ca = findAcc(CLOUD.user.id) || { id:CLOUD.user.id, role:CLOUD.user.role, name:CLOUD.user.name };
+    enter(ca);
+    if(CLOUD.user.temp) setTimeout(cloudAskPw, 500);
+    return;
+  }
   var saved = null;
   try{ saved = JSON.parse(sessionStorage.getItem(SES_KEY) || 'null'); }catch(e){}
   var acc = saved && findAcc(saved.id);
@@ -7696,5 +7773,271 @@ loadSheetConsults();
   if(/parent/.test(location.hash)) loginTab('parent');
 })();
 </script>
+<script>
+/* ===== Firebase 연결 (1단계: 직원 로그인 + 업무 기록 공유 저장) =====
+   - 로그인: Firebase 이메일/비밀번호. 아이디 'kim'은 kim.g0@beyond-sajik.app 처럼 바꿔서 써요(g 뒤 숫자는 비밀번호를 새로 정할 때마다 올라가요).
+   - 저장: 지금처럼 localStorage에 쓰면, 같은 내용을 Firestore kv/{저장 이름}에도 올려요. 여러 사람이 같이 고쳐도 바뀐 칸만 합쳐요.
+   - 권한: firebase/firestore.rules (원장님 전체, 선생님은 수강료 제외, 계정 명단은 원장님만 고침).
+   - 학부모 화면은 2단계에서 연결해요. */
+var FB = {
+  apiKey:'AIzaSyDux5xS0ywPVlgNPyeiOIOQU2iXvjFNKo0', authDomain:'beyond-sajik.firebaseapp.com', projectId:'beyond-sajik',
+  storageBucket:'beyond-sajik.firebasestorage.app', messagingSenderId:'1004954022333', appId:'1:1004954022333:web:2122e5263b387d5e4ca2d4'
+};
+var CLOUD = (function(){
+  var EMU = window.FB_EMU;   // 시험용 에뮬레이터 주소 (실제 화면에서는 없음)
+  var AUTH = (EMU ? EMU.auth + '/identitytoolkit.googleapis.com' : 'https://identitytoolkit.googleapis.com') + '/v1/';
+  var TOKEN = (EMU ? EMU.auth + '/securetoken.googleapis.com' : 'https://securetoken.googleapis.com') + '/v1/token?key=' + FB.apiKey;
+  var DB = (EMU ? EMU.db : 'https://firestore.googleapis.com') + '/v1/projects/' + FB.projectId + '/databases/(default)/documents/';
+  var DOMAIN = 'beyond-sajik.app', AKEY = 'bxfb-auth';
+  var SYNC = ['beyond-accounts-v1','beyond-attend-v1','beyond-board-v1','beyond-consult-record-v1','beyond-daily-v2','beyond-delete-v1','beyond-gyomu-v1',
+    'beyond-journal-v1','beyond-lesson-check-v1','beyond-lesson-items-v1','beyond-mail-v1','beyond-monthly-v1','beyond-notice-v1','beyond-pay-v1',
+    'beyond-public-v1','beyond-reserve-v1','beyond-roster-v1','beyond-schedule-v1','beyond-timetable-v1'];
+  var DIRECTOR_ONLY_READ = ['beyond-pay-v1'];
+  var C = { on: !!FB.apiKey && !/[?&]local=1\b/.test(location.search), ok:false, user:null, ownerExists:false, base:{}, stale:false, pending:{}, keys:SYNC };
+  var rawSet = Storage.prototype.setItem, rawRemove = Storage.prototype.removeItem;
+
+  function email(id, gen){ return String(id).toLowerCase() + '.g' + (gen || 0) + '@' + DOMAIN; }
+  function parseEmail(e){ var m = /^([a-z0-9_]+)\.g(\d+)@/.exec(e || ''); return m ? { id:m[1], gen:+m[2] } : null; }
+  function readAuth(){ try{ return JSON.parse(localStorage.getItem(AKEY) || sessionStorage.getItem(AKEY) || 'null'); }catch(e){ return null; } }
+  function writeAuth(a, keep){
+    try{ rawRemove.call(localStorage, AKEY); rawRemove.call(sessionStorage, AKEY); if(a) rawSet.call(keep ? localStorage : sessionStorage, AKEY, JSON.stringify(a)); }catch(e){}
+  }
+  function jfetch(url, opt){
+    return fetch(url, opt).then(function(r){ return r.text().then(function(t){ var j = null; try{ j = t ? JSON.parse(t) : {}; }catch(e){ j = { raw:t }; } if(!r.ok){ var err = new Error((j && j.error && (j.error.message || j.error.status)) || ('HTTP ' + r.status)); err.status = r.status; err.body = j; throw err; } return j; }); });
+  }
+  function authCall(path, body){ return jfetch(AUTH + path + '?key=' + FB.apiKey, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(body) }); }
+  function session(j, keep){ var a = { idToken:j.idToken, refreshToken:j.refreshToken, exp:Date.now() + (+j.expiresIn || 3600) * 1000 - 120000, email:j.email, keep:!!keep }; writeAuth(a, keep); return a; }
+  var tokP = null;
+  function token(){
+    var a = readAuth(); if(!a) return Promise.reject(new Error('NO_AUTH'));
+    if(a.exp > Date.now()) return Promise.resolve(a.idToken);
+    if(tokP) return tokP;
+    tokP = jfetch(TOKEN, { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' }, body:'grant_type=refresh_token&refresh_token=' + encodeURIComponent(a.refreshToken) })
+      .then(function(j){ a.idToken = j.id_token; a.refreshToken = j.refresh_token; a.exp = Date.now() + (+j.expires_in || 3600) * 1000 - 120000; writeAuth(a, a.keep); tokP = null; return a.idToken; },
+            function(e){ tokP = null; throw e; });
+    return tokP;
+  }
+  function hdr(t){ var h = { 'Content-Type':'application/json' }; if(t) h.Authorization = 'Bearer ' + t; return h; }
+  // Firestore 값 <-> JS
+  function toF(v){
+    if(v === null || v === undefined) return { nullValue:null };
+    if(typeof v === 'boolean') return { booleanValue:v };
+    if(typeof v === 'number') return Number.isInteger(v) ? { integerValue:String(v) } : { doubleValue:v };
+    if(typeof v === 'string') return { stringValue:v };
+    var f = {}; Object.keys(v).forEach(function(k){ f[k] = toF(v[k]); }); return { mapValue:{ fields:f } };
+  }
+  function fromF(x){
+    if(!x) return null;
+    if('stringValue' in x) return x.stringValue; if('integerValue' in x) return +x.integerValue; if('doubleValue' in x) return x.doubleValue;
+    if('booleanValue' in x) return x.booleanValue; if('timestampValue' in x) return x.timestampValue; if('nullValue' in x) return null;
+    if('mapValue' in x){ var o = {}, f = x.mapValue.fields || {}; Object.keys(f).forEach(function(k){ o[k] = fromF(f[k]); }); return o; }
+    return null;
+  }
+  function docFields(o){ var f = {}; Object.keys(o).forEach(function(k){ f[k] = toF(o[k]); }); return f; }
+  function getDoc(path, auth){
+    var p = auth === false ? Promise.resolve(null) : token().catch(function(){ return null; });
+    return p.then(function(t){ return jfetch(DB + path, { headers:hdr(t) }); })
+      .then(function(d){ var o = {}; Object.keys(d.fields || {}).forEach(function(k){ o[k] = fromF(d.fields[k]); }); return { data:o, updateTime:d.updateTime }; },
+            function(e){ if(e.status === 404) return null; throw e; });
+  }
+  function commit(writes){ return token().then(function(t){ return jfetch(DB.replace(/documents\/$/, 'documents:commit'), { method:'POST', headers:hdr(t), body:JSON.stringify({ writes:writes }) }); }); }
+  function upd(path, obj, pre){ var w = { update:{ name:'projects/' + FB.projectId + '/databases/(default)/documents/' + path, fields:docFields(obj) } }; if(pre) w.currentDocument = pre; return w; }
+
+  // 3방향 합치기: 처음 받은 값(base)에서 내가 바꾼 칸만 서버 최신값(remote)에 얹어요.
+  function isObj(v){ return v && typeof v === 'object' && !Array.isArray(v); }
+  function idArr(a){ return Array.isArray(a) && a.length && a.every(function(x){ return isObj(x) && x.id != null; }); }
+  function same(a, b){ return JSON.stringify(a) === JSON.stringify(b); }
+  function merge3(base, local, remote){
+    if(same(local, base)) return remote;
+    if(same(remote, base) || remote === undefined) return local;
+    if(isObj(local) && isObj(remote)){
+      var b = isObj(base) ? base : {}, out = {}, ks = {};
+      [b, local, remote].forEach(function(o){ Object.keys(o).forEach(function(k){ ks[k] = 1; }); });
+      Object.keys(ks).forEach(function(k){ var v = merge3(b[k], local[k], remote[k]); if(v !== undefined) out[k] = v; });
+      return out;
+    }
+    if((idArr(local) || idArr(remote)) && Array.isArray(local) && Array.isArray(remote)){
+      var bm = {}, lm = {}, rm = {}, order = [];
+      (Array.isArray(base) ? base : []).forEach(function(x){ if(isObj(x)) bm[x.id] = x; });
+      local.forEach(function(x){ lm[x.id] = x; }); remote.forEach(function(x){ rm[x.id] = x; if(order.indexOf(x.id) === -1) order.push(x.id); });
+      local.forEach(function(x){ if(order.indexOf(x.id) === -1) order.push(x.id); });
+      return order.map(function(id){ return merge3(bm[id], lm[id], rm[id]); }).filter(function(x){ return x !== undefined; });
+    }
+    return local;
+  }
+  function parse(s){ try{ return JSON.parse(s); }catch(e){ return s; } }
+  function clean(k, s){
+    if(k !== 'beyond-accounts-v1' || s == null) return s;
+    var o = parse(s); if(!isObj(o)) return s;
+    (o.accounts || []).forEach(function(a){ delete a.salt; delete a.hash; delete a.rsalt; delete a.rhash; });
+    return JSON.stringify(o);
+  }
+
+  // 받아오기
+  function pullAll(){
+    var keys = SYNC.filter(function(k){ return C.user.role === 'director' || DIRECTOR_ONLY_READ.indexOf(k) === -1; });
+    return Promise.all(keys.map(function(k){ return getDoc('kv/' + k).then(function(d){ return [k, d]; }); })).then(function(list){
+      list.forEach(function(x){
+        var k = x[0], d = x[1];
+        if(d && typeof d.data.v === 'string'){ rawSet.call(localStorage, k, d.data.v); C.base[k] = d.data.v; C.ut[k] = d.updateTime; }
+        else { rawRemove.call(localStorage, k); C.base[k] = null; C.ut[k] = null; }
+      });
+      SYNC.forEach(function(k){ if(keys.indexOf(k) === -1) rawRemove.call(localStorage, k); });
+    });
+  }
+  C.ut = {};
+  // 올리기
+  var timers = {}, busy = {};
+  function status(t, cls){ var el = document.getElementById('cloudChip'); if(!el) return; el.textContent = t; el.className = 'cloud-chip ' + (cls || ''); el.hidden = false; }
+  function pendingN(){ return Object.keys(C.pending).filter(function(k){ return C.pending[k]; }).length; }
+  function queue(k){
+    C.pending[k] = true; status('저장 중…', 'wait');
+    clearTimeout(timers[k]); timers[k] = setTimeout(function(){ push(k); }, 1200);
+  }
+  function push(k, tries){
+    if(busy[k]){ clearTimeout(timers[k]); timers[k] = setTimeout(function(){ push(k); }, 600); return Promise.resolve(); }
+    busy[k] = true; tries = tries || 0;
+    var local = clean(k, localStorage.getItem(k));
+    if(local == null){ busy[k] = false; C.pending[k] = false; return Promise.resolve(); }
+    if(local.length > 950000) status('기록이 너무 커요: ' + k, 'bad');
+    return getDoc('kv/' + k).then(function(d){
+      var remote = d && typeof d.data.v === 'string' ? d.data.v : null, val = local;
+      if(remote != null && remote !== C.base[k]){
+        val = JSON.stringify(merge3(parse(C.base[k]), parse(local), parse(remote)));
+        if(val !== local){ C.stale = true; showStale(); }
+      }
+      if(val === remote){ return null; }
+      var pre = d ? { updateTime:d.updateTime } : { exists:false };
+      return commit([upd('kv/' + k, { v:val, at:new Date().toISOString(), by:(C.user && C.user.id) || '' }, pre)]);
+    }).then(function(){
+      C.base[k] = local; busy[k] = false;
+      if(localStorage.getItem(k) === null || clean(k, localStorage.getItem(k)) === local) C.pending[k] = false;
+      if(!pendingN()) status('저장됨 ✓', 'ok');
+    }, function(e){
+      busy[k] = false;
+      if(tries < 4 && (e.status === 400 || e.status === 409 || e.status === 412 || !e.status)) return new Promise(function(r){ setTimeout(r, 500 * (tries + 1)); }).then(function(){ return push(k, tries + 1); });
+      status(e.status === 403 ? '저장 권한이 없어요' : '저장 안 됨 · 인터넷 확인', 'bad');
+      clearTimeout(timers[k]); timers[k] = setTimeout(function(){ push(k); }, 15000);
+    });
+  }
+  C.flush = function(){ return Promise.all(Object.keys(C.pending).filter(function(k){ return C.pending[k]; }).map(function(k){ clearTimeout(timers[k]); return push(k); })); };
+  Storage.prototype.setItem = function(k, v){
+    rawSet.call(this, k, v);
+    if(C.ok && C.user && this === localStorage && SYNC.indexOf(k) !== -1 && (C.user.role === 'director' || (k !== 'beyond-pay-v1' && k !== 'beyond-accounts-v1'))) queue(k);
+  };
+  window.addEventListener('beforeunload', function(e){ if(C.ok && pendingN()){ C.flush(); e.preventDefault(); e.returnValue = ''; } });
+  document.addEventListener('visibilitychange', function(){ if(!C.ok || !C.user) return; if(document.hidden) C.flush(); else checkRemote(); });
+  // 다른 사람이 고친 내용 알리기
+  function showStale(){ var b = document.getElementById('cloudStale'); if(b) b.hidden = false; }
+  function checkRemote(){
+    if(!C.ok || !C.user || C.stale) return;
+    var keys = SYNC.filter(function(k){ return C.user.role === 'director' || DIRECTOR_ONLY_READ.indexOf(k) === -1; });
+    Promise.all(keys.map(function(k){ return getDoc('kv/' + k).then(function(d){ return d && typeof d.data.v === 'string' && d.data.v !== C.base[k] && d.updateTime !== C.ut[k] && !C.pending[k]; }, function(){ return false; }); }))
+      .then(function(r){ if(r.some(Boolean)){ C.stale = true; showStale(); } });
+  }
+  setInterval(checkRemote, 90000);
+
+  // 계정
+  C.email = email;
+  C.ownerCheck = function(){ return getDoc('config/owner', false).then(function(d){ C.ownerExists = !!d; return C.ownerExists; }); };
+  C.genOf = function(id){ return getDoc('login/' + String(id).toLowerCase(), false).then(function(d){ return d ? (+d.data.gen || 0) : null; }); };
+  C.signIn = function(id, pw, keep){
+    return C.genOf(id).then(function(gen){
+      if(gen === null){ var e = new Error('NO_ID'); throw e; }
+      return authCall('accounts:signInWithPassword', { email:email(id, gen), password:pw, returnSecureToken:true });
+    }).then(function(j){ session(j, keep); });
+  };
+  C.setupOwner = function(id, pw){
+    id = String(id).toLowerCase();
+    return authCall('accounts:signUp', { email:email(id, 0), password:pw, returnSecureToken:true }).catch(function(e){
+      if(/EMAIL_EXISTS/.test(e.message)) return authCall('accounts:signInWithPassword', { email:email(id, 0), password:pw, returnSecureToken:true });
+      throw e;
+    }).then(function(j){
+      session(j, true);
+      return commit([
+        upd('staff/' + id, { role:'director', name:'원장님', left:false, gen:0, temp:false }, { exists:false }),
+        upd('login/' + id, { gen:0 }),
+        upd('config/owner', { id:id, at:new Date().toISOString() }, { exists:false })
+      ]);
+    });
+  };
+  // 원장님이 선생님 계정 만들기·임시 비밀번호 정하기 (원장님 로그인은 그대로 둬요)
+  C.makeStaff = function(acc, tempPw){
+    var gen = (acc.gen || 0) + (acc.cloud ? 1 : 0);
+    return authCall('accounts:signUp', { email:email(acc.id, gen), password:tempPw, returnSecureToken:true }).catch(function(e){
+      if(/EMAIL_EXISTS/.test(e.message)){ gen++; return authCall('accounts:signUp', { email:email(acc.id, gen), password:tempPw, returnSecureToken:true }); }
+      throw e;
+    }).then(function(){
+      return commit([
+        upd('staff/' + acc.id, { role:acc.role, name:acc.name, left:!!acc.left, gen:gen, temp:true }),
+        upd('login/' + acc.id, { gen:gen })
+      ]).then(function(){ acc.gen = gen; acc.cloud = true; return gen; });
+    });
+  };
+  C.syncStaff = function(accounts){
+    if(!C.ok || !C.user || C.user.role !== 'director') return Promise.resolve();
+    var w = [];
+    accounts.forEach(function(a){
+      if(!a.cloud && a.role !== 'director') return;
+      var s = JSON.stringify([a.role, a.name, !!a.left]);
+      if(C.staffSent[a.id] === s) return;
+      C.staffSent[a.id] = s;
+      w.push({ update:{ name:'projects/' + FB.projectId + '/databases/(default)/documents/staff/' + a.id, fields:docFields({ role:a.role, name:a.name, left:!!a.left }) }, updateMask:{ fieldPaths:['role','name','left'] } });
+    });
+    return w.length ? commit(w).catch(function(){ status('직원 명단 저장 안 됨', 'bad'); }) : Promise.resolve();
+  };
+  C.staffSent = {};
+  C.changePw = function(pw){
+    return token().then(function(t){ return authCall('accounts:update', { idToken:t, password:pw, returnSecureToken:true }); })
+      .then(function(j){ var a = readAuth(); session(j, a && a.keep); return commit([{ update:{ name:'projects/' + FB.projectId + '/databases/(default)/documents/staff/' + C.user.id, fields:{ temp:{ booleanValue:false } } }, updateMask:{ fieldPaths:['temp'] } }]); })
+      .then(function(){ C.user.temp = false; });
+  };
+  C.uploadLocal = function(keys){
+    return Promise.all(keys.map(function(k){ C.base[k] = null; return push(k); }));
+  };
+  C.logout = function(){
+    return C.flush().catch(function(){}).then(function(){
+      writeAuth(null); SYNC.forEach(function(k){ rawRemove.call(localStorage, k); });
+      try{ rawRemove.call(localStorage, 'beyond-board-read-v1'); }catch(e){}
+    });
+  };
+  C.errMsg = function(e){
+    var m = (e && e.message) || '';
+    if(/NO_ID|EMAIL_NOT_FOUND|INVALID_PASSWORD|INVALID_LOGIN_CREDENTIALS|INVALID_EMAIL/.test(m)) return '아이디 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요.';
+    if(/TOO_MANY_ATTEMPTS/.test(m)) return '로그인을 너무 많이 시도했어요. 잠시 뒤에 다시 해 주세요.';
+    if(/USER_DISABLED/.test(m)) return '사용할 수 없는 계정이에요. 원장님께 문의해 주세요.';
+    if(/WEAK_PASSWORD/.test(m)) return '비밀번호는 6자 이상으로 정해 주세요.';
+    if(e && e.status === 403) return '들어갈 권한이 없는 계정이에요. 퇴사 처리됐거나 비밀번호가 새로 정해졌을 수 있어요. 원장님께 문의해 주세요.';
+    return '서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.';
+  };
+
+  // 시작
+  C.boot = function(run){
+    if(!C.on){ run(); return; }
+    var a = readAuth(), who = a && parseEmail(a.email);
+    var start = function(){ C.ok = true; run(); };
+    if(!who){
+      // 로그인 전: 공유 기록이 이 기기에 남지 않게 지워요. (아직 원장님 계정이 없으면 옮길 수 있게 남겨 둬요)
+      C.ownerCheck().then(function(has){ if(has) SYNC.forEach(function(k){ rawRemove.call(localStorage, k); }); start(); }, function(){ C.on = false; C.offline = true; run(); });
+      return;
+    }
+    getDoc('staff/' + who.id).then(function(d){
+      if(!d || d.data.left || +d.data.gen !== who.gen){ var e = new Error('DENIED'); e.status = 403; throw e; }
+      C.user = { id:who.id, gen:who.gen, role:d.data.role, name:d.data.name, temp:!!d.data.temp };
+      C.ownerExists = true;
+      return pullAll();
+    }).then(start, function(e){
+      writeAuth(null); SYNC.forEach(function(k){ rawRemove.call(localStorage, k); });
+      C.bootErr = C.errMsg(e);
+      C.ownerCheck().then(start, function(){ C.on = false; C.offline = true; run(); });
+    });
+  };
+  return C;
+})();
+</script>
+<script>
+CLOUD.boot(function(){ var s = document.createElement('script'); s.text = document.getElementById('mainJs').textContent; document.body.appendChild(s); });
+</script>
+
 </body>
 </html>
