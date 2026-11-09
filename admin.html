@@ -518,6 +518,9 @@
   .at-seg .out .done{ font-size:12px; color:var(--good); font-weight:700; }
   .at-more{ grid-column:2; display:flex; flex-direction:column; gap:8px; }
   .at-more input[type=text]{ width:100%; font-size:13px; border:1px solid var(--border); border-radius:8px; padding:8px 10px; background:var(--surface); color:var(--ink); }
+  .at-late{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:13px; font-weight:700; color:var(--ink); }
+  .at-more .at-late input[type=text]{ width:64px; text-align:center; font-weight:700; }
+  .at-late small{ font-weight:500; color:var(--ink-faint); font-size:11.5px; }
   .at-more input.need{ border-color:var(--warn); background:var(--warn-soft); }
   .at-notice{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
   .at-notice label{ display:flex; align-items:center; gap:5px; cursor:pointer; color:var(--ink); }
@@ -3485,7 +3488,7 @@ function dtEntry(){
   c.students.forEach(function(s){
     if(e.rows[s]) return;
     var row = e.rows[s] = dtNewRow(), a = typeof atFor === 'function' && atFor(c.id, ymd(dtDay), s);
-    if(a){ row.att = a.st === '보강' ? '출석' : a.st; if(a.st === '지각') row.attNote = a.reason; }   // 출결·지각 기록을 이어 받아요
+    if(a){ row.att = a.st === '보강' ? '출석' : a.st; if(a.st === '지각') row.attNote = lateNote(a); }   // 출결·지각 기록을 이어 받아요
   });
   return e;
 }
@@ -4321,11 +4324,18 @@ function nowHM(){ var d = new Date(); return ('0'+d.getHours()).slice(-2) + ':' 
 function korTime(hm){ if(!hm) return ''; var p = hm.split(':'), h = +p[0]; return (h < 12 ? '오전 ' : '오후 ') + ((h % 12) || 12) + ':' + p[1]; }
 function ro(word){ var w = String(word).trim(), ch = w.charCodeAt(w.length - 1); if(ch < 0xAC00 || ch > 0xD7A3) return '(으)로'; var jong = (ch - 0xAC00) % 28; return jong === 0 || jong === 8 ? '로' : '으로'; }
 var AT_HELLO = '안녕하세요 비욘드잉글리쉬입니다^^';
+// 지각 [ ]분: 숫자만, 999분까지. 수업 시작 시간과 등원 시각으로 처음 값을 채워요(고칠 수 있어요).
+function lateVal(v){ return String(v || '').replace(/[^0-9]/g, '').slice(0, 3).replace(/^0+(?=\d)/, ''); }
+function lateGuess(cid, inAt){ var c = CLASSES.find(function(x){ return x.id === cid; }), st = c && (c.time || '').split(/[–-]/)[0].trim();
+  if(!st || !inAt || !/^\d{1,2}:\d{2}$/.test(st)) return ''; var a = st.split(':'), b = inAt.split(':'), m = (+b[0] * 60 + +b[1]) - (+a[0] * 60 + +a[1]); return m > 0 && m < 240 ? String(m) : ''; }
+// 데일리 리포트·알림에 들어가는 지각 메모: '20분 · 사유'
+function atLateLine(r){ var m = lateVal(r.lateMin), why = (r.reason || '').trim(), t = [m ? m + '분 지각' : '', why ? '늦은 사유: ' + why : ''].filter(Boolean).join(', '); return t ? '\n(' + t + ')' : ''; }
+function lateNote(r){ var m = lateVal(r.lateMin), why = (r.reason || '').trim(); return m ? m + '분' + (why ? ' · ' + why : '') : why; }
 function atMsg(type, s, r){
   var c = atCls(), start = (c.time || '').split(/[–-]/)[0];
   if(type === 'in'){
     if(r.st === '보강') return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.inAt) + '에 보강 수업을 위해 등원했습니다.';
-    return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.inAt) + '에 학원에 등원했습니다.' + (r.st === '지각' && r.reason.trim() ? '\n(늦은 사유: ' + r.reason.trim() + ')' : '');
+    return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.inAt) + '에 학원에 등원했습니다.' + (r.st === '지각' ? atLateLine(r) : '');
   }
   if(type === 'out') return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.outAt) + '에 하원했습니다. 오늘도 수고 많았습니다.';
   if(type === 'early') return AT_HELLO + '\n' + s + ' 학생이 ' + korTime(r.outAt) + '에 조퇴했습니다.' + (r.reason.trim() ? '\n사유: ' + r.reason.trim() : '');
@@ -4381,7 +4391,7 @@ function atRowHtml(s, r){
   var more = '';
   if(r.st === '지각' || r.st === '조퇴' || r.st === '결석'){
     var prob = atProblem(r);
-    more = '<div class="at-more"><input type="text" data-f="reason" class="'+(prob === '사유' && r.tried ? 'need' : '')+'" value="'+esc(r.reason)+'" placeholder="'+(r.st==='지각'?'예: 학교 상담으로 인한 지각':r.st==='조퇴'?'예: 병원 진료로 조퇴':'예: 컨디션 저조로 인한 결석')+'" aria-label="'+esc(s)+' 사유">';
+    more = '<div class="at-more">' + (r.st === '지각' ? '<label class="at-late">지각 <input type="text" data-f="lateMin" inputmode="numeric" maxlength="3" value="'+esc(r.lateMin || '')+'" placeholder="0" aria-label="'+esc(s)+' 지각 분"> 분 <small>등원 시각으로 먼저 채워져요. 고쳐도 돼요</small></label>' : '') + '<input type="text" data-f="reason" class="'+(prob === '사유' && r.tried ? 'need' : '')+'" value="'+esc(r.reason)+'" placeholder="'+(r.st==='지각'?'예: 학교 상담으로 인한 지각':r.st==='조퇴'?'예: 병원 진료로 조퇴':'예: 컨디션 저조로 인한 결석')+'" aria-label="'+esc(s)+' 사유">';
     if(r.st === '결석'){
       more += '<div class="at-notice"><span>사전 연락</span>' +
         '<label><input type="radio" name="nt-'+esc(s)+'" data-f="notice" value="yes"'+(r.notice==='yes'?' checked':'')+'>있음 (학생·타과목)</label>' +
@@ -4457,7 +4467,7 @@ function atSyncDaily(){
   Object.keys(e.rows).forEach(function(s){
     var r = e.rows[s], row = d.rows[s]; if(!row || !r.st) return;
     row.att = r.st === '보강' ? '출석' : r.st;
-    row.attNote = r.st === '지각' || r.st === '기타' ? r.reason : '';
+    row.attNote = r.st === '지각' ? lateNote(r) : r.st === '기타' ? r.reason : '';
   });
   dtSave();
 }
@@ -4472,6 +4482,8 @@ $('atRows').addEventListener('click', function(ev){
     r.st = r.st === v ? '' : v;
     if((r.st === '출석' || r.st === '지각' || r.st === '보강' || r.st === '조퇴') && !r.inAt) r.inAt = nowHM();
     if(r.st === '조퇴' && !r.outAt) r.outAt = nowHM();
+    if(r.st === '지각' && !r.lateMin) r.lateMin = lateGuess(atClassId, r.inAt);
+    if(r.st !== '지각') r.lateMin = '';
     if(r.st === '결석' || r.st === ''){ r.inAt = ''; r.outAt = ''; }
     r.tried = false;
     atSave(); row.outerHTML = atRowHtml(s, r); renderAtSum();
@@ -4513,7 +4525,10 @@ $('atRows').addEventListener('click', function(ev){
 $('atRows').addEventListener('input', function(ev){
   var el = ev.target, f = el.dataset.f; if(!f) return;
   var row = el.closest('.at-row'), e = atEntry(), s = row.dataset.name, r = e.rows[s];
-  r[f] = el.type === 'checkbox' ? el.checked : el.value;
+  r[f] = el.type === 'checkbox' ? el.checked : f === 'lateMin' ? lateVal(el.value) : el.value;
+  if(f === 'lateMin' && el.value !== r.lateMin) el.value = r.lateMin;
+  if(f === 'inAt' && r.st === '지각' && !r.lateEdited){ r.lateMin = lateGuess(atClassId, r.inAt); var li = row.querySelector('[data-f=lateMin]'); if(li) li.value = r.lateMin; }
+  if(f === 'lateMin') r.lateEdited = true;
   if(f === 'reason') el.classList.remove('need');
   atSave();
   if(f === 'notice') row.outerHTML = atRowHtml(s, r);
@@ -7713,6 +7728,7 @@ function qsOpen(cid, s){
   var sentNote = de.stage === 'sent' ? '<p class="qs-warn">오늘 데일리 리포트는 이미 보냈어요. 고치면 데일리 테스트 화면에서 다시 저장하고 보내야 해요.</p>' : '';
   $('qsForm').innerHTML = '<div class="qs-hd"><div><h2>' + esc(s) + '</h2><p class="muted">' + esc(c.dept + ' · ' + c.name + ' · ' + c.teacher + ' 선생님') + ' · ' + (t.getMonth() + 1) + '월 ' + t.getDate() + '일 (' + DAYS[t.getDay()] + ') 오늘</p></div><button type="button" class="btn soft" data-qsclose>닫기</button></div>'
     + '<section class="qs-sec"><h3>① 출결·지각</h3><div class="qs-row"><label>출결<select data-qa="st"><option value="">아직 안 함</option>' + qsOpt(AT_ST, at.st) + '</select></label>'
+    + '<label>지각 분<input type="text" data-qa="lateMin" inputmode="numeric" maxlength="3" value="' + esc(at.lateMin || '') + '" placeholder="지각일 때"></label>'
     + '<label class="qs-grow">사유 <small class="muted">지각·결석·조퇴</small><input type="text" data-qa="reason" maxlength="40" value="' + esc(at.reason) + '" placeholder="예: 학교 행사로 10분 늦음"></label>'
     + '<label>등원 시간<input type="time" data-qa="inAt" value="' + esc(at.inAt) + '"></label></div><p class="hint">등원·결석 카톡은 출결·지각 화면에서 저장할 때 만들어져요.</p></section>'
     + '<section class="qs-sec"><h3>② 수업 기록 (진도·숙제)</h3><div class="qs-row"><label class="qs-grow">진도<span class="qs-prog"><select data-qj="book"><option value="">반 공통' + (en.book ? ' (' + esc(en.book) + ')' : '') + '</option>' + jrBookOpts(jr.book) + '</select><select data-qj="prog"' + (jr.book ? '' : ' disabled') + '>' + (jr.book ? bookItems(jr.book).map(function(it){ return '<option' + (it === jr.prog ? ' selected' : '') + '>' + esc(it) + '</option>'; }).join('') : '<option>' + esc(en.prog || '반 공통 진도') + '</option>') + '</select></span></label></div>'
@@ -7729,8 +7745,12 @@ function qsOpen(cid, s){
 function qsChange(el){
   var cid = qs.cid, s = qs.s, v = el.type === 'checkbox' ? el.checked : el.value;
   if(el.dataset.qa){
-    qsWith(cid, function(){ var r = atEntry().rows[s]; r[el.dataset.qa] = v; if(el.dataset.qa === 'st' && (v === '출석' || v === '지각' || v === '보강') && !r.inAt){ r.inAt = nowHM(); $('qsForm').querySelector('[data-qa=inAt]').value = r.inAt; } atSave();
-      var de = dtEntry(); if(el.dataset.qa === 'st' && v){ de.rows[s].att = v === '보강' ? '출석' : v; dtSave(); } });
+    qsWith(cid, function(){ var r = atEntry().rows[s], f = el.dataset.qa; if(f === 'lateMin'){ v = lateVal(v); el.value = v; r.lateEdited = true; } r[f] = v; if(f === 'st' && (v === '출석' || v === '지각' || v === '보강') && !r.inAt){ r.inAt = nowHM(); $('qsForm').querySelector('[data-qa=inAt]').value = r.inAt; }
+      if(f === 'st' && v === '지각' && !r.lateMin){ r.lateMin = lateGuess(cid, r.inAt); $('qsForm').querySelector('[data-qa=lateMin]').value = r.lateMin; } if(f === 'st' && v !== '지각'){ r.lateMin = ''; $('qsForm').querySelector('[data-qa=lateMin]').value = ''; }
+      atSave();
+      var de = dtEntry(); if(f === 'st' && v){ de.rows[s].att = v === '보강' ? '출석' : v; }
+      if(de.rows[s].att === '지각' && (f === 'st' || f === 'lateMin' || f === 'reason') && (!de.stage || de.stage === 'draft')) de.rows[s].attNote = lateNote(r);
+      if(f === 'st' && v || f === 'lateMin' || f === 'reason') dtSave(); });
   } else if(el.dataset.qj){
     qsWith(cid, function(){ var r = entry().rows[s], f = el.dataset.qj; r[f] = f === 'sb' || f === 'pb' ? v.replace(/[^0-9,~\- ]/g, '').trim() : f === 'spk' ? spkVal(v) : v;
       if(f === 'book'){ r.prog = bookItems(v)[0] || ''; } if(f === 'book2'){ r.prog2 = bookItems(v)[0] || ''; } saveJr(); });
