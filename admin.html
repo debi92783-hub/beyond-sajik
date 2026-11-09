@@ -98,6 +98,8 @@
   .side .unread{ margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:99px; background:var(--warn); color:#fff; font-size:11.5px; font-weight:800; line-height:20px; text-align:center; font-variant-numeric:tabular-nums; }
   .bd-table td.t.is-unread .bd-link{ font-weight:800; }
   .side svg{ flex:none; }
+  .menu-btn{ display:none; }
+  @media print{ .menu-btn{ display:none !important; } }
   .phrases{ margin-top:14px; padding:14px 12px; border-radius:12px; background:var(--surface-soft); display:flex; flex-direction:column; gap:4px; }
   .phrases span{ font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:0.04em; margin-bottom:2px; }
   .phrases button{ text-align:left; border:0; background:none; padding:3px 0; font-size:12px; cursor:pointer; }
@@ -1310,9 +1312,14 @@
     .topbar{ padding:12px 16px; position:static; }
     .search-wrap{ width:100%; order:3; } .search{ width:100%; }
     .layout{ flex-direction:column; align-items:stretch; }
-    .side{ flex:none; position:static; min-height:0; max-height:none; width:100%; flex-direction:row; align-items:center; overflow-x:auto; padding:10px 16px; border-right:0; border-bottom:1px solid var(--border); gap:4px; }
-    .side h3, .phrases{ display:none; }
-    .side a{ white-space:nowrap; padding:8px 10px; font-size:13px; }
+    .side{ flex:none; position:static; min-height:0; max-height:none; width:100%; display:none; padding:6px 16px 14px; border-right:0; border-bottom:1px solid var(--border); gap:2px; }
+    .layout.menu-open .side{ display:flex; }
+    .side .phrases{ display:none; }
+    .side h3{ margin:12px 10px 4px; }
+    .side a{ padding:11px 12px; font-size:15px; }
+    .menu-btn{ display:flex; align-items:center; gap:10px; width:100%; padding:12px 16px; border:0; border-bottom:1px solid var(--border); background:var(--surface); color:var(--ink); font:inherit; font-size:15px; cursor:pointer; text-align:left; }
+    .menu-btn b{ font-weight:800; } .menu-btn span{ color:var(--accent); font-weight:700; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .menu-btn span::before{ content:'· '; color:var(--ink-faint); }
+    .menu-btn i{ font-style:normal; color:var(--ink-soft); transition:transform .15s; } .layout.menu-open .menu-btn i{ transform:rotate(180deg); }
     main{ padding:20px 16px 48px; }
     .t-aside{ position:static; }
     .sched div{ grid-template-columns:90px 1fr; }
@@ -1456,6 +1463,7 @@
 </header>
 
 <div class="layout" id="appLayout">
+  <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="side"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg><b>메뉴</b><span id="menuCur"></span><i aria-hidden="true">▾</i></button>
   <nav class="side" aria-label="메뉴" id="side"></nav>
 
   <main>
@@ -2290,7 +2298,10 @@ function renderSide(){
     html += '<button type="button" class="add" id="addPhrase">+ 문구 추가</button></div>';
   }
   $('side').innerHTML = html;
+  var ca = $('side').querySelector('a[aria-current="page"]'); $('menuCur').textContent = ca ? ca.dataset.name : '';
 }
+function menuToggle(open){ var l = $('appLayout'); open = open == null ? !l.classList.contains('menu-open') : open; l.classList.toggle('menu-open', open); $('menuBtn').setAttribute('aria-expanded', open); }
+$('menuBtn').addEventListener('click', function(){ menuToggle(); });
 
 $('noticeWrite').addEventListener('click', function(){ openBoard('comm', 'notice'); bd.id = null; bd.mode = 'write'; renderBoard(); $('bdT').focus(); });
 $('brandHome').addEventListener('click', function(e){ e.preventDefault(); if(!session) return; state.tpart = 'check'; var hv = session.role === 'director' ? state.view : 'teacher'; setView(hv, hv === 'teacher' ? 'thome' : 'main'); window.scrollTo(0, 0); });
@@ -2298,6 +2309,7 @@ $('side').addEventListener('click', function(e){
   var a = e.target.closest('a');
   if(a){
     e.preventDefault();
+    menuToggle(false); if(window.innerWidth <= 860) setTimeout(function(){ window.scrollTo(0, 0); }, 0);
     if(a.dataset.key === 'journal'){ state.tpart = 'check'; return setView('teacher'); }
     if(a.dataset.key === 'progress'){ state.tpart = 'jr'; return setView('teacher'); }
     if(a.dataset.key === 'gyomu') return setView(state.view, 'gyomu');
