@@ -276,6 +276,13 @@
   .dt-lesson.jr-lesson{ grid-template-columns:2fr 1fr 1fr 0.75fr; }
   .jr-lesson .jr-note{ grid-column:1 / -1; }
   .jr-lesson .jr-prog2{ grid-column:1 / 2; }
+  .jr-phr .btn.sm{ padding:5px 10px; font-size:12.5px; }
+  .jr-phr{ margin:0 0 12px; padding:12px; border-radius:10px; background:var(--surface-soft); }
+  .jr-phr-hd{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; } .jr-phr-hd b{ font-size:13px; } .jr-phr-hd small{ font-size:12px; flex:1; }
+  .jr-phr-list{ display:flex; flex-wrap:wrap; }
+  .jr-phr-ed{ display:flex; flex-direction:column; gap:6px; }
+  .jr-phr-row{ display:flex; gap:6px; align-items:center; } .jr-phr-row input{ flex:1; min-width:0; font:inherit; font-size:13px; border:1px solid var(--border); border-radius:7px; padding:7px 9px; background:var(--surface); color:var(--ink); }
+  .jr-phr-act{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
   .jr-grp{ display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .jr-grp > i{ font-style:normal; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
   .jr-own{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:2 1 360px; }
@@ -1581,8 +1588,9 @@
               <label>숙제 · PB <span class="pg"><b>page</b><input type="text" id="jPb" inputmode="numeric" placeholder="예: 11-13"></span></label>
               <label>스피킹 <span class="pg"><input type="text" id="jSpk" inputmode="numeric" maxlength="3" placeholder="예: 80"><b>%</b></span></label>
               <label class="jr-prog2">진도 2 (함께 배우는 교재) <span class="prog"><select id="jBook2" aria-label="교재명 2"></select><select id="jProg2" aria-label="책진도 2"></select></span></label>
-              <label class="jr-note">숙제 추가 내용 <input type="text" id="jNote" placeholder="예: 단어 20개 암기 + 테스트 (오른쪽 자주 쓰는 문구를 눌러도 돼요)"></label>
+              <label class="jr-note">숙제 추가 내용 <input type="text" id="jNote" placeholder="예: 단어 20개 암기 + 테스트 (아래 자주 쓰는 문구를 눌러도 돼요)"></label>
             </div>
+            <div class="jr-phr" id="jrPhr"></div>
             <p class="muted" style="margin:0 0 12px">데일리 테스트와 같은 교재·책진도 목록이에요. 데일리 테스트 점검 페이지는 수업 진도와 다를 수 있어서 따로 적어요. 교재는 지난 수업 기록에서 이어 받고 책진도는 다음 차시로 미리 골라 둬요.</p>
             <button class="btn" type="button" id="applyAll">전체 학생에 적용</button>
           </div>
@@ -2138,7 +2146,49 @@ var ALERTS = [
   { name:'박주원', type:'미납', date:'10/18' },
   { name:'최하은', type:'결석', date:'10/23' }
 ];
-var PHRASES = ['워크북 1회 풀고 오답 정리', '단어 20개 암기 + 테스트'];
+// 자주 쓰는 숙제 문구: 선생님마다 따로 저장하고 고칠 수 있어요(2026-11-09 원장쌤). 처음엔 기본 10개.
+var PH_KEY = 'beyond-phrases-v1', PH_MAX = 20;
+var PH_BASE = ['단어 20개 암기 + 테스트', '워크북 1회 풀고 오답 정리', '본문 3번 소리 내어 읽기', '클래스카드 단어 학습 완료', '스피킹 녹음 1회 제출',
+  '배운 문장 3개 영어로 써 오기', '오답 노트 정리해 오기', '파닉스 소리 카드 5번 읽기', '스토리북 따라 읽기 3회', '다음 시간 단어 시험 준비'];
+var phStore = (function(){ try{ return JSON.parse(localStorage.getItem(PH_KEY) || '{}') || {}; }catch(e){ return {}; } })();
+var phEdit = false;
+function phOwner(){ return state.teacher || ''; }
+function phList(){ var l = phStore[phOwner()]; return Array.isArray(l) ? l : PH_BASE.slice(); }
+function phSave(l){ phStore[phOwner()] = l; try{ localStorage.setItem(PH_KEY, JSON.stringify(phStore)); }catch(e){} }
+function phUse(t){
+  var cur = $('jNote').value.trim();
+  if(cur.indexOf(t) !== -1) return toast('이미 들어 있는 문구예요.');
+  $('jNote').value = cur ? cur + ', ' + t : t; saveCommon(); renderPreview(); toast('숙제 추가 내용 칸에 넣었어요.');
+}
+function renderPhr(){
+  var box = $('jrPhr'); if(!box) return;
+  var l = phList();
+  if(!phEdit){
+    box.innerHTML = '<div class="jr-phr-hd"><b>자주 쓰는 문구</b><small class="muted">누르면 숙제 추가 내용 칸에 들어가요</small><button type="button" class="btn soft sm" id="phEditBtn">✎ 문구 고치기</button></div>'
+      + '<div class="jr-phr-list">' + (l.length ? l.map(function(t, i){ return '<button type="button" class="dt-chip" data-phuse="' + i + '">' + esc(t) + '</button>'; }).join('') : '<span class="muted">문구가 없어요. ‘문구 고치기’에서 추가해 주세요.</span>') + '</div>';
+    return;
+  }
+  box.innerHTML = '<div class="jr-phr-hd"><b>' + esc(phOwner()) + ' 선생님 문구 고치기</b><small class="muted">최대 ' + PH_MAX + '개 · 한 문구 40자까지</small></div>'
+    + '<div class="jr-phr-ed">' + l.map(function(t, i){ return '<div class="jr-phr-row"><input type="text" maxlength="40" value="' + esc(t) + '" aria-label="문구 ' + (i + 1) + '"><button type="button" class="btn soft sm" data-phup="' + i + '" aria-label="위로"' + (i ? '' : ' disabled') + '>↑</button><button type="button" class="btn soft sm" data-phdel="' + i + '">빼기</button></div>'; }).join('') + '</div>'
+    + '<div class="jr-phr-act"><button type="button" class="btn soft sm" id="phAdd"' + (l.length >= PH_MAX ? ' disabled' : '') + '>+ 문구 추가</button><button type="button" class="btn soft sm" id="phReset">기본 10개로 되돌리기</button><span style="flex:1"></span><button type="button" class="btn soft sm" id="phCancel">취소</button><button type="button" class="btn sm" id="phDone">저장</button></div>';
+}
+function phRows(){ return [].map.call($('jrPhr').querySelectorAll('.jr-phr-row input'), function(i){ return i.value; }); }
+function phDraw(l){ var keep = phStore[phOwner()]; phStore[phOwner()] = l; renderPhr(); phStore[phOwner()] = keep; }
+document.addEventListener('click', function(ev){
+  var box = $('jrPhr'); if(!box || !box.contains(ev.target)) return;
+  var u = ev.target.closest('[data-phuse]'); if(u) return phUse(phList()[+u.dataset.phuse]);
+  if(ev.target.id === 'phEditBtn'){ phEdit = true; return renderPhr(); }
+  var l = phEdit ? phRows() : null;
+  var d = ev.target.closest('[data-phdel]'); if(d){ l.splice(+d.dataset.phdel, 1); return phDraw(l); }
+  var up = ev.target.closest('[data-phup]'); if(up){ var i = +up.dataset.phup; l.splice(i - 1, 0, l.splice(i, 1)[0]); return phDraw(l); }
+  if(ev.target.id === 'phAdd'){ l.push(''); phDraw(l); var ins = box.querySelectorAll('.jr-phr-row input'); ins[ins.length - 1].focus(); return; }
+  if(ev.target.id === 'phReset'){ return phDraw(PH_BASE.slice()); }
+  if(ev.target.id === 'phCancel'){ phEdit = false; return renderPhr(); }
+  if(ev.target.id === 'phDone'){
+    var out = []; l.forEach(function(t){ t = t.trim().slice(0, 40); if(t && out.indexOf(t) === -1) out.push(t); });
+    phSave(out.slice(0, PH_MAX)); phEdit = false; renderPhr(); renderSide(); toast('자주 쓰는 문구를 저장했어요.');
+  }
+});
 
 /* ===== 반·학생 명단 =====
    학생 한 명 = { id, name, cid(반), school, grade, phone(학생), pphone(학부모), prel(관계), joined(등록일), status, hist, memo }
@@ -2299,8 +2349,8 @@ function renderSide(){
   });
   if(state.view === 'teacher'){
     html += '<div class="phrases"><span>자주 쓰는 숙제 문구</span>';
-    PHRASES.forEach(function(p, i){ html += '<button type="button" data-phrase="'+i+'">'+esc(p)+'</button>'; });
-    html += '<button type="button" class="add" id="addPhrase">+ 문구 추가</button></div>';
+    phList().forEach(function(p, i){ html += '<button type="button" data-phrase="'+i+'">'+esc(p)+'</button>'; });
+    html += '<button type="button" class="add" id="addPhrase">✎ 문구 고치기</button></div>';
   }
   $('side').innerHTML = html;
   var ca = $('side').querySelector('a[aria-current="page"]'); $('menuCur').textContent = ca ? ca.dataset.name : '';
@@ -2338,17 +2388,11 @@ $('side').addEventListener('click', function(e){
     return;
   }
   var p = e.target.closest('[data-phrase]');
-  if(p){ $('jNote').value = PHRASES[+p.dataset.phrase]; saveCommon(); renderPreview(); toast('숙제 추가 내용 칸에 넣었어요.'); return; }
+  if(p){ var t = phList()[+p.dataset.phrase]; if(state.tpart !== 'jr' || state.page !== 'main'){ state.tpart = 'jr'; setView('teacher'); } phUse(t); return; }
   if(e.target.id === 'addPhrase'){
-    e.target.outerHTML = '<input type="text" id="newPhrase" placeholder="새 문구 입력 후 Enter" style="font-size:12px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface);">';
-    $('newPhrase').focus();
+    if(state.tpart !== 'jr' || state.page !== 'main'){ state.tpart = 'jr'; setView('teacher'); }
+    phEdit = true; renderPhr(); var bx = $('jrPhr'); if(bx) bx.scrollIntoView({ block:'center' });
   }
-});
-$('side').addEventListener('keydown', function(e){
-  if(e.target.id !== 'newPhrase' || e.key !== 'Enter') return;
-  var txt = e.target.value.trim();
-  if(txt) PHRASES.push(txt);
-  renderSide();
 });
 
 document.querySelector('.seg').addEventListener('click', function(e){
@@ -2971,6 +3015,7 @@ function renderJrCommon(){
   $('jBook').innerHTML = '<option value="">교재 선택</option>' + jrBookOpts(e.book);
   $('jProg').disabled = !e.book;
   $('jProg').innerHTML = e.book ? progOpts(e.book, e.prog) : '<option>교재를 먼저 골라 주세요</option>';
+  renderPhr();
   $('jBook2').innerHTML = '<option value="">교재 선택 (없으면 비워 둬요)</option>' + jrBookOpts(e.book2 || '');
   $('jProg2').disabled = !e.book2;
   $('jProg2').innerHTML = e.book2 ? progOpts(e.book2, e.prog2) : '<option>교재를 먼저 골라 주세요</option>';
@@ -7826,7 +7871,7 @@ var CLOUD = (function(){
   var DB = (EMU ? EMU.db : 'https://firestore.googleapis.com') + '/v1/projects/' + FB.projectId + '/databases/(default)/documents/';
   var DOMAIN = 'beyond-sajik.app', AKEY = 'bxfb-auth';
   var SYNC = ['beyond-accounts-v1','beyond-attend-v1','beyond-board-v1','beyond-consult-record-v1','beyond-daily-v2','beyond-delete-v1','beyond-gyomu-v1',
-    'beyond-journal-v1','beyond-lesson-check-v1','beyond-lesson-items-v1','beyond-mail-v1','beyond-monthly-v1','beyond-notice-v1','beyond-pay-v1',
+    'beyond-journal-v1','beyond-lesson-check-v1','beyond-lesson-items-v1','beyond-mail-v1','beyond-monthly-v1','beyond-notice-v1','beyond-pay-v1','beyond-phrases-v1',
     'beyond-public-v1','beyond-reserve-v1','beyond-roster-v1','beyond-schedule-v1','beyond-timetable-v1'];
   var DIRECTOR_ONLY_READ = ['beyond-pay-v1'];
   var C = { on: !!FB.apiKey && !/[?&]local=1\b/.test(location.search), ok:false, user:null, ownerExists:false, base:{}, stale:false, pending:{}, keys:SYNC };
