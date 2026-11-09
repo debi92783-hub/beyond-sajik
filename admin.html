@@ -1017,6 +1017,8 @@
   .iv-q{ display:flex; gap:10px; border-bottom:1px solid var(--border); padding:8px 0 0; break-inside:avoid; } .iv-q > b{ flex:none; font-size:15px; font-weight:900; color:var(--accent); width:24px; } .iv-q > div{ flex:1; min-width:0; }
   .iv-q p{ margin:0; font-weight:700; font-size:13.5px; } .iv-q small{ display:block; color:var(--ink-soft); font-size:12px; margin-top:2px; } .iv-ln{ height:64px; }
   .iv-end{ text-align:center; font-weight:700; color:var(--ink-soft); margin:8px 0 0; }
+  .ha-msg{ white-space:pre-wrap; font-size:12px; line-height:1.5; } .ha-cp{ margin-top:8px; }
+  @media print{ .ha-cp{ display:none; } .ms:has(.ha-msg){ gap:6px; } .ms:has(.ha-msg) .ms-hd p{ display:none; } .ms .ha-msg{ font-size:9.5px; line-height:1.3; padding:6px 8px; } .ms:has(.ha-msg) .ms-box{ padding:6px 9px; } .ms:has(.ha-msg) .ms-box ul{ font-size:10.5px; gap:0; } .ms:has(.ha-msg) .ms-step{ padding:6px 8px; } .ms:has(.ha-msg) .ms-step span{ font-size:10.5px; } .ms:has(.ha-msg) .ms-step em{ font-size:9.5px; margin-top:2px; } .ms:has(.ha-msg) .ms-rules div{ padding:5px 10px; font-size:11.5px; } }
   .ms-ex{ margin:6px 0 0; font-size:11.5px; color:var(--ink-soft); }
   .ms-ex code{ font-family:inherit; background:var(--surface-soft); border-radius:6px; padding:1px 6px; color:var(--ink); }
   .ms-who{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; margin-bottom:10px; }
@@ -6110,10 +6112,44 @@ function ivPaper(){
     '<p class="iv-end">성실하게 답해 주셔서 감사합니다. 수고하셨습니다.</p>' +
     '<div class="ms-ft"><button type="button" class="btn soft" data-mantab="sheet">← 면접관용 한 장</button><button type="button" class="btn soft" onclick="window.print()">지필 면접지 인쇄하기 (A4 3장)</button></div>';
 }
+var HA_POST = {
+  reg:'[비욘드잉글리쉬 사직어학원] 초·중등 영어강사 모집 (정규직)\n\n■ 모집 분야: 초등·중등 영어강사 [ ]명\n■ 담당 업무\n- 초1~중3 영어 수업 (파닉스·리딩·문법·내신)\n- 데일리 테스트·숙제 관리, 데일리 리포트·월말 리포트 작성\n- 학부모 상담 (신규·재원생)\n■ 자격 요건\n- 전문대학 졸업 이상\n- 영어 수업 경력 [ ]년 이상 (신입 가능 여부: [ ])\n■ 우대 사항\n- 초등 파닉스·리딩 또는 중등 내신 수업 경험\n- 학생·학부모와 꼼꼼하게 소통하시는 분\n■ 근무 조건\n- 근무: 월~금 [ ]시~[ ]시 (반 시간표에 따라 협의)\n- 급여: [월 ___만 원 / 면접 후 협의], 4대 보험\n- 수습 기간: [ ]개월\n■ 전형 절차\n서류 → 지필 면접 → 대면 면접·시범 강의 → 최종 합격 → 서울 본사 2박 3일 교육(필수)\n■ 제출 서류: 이력서, 자기소개서\n■ 접수: [지원 방법] / 마감 [ ]월 [ ]일 (채용 시 마감)\n■ 문의: [학원 전화번호]',
+  part:'[비욘드잉글리쉬 사직어학원] 테스트·숙제 관리 아르바이트 모집\n\n■ 모집 분야: 테스트·숙제 관리 [ ]명\n■ 담당 업무\n- 반별 단어 시험·데일리 테스트 채점과 기록\n- 숙제·클래스카드·Speaking 점검 확인\n- 담당 선생님께 결과 전달\n■ 자격 요건\n- 대학생 이상, 영어 단어·문장 채점이 가능하신 분\n■ 근무 조건\n- 근무: 주 [ ]일 ([월수금 / 화목]), [ ]시~[ ]시\n- 급여: 시급 [ ]원 (최저임금 이상), 주휴수당은 법 기준에 따라 지급\n■ 전형 절차: 서류 → 면접 → 최종 합격\n■ 제출 서류: 이력서\n■ 접수: [지원 방법] / 마감 [ ]월 [ ]일 (채용 시 마감)\n■ 문의: [학원 전화번호]'
+};
+function haSheet(m){
+  return '<div class="ms-hd"><div><h2>직원 채용 공고 작성 예시</h2><p>아래 예시를 복사해서 [ ] 칸만 채우면 바로 올릴 수 있어요. 합격 후 할 일까지 한 장으로 정리했어요.</p></div><small>비욘드잉글리쉬 사직어학원 · 최종 수정 ' + m.updated + '</small></div>' +
+    '<div class="ms-rules"><div><i>1</i>학원 이름은 \'비욘드잉글리쉬 사직어학원\'</div><div><i>2</i>급여·근무 시간은 숫자로 정확하게</div><div><i>3</i>성별·나이·외모 조건은 쓰지 않기</div></div>' +
+    '<div class="ms-two">' +
+      '<div class="ms-box ok"><h4>✓ 공고에 꼭 넣어요</h4><ul><li>모집 분야와 인원</li><li>담당 업무 (수업·테스트·리포트·상담)</li><li>자격 요건과 우대 사항</li><li>근무 요일·시간, 급여, 4대 보험</li><li>전형 절차 (서울 본사 2박 3일 교육 포함)</li><li>제출 서류, 마감일, 문의처</li></ul></div>' +
+      '<div class="ms-box no"><h4>✕ 공고에 쓰지 않아요</h4><ul><li>성별 제한 (예: 여자 선생님만)</li><li>나이 제한 (예: 30세 이하)</li><li>키·몸무게·외모, 결혼 여부, 출신 지역</li><li>\'급여 협의\'만 쓰고 근무 시간을 빼는 것</li></ul><p class="ms-ex">성별·나이로 지원을 막는 조건은 법에서 차별로 금지하고 있어요. 직무와 상관없는 개인정보도 묻지 않아요.</p></div>' +
+    '</div>' +
+    '<div class="ms-sec"><h3><span class="pill">예시</span>복사해서 쓰는 공고 문구</h3><div class="ms-two">' +
+      '<div class="ms-box"><h4>정규 영어강사</h4><div class="ms-msg ha-msg">' + esc(HA_POST.reg) + '</div><div class="ha-cp"><button type="button" class="btn soft" data-hacopy="reg">문구 복사하기</button></div></div>' +
+      '<div class="ms-box"><h4>아르바이트 (테스트·숙제 파트)</h4><div class="ms-msg ha-msg">' + esc(HA_POST.part) + '</div><div class="ha-cp"><button type="button" class="btn soft" data-hacopy="part">문구 복사하기</button></div></div>' +
+    '</div></div>' +
+    '<div class="ms-sec"><h3><span class="pill">합격 후</span>근무 시작 전에 할 일</h3><div class="ms-flow">' +
+      '<div class="ms-step"><b>① 경력 조회</b><span>성범죄 경력, 아동학대 관련 범죄 전력 조회</span><em>본인 동의를 받아 경찰서에 조회해요. 아르바이트 선생님도 똑같이 해요.</em></div>' +
+      '<div class="ms-step"><b>② 근로계약서</b><span>근무 시간·급여·휴일을 적은 근로계약서 작성</span><em>서면으로 쓰고 한 부는 선생님께 드려요.</em></div>' +
+      '<div class="ms-step"><b>③ 교육청 등록</b><span>강사를 채용하면 학원변경등록 신청 (처리 기간 7일)</span><em>신청서, 강사채용명단, 두 가지 조회 회신서, 최종학력증명서</em></div>' +
+      '<div class="ms-step"><b>④ 본사 교육</b><span>서울 본사 2박 3일 필수 교육</span><em>일정을 미리 알려 주고 참석을 확인해요.</em></div>' +
+    '</div></div>' +
+    '<p class="ms-ex">근거: 경상남도교육청 학원 강사 채용·해임 변경등록 안내(강사 자격은 일반학원 기준 전문대학 졸업 이상 등). 2026년 최저임금은 시간당 10,320원(고용노동부 고시 제2025-47호)이고, 2027년 1월부터는 10,700원으로 결정됐어요. 아르바이트 선생님이 수업을 맡게 되면 강사 등록 대상인지 교육청에 먼저 물어봐요.</p>' +
+    '<div class="ms-ft"><button type="button" class="btn soft" data-man="interview">직원 면접 질문지 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
+}
+MANUALS.push({ id:'hire-ad', group:'채용', title:'직원 채용 공고 작성 예시', tag:'채용', updated:'2026-11-09',
+  summary:'정규 영어강사·아르바이트(테스트·숙제 파트) 공고 문구 예시, 공고에 꼭 넣을 것과 쓰지 않을 것, 합격 후 경력 조회·근로계약서·교육청 등록·본사 교육 순서예요.',
+  sheet:function(){ return haSheet(this); } });
+$('manBody').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-hacopy]'); if(!b) return;
+  var t = HA_POST[b.dataset.hacopy];
+  var done = function(){ b.textContent = '복사했어요 ✓'; setTimeout(function(){ b.textContent = '문구 복사하기'; }, 1600); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, function(){ b.textContent = '복사가 안 돼요. 직접 선택해 주세요'; });
+  else b.textContent = '복사가 안 돼요. 직접 선택해 주세요';
+});
 MANUALS.push({ id:'interview', group:'채용', title:'직원 면접 질문지', tag:'채용', updated:'2026-10-28',
   summary:'지원 동기·교육관, 수업·경력, 학생·학부모 관리, 함께 일하기·근무 조건, 마지막으로 사람을 보는 질문 3개까지 우리 학원에 맞춘 질문 18개(90점)예요. 면접관용 한 장과 지원자용 지필 면접지가 있어요.',
   sheet:function(){ return ivSheet(this); }, paper:ivPaper });
-var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생'], ['채용','채용 · 직원 면접']];
+var MAN_GROUPS = [['업무','업무 매뉴얼'], ['상담','상담 매뉴얼 · 신규 상담 → 신규 등록 7일 → 재원생 → 시험 전후 → 퇴원생'], ['채용','채용 · 공고 · 직원 면접']];
 var manOpen = null;
 function renderManual(){
   if(!manOpen){
