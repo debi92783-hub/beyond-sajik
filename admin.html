@@ -273,6 +273,7 @@
   .stu .score{ width:110px; }
   .stu .memo{ flex:1 1 140px; }
   .jr-lesson{ padding:0; margin-bottom:10px; }
+  .dt-lesson.jr-lesson{ grid-template-columns:2fr 1fr 1fr 0.75fr; }
   .jr-lesson .jr-note{ grid-column:1 / -1; }
   .jr-grp{ display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .jr-grp > i{ font-style:normal; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
@@ -282,8 +283,9 @@
   .jr-pg{ display:inline-flex; align-items:stretch; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface); }
   .jr-pg b{ display:flex; align-items:center; padding:0 7px; background:var(--surface-soft); color:var(--ink-soft); font-size:11.5px; border-right:1px solid var(--border); }
   .stu .jr-pg input{ border:0; border-radius:0; width:70px; padding:6px 8px; }
+  .jr-pg input + b{ border-right:0; border-left:1px solid var(--border); } .stu .jr-pg input[data-f=spk]{ width:48px; }
   .stu.own{ background:var(--accent-soft); margin:0 -10px; padding-left:10px; padding-right:10px; border-radius:8px; }
-  @media screen and (max-width: 720px){ .jr-lesson{ grid-template-columns:1fr; } }
+  @media screen and (max-width: 720px){ .jr-lesson, .dt-lesson.jr-lesson{ grid-template-columns:1fr; } }
   .preview-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 12px; }
   .preview-head select{ font-size:12.5px; border:1px solid var(--border); border-radius:8px; padding:5px 8px; background:var(--surface); }
   .bubble{ background:var(--surface-soft); border:1px solid var(--border); border-radius:12px; padding:16px 18px; max-width:460px; font-size:13px; line-height:1.65; white-space:pre-line; margin-bottom:14px; }
@@ -1576,6 +1578,7 @@
               <label>진도 (교재명 &gt; 책진도)<span class="prog"><select id="jBook" aria-label="교재명"></select><select id="jProg" aria-label="책진도"></select></span></label>
               <label>숙제 · SB <span class="pg"><b>page</b><input type="text" id="jSb" inputmode="numeric" placeholder="예: 15-16"></span></label>
               <label>숙제 · PB <span class="pg"><b>page</b><input type="text" id="jPb" inputmode="numeric" placeholder="예: 11-13"></span></label>
+              <label>스피킹 <span class="pg"><input type="text" id="jSpk" inputmode="numeric" maxlength="3" placeholder="예: 80"><b>%</b></span></label>
               <label class="jr-note">숙제 추가 내용 <input type="text" id="jNote" placeholder="예: 단어 20개 암기 + 테스트 (오른쪽 자주 쓰는 문구를 눌러도 돼요)"></label>
             </div>
             <p class="muted" style="margin:0 0 12px">데일리 테스트와 같은 교재·책진도 목록이에요. 데일리 테스트 점검 페이지는 수업 진도와 다를 수 있어서 따로 적어요. 교재는 지난 수업 기록에서 이어 받고 책진도는 다음 차시로 미리 골라 둬요.</p>
@@ -2644,7 +2647,7 @@ function gyAuto(t, d){
     }
     // 진도·과제는 수업 기록에서만 가져와요. 데일리 테스트의 점검 페이지는 수업 진도와 다를 수 있어서 섞지 않아요.
     if(j){
-      var hdiff = c.students.filter(function(s){ var r = j.rows[s]; return r && (r.sb || r.pb); }).length;
+      var hdiff = c.students.filter(function(s){ var r = j.rows[s]; return r && (r.sb || r.pb || r.spk); }).length;
       if(hw && hdiff) hw += ' (학생별 다름 ' + hdiff + '명)';
     }
     // 데일리 테스트 숙제 검사에서 미완료·일부완료 학생만 덧붙여요
@@ -2954,15 +2957,16 @@ function progOpts(book, prog){
 function firstProg(book){ var it = bookItems(book); return it[0] || ''; }
 // 학생별 값이 비어 있으면 반 공통 값을 써요
 // 진도와 숙제는 따로: 진도만 바꿔도 숙제는 반 공통, 숙제만 바꿔도 진도는 반 공통이에요.
-function effJr(r, e){ return { book:r.book || e.book, prog:r.book ? r.prog : e.prog, sb:r.sb || e.sb, pb:r.pb || e.pb }; }
+function effJr(r, e){ return { book:r.book || e.book, prog:r.book ? r.prog : e.prog, sb:r.sb || e.sb, pb:r.pb || e.pb, spk:r.spk || e.spk || '' }; }
+function spkVal(v){ v = String(v || '').replace(/[^0-9]/g, '').slice(0, 3); return v && +v > 100 ? '100' : v; }
 function jrProgText(x){ return x.book && x.prog ? x.book + ' > ' + x.prog : ''; }
-function jrHwText(x){ return [x.sb ? 'SB page ' + x.sb : '', x.pb ? 'PB page ' + x.pb : ''].filter(Boolean).join(' · '); }
+function jrHwText(x){ return [x.sb ? 'SB page ' + x.sb : '', x.pb ? 'PB page ' + x.pb : '', x.spk ? '스피킹 ' + x.spk + '%' : ''].filter(Boolean).join(' · '); }
 function renderJrCommon(){
   var e = entry();
-  $('jBook').innerHTML = '<option value="">교재 선택</option>' + DT_BOOKS.map(function(b){ return '<option'+(b[0]===e.book?' selected':'')+'>'+b[0]+'</option>'; }).join('');
+  $('jBook').innerHTML = '<option value="">교재 선택</option>' + jrBookOpts(e.book);
   $('jProg').disabled = !e.book;
   $('jProg').innerHTML = e.book ? progOpts(e.book, e.prog) : '<option>교재를 먼저 골라 주세요</option>';
-  $('jSb').value = e.sb; $('jPb').value = e.pb; $('jNote').value = e.note || '';
+  $('jSb').value = e.sb; $('jPb').value = e.pb; $('jSpk').value = e.spk || ''; $('jNote').value = e.note || '';
 }
 function hwClass(v){ return v === '완료' ? 's-done' : v === '미완료' ? 's-todo' : 's-hold'; }
 
@@ -2970,13 +2974,14 @@ function renderStudents(){
   var e = entry();
   $('stuList').innerHTML = cls().students.map(function(s, i){
     var r = e.rows[s];
-    return '<div class="stu'+(r.book || r.sb || r.pb ? ' own' : '')+'" data-name="'+esc(s)+'">'+
+    return '<div class="stu'+(r.book || r.sb || r.pb || r.spk ? ' own' : '')+'" data-name="'+esc(s)+'">'+
       '<label>'+esc(s)+'</label>'+
       '<span class="jr-own"><span class="jr-grp"><i>진도</i>'+
-        '<select data-f="book" aria-label="'+esc(s)+' 교재"><option value="">반 공통 진도</option>'+DT_BOOKS.map(function(b){ return '<option'+(b[0]===r.book?' selected':'')+'>'+b[0]+'</option>'; }).join('')+'</select>'+
+        '<select data-f="book" aria-label="'+esc(s)+' 교재"><option value="">반 공통 진도</option>'+jrBookOpts(r.book)+'</select>'+
         '<select data-f="prog" aria-label="'+esc(s)+' 책진도"'+(r.book ? '' : ' disabled')+'>'+(r.book ? progOpts(r.book, r.prog) : '<option>'+esc(e.prog || '–')+'</option>')+'</select></span>'+
         '<span class="jr-grp"><i>숙제</i><span class="jr-pg"><b>SB</b><input type="text" data-f="sb" inputmode="numeric" value="'+esc(r.sb)+'" placeholder="'+esc(e.sb || 'page')+'" aria-label="'+esc(s)+' SB page"></span>'+
-        '<span class="jr-pg"><b>PB</b><input type="text" data-f="pb" inputmode="numeric" value="'+esc(r.pb)+'" placeholder="'+esc(e.pb || 'page')+'" aria-label="'+esc(s)+' PB page"></span></span>'+
+        '<span class="jr-pg"><b>PB</b><input type="text" data-f="pb" inputmode="numeric" value="'+esc(r.pb)+'" placeholder="'+esc(e.pb || 'page')+'" aria-label="'+esc(s)+' PB page"></span>'+
+        '<span class="jr-pg"><b>스피킹</b><input type="text" data-f="spk" inputmode="numeric" maxlength="3" value="'+esc(r.spk || '')+'" placeholder="'+esc(e.spk || '–')+'" aria-label="'+esc(s)+' 스피킹 퍼센트"><b>%</b></span></span>'+
       '</span>'+
       '<input type="text" class="memo" data-f="memo" value="'+esc(r.memo)+'" placeholder="학부모님께 전할 말 (리포트 기타사항에 들어가요)" aria-label="'+esc(s)+' 기타사항">'+
     '</div>';
@@ -2989,7 +2994,7 @@ function renderStudents(){
 
 function renderCounts(){
   var e = entry(), names = cls().students;
-  var own = names.filter(function(s){ var r = e.rows[s]; return r.book || r.sb || r.pb; }).length;
+  var own = names.filter(function(s){ var r = e.rows[s]; return r.book || r.sb || r.pb || r.spk; }).length;
   $('stuCount').textContent = names.length + '명 · 진도·숙제가 다른 학생 ' + own + '명';
   var d = dtStore[state.classId + '|' + ymd(day)], sent = d && d.stage === 'sent' ? d.sent || 0 : 0;
   $('sentNum').textContent = sent + ' / ' + names.length + '명';
@@ -3014,17 +3019,17 @@ function renderPreview(){
     '\n데일리 테스트 점검표를 저장하면 출결·교재·숙제 검사·단어 결과와 함께 한 장으로 나가요.');
 }
 
-function saveCommon(){ var e = entry(); e.book = $('jBook').value; e.prog = e.book ? $('jProg').value : ''; e.sb = $('jSb').value.trim(); e.pb = $('jPb').value.trim(); e.note = $('jNote').value.trim(); saveJrSoon(); }
+function saveCommon(){ var e = entry(); e.book = $('jBook').value; e.prog = e.book ? $('jProg').value : ''; e.sb = $('jSb').value.trim(); e.pb = $('jPb').value.trim(); e.spk = spkVal($('jSpk').value); e.note = $('jNote').value.trim(); saveJrSoon(); }
 $('jBook').addEventListener('change', function(){ var e = entry(); e.book = this.value; e.prog = firstProg(e.book); saveJrSoon(); renderJrCommon(); renderStudents(); });
 $('jProg').addEventListener('change', function(){ saveCommon(); renderStudents(); });
-['jSb','jPb'].forEach(function(id){ $(id).addEventListener('input', function(){ saveCommon(); renderStudents(); }); });
+['jSb','jPb','jSpk'].forEach(function(id){ $(id).addEventListener('input', function(){ saveCommon(); renderStudents(); }); });
 $('jNote').addEventListener('input', function(){ saveCommon(); renderPreview(); });
 
 $('applyAll').addEventListener('click', function(){
   saveCommon();
   var e = entry();
-  if(!e.prog && !e.sb && !e.pb) return toast('오늘 진도나 숙제 page를 먼저 입력해 주세요.');
-  cls().students.forEach(function(s){ var r = e.rows[s]; r.book = ''; r.prog = ''; r.sb = ''; r.pb = ''; });
+  if(!e.prog && !e.sb && !e.pb && !e.spk) return toast('오늘 진도나 숙제 page를 먼저 입력해 주세요.');
+  cls().students.forEach(function(s){ var r = e.rows[s]; r.book = ''; r.prog = ''; r.sb = ''; r.pb = ''; r.spk = ''; });
   renderStudents();
   saveJr();
   toast(cls().name + ' ' + cls().students.length + '명 모두에게 같은 진도·숙제를 넣었어요.');
@@ -3035,12 +3040,13 @@ $('stuList').addEventListener('change', onStudentChange);
 function onStudentChange(ev){
   var row = ev.target.closest('.stu'); if(!row) return;
   var f = ev.target.dataset.f, r = entry().rows[row.dataset.name];
-  r[f] = f === 'checked' ? ev.target.checked : ev.target.value;
+  r[f] = f === 'checked' ? ev.target.checked : f === 'spk' ? spkVal(ev.target.value) : ev.target.value;
+  if(f === 'spk' && ev.target.value !== r.spk) ev.target.value = r.spk;
   if(f === 'book' && ev.type === 'change') r.prog = firstProg(r.book);
   saveJrSoon();
   if(f === 'hw') ev.target.className = hwClass(r.hw);
   if(f === 'book' && ev.type === 'change') return renderStudents();
-  if(f === 'book' || f === 'sb' || f === 'pb') row.classList.toggle('own', !!(r.book || r.sb || r.pb));
+  if(f === 'book' || f === 'sb' || f === 'pb' || f === 'spk') row.classList.toggle('own', !!(r.book || r.sb || r.pb || r.spk));
   renderCounts();
   if($('previewPick').value === row.dataset.name) renderPreview();
 }
@@ -3390,6 +3396,9 @@ var DT_BOOKS = (function(){
   return [ ['FUN PHONICS', range('', fmt)], ['FUN STORY', range('', fmt)], ['PHONICS', ph], ['STORY', story], ['BASIC', units(12, 4)], ['INTERMEDIATE', units(12, 4)],
     ['ADVANCED', [['권', [1,2,3,4,5,6,7,8,9].map(function(v){ return v + '권'; })]]] ];
 })();
+// 수업 진도에서는 PHONICS·STORY를 빼요(2026-11-09 원장쌤). 예전 기록에 고른 교재는 그 칸에만 그대로 보여요.
+var JR_HIDE = ['PHONICS', 'STORY'];
+function jrBookOpts(cur){ return DT_BOOKS.filter(function(b){ return JR_HIDE.indexOf(b[0]) === -1 || b[0] === cur; }).map(function(b){ return '<option'+(b[0]===cur?' selected':'')+'>'+b[0]+'</option>'; }).join(''); }
 function bookItems(name){ var b = DT_BOOKS.find(function(x){ return x[0] === name; }); return b ? [].concat.apply([], b[1].map(function(g){ return g[1]; })) : []; }
 function progText(e){ return e.book && e.prog ? e.book + ' > ' + e.prog : (e.unit || ''); }
 var DT_LABEL = { flash:'flash', self:'self', inter:'inter', text:'본문' };
@@ -3566,7 +3575,7 @@ function wordText(r, e){
   var parts = [r.w1, r.w2, r.w3].map(function(v, i){ return num(v) === null ? null : (many ? (i+1) + '회 ' : '') + v + '/' + e.max.word; }).filter(Boolean);
   return (parts.join(', ') || '응시 전') + (r.wDone ? ' → 완료' : parts.length ? ' → 미완료' : '');
 }
-function hwRange(e){ return [e.sb ? 'SB: page ' + e.sb : '', e.pb ? 'PB: page ' + e.pb : ''].filter(Boolean).join('  '); }
+function hwRange(e){ return [e.sb ? 'SB: page ' + e.sb : '', e.pb ? 'PB: page ' + e.pb : '', e.spk ? '스피킹: ' + e.spk + '%' : ''].filter(Boolean).join('  '); }
 // 수업 기록(진도·과제)에 적은 학생별 진도·숙제를 리포트에 넣어요. 비어 있으면 데일리 테스트 반 공통 값을 써요.
 function jrFor(s, classId, date, e){
   var j = state.entries[classId + '|' + date], r = j && j.rows[s];
@@ -7647,8 +7656,8 @@ function qsOpen(cid, s){
     + '<section class="qs-sec"><h3>① 출결·지각</h3><div class="qs-row"><label>출결<select data-qa="st"><option value="">아직 안 함</option>' + qsOpt(AT_ST, at.st) + '</select></label>'
     + '<label class="qs-grow">사유 <small class="muted">지각·결석·조퇴</small><input type="text" data-qa="reason" maxlength="40" value="' + esc(at.reason) + '" placeholder="예: 학교 행사로 10분 늦음"></label>'
     + '<label>등원 시간<input type="time" data-qa="inAt" value="' + esc(at.inAt) + '"></label></div><p class="hint">등원·결석 카톡은 출결·지각 화면에서 저장할 때 만들어져요.</p></section>'
-    + '<section class="qs-sec"><h3>② 수업 기록 (진도·숙제)</h3><div class="qs-row"><label class="qs-grow">진도<span class="qs-prog"><select data-qj="book"><option value="">반 공통' + (en.book ? ' (' + esc(en.book) + ')' : '') + '</option>' + DT_BOOKS.map(function(b){ return '<option' + (b[0] === jr.book ? ' selected' : '') + '>' + esc(b[0]) + '</option>'; }).join('') + '</select><select data-qj="prog"' + (jr.book ? '' : ' disabled') + '>' + (jr.book ? bookItems(jr.book).map(function(it){ return '<option' + (it === jr.prog ? ' selected' : '') + '>' + esc(it) + '</option>'; }).join('') : '<option>' + esc(en.prog || '반 공통 진도') + '</option>') + '</select></span></label></div>'
-    + '<div class="qs-row"><label>숙제 SB page<input type="text" data-qj="sb" value="' + esc(jr.sb) + '" placeholder="' + esc(en.sb || '반 공통') + '"></label><label>숙제 PB page<input type="text" data-qj="pb" value="' + esc(jr.pb) + '" placeholder="' + esc(en.pb || '반 공통') + '"></label><label class="qs-grow">수업 메모<input type="text" data-qj="memo" maxlength="60" value="' + esc(jr.memo || '') + '" placeholder="이 학생만 따로 적을 내용"></label></div>'
+    + '<section class="qs-sec"><h3>② 수업 기록 (진도·숙제)</h3><div class="qs-row"><label class="qs-grow">진도<span class="qs-prog"><select data-qj="book"><option value="">반 공통' + (en.book ? ' (' + esc(en.book) + ')' : '') + '</option>' + jrBookOpts(jr.book) + '</select><select data-qj="prog"' + (jr.book ? '' : ' disabled') + '>' + (jr.book ? bookItems(jr.book).map(function(it){ return '<option' + (it === jr.prog ? ' selected' : '') + '>' + esc(it) + '</option>'; }).join('') : '<option>' + esc(en.prog || '반 공통 진도') + '</option>') + '</select></span></label></div>'
+    + '<div class="qs-row"><label>숙제 SB page<input type="text" data-qj="sb" value="' + esc(jr.sb) + '" placeholder="' + esc(en.sb || '반 공통') + '"></label><label>숙제 PB page<input type="text" data-qj="pb" value="' + esc(jr.pb) + '" placeholder="' + esc(en.pb || '반 공통') + '"></label><label>스피킹 %<input type="text" data-qj="spk" inputmode="numeric" maxlength="3" value="' + esc(jr.spk || '') + '" placeholder="' + esc(en.spk || '반 공통') + '"></label><label class="qs-grow">수업 메모<input type="text" data-qj="memo" maxlength="60" value="' + esc(jr.memo || '') + '" placeholder="이 학생만 따로 적을 내용"></label></div>'
     + '<p class="hint">비워 두면 반 공통 진도·숙제가 들어가요. 지금: ' + esc(jrProgText(x) || '진도 없음') + (jrHwText(x) ? ' · ' + esc(jrHwText(x)) : '') + '</p></section>'
     + '<section class="qs-sec"><h3>③ 데일리 테스트</h3>' + sentNote + '<div class="qs-row"><label>교재<select data-qd="book">' + qsOpt(DT_OPT.book, dr.book) + '</select></label><label>숙제<select data-qd="hw">' + qsOpt(DT_OPT.hw, dr.hw) + '</select></label><label>Speaking<select data-qd="spk">' + qsOpt(DT_OPT.spk, dr.spk) + '</select></label><label>클래스카드<select data-qd="cc">' + qsOpt(DT_OPT.cc, dr.cc || '완료') + '</select></label></div>'
     + '<div class="qs-row"><b class="qs-sub">Speaking 점검 page</b>' + DT_SCORES.map(function(f){ return '<label class="qs-sc">' + esc(DT_LABEL[f]) + '<input type="text" class="qs-pg" data-qd="' + f + '" inputmode="numeric" placeholder="p." value="' + esc(dr[f]) + '"></label>'; }).join('') + '</div>'
@@ -7663,7 +7672,7 @@ function qsChange(el){
     qsWith(cid, function(){ var r = atEntry().rows[s]; r[el.dataset.qa] = v; if(el.dataset.qa === 'st' && (v === '출석' || v === '지각' || v === '보강') && !r.inAt){ r.inAt = nowHM(); $('qsForm').querySelector('[data-qa=inAt]').value = r.inAt; } atSave();
       var de = dtEntry(); if(el.dataset.qa === 'st' && v){ de.rows[s].att = v === '보강' ? '출석' : v; dtSave(); } });
   } else if(el.dataset.qj){
-    qsWith(cid, function(){ var r = entry().rows[s], f = el.dataset.qj; r[f] = f === 'sb' || f === 'pb' ? v.replace(/[^0-9,~\- ]/g, '').trim() : v;
+    qsWith(cid, function(){ var r = entry().rows[s], f = el.dataset.qj; r[f] = f === 'sb' || f === 'pb' ? v.replace(/[^0-9,~\- ]/g, '').trim() : f === 'spk' ? spkVal(v) : v;
       if(f === 'book'){ r.prog = bookItems(v)[0] || ''; } saveJr(); });
     if(el.dataset.qj === 'book') return qsOpen(cid, s);
   } else if(el.dataset.qd){
