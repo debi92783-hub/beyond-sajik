@@ -2211,6 +2211,26 @@ var roster = (function(){
   CLASSES.forEach(function(c){ c.students.forEach(function(s){ n++; list.push({ id:'s' + n, name:s, cid:c.id, school:'', grade:'', phone:'', pphone:'', prel:'', joined:'', status:'on', hist:[], memo:'' }); }); });
   return { list:list, seq:n };
 })();
+/* 학년 자동 올림(2026-11-11 원장쌤): 학년을 적은 학년도(s.gy)를 함께 저장하고, 새 학년도(매년 3월 1일)가 되면 한 학년씩 올려요.
+   고3 다음은 '졸업'. 초6→중1, 중3→고1로 올라가면 학교를 확인하라고 표시해요(s.schoolChk). */
+var RS_GRADES = ['초1','초2','초3','초4','초5','초6','중1','중2','중3','고1','고2','고3'];
+function rsSY(d){ d = d || new Date(); return d.getMonth() >= 2 ? d.getFullYear() : d.getFullYear() - 1; }
+function rsRoll(){
+  var sy = rsSY(), ch = 0;
+  roster.list.forEach(function(s){
+    if(!s.grade){ return; }
+    if(!s.gy){ s.gy = sy; ch++; return; }
+    var n = sy - s.gy; if(n <= 0) return;
+    var i = RS_GRADES.indexOf(s.grade), from = s.grade;
+    if(i === -1){ s.gy = sy; ch++; return; }
+    var j = i + n, to = j >= RS_GRADES.length ? '졸업' : RS_GRADES[j];
+    if((i <= 5 && j >= 6) || (i <= 8 && j >= 9)) s.schoolChk = true;
+    s.grade = to; s.gy = sy; ch++;
+    s.hist = s.hist || []; s.hist.push({ d:sy + '-03-01', t:'학년 자동 올림 ' + from + ' → ' + to + (s.schoolChk ? ' (학교 확인 필요)' : ''), by:'자동' });
+  });
+  if(ch) try{ localStorage.setItem(RS_KEY, JSON.stringify(roster)); }catch(e){}
+}
+rsRoll();
 function rsApply(){
   CLASSES.forEach(function(c){ c.students = roster.list.filter(function(s){ return s.cid === c.id && s.status === 'on'; }).map(function(s){ return s.name; }); });
   if(typeof PHONE4 !== 'undefined') rsPin();
@@ -7046,7 +7066,7 @@ $('pvPrev').addEventListener('click', function(ev){ pvClick(ev, function(){ pvPr
    선생님: 담당 반만 보고, 학교·학년·연락처는 고칠 수 있어요. 반 이동·상태 바꾸기는 원장님만. */
 var RS_ST = { on:'재원', wait:'대기', rest:'휴원', out:'퇴원' };
 var RS_SCHOOLS = ['창신초','남문초','여고초','거제초'];   // 그 밖의 학교는 '기타'에서 직접 써요
-var RS_GRADES = ['초1','초2','초3','초4','초5','초6','중1','중2','중3','고1'];
+// RS_GRADES는 반·학생 명단 맨 위에 있어요(학년 자동 올림에 먼저 써요).
 var rs = { cid:'', q:'', showOut:false, edit:null };
 function rsPin(){
   roster.list.forEach(function(s){
@@ -7146,7 +7166,7 @@ function rsTable(list, withCls){
       if(dir && s.status === 'rest') act += '<button type="button" class="btn soft" data-rsto="on" data-id="' + s.id + '">복귀</button>';
       if(dir && s.status === 'out') act += '<button type="button" class="btn soft" data-rsre="' + s.id + '">다시 등록</button>';
       return '<tr><td><b>' + esc(s.name) + '</b></td>' + (withCls ? '<td>' + esc(rsCname(s.cid)) + '</td>' : '')
-        + '<td>' + esc([s.school, s.grade].filter(Boolean).join(' ') || '–') + '</td><td>' + rsTelLink(s.phone) + '</td><td>' + rsTelLink(s.pphone) + (s.prel && s.pphone ? ' <small class="muted">' + esc(s.prel) + '</small>' : '') + '</td>'
+        + '<td>' + esc([s.school, s.grade].filter(Boolean).join(' ') || '–') + (s.schoolChk ? ' <span class="tag warn" title="학년이 올라가 학교가 바뀌었을 수 있어요">학교 확인</span>' : '') + '</td><td>' + rsTelLink(s.phone) + '</td><td>' + rsTelLink(s.pphone) + (s.prel && s.pphone ? ' <small class="muted">' + esc(s.prel) + '</small>' : '') + '</td>'
         + '<td class="dt">' + esc(s.joined || '–') + '</td><td><span class="tag rs-st ' + s.status + '">' + RS_ST[s.status] + (s.status === 'out' && s.outAt ? ' ' + esc(s.outAt) : '') + '</span></td><td class="rs-acts">' + act + '</td></tr>';
     }).join('') + '</tbody></table></div>';
 }
@@ -7162,7 +7182,7 @@ function rsOpen(id, cid){
     + '<label>반<select id="rsCls"' + ro + '><option value="">반 배정 전</option>' + cls + '</select></label></div>'
     + '<div class="row2"><label>학교<select id="rsSchoolSel"><option value="">선택</option>' + RS_SCHOOLS.map(function(g){ return '<option' + (g === s.school ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '<option value="etc"' + (s.school && RS_SCHOOLS.indexOf(s.school) === -1 ? ' selected' : '') + '>기타 (직접 입력)</option></select>'
     + '<input type="text" id="rsSchool" maxlength="20" placeholder="학교 이름 (예: 사직중)" value="' + esc(RS_SCHOOLS.indexOf(s.school) === -1 ? s.school : '') + '"' + (s.school && RS_SCHOOLS.indexOf(s.school) === -1 ? '' : ' hidden') + '></label>'
-    + '<label>학년<select id="rsGrade"><option value="">선택</option>' + RS_GRADES.map(function(g){ return '<option' + (g === s.grade ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label></div>'
+    + '<label>학년 <span class="hint">매년 3월 1일에 자동으로 올라가요</span><select id="rsGrade"><option value="">선택</option>' + RS_GRADES.concat(['졸업']).map(function(g){ return '<option' + (g === s.grade ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label></div>'
     + '<label>학생 연락처 <span class="hint">휴대폰이 없으면 비워 두세요</span><input type="tel" id="rsPhone" inputmode="numeric" placeholder="010-0000-0000" value="' + esc(s.phone) + '"></label>'
     + '<div class="row2"><label>학부모 연락처<input type="tel" id="rsPPhone" inputmode="numeric" placeholder="010-0000-0000" value="' + esc(s.pphone) + '"></label>'
     + '<label>관계<select id="rsPRel">' + ['어머니','아버지','보호자'].map(function(g){ return '<option' + (g === s.prel ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label></div>'
@@ -7180,7 +7200,7 @@ function rsOpen(id, cid){
 function rsSubmit(){
   var dir = rsDir(), err = $('rsErr');
   var s = rs.edit ? rsFind(rs.edit) : null;
-  var v = { name:$('rsName').value.trim(), cid:$('rsCls').value, school:$('rsSchoolSel').value === 'etc' ? $('rsSchool').value.trim() : $('rsSchoolSel').value, grade:$('rsGrade').value, phone:rsTel($('rsPhone').value), pphone:rsTel($('rsPPhone').value), prel:$('rsPRel').value, joined:$('rsJoin').value, status:$('rsSt').value, memo:$('rsMemo').value.trim() };
+  var v = { name:$('rsName').value.trim(), cid:$('rsCls').value, school:$('rsSchoolSel').value === 'etc' ? $('rsSchool').value.trim() : $('rsSchoolSel').value, grade:$('rsGrade').value, gy:$('rsGrade').value ? rsSY() : '', phone:rsTel($('rsPhone').value), pphone:rsTel($('rsPPhone').value), prel:$('rsPRel').value, joined:$('rsJoin').value, status:$('rsSt').value, memo:$('rsMemo').value.trim() };
   if(!dir){ v.name = s.name; v.cid = s.cid; v.joined = s.joined; v.status = s.status; }
   if(!v.name){ err.textContent = '이름을 써 주세요.'; return; }
   if(v.status !== 'out' && v.cid && roster.list.some(function(x){ return x !== s && x.cid === v.cid && x.name === v.name && x.status !== 'out'; })){ err.textContent = '이 반에 같은 이름 학생이 있어요. 이름 뒤에 구분(예: 김하준B)을 붙여 주세요.'; return; }
@@ -7203,6 +7223,7 @@ function rsSubmit(){
     if(s.status !== v.status) ch.push('상태 ' + RS_ST[s.status] + ' → ' + RS_ST[v.status]);
     if(s.phone !== v.phone || s.pphone !== v.pphone) ch.push('연락처 수정');
     if(s.school !== v.school || s.grade !== v.grade) ch.push('학교·학년 수정');
+    delete s.schoolChk;
     if(v.status === 'out' && s.status !== 'out') s.outAt = ymd(new Date());
     if(v.status !== 'out') delete s.outAt;
     Object.keys(v).forEach(function(k){ s[k] = v[k]; });
@@ -7227,7 +7248,7 @@ function rsBulkHtml(){
   var b = rs.bulk;
   var h = '<div class="card rs-bulk"><div class="card-head"><h2>학생 한 번에 입력 <small class="muted">엑셀 양식</small></h2>'
     + '<span class="rs-bk-btns"><button type="button" class="btn soft" data-rsbk="tpl">① 양식 내려받기</button><label class="btn soft an-pick">② 채운 파일 넣기<input type="file" id="rsBkFile" accept=".xlsx,.xls,.csv,.tsv,.txt"></label><button type="button" class="btn soft" data-rsbk="paste">또는 표 붙여넣기</button></span></div>'
-    + '<p class="muted rs-note">양식에는 지금 학생이 미리 들어 있어요. 빈 칸(학교·연락처 등)을 채우고, 새 학생은 아래 줄에 이어 써요. 부서·반·학교·학년·관계·상태는 노란 칸을 누르면 ▼로 골라요. 반은 반 이름 그대로(예: ' + esc(CLASSES[0] ? CLASSES[0].name : '파닉스 A') + '), 학년은 초1~중3·고1, 상태는 재원·대기·휴원·퇴원 가운데 하나로 써요. 빈 칸은 지금 정보를 지우지 않고 그대로 둬요.</p>'
+    + '<p class="muted rs-note">양식에는 지금 학생이 미리 들어 있어요. 빈 칸(학교·연락처 등)을 채우고, 새 학생은 아래 줄에 이어 써요. 부서·반·학교·학년·관계·상태는 노란 칸을 누르면 ▼로 골라요. 반은 반 이름 그대로(예: ' + esc(CLASSES[0] ? CLASSES[0].name : '파닉스 A') + '), 학년은 초1~고3(지금 학년, 매년 3월 1일에 자동으로 올라가요), 상태는 재원·대기·휴원·퇴원 가운데 하나로 써요. 빈 칸은 지금 정보를 지우지 않고 그대로 둬요.</p>'
     + '<div class="mo-pbox" id="rsBkBox"' + (b && b.paste ? '' : ' hidden') + '><textarea id="rsBkT" rows="6" placeholder="엑셀에서 제목 줄(이름·반·학교…)까지 같이 복사해서 붙여넣어요."></textarea><div class="mo-bulk-btns"><button type="button" class="btn" data-rsbk="read">미리 보기</button><button type="button" class="btn soft" data-rsbk="pclose">닫기</button></div></div>';
   if(b && b.list){
     var cnt = function(k){ return b.list.filter(function(x){ return x.act === k; }).length; };
@@ -7268,7 +7289,7 @@ function rsBulkRead(rows){
     if(g('cls') && !c) errs.push('‘' + g('cls') + '’ 반을 찾지 못했어요');
     x.clsName = c ? c.name : g('cls');
     if(g('school')) v.school = g('school');
-    if(g('grade')){ var gr = g('grade').replace(/\s/g, '').replace(/^초등?(\d)(학년)?$/, '초$1').replace(/^중학?(\d)(학년)?$/, '중$1').replace(/^고등?(\d)(학년)?$/, '고$1'); if(RS_GRADES.indexOf(gr) !== -1) v.grade = gr; else errs.push('학년 ‘' + g('grade') + '’은 초1~중3·고1로 써 주세요'); }
+    if(g('grade')){ var gr = g('grade').replace(/\s/g, '').replace(/^초등?(\d)(학년)?$/, '초$1').replace(/^중학?(\d)(학년)?$/, '중$1').replace(/^고등?(\d)(학년)?$/, '고$1'); if(RS_GRADES.indexOf(gr) !== -1) v.grade = gr; else errs.push('학년 ‘' + g('grade') + '’은 초1~고3으로 써 주세요'); }
     if(g('phone')) v.phone = rsTel(g('phone'));
     if(g('pphone')) v.pphone = rsTel(g('pphone'));
     if(g('prel')) v.prel = g('prel');
@@ -7315,13 +7336,13 @@ function rsBulkApply(){
     if(x.act === 'new'){
       roster.seq = (roster.seq || roster.list.length) + 1;
       var s = { id:'s' + roster.seq, name:x.name, cid:x.v.cid, school:'', grade:'', phone:'', pphone:'', prel:'', joined:'', status:'on', hist:[], memo:'' };
-      Object.keys(x.v).forEach(function(k){ s[k] = x.v[k]; });
+      Object.keys(x.v).forEach(function(k){ s[k] = x.v[k]; }); if(s.grade) s.gy = rsSY();
       rsLog(s, '한 번에 입력으로 등록 · ' + rsCname(s.cid) + ' · ' + RS_ST[s.status]); roster.list.push(s);
     } else {
       var t = rsFind(x.id); if(!t) return;
       if(x.v.status === 'out' && t.status !== 'out') t.outAt = ymd(new Date());
       if(x.v.status && x.v.status !== 'out') delete t.outAt;
-      Object.keys(x.v).forEach(function(k){ t[k] = x.v[k]; });
+      Object.keys(x.v).forEach(function(k){ t[k] = x.v[k]; }); if(x.v.grade){ t.gy = rsSY(); delete t.schoolChk; }
       rsLog(t, '한 번에 입력 · ' + x.msg);
     }
   });
