@@ -1249,6 +1249,12 @@
   .rs-st.on{ background:var(--good-soft); color:var(--good); } .rs-st.wait{ background:var(--accent-soft); color:var(--accent); }
   .rs-st.rest{ background:var(--hold-soft); color:var(--hold); } .rs-st.out{ background:var(--surface-soft); color:var(--ink-soft); }
   .rs-note{ margin:0 0 10px; font-size:12.5px; }
+  .cl-t-list input[type=text], .cl-t-list select{ font:inherit; font-size:13px; border:1px solid var(--border); border-radius:7px; padding:6px 8px; background:var(--surface); color:var(--ink); width:100%; box-sizing:border-box; min-width:90px; }
+  .cl-t-list td{ vertical-align:top; } .cl-t{ font-size:12.5px; white-space:nowrap; } .cl-ch{ display:block; font-size:11.5px; color:var(--accent); font-weight:700; margin-top:3px; }
+  .t-list .info-row .class-chips label{ flex-direction:row; align-items:center; color:var(--ink); }
+  .t-cls-edit{ width:100%; margin:6px 0 10px; } .t-cls-edit p{ margin:0 0 6px; font-size:13px; }
+  .cl-off td{ opacity:.5; } .cl-ck{ display:flex; align-items:center; gap:4px; font-size:12.5px; white-space:nowrap; }
+  .cl-act{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; } .cl-date{ display:flex; align-items:center; gap:6px; font-size:12.5px; } .cl-date input{ font:inherit; font-size:12.5px; border:1px solid var(--border); border-radius:7px; padding:5px 7px; }
   #view-roster .card{ margin-bottom:16px; }
   .pay-cls{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; } .pay-crow{ display:flex; gap:10px; align-items:flex-start; } .pay-crow > b{ flex:none; width:52px; font-size:12.5px; color:var(--ink-soft); padding-top:8px; }
   .pay-un{ font-style:normal; font-size:11px; font-weight:800; color:#fff; background:var(--warn); border-radius:99px; padding:1px 6px; margin-left:4px; }
@@ -2148,8 +2154,32 @@ var CLASSES = [
   { id:'h-g',  dept:'중등부', name:'중등 고등문법 선행반',   teacher:'최현우', time:'19:20–20:30', room:'2강의실', today:true,
     students:['진우석','마서영','편준기','길하영','방도경','엄수빈'] }
 ];
+/* 반 설정(2026-11-11 원장쌤): 원장님이 반 이름·부서·강의실을 고치고, 과정이 끝나면 여러 반 이름을 한꺼번에 바꿔요.
+   기록은 반 고유 번호(id)로 저장돼서 이름을 바꿔도 지난 기록이 이어져요. 예전 이름은 c.names에 남겨요.
+   수업이 끝난 반은 지우지 않고 '닫은 반'(closed)으로 남겨요. 담당 선생님은 선생님 계정, 요일·시간은 시간표에서 정해요. */
+var CL_KEY = 'beyond-classes-v1', CLASSES_ALL = CLASSES.slice();
+(function(){
+  var st = null; try{ st = JSON.parse(localStorage.getItem(CL_KEY) || 'null'); }catch(e){}
+  if(!st || !Array.isArray(st.list)) return;
+  var all = st.list.map(function(x){
+    var base = CLASSES.find(function(c){ return c.id === x.id; }) || { teacher:'미배정', time:'15:00–15:50', today:false, students:[] };
+    var c = {}; Object.keys(base).forEach(function(k){ c[k] = base[k]; });
+    ['dept','name','room','closed','closedAt','names'].forEach(function(k){ if(x[k] !== undefined) c[k] = x[k]; });
+    c.id = x.id; return c;
+  });
+  CLASSES_ALL = all;
+  CLASSES.length = 0; all.forEach(function(c){ if(!c.closed) CLASSES.push(c); });
+})();
+function clSave(){
+  var list = CLASSES_ALL.map(function(c){ return { id:c.id, dept:c.dept, name:c.name, room:c.room || '', closed:!!c.closed, closedAt:c.closedAt || '', names:c.names || [] }; });
+  try{ localStorage.setItem(CL_KEY, JSON.stringify({ list:list })); }catch(e){}
+  CLASSES.length = 0; CLASSES_ALL.forEach(function(c){ if(!c.closed) CLASSES.push(c); });
+  todayFill();
+}
 // 오늘 출석 수, 숙제 완료율 (예시)
 var TODAY = { 'p-a':[8,100], 'p-b':[7,86], 'r-1':[9,90], 'r-2':[10,70], 'g-e':[6,92], 'm-a':[9,78], 'm-b':[7,88], 'h-g':[5,100] };
+function todayFill(){ CLASSES_ALL.forEach(function(c){ if(!TODAY[c.id]) TODAY[c.id] = [0, 100]; }); }
+todayFill();
 var ALERTS = [
   { name:'김도윤', type:'미납', date:'10/20' },
   { name:'이서아', type:'결석', date:'10/23' },
@@ -6761,7 +6791,7 @@ function renderSettings(){
     return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+(req[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+cloudTag(a)+'</td><td>'+esc(a.id)+'</td><td>'+(cl.length ? esc(cl.join(', ')) : '<span class="muted">없음</span>')+'</td>' +
       '<td class="dt">'+tDate(a.hire)+'</td><td class="dt">'+tDate(a.edu)+'</td>' +
       '<td class="dt"><input type="date" class="t-lv" data-lv="left" value="'+esc(a.left || '')+'" aria-label="'+esc(a.name)+' 퇴사일"></td><td class="dt"><input type="date" class="t-lv" data-lv="eduOff" value="'+esc(a.eduOff || '')+'" aria-label="'+esc(a.name)+' 교육청 등록 철회일"></td>' +
-      '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 초기화</button></td></tr>';
+      '<td class="acts"><button type="button" data-act="info">정보·담당 반 수정</button><button type="button" data-act="pw">비밀번호 초기화</button></td></tr>';
   }).join('') : '<tr><td colspan="8" class="muted" style="padding:16px 10px">아직 등록된 선생님이 없어요. 위에서 첫 선생님을 등록해 주세요.</td></tr>';
   $('tLeftCount').textContent = gone.length + '명';
   $('tLeftRows').innerHTML = gone.length ? gone.map(function(a){
@@ -6808,7 +6838,8 @@ function tInfoRow(tr, acc, mode){
   var body = mode === 'leave'
     ? '<p><b>'+esc(acc.name)+' 선생님 퇴사 처리</b> · 로그인이 막히고 담당 반은 미배정이 돼요. 계정과 기록은 지우지 않아요.</p>' + f('left', '퇴사일', today) + f('eduOff', '교육청 등록 철회일 (아직이면 비워 두세요)', acc.eduOff)
     : '<label>근무 형태<select data-k="type"><option value="">정규</option><option value="part"'+(acc.type === 'part' ? ' selected' : '')+'>아르바이트</option></select></label>' + f('hire', '입사일', acc.hire) + (acc.type === 'part' ? '' : f('edu', '교육청 등록일', acc.edu)) + (acc.left ? f('left', '퇴사일', acc.left) + f('eduOff', '교육청 등록 철회일', acc.eduOff) : '') +
-      (acc.type === 'part' && !acc.left ? '<div class="pt-parts pt-edit"><p>담당 반과 맡을 파트</p>'+ptPartsHtml(acc.parts || {})+'</div>' : '');
+      (acc.type === 'part' && !acc.left ? '<div class="pt-parts pt-edit"><p>담당 반과 맡을 파트</p>'+ptPartsHtml(acc.parts || {})+'</div>' : '') +
+      (acc.type !== 'part' && !acc.left ? '<div class="t-cls-edit"><p><b>담당 반</b> <small class="muted">체크한 반이 이 선생님 반이 돼요. 다른 선생님 반을 체크하면 이 선생님으로 바뀌어요.</small></p><div class="class-chips">' + CLASSES.map(function(c){ var mine = c.teacher === acc.name; return '<label><input type="checkbox" data-tcls="' + c.id + '"' + (mine ? ' checked' : '') + '>' + esc(c.name) + ' <small>' + (mine ? '' : esc(c.teacher)) + '</small></label>'; }).join('') + '</div></div>' : '');
   tr.insertAdjacentHTML('afterend', '<tr class="info-row" data-mode="'+mode+'"><td colspan="'+cols+'"><form data-id="'+acc.id+'" data-mode="'+mode+'">'+body+'<button class="btn'+(mode === 'leave' ? '' : ' soft')+'" type="submit">'+(mode === 'leave' ? '퇴사 처리' : '저장')+'</button><button class="btn soft" type="button" data-act="close">취소</button><span class="form-err"></span></form></td></tr>');
   tr.nextElementSibling.querySelector('input').focus();
 }
@@ -6826,7 +6857,14 @@ function tInfoSubmit(e){
   } else {
     ['type','hire','edu','left','eduOff'].forEach(function(k){ if(k in v){ if(k === 'left' && !v.left) return; acc[k] = v[k]; } });
     var pe = f.querySelector('.pt-edit'); if(pe) acc.parts = ptPartsRead(pe);
-    toast(acc.name + ' 선생님 정보를 저장했어요.');
+    var tc = f.querySelectorAll('[data-tcls]'), take = [], drop = [];
+    tc.forEach(function(i){ var c = CLASSES.find(function(x){ return x.id === i.dataset.tcls; }); if(!c) return;
+      if(i.checked && c.teacher !== acc.name) take.push(c); if(!i.checked && c.teacher === acc.name) drop.push(c); });
+    var from = take.filter(function(c){ return c.teacher && c.teacher !== '미배정'; });
+    if(from.length && !confirm(from.map(function(c){ return c.name + ': ' + c.teacher + ' 선생님 → ' + acc.name + ' 선생님'; }).join('\n') + '\n\n담당 선생님을 이렇게 바꿀까요?')) return;
+    take.forEach(function(c){ c.teacher = acc.name; store.assign[c.id] = acc.name; });
+    drop.forEach(function(c){ c.teacher = '미배정'; store.assign[c.id] = '미배정'; });
+    toast(acc.name + ' 선생님 정보를 저장했어요.' + (take.length || drop.length ? ' 담당 반: ' + (CLASSES.filter(function(c){ return c.teacher === acc.name; }).map(function(c){ return c.name; }).join(', ') || '없음') : ''));
   }
   saveStore(); renderDirector(); renderSettings();
 }
@@ -7087,7 +7125,7 @@ function rsClasses(){ return rsDir() ? CLASSES : dtClasses(); }
 function rsOf(cid, st){ return roster.list.filter(function(s){ return s.cid === cid && (!st || s.status === st); }); }
 function rsFind(id){ return roster.list.find(function(s){ return s.id === id; }); }
 function rsLog(s, text){ s.hist = s.hist || []; s.hist.push({ d:ymd(new Date()), t:text, by:state.view === 'director' ? '원장님' : state.teacher }); }
-function rsCname(cid){ var c = CLASSES.find(function(x){ return x.id === cid; }); return c ? c.name : '반 없음'; }
+function rsCname(cid){ var c = CLASSES_ALL.find(function(x){ return x.id === cid; }); return c ? c.name + (c.closed ? ' (닫은 반)' : '') : '반 없음'; }
 function rsBar(n){ var p = Math.min(100, Math.round(n / RS_CAP * 100)); return '<span class="rs-bar' + (n >= RS_CAP ? ' full' : '') + '"><i style="width:' + p + '%"></i></span>'; }
 
 /* 면담·변화 기록: 교무일지 '수업 중 면담 내용'(자동으로 모음) + 학생 카드에서 쓰는 변화 기록(s.notes, 지우지 않음).
@@ -7131,10 +7169,12 @@ function rsListHtml(cs){
     h += '<div class="card"><div class="card-head"><h2>찾은 학생 <small class="muted">' + hit.length + '명</small></h2></div>' + (hit.length ? rsTable(hit, true) : '<p class="empty">찾는 학생이 없어요.</p>') + '</div>';
     return h;
   }
+  if(dir) h += clEditHtml();
   if(dir) h += rsBulkHtml();
   h += '<div class="rs-grid">' + cs.map(function(c){
     var on = rsOf(c.id, 'on').length, w = rsOf(c.id, 'wait').length, r = rsOf(c.id, 'rest').length;
     return '<button type="button" class="card rs-cls" data-rscls="' + c.id + '"><span class="rs-dept">' + esc(c.dept) + '</span><b>' + esc(c.name) + '</b><small>' + esc(c.teacher) + ' · ' + esc(c.time) + ' · ' + esc(c.room || '') + '</small>'
+      + (c.names && c.names.length ? '<small class="muted">예전 이름: ' + esc(c.names[c.names.length - 1].name) + '</small>' : '')
       + '<span class="rs-cap"><b>' + on + '</b>/' + RS_CAP + '명' + (on >= RS_CAP ? ' <span class="tag warn">정원 마감</span>' : ' <span class="muted">빈자리 ' + (RS_CAP - on) + '</span>') + '</span>' + rsBar(on)
       + ((w || r) ? '<small class="rs-more">' + (w ? '대기 ' + w + '명' : '') + (w && r ? ' · ' : '') + (r ? '휴원 ' + r + '명' : '') + '</small>' : '') + '</button>';
   }).join('') + '</div>';
@@ -7146,6 +7186,55 @@ function rsListHtml(cs){
       + (rs.showOut ? (outs.length ? rsTable(outs, true) : '<p class="empty">퇴원한 학생이 없어요.</p>') : '<p class="muted rs-note">퇴원한 학생은 지워지지 않고 여기에 남아요. 다시 등록할 때도 여기에서 해요.</p>') + '</div>';
   }
   return h;
+}
+/* 반 설정 카드 */
+var clEd = null;   // 고치는 중: { rows:[{id,dept,name,room,closed,isNew}], date }
+function clEditHtml(){
+  if(!clEd) return '<div class="card cl-card"><div class="card-head"><h2>반 설정 <small class="muted">반 ' + CLASSES.length + '개' + (CLASSES_ALL.length > CLASSES.length ? ' · 닫은 반 ' + (CLASSES_ALL.length - CLASSES.length) + '개' : '') + '</small></h2><button type="button" class="btn soft" data-cl="open">반 이름 바꾸기 · 반 추가</button></div>'
+    + '<p class="muted rs-note">과정이 끝나 여러 반 이름을 한꺼번에 바꿀 때 여기에서 해요. 반 이름을 바꿔도 학생과 지난 기록은 그대로 이어져요.</p></div>';
+  var rows = clEd.rows.map(function(r, i){
+    var c = CLASSES_ALL.find(function(x){ return x.id === r.id; }), on = r.isNew ? 0 : rsOf(r.id, 'on').length + rsOf(r.id, 'wait').length + rsOf(r.id, 'rest').length;
+    var old = c && c.name !== r.name.trim() && r.name.trim() ? '<small class="cl-ch">' + esc(c.name) + ' → ' + esc(r.name.trim()) + '</small>' : '';
+    return '<tr' + (r.closed ? ' class="cl-off"' : '') + '><td><select data-clf="dept" data-i="' + i + '">' + ['초등부','중등부'].map(function(d){ return '<option' + (d === r.dept ? ' selected' : '') + '>' + d + '</option>'; }).join('') + '</select></td>'
+      + '<td><input type="text" data-clf="name" data-i="' + i + '" maxlength="20" value="' + esc(r.name) + '" placeholder="반 이름">' + old + '</td>'
+      + '<td><input type="text" data-clf="room" data-i="' + i + '" maxlength="10" value="' + esc(r.room || '') + '" placeholder="예: 1강의실"></td>'
+      + '<td class="cl-t">' + esc(c ? c.teacher : '미배정') + '<br><small class="muted">' + esc(c ? c.time : '') + '</small></td>'
+      + '<td class="cl-t">' + (r.isNew ? '새 반' : on + '명') + '</td>'
+      + '<td><label class="cl-ck"><input type="checkbox" data-clf="closed" data-i="' + i + '"' + (r.closed ? ' checked' : '') + (on ? ' disabled title="학생을 다른 반으로 옮기거나 퇴원 처리한 뒤에 닫을 수 있어요"' : '') + '> 닫기</label></td></tr>';
+  }).join('');
+  return '<div class="card cl-card"><div class="card-head"><h2>반 설정 · 이름 한꺼번에 바꾸기</h2></div>'
+    + '<p class="muted rs-note">이름을 고칠 반만 바꾸고 <b>저장</b>을 눌러요. 학생·기록은 그 반에 그대로 남고, 예전 이름은 반 카드와 엑셀 명단 넣기에서 함께 알아봐요. 수업이 끝난 반은 지우지 않고 <b>닫기</b>로 남겨요(학생이 있으면 먼저 옮겨요). 담당 선생님은 선생님 계정에서, 요일·시간은 시간표에서 정해요.</p>'
+    + '<div class="table-wrap"><table class="t-list cl-t-list"><thead><tr><th>부서</th><th>반 이름</th><th>강의실</th><th>담당 · 시간</th><th>학생</th><th>수업 종료</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + '<div class="cl-act"><button type="button" class="btn soft" data-cl="add">+ 새 반 추가</button><label class="cl-date">바꾸는 날짜 <input type="date" data-clf="date" value="' + esc(clEd.date) + '"></label><span style="flex:1"></span><button type="button" class="btn soft" data-cl="cancel">취소</button><button type="button" class="btn" data-cl="save">저장</button></div></div>';
+}
+function clClick(t){
+  var a = t.dataset.cl;
+  if(a === 'open'){ clEd = { date:ymd(new Date()), rows:CLASSES_ALL.filter(function(c){ return !c.closed; }).map(function(c){ return { id:c.id, dept:c.dept, name:c.name, room:c.room || '', closed:false }; }) }; return renderRoster(); }
+  if(a === 'cancel'){ clEd = null; return renderRoster(); }
+  if(a === 'add'){ clEd.rows.push({ id:'c' + Date.now().toString(36), dept:'초등부', name:'', room:'', closed:false, isNew:true }); renderRoster(); var ins = document.querySelectorAll('[data-clf=name]'); ins[ins.length - 1].focus(); return; }
+  if(a === 'save'){
+    var rows = clEd.rows.filter(function(r){ return !(r.isNew && !r.name.trim()); }), names = {}, bad = '';
+    rows.forEach(function(r){ var n = r.name.trim().replace(/\s+/g, ' '); r.name = n; if(!n) bad = '반 이름이 빈 칸이 있어요.'; else if(!r.closed && names[n]) bad = '‘' + n + '’ 반이 두 개예요. 이름을 다르게 해 주세요.'; if(!r.closed) names[n] = 1; });
+    if(bad) return toast(bad);
+    var ch = [];
+    rows.forEach(function(r){
+      var c = CLASSES_ALL.find(function(x){ return x.id === r.id; });
+      if(!c){ ch.push('새 반: ' + r.name); return; }
+      if(c.name !== r.name) ch.push(c.name + ' → ' + r.name);
+      if(c.dept !== r.dept || (c.room || '') !== r.room.trim()) ch.push(r.name + ' 부서·강의실 수정');
+      if(r.closed) ch.push(c.name + ' 닫기');
+    });
+    if(!ch.length){ clEd = null; renderRoster(); return toast('바뀐 내용이 없어요.'); }
+    if(!confirm('아래처럼 바꿀까요? (' + clEd.date + ')\n\n' + ch.join('\n'))) return;
+    rows.forEach(function(r){
+      var c = CLASSES_ALL.find(function(x){ return x.id === r.id; });
+      if(!c){ CLASSES_ALL.push({ id:r.id, dept:r.dept, name:r.name, teacher:'미배정', time:'15:00–15:50', room:r.room.trim(), today:false, students:[], names:[] }); return; }
+      if(c.name !== r.name){ c.names = (c.names || []).concat([{ name:c.name, until:clEd.date }]); c.name = r.name; }
+      c.dept = r.dept; c.room = r.room.trim(); if(r.closed){ c.closed = true; c.closedAt = clEd.date; }
+    });
+    clSave(); clEd = null; rsApply(); renderRoster(); if(typeof renderSide === 'function') renderSide();
+    toast('반 설정을 저장했어요. ' + ch.length + '건 바뀌었어요.');
+  }
 }
 function rsDetailHtml(c){
   var dir = rsDir(), on = rsOf(c.id, 'on');
@@ -7272,7 +7361,8 @@ function rsDate(v){
 }
 function rsFindCls(name){
   var n = rsCellStr(name).replace(/\s/g, ''); if(!n) return null;
-  return CLASSES.find(function(c){ return c.name.replace(/\s/g, '') === n; }) || CLASSES.find(function(c){ return c.id === name; }) || null;
+  return CLASSES.find(function(c){ return c.name.replace(/\s/g, '') === n; }) || CLASSES.find(function(c){ return c.id === name; })
+    || CLASSES.find(function(c){ return (c.names || []).some(function(o){ return o.name.replace(/\s/g, '') === n; }); }) || null;
 }
 function rsBulkRead(rows){
   if(!rows || rows.length < 2){ toast('제목 줄과 학생 줄이 있어야 해요.'); return; }
@@ -7445,6 +7535,7 @@ $('rsBody').addEventListener('click', function(ev){
   else if(t.dataset.rsto) rsTo(t.dataset.id, t.dataset.rsto);
   else if(t.dataset.rsre){ var s = rsFind(t.dataset.rsre); if(s){ rsOpen(s.id); $('rsSt').value = 'on'; } }
   else if(t.hasAttribute('data-rsout')){ rs.showOut = !rs.showOut; renderRoster(); }
+  else if(t.dataset.cl) clClick(t);
   else if(t.hasAttribute('data-rscsv')) rsCsv();
   else if(t.dataset.rsbk === 'tpl') rsBulkTpl();
   else if(t.dataset.rsbk === 'paste'){ $('rsBkBox').hidden = false; $('rsBkT').focus(); }
@@ -7454,6 +7545,8 @@ $('rsBody').addEventListener('click', function(ev){
   else if(t.dataset.rsbk === 'cancel'){ rs.bulk = null; renderRoster(); }
 });
 $('rsBody').addEventListener('change', function(ev){
+  var cf = ev.target.dataset && ev.target.dataset.clf;
+  if(cf && clEd){ if(cf === 'date'){ clEd.date = ev.target.value || ymd(new Date()); return; } var r = clEd.rows[+ev.target.dataset.i]; if(r){ r[cf] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value; if(cf === 'closed') ev.target.closest('tr').classList.toggle('cl-off', r.closed); } return; }
   if(ev.target.id !== 'rsBkFile') return;
   var f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if(!f) return;
   if(/\.xlsx?$/i.test(f.name)){
@@ -7462,6 +7555,10 @@ $('rsBody').addEventListener('change', function(ev){
   } else { var fr = new FileReader(); fr.onload = function(){ rsBulkRead(moParseDelim(fr.result)); }; fr.readAsText(f); }
 });
 $('rsBody').addEventListener('input', function(ev){
+  var cf = ev.target.dataset && ev.target.dataset.clf;
+  if(cf && clEd){ if(cf === 'date'){ clEd.date = ev.target.value || ymd(new Date()); return; } var r = clEd.rows[+ev.target.dataset.i]; if(!r) return; r[cf] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
+    if(cf === 'name'){ var td = ev.target.parentNode, o = td.querySelector('.cl-ch'), c = CLASSES_ALL.find(function(x){ return x.id === r.id; }), v = r.name.trim(); if(o) o.remove(); if(c && v && c.name !== v) td.insertAdjacentHTML('beforeend', '<small class="cl-ch">' + esc(c.name) + ' → ' + esc(v) + '</small>'); }
+    return; }
   if(ev.target.id !== 'rsQ') return;
   rs.q = ev.target.value; var pos = ev.target.selectionStart;
   renderRoster(); var q = $('rsQ'); q.focus(); try{ q.setSelectionRange(pos, pos); }catch(e){}
@@ -7964,7 +8061,7 @@ var CLOUD = (function(){
   var DB = (EMU ? EMU.db : 'https://firestore.googleapis.com') + '/v1/projects/' + FB.projectId + '/databases/(default)/documents/';
   var DOMAIN = 'beyond-sajik.app', AKEY = 'bxfb-auth';
   var SYNC = ['beyond-accounts-v1','beyond-attend-v1','beyond-board-v1','beyond-consult-record-v1','beyond-daily-v2','beyond-delete-v1','beyond-gyomu-v1',
-    'beyond-journal-v1','beyond-lesson-check-v1','beyond-lesson-items-v1','beyond-mail-v1','beyond-monthly-v1','beyond-notice-v1','beyond-pay-v1','beyond-phrases-v1',
+    'beyond-journal-v1','beyond-lesson-check-v1','beyond-lesson-items-v1','beyond-mail-v1','beyond-monthly-v1','beyond-notice-v1','beyond-pay-v1','beyond-phrases-v1','beyond-classes-v1',
     'beyond-public-v1','beyond-reserve-v1','beyond-roster-v1','beyond-schedule-v1','beyond-timetable-v1'];
   var DIRECTOR_ONLY_READ = ['beyond-pay-v1'];
   var C = { on: !!FB.apiKey && !/[?&]local=1\b/.test(location.search), ok:false, user:null, ownerExists:false, base:{}, stale:false, pending:{}, keys:SYNC };
