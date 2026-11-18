@@ -1957,7 +1957,7 @@
         </div>
         <div style="display:flex; flex-direction:column; gap:20px; min-width:0">
           <div class="card">
-            <div class="card-head"><h2>아르바이트 선생님 등록</h2></div>
+            <div class="card-head"><h2>조교 선생님 등록</h2></div>
             <form class="reg" id="ptForm" novalidate>
               <label>이름<input type="text" id="ptName" placeholder="예: 김하늘" maxlength="10"></label>
               <div>
@@ -1970,7 +1970,7 @@
               </div>
               <p class="form-err" id="ptErr"></p>
               <p class="ok-msg" id="ptOk"></p>
-              <button class="btn" type="submit" style="align-self:flex-start">아르바이트 선생님 등록</button>
+              <button class="btn" type="submit" style="align-self:flex-start">조교 선생님 등록</button>
             </form>
           </div>
           <div class="card">
@@ -2003,7 +2003,7 @@
         </div>
       </div>
       <div class="card t-card">
-        <div class="card-head"><h2>아르바이트 선생님 명단</h2><span class="muted" id="ptCount"></span></div>
+        <div class="card-head"><h2>조교 선생님 명단</h2><span class="muted" id="ptCount"></span></div>
         <div class="table-wrap">
           <table class="t-list">
             <thead><tr><th>이름</th><th>아이디</th><th>담당 반 · 파트</th><th>입사일</th><th>퇴사일</th><th>교육청 등록 철회일</th><th></th></tr></thead>
@@ -3539,7 +3539,7 @@ var dtStore = (function(){ try{ return JSON.parse(localStorage.getItem(DT_KEY) |
 var dtDay = new Date(); dtDay.setHours(0,0,0,0);
 var dtClassId = null, dtOnly = null;
 function dtSave(){ try{ localStorage.setItem(DT_KEY, JSON.stringify(dtStore)); }catch(e){} }
-// 선생님은 담당 반, 아르바이트 선생님은 테스트·숙제 파트를 맡은 반을 봐요
+// 선생님은 담당 반, 조교 선생님은 테스트·숙제 파트를 맡은 반을 봐요
 function dtClasses(){ var pt = ptClassIds(state.teacher); return state.view === 'director' ? CLASSES : CLASSES.filter(function(c){ return c.teacher === state.teacher || pt.indexOf(c.id) !== -1; }); }
 function dtCls(){ return CLASSES.find(function(c){ return c.id === dtClassId; }); }
 function dtNewRow(){ return { on:true, att:'출석', attNote:'', book:'지참', hw:'완료', spk:'완료', cc:'완료', flash:'', self:'', inter:'', text:'', w1:'', w2:'', w3:'', wDone:false, memo:'' }; }
@@ -3635,7 +3635,7 @@ function renderDaily(){
   renderDtTodo(); renderDtOne();
 }
 /* 학생 찾기 · 오늘 남은 일 · 학생 한 명 기록
-   아르바이트 선생님처럼 여러 반을 오가며 체크할 때, 반을 찾지 않고 이름으로 바로 들어가요. */
+   조교 선생님처럼 여러 반을 오가며 체크할 때, 반을 찾지 않고 이름으로 바로 들어가요. */
 function dtGo(cid, name){ dtClassId = cid; dtOnly = name || null; $('dtQ').value = ''; $('dtQRes').hidden = true; renderDaily(); if(name) $('dtRows').scrollIntoView({ block:'center' }); }
 function renderDtTodo(){
   var d = ymd(dtDay), re = [], hw = [], none = [];
@@ -6362,12 +6362,12 @@ function haSheet(m){
       '<p class="ms-ex">한 곳에만 올리지 말고 정규 강사는 훈장마을·사람인, 파트는 알바몬·알바천국·당근에 같이 올려요. 사이트 메뉴와 가입 절차는 바뀔 수 있으니 올릴 때 화면에서 확인해요.</p>' +
     '</div>' +
     '<div class="ms-sec"><h3><span class="pill">합격 후</span>근무 시작 전에 할 일</h3><div class="ms-flow">' +
-      '<div class="ms-step"><b>① 경력 조회</b><span>성범죄 경력, 아동학대 관련 범죄 전력 조회</span><em>본인 동의를 받아 경찰서에 조회해요. 아르바이트 선생님도 똑같이 해요.</em></div>' +
+      '<div class="ms-step"><b>① 경력 조회</b><span>성범죄 경력, 아동학대 관련 범죄 전력 조회</span><em>본인 동의를 받아 경찰서에 조회해요. 조교 선생님도 똑같이 해요.</em></div>' +
       '<div class="ms-step"><b>② 근로계약서</b><span>근무 시간·급여·휴일을 적은 근로계약서 작성</span><em>서면으로 쓰고 한 부는 선생님께 드려요.</em></div>' +
       '<div class="ms-step"><b>③ 교육청 등록</b><span>강사를 채용하면 학원변경등록 신청 (처리 기간 7일)</span><em>신청서(교육지원청 비치), 성범죄경력조회 회보서, 최종학력증명서</em></div>' +
       '<div class="ms-step"><b>④ 본사 교육</b><span>계약직 기간 안에 서울 본사 2박 3일 필수 교육 이수</span><em>교통비·숙박비는 학원이 지원해요. 일정을 미리 알려 주고 참석을 확인해요. 이수한 뒤 정규직으로 채용해요.</em></div>' +
     '</div></div>' +
-    '<p class="ms-ex">근거: 부산광역시교육청 학원설립/변경안내 — 강사 채용·해임은 학원변경등록 대상, 서류는 신청서·성범죄경력조회 회보서·최종학력증명서, 처리기한 7일. 강사 자격 기준은 관할 교육지원청에서 확인해요. 2026년 최저임금은 시간당 10,320원(고용노동부 고시 제2025-47호)이고, 2027년 1월부터는 10,700원으로 결정됐어요. 아르바이트 선생님이 수업을 맡게 되면 강사 등록 대상인지 교육청에 먼저 물어봐요.</p>' +
+    '<p class="ms-ex">근거: 부산광역시교육청 학원설립/변경안내 — 강사 채용·해임은 학원변경등록 대상, 서류는 신청서·성범죄경력조회 회보서·최종학력증명서, 처리기한 7일. 강사 자격 기준은 관할 교육지원청에서 확인해요. 2026년 최저임금은 시간당 10,320원(고용노동부 고시 제2025-47호)이고, 2027년 1월부터는 10,700원으로 결정됐어요. 조교 선생님이 수업을 맡게 되면 강사 등록 대상인지 교육청에 먼저 물어봐요.</p>' +
     '<div class="ms-ft"><button type="button" class="btn soft" data-man="interview">직원 면접 질문지 보기 →</button><button type="button" class="btn soft" onclick="window.print()">한 장으로 인쇄하기</button></div>';
 }
 MANUALS.push({ id:'hire-ad', group:'채용', title:'직원 채용 공고 작성 예시', tag:'채용', updated:'2026-11-09',
@@ -6793,7 +6793,7 @@ function renderSettings(){
     return '<tr data-id="'+a.id+'"><td><b>'+esc(a.name)+'</b>'+((store.resetReq || {})[a.id] ? ' <span class="tag warn">재설정 요청</span>' : '')+cloudTag(a)+'</td><td>'+esc(a.id)+'</td><td>'+ptPartsText(a)+'</td><td class="dt">'+tDate(a.hire)+'</td>' +
       '<td class="dt"><input type="date" class="t-lv" data-lv="left" value="'+esc(a.left || '')+'" aria-label="'+esc(a.name)+' 퇴사일"></td><td class="dt"><input type="date" class="t-lv" data-lv="eduOff" value="'+esc(a.eduOff || '')+'" aria-label="'+esc(a.name)+' 교육청 등록 철회일"></td>' +
       '<td class="acts"><button type="button" data-act="info">정보 수정</button><button type="button" data-act="pw">비밀번호 초기화</button></td></tr>';
-  }).join('') : '<tr><td colspan="7" class="muted" style="padding:16px 10px">등록된 아르바이트 선생님이 없어요.</td></tr>';
+  }).join('') : '<tr><td colspan="7" class="muted" style="padding:16px 10px">등록된 조교 선생님이 없어요.</td></tr>';
   var gone = store.accounts.filter(function(a){ return a.role === 'teacher' && a.left; }).sort(function(a, b){ return (b.left || '').localeCompare(a.left || ''); });
   var req = store.resetReq || {}, reqN = all.filter(function(a){ return req[a.id]; }).length;
   $('tCount').textContent = teachers.length + '명' + (reqN ? ' · 재설정 요청 ' + reqN + '건' : '');
@@ -6814,7 +6814,7 @@ function renderSettings(){
   }).join('') : '<tr><td colspan="8" class="muted" style="padding:16px 10px">퇴사한 선생님이 없어요.</td></tr>';
 }
 
-/* 아르바이트 선생님: 반마다 맡을 파트(테스트 관리 test · 숙제 관리 hw)를 골라요. a.parts = { 반id:['test','hw'] } */
+/* 조교 선생님: 반마다 맡을 파트(테스트 관리 test · 숙제 관리 hw)를 골라요. a.parts = { 반id:['test','hw'] } */
 var PT_PARTS = [['test','테스트 관리'],['hw','숙제 관리']];
 function ptPartsHtml(cur){
   return CLASSES.map(function(c){
@@ -6829,7 +6829,7 @@ function ptPartsText(a){
   if(!ks.length) return '<span class="muted">없음</span>';
   return ks.map(function(k){ var c = CLASSES.find(function(x){ return x.id === k; }); return c ? esc(c.name) + ' <small class="muted">(' + p[k].map(function(x){ return x === 'test' ? '테스트' : '숙제'; }).join('·') + ')</small>' : ''; }).filter(Boolean).join('<br>');
 }
-// 아르바이트 선생님이 파트를 맡은 반 id 목록
+// 조교 선생님이 파트를 맡은 반 id 목록
 function ptClassIds(name){ var a = store.accounts.find(function(x){ return x.role === 'teacher' && x.name === name && x.type === 'part' && !x.left; }); return a && a.parts ? Object.keys(a.parts).filter(function(k){ return a.parts[k].length; }) : []; }
 // 비밀번호 초기화: 선생님이 다음에 로그인할 때 새 비밀번호를 직접 정해요
 function tPwReset(acc){
@@ -6841,7 +6841,7 @@ function tPwReset(acc){
   acc.salt = ''; acc.hash = ''; if(store.resetReq) delete store.resetReq[acc.id];
   saveStore(); renderSettings(); toast(acc.name + ' 선생님 비밀번호를 초기화했어요. 아이디로 로그인하면서 새 비밀번호를 정하면 돼요.');
 }
-function tType(a){ return a.type === 'part' ? '<span class="tag t-part">아르바이트</span>' : '<span class="muted">정규</span>'; }
+function tType(a){ return a.type === 'part' ? '<span class="tag t-part">조교</span>' : '<span class="muted">정규</span>'; }
 function tDate(v){ return v ? esc(v.replace(/-/g, '.')) : '<span class="muted">–</span>'; }
 // 날짜 수정·퇴사 처리 칸 (표 아래에 열려요)
 function tInfoRow(tr, acc, mode){
@@ -6851,7 +6851,7 @@ function tInfoRow(tr, acc, mode){
   var f = function(k, l, v){ return '<label>'+l+'<input type="date" data-k="'+k+'" value="'+esc(v || '')+'"></label>'; };
   var body = mode === 'leave'
     ? '<p><b>'+esc(acc.name)+' 선생님 퇴사 처리</b> · 로그인이 막히고 담당 반은 미배정이 돼요. 계정과 기록은 지우지 않아요.</p>' + f('left', '퇴사일', today) + f('eduOff', '교육청 등록 철회일 (아직이면 비워 두세요)', acc.eduOff)
-    : '<label>근무 형태<select data-k="type"><option value="">정규</option><option value="part"'+(acc.type === 'part' ? ' selected' : '')+'>아르바이트</option></select></label>' + f('hire', '입사일', acc.hire) + (acc.type === 'part' ? '' : f('edu', '교육청 등록일', acc.edu)) + (acc.left ? f('left', '퇴사일', acc.left) + f('eduOff', '교육청 등록 철회일', acc.eduOff) : '') +
+    : '<label>근무 형태<select data-k="type"><option value="">정규</option><option value="part"'+(acc.type === 'part' ? ' selected' : '')+'>조교</option></select></label>' + f('hire', '입사일', acc.hire) + (acc.type === 'part' ? '' : f('edu', '교육청 등록일', acc.edu)) + (acc.left ? f('left', '퇴사일', acc.left) + f('eduOff', '교육청 등록 철회일', acc.eduOff) : '') +
       (acc.type === 'part' && !acc.left ? '<div class="pt-parts pt-edit"><p>담당 반과 맡을 파트</p>'+ptPartsHtml(acc.parts || {})+'</div>' : '') +
       (acc.type !== 'part' && !acc.left ? '<div class="t-cls-edit"><p><b>담당 반</b> <small class="muted">체크한 반이 이 선생님 반이 돼요. 다른 선생님 반을 체크하면 이 선생님으로 바뀌어요.</small></p><div class="class-chips">' + CLASSES.map(function(c){ var mine = c.teacher === acc.name; return '<label><input type="checkbox" data-tcls="' + c.id + '"' + (mine ? ' checked' : '') + '>' + esc(c.name) + ' <small>' + (mine ? '' : esc(c.teacher)) + '</small></label>'; }).join('') + '</div></div>' : '');
   tr.insertAdjacentHTML('afterend', '<tr class="info-row" data-mode="'+mode+'"><td colspan="'+cols+'"><form data-id="'+acc.id+'" data-mode="'+mode+'">'+body+'<button class="btn'+(mode === 'leave' ? '' : ' soft')+'" type="submit">'+(mode === 'leave' ? '퇴사 처리' : '저장')+'</button><button class="btn soft" type="button" data-act="close">취소</button><span class="form-err"></span></form></td></tr>');
@@ -6925,8 +6925,8 @@ $('ptForm').addEventListener('submit', function(e){
   store.accounts.push(pacc);
   saveStore(); renderDirector();
   $('ptForm').reset(); renderSettings();
-  if(CLOUD.ok) return cloudIssue(pacc, tempPw(), function(pw){ $('ptOk').textContent = name + ' 선생님(아르바이트)을 등록했어요. 아이디 ' + pacc.id + ' · 임시 비밀번호 ' + pw + ' 를 선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'; });
-  $('ptOk').textContent = name + ' 선생님(아르바이트)을 등록했어요. 아이디는 ' + id.toLowerCase() + '예요. 선생님께 알려 주세요. 로그인 화면의 \'원장님·선생님\'에서 처음 들어올 때 비밀번호를 정하면 선생님 화면이 열려요.';
+  if(CLOUD.ok) return cloudIssue(pacc, tempPw(), function(pw){ $('ptOk').textContent = name + ' 조교 선생님을 등록했어요. 아이디 ' + pacc.id + ' · 임시 비밀번호 ' + pw + ' 를 선생님께 알려 주세요. 처음 로그인할 때 새 비밀번호로 바꿔요.'; });
+  $('ptOk').textContent = name + ' 조교 선생님을 등록했어요. 아이디는 ' + id.toLowerCase() + '예요. 선생님께 알려 주세요. 로그인 화면의 \'원장님·선생님\'에서 처음 들어올 때 비밀번호를 정하면 선생님 화면이 열려요.';
 });
 $('ptRows').addEventListener('click', function(e){
   var b = e.target.closest('[data-act]'); if(!b) return;
@@ -6967,7 +6967,7 @@ $('tCsv').addEventListener('click', function(){
   var q = function(v){ v = String(v == null ? '' : v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   var L = [['구분','이름','근무 형태','아이디','담당 반','입사일','교육청 등록일','퇴사일','교육청 등록 철회일']];
   store.accounts.filter(function(a){ return a.role === 'teacher'; }).forEach(function(a){
-    L.push([a.left ? '퇴사' : '재직', a.name, a.type === 'part' ? '아르바이트' : '정규', a.id, a.left ? '' : CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; }).join(' / '), a.hire || '', a.edu || '', a.left || '', a.eduOff || '']);
+    L.push([a.left ? '퇴사' : '재직', a.name, a.type === 'part' ? '조교' : '정규', a.id, a.left ? '' : CLASSES.filter(function(c){ return c.teacher === a.name; }).map(function(c){ return c.name; }).join(' / '), a.hire || '', a.edu || '', a.left || '', a.eduOff || '']);
   });
   rcSave('선생님명단_' + ymd(new Date()).replace(/-/g, '') + '.csv', new Blob(['\uFEFF' + L.map(function(r){ return r.map(q).join(','); }).join('\r\n')], { type:'text/csv;charset=utf-8' }));
 });
