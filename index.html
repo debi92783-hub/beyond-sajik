@@ -689,6 +689,27 @@
     .cr-head, .cr-units.ps li{ grid-template-columns: 44px 1fr 1.2fr; font-size: .86rem; }
   }
 
+  /* ---------- 회비·교재비 ---------- */
+  .fee-lead{ color: var(--ink-soft); margin: 0 0 20px; word-break: keep-all; }
+  .fee-grid{ display:grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: start; }
+  .fee-card{ background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .fee-card h3{ margin: 0 0 10px; font-size: 1.15rem; }
+  .fee-card h4{ margin: 20px 0 4px; font-size: 1rem; }
+  .fee-card p{ margin: 0; color: var(--ink-soft); line-height: 1.65; word-break: keep-all; }
+  .fee-methods{ margin: 0; padding-left: 18px; color: var(--ink-soft); line-height: 1.8; }
+  .fee-account{ margin-top: 6px !important; color: var(--ink) !important; font-weight: 600; }
+  .fee-table{ margin-top: 20px; border-top: 1px solid var(--line); }
+  .fee-table summary{ cursor:pointer; padding: 14px 0; font-weight: 700; }
+  .fee-table table{ width: 100%; border-collapse: collapse; }
+  .fee-table td{ padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .fee-table td:last-child{ text-align: right; color: var(--ink-soft); white-space: nowrap; }
+  .fee-small{ font-size: .84rem; color: var(--ink-soft); margin-top: 12px !important; }
+  .fee-qr{ display:flex; justify-content:center; margin: 16px 0; }
+  .fee-qr img, .fee-qr canvas{ width: 180px !important; height: 180px !important; }
+  .fee-db-btn{ display:block; text-align:center; }
+  .fee-tip{ margin-top: 12px !important; background: #FBF3E3; border-radius: 10px; padding: 12px 14px; font-size: .9rem; }
+  @media (max-width: 720px){ .fee-grid{ grid-template-columns: 1fr; } }
+
   /* ---------- 수업 음원 앱 ---------- */
   .audio-lead{ color: var(--ink-soft); margin: 0 0 20px; word-break: keep-all; }
   .audio-btns{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
@@ -745,14 +766,12 @@
   .hi-tel:hover{ background: var(--card); }
   .home-menu{ padding: 32px 0 56px; }
   .menu-title{ font-family: var(--serif); font-size: 1.3rem; margin: 0 0 18px; text-align:center; }
-  .menu-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .menu-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
   .menu-card{ display:flex; flex-direction:column; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; text-decoration:none; color: var(--ink); box-shadow: 0 6px 18px rgba(30,42,68,0.06); transition: transform .15s ease, box-shadow .15s ease; }
   .menu-card:hover{ transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30,42,68,0.12); }
   .menu-card .mc-ico svg{ width: 44px; height: 44px; display:block; }
   .menu-card b{ font-size: 1.08rem; }
   .menu-card span:not(.mc-ico){ font-size: 0.9rem; color: var(--ink-soft); line-height: 1.5; word-break: keep-all; }
-  .menu-card.mc-main{ grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items:center; column-gap: 14px; }
-  .menu-card.mc-main span:not(.mc-ico){ flex-basis: 100%; }
   .menu-card.mc-main{ background: var(--ink); border-color: var(--ink); color: #fff; }
   .menu-card.mc-main span:not(.mc-ico){ color: rgba(255,255,255,0.8); }
   .home-note{ margin-top: 22px; background: #FBF3E3; border: 1px solid #EED9AE; border-radius: 12px; padding: 16px 20px; }
@@ -790,6 +809,7 @@
       <a href="#curriculum">커리큘럼</a>
       <a href="#news">소식</a>
       <a href="#audio">음원 앱</a>
+      <a href="#fees">회비</a>
       <a href="#info">오시는 길</a>
     </nav>
     <div class="bar-actions">
@@ -867,6 +887,11 @@
         <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 26v-2a14 14 0 0 1 28 0v2" fill="none" stroke="#1E2A44" stroke-width="2.4"/><rect x="7" y="25" width="9" height="14" rx="3" fill="#E2A33B"/><rect x="32" y="25" width="9" height="14" rx="3" fill="#E2A33B"/></svg></span>
         <b>수업 음원 앱</b>
         <span>오늘 배운 음원을 집에서 다시 들어요</span>
+      </a>
+      <a class="menu-card" href="#fees">
+        <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="5" y="12" width="38" height="26" rx="4" fill="#fff" stroke="#1E2A44" stroke-width="2"/><rect x="5" y="18" width="38" height="5" fill="#1E2A44"/><rect x="10" y="29" width="12" height="4" rx="1" fill="#E2A33B"/></svg></span>
+        <b>회비·교재비</b>
+        <span>납부일, 납부 방법, 교습비 안내</span>
       </a>
       <a class="menu-card mc-main" href="#reserve">
         <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="6" y="9" width="36" height="32" rx="3" fill="#fff" stroke="#fff" stroke-width="2"/><line x1="6" y1="17" x2="42" y2="17" stroke="#1E2A44" stroke-width="2"/><circle cx="16" cy="26" r="3" fill="#E2A33B"/><circle cx="24" cy="26" r="3" fill="#DCD8C9"/><circle cx="32" cy="26" r="3" fill="#DCD8C9"/><circle cx="16" cy="34" r="3" fill="#DCD8C9"/></svg></span>
@@ -1264,6 +1289,36 @@
   </div>
 </section>
 
+<!-- 회비·교재비: 내용은 아래 스크립트의 FEES 한 곳에서 고쳐요 -->
+<section id="fees" class="view-sec">
+  <div class="wrap">
+    <h2 class="section-title">회비·교재비</h2>
+    <p class="fee-lead" id="feeLead"></p>
+    <div class="fee-grid">
+      <div class="fee-card">
+        <h3>회비 납부 방법</h3>
+        <ul class="fee-methods" id="feeMethods"></ul>
+        <h4>교재비 안내</h4>
+        <p id="feeBook"></p>
+        <p class="fee-account" id="feeAccount" hidden></p>
+        <details class="fee-table" open>
+          <summary>등록 교습비 보기</summary>
+          <table><tbody id="feeRows"></tbody></table>
+          <p class="fee-small" id="feeTableNote"></p>
+        </details>
+      </div>
+      <div class="fee-card" id="feeDb" hidden>
+        <h3>동백전 결제</h3>
+        <p>다른 기기로 보고 계시면 동백전 앱으로 QR을 찍어 주세요. 지금 휴대폰으로 보고 계시면 아래 버튼을 눌러 주세요.</p>
+        <div class="fee-qr" id="feeQr"></div>
+        <a class="btn-primary fee-db-btn" id="feeDbBtn" href="#" target="_blank" rel="noopener">동백전 결제 링크 열기</a>
+        <p class="fee-tip">가맹점 이름과 금액을 꼭 확인해 주세요. 결제를 마치시면 완료 화면을 캡처해서 학원 카톡으로 보내 주세요.</p>
+      </div>
+    </div>
+    <p class="fee-small">궁금하신 점은 학원 카톡이나 전화(<a href="tel:051-502-3596">051-502-3596</a>)로 편하게 물어봐 주세요.</p>
+  </div>
+</section>
+
 <section id="info" class="view-sec">
   <div class="wrap info-grid">
     <div class="info-block">
@@ -1313,8 +1368,8 @@
 <script>
 /* 처음 화면 ↔ 카드 눌러 보기 (주소 끝 #이름 으로 구분해요) */
 (function(){
-  var VIEWS = { concerns:'learn', philosophy:'learn', curriculum:'curriculum', news:'news', blog:'news', insta:'news', audio:'audio', reserve:'reserve', info:'info' };
-  var TITLES = { learn:'학습법', curriculum:'커리큘럼·교재', news:'블로그·인스타 소식', audio:'수업 음원 앱', reserve:'상담 예약', info:'오시는 길·운영시간' };
+  var VIEWS = { concerns:'learn', philosophy:'learn', curriculum:'curriculum', news:'news', blog:'news', insta:'news', audio:'audio', fees:'fees', reserve:'reserve', info:'info' };
+  var TITLES = { learn:'학습법', curriculum:'커리큘럼·교재', news:'블로그·인스타 소식', audio:'수업 음원 앱', fees:'회비·교재비', reserve:'상담 예약', info:'오시는 길·운영시간' };
   var HOME_TITLE = document.title;
   function route(){
     var h = decodeURIComponent(location.hash.slice(1));
@@ -1352,6 +1407,22 @@ var CONFIG = {
   // 비워 두면 예전처럼 메일 앱이 열리는 방식으로 동작해요.
   SHEET_URL: '',
   CONTACT_EMAIL: 'debi92@naver.com',
+  // ── 회비·교재비 화면 (2026-11-23) ── 고칠 때는 여기만 바꾸면 돼요. 빈칸('')은 화면에 안 보이거나 '학원에 문의'로 보여요.
+  FEES: {
+    lead: '회비는 매달 정해진 날까지 납부해 주세요. 교재비는 교재가 나갈 때 카카오톡으로 안내드려요.',  // 예: '매월 25일은 다음 달 회비 납부일이에요.'
+    methods: ['카드 결제', '동백전', '제로페이', '학원 방문 결제'],
+    book: '교재비는 학원 카톡으로 안내받으신 금액을 안내드린 계좌로 입금해 주세요.',
+    account: '',            // 예: '부산은행 000-0000-0000-00 (예금주: 홍길동)'
+    items: [                // 등록 교습비 (price 를 숫자로 넣으면 '170,000원'처럼 보여요)
+      { name: 'FUN PHONICS · FUN STORY', price: '' },
+      { name: 'BASIC', price: '' },
+      { name: 'INTERMEDIATE', price: '' },
+      { name: 'ADVANCED', price: '' }
+    ],
+    tableNote: '교습비는 부산광역시교육청에 등록된 금액이에요.',
+    dongbaekUrl: '',        // 동백전 결제 링크(https://...)를 넣으면 오른쪽에 '동백전 결제' 칸과 버튼이 생겨요
+    dongbaekQr: ''          // 동백전 QR 그림 파일을 img 폴더에 넣고 이름을 적어요. 예: 'img/dongbaek-qr.png'
+  },
   // 블로그·인스타 최신 글 주소: 비워 두면 위 SHEET_URL(같은 앱스 스크립트)의 ?action=feed 를 써요.
   FEED_URL: '',
   // 요일별 상담 가능 시간 (0=일 ~ 6=토). 24시간 'HH:MM', 적힌 시간만 고를 수 있어요
@@ -1709,6 +1780,29 @@ var CONFIG = {
   render({ blog: [], insta: [] }, false);
   fetch(url).then(function(r){ return r.json(); }).then(function(f){ render(f || {}, false); })
     .catch(function(){ render({ blog: [], insta: [] }, false); });
+})();
+
+/* ============================================================
+   회비·교재비 (CONFIG.FEES 로 그려요)
+   ============================================================ */
+(function(){
+  var F = CONFIG.FEES || {}, $ = function(id){ return document.getElementById(id); };
+  var esc = function(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  $('feeLead').textContent = F.lead || '';
+  $('feeMethods').innerHTML = (F.methods || []).map(function(m){ return '<li>' + esc(m) + '</li>'; }).join('');
+  $('feeBook').textContent = F.book || '';
+  if(F.account){ $('feeAccount').textContent = F.account; $('feeAccount').hidden = false; }
+  $('feeRows').innerHTML = (F.items || []).map(function(it){
+    var p = it.price === '' || it.price == null ? '학원에 문의' : (typeof it.price === 'number' ? it.price.toLocaleString('ko-KR') + '원' : it.price);
+    return '<tr><td><b>' + esc(it.name) + '</b></td><td>' + esc(p) + '</td></tr>';
+  }).join('');
+  $('feeTableNote').textContent = F.tableNote || '';
+  if(/^https:\/\//.test(F.dongbaekUrl || '')){
+    $('feeDb').hidden = false;
+    $('feeDbBtn').href = F.dongbaekUrl;
+if(F.dongbaekQr) $('feeQr').innerHTML = '<img src="' + esc(F.dongbaekQr) + '" alt="동백전 결제 QR">';
+    else $('feeQr').hidden = true;
+  }
 })();
 </script>
 
