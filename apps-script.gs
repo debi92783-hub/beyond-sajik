@@ -80,6 +80,9 @@ function bookedKeys_(sh) {
 }
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'feed') {
+    return json_(feed_());
+  }
   if (e && e.parameter && e.parameter.action === 'booked') {
     var sh = getSheet_();
     // booked: 홈페이지 달력용, items: 학원 관리 화면 공통 일정표용
@@ -263,4 +266,67 @@ function parseNaverMail_(subject, body) {
     out.time = ('0' + h).slice(-2) + ':' + (t[3] || '00');
   }
   return out;
+}
+
+
+/* ============================================================
+ * 2026-11-23 추가: 홈페이지 '블로그·인스타 최신 글' (?action=feed)
+ *  - 블로그: 네이버 블로그 RSS 를 읽어요. 따로 설정할 것 없어요.
+ *  - 인스타: [프로젝트 설정 > 스크립트 속성]에 IG_TOKEN(인스타그램 장기 토큰)을 넣으면 보여요.
+ *    토큰이 없으면 인스타 칸은 '인스타에서 보기' 칸으로 보여요.
+ *    토큰은 60일마다 연장해야 해서, refreshIgToken 을 '시간 기반 트리거(매주 1번)'로 걸어 두세요.
+ *  - 30분 동안 결과를 저장해 두고 다시 써요(네이버·인스타에 너무 자주 묻지 않게).
+ * ============================================================ */
+var BLOG_RSS = 'https://rss.blog.naver.com/beyondsajik.xml';
+
+function feed_() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get('feed');
+  if (hit) return JSON.parse(hit);
+  var out = { blog: blogFeed_(), insta: instaFeed_(), at: new Date().toISOString() };
+  cache.put('feed', JSON.stringify(out), 1800);
+  return out;
+}
+
+function blogFeed_() {
+  try {
+    var xml = UrlFetchApp.fetch(BLOG_RSS, { muteHttpExceptions: true }).getContentText('UTF-8');
+    var items = XmlService.parse(xml).getRootElement().getChild('channel').getChildren('item');
+    return items.slice(0, 6).map(function (it) {
+      var desc = it.getChildText('description') || '';
+      var img = desc.match(/<img[^>]+src=["']([^"']+)["']/i);
+      return {
+        title: it.getChildText('title'),
+        link: (it.getChildText('link') || '').replace(/^http:/, 'https:'),
+        date: new Date(it.getChildText('pubDate')).toISOString(),
+        thumb: img ? img[1].replace(/^http:/, 'https:') : ''
+      };
+    });
+  } catch (err) { return []; }
+}
+
+function instaFeed_() {
+  var token = PropertiesService.getScriptProperties().getProperty('IG_TOKEN');
+  if (!token) return [];
+  try {
+    var url = 'https://graph.instagram.com/me/media?fields=caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=6&access_token=' + encodeURIComponent(token);
+    var res = JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText());
+    return (res.data || []).map(function (m) {
+      return {
+        caption: (m.caption || '').split('\n')[0].slice(0, 60),
+        link: m.permalink,
+        date: m.timestamp,
+        thumb: m.media_type === 'VIDEO' ? (m.thumbnail_url || '') : (m.media_url || '')
+      };
+    });
+  } catch (err) { return []; }
+}
+
+/** 인스타 토큰 연장 (매주 1번 트리거로 실행) */
+function refreshIgToken() {
+  var props = PropertiesService.getScriptProperties();
+  var token = props.getProperty('IG_TOKEN');
+  if (!token) return;
+  var res = JSON.parse(UrlFetchApp.fetch('https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=' + encodeURIComponent(token), { muteHttpExceptions: true }).getContentText());
+  if (res.access_token) props.setProperty('IG_TOKEN', res.access_token);
 }
