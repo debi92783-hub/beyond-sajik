@@ -1743,18 +1743,19 @@ var CONFIG = {
   var esc = function(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var safeUrl = function(u){ return /^https:\/\//.test(u || '') ? u : ''; };
   var dstr = function(d){ var t = new Date(d); return isNaN(t) ? '' : (t.getFullYear() + '.' + (t.getMonth()+1) + '.' + t.getDate()); };
+  var cleanT = function(t){ return String(t || '').replace(/^\s*\[[^\]]*\]\s*/, ''); };
   var bg = function(u){ u = safeUrl(u); return u ? ' style="background-image:url(&quot;' + esc(u) + '&quot;)"' : ''; };
   function render(feed, demo){
     var blog = (feed.blog || []).slice(0, 5), insta = (feed.insta || []).slice(0, 6);
     document.getElementById('blogList').innerHTML = blog.length ? blog.map(function(b){
-      return '<a class="blog-item" href="' + esc(safeUrl(b.link) || 'https://blog.naver.com/beyondsajik') + '" target="_blank" rel="noopener"><span class="bi-thumb"' + bg(b.thumb) + '></span><span><b>' + esc(b.title) + '</b><small>' + esc(dstr(b.date)) + '</small></span></a>';
+      return '<a class="blog-item" href="' + esc(safeUrl(b.link) || 'https://blog.naver.com/beyondsajik') + '" target="_blank" rel="noopener"><span class="bi-thumb"' + bg(b.thumb) + '></span><span><b>' + esc(cleanT(b.title)) + '</b><small>' + esc(dstr(b.date)) + '</small></span></a>';
     }).join('') : '<p class="feed-note">블로그 글을 불러오지 못했어요. 위 \'블로그 가기\'를 눌러 주세요.</p>';
     var ig = insta.map(function(p){
       return '<a class="insta-item" href="' + esc(safeUrl(p.link) || 'https://www.instagram.com/beyondenglish_sajik') + '" target="_blank" rel="noopener"' + bg(p.thumb) + ' aria-label="' + esc(p.caption || '인스타그램 게시물') + '"><span class="ii-cap">' + esc(p.caption || '') + '</span></a>';
     });
     while(ig.length < 6) ig.push('<a class="insta-item ph" href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타에서<br>보기</a>');
     document.getElementById('instaGrid').innerHTML = ig.join('');
-    var all = blog.map(function(b){ return { src:'blog', label:'블로그', t:b.title, d:b.date, l:b.link, th:b.thumb }; })
+    var all = blog.map(function(b){ return { src:'blog', label:'블로그', t:cleanT(b.title), d:b.date, l:b.link, th:b.thumb }; })
       .concat(insta.map(function(p){ return { src:'insta', label:'인스타', t:p.caption, d:p.date, l:p.link, th:p.thumb }; }))
       .sort(function(a, b){ return new Date(b.d) - new Date(a.d); }).slice(0, 3);
     var home = document.getElementById('homeLatest');
@@ -1762,24 +1763,21 @@ var CONFIG = {
     home.innerHTML = all.map(function(x){
       return '<a class="hl-item" href="' + esc(safeUrl(x.l) || '#news') + '" target="_blank" rel="noopener"><span class="hl-thumb"' + bg(x.th) + '></span><span class="hl-txt"><b>' + esc(x.t || '새 게시물') + '</b><small><span class="src ' + x.src + '">' + x.label + '</span>' + esc(dstr(x.d)) + '</small></span></a>';
     }).join('');
-    document.getElementById('feedNote').textContent = demo ? '지금은 미리보기라 예시 글이 보여요. 앱스 스크립트를 연결하면 실제 최신 글이 자동으로 보여요.' : '';
+    document.getElementById('feedNote').textContent = demo ? '미리보기 화면이라 11월 23일 기준 블로그 글을 보여 드려요. 실제 주소에서는 새 글이 자동으로 보여요.' : '';
   }
   var DEMO = {
     blog: [
-      { title:'(예시) 파닉스반 장모음 읽기, 이렇게 완성했어요', date:'2026-11-20', link:'' },
-      { title:'(예시) 11월 스피킹 발표 시간 이야기', date:'2026-11-14', link:'' },
-      { title:'(예시) 초등 영어, 문장으로 쌓는 이유', date:'2026-11-07', link:'' }
+      { title:'[사직동영어학원] 파닉스, 알파벳만 외우면 끝일까요?', date:'2026-11-22T03:29:35Z', link:'https://blog.naver.com/beyondsajik/224486911611' },
+      { title:'[사직동영어학원] 가방 주인들은 지금 어디에 있을까요?', date:'2026-11-18T10:10:53Z', link:'https://blog.naver.com/beyondsajik/224482379368' },
+      { title:'[사직동영어학원] 처음 시작은 파닉스부터? 1월 16일·23일 신규 설명회', date:'2026-11-16T02:04:46Z', link:'https://blog.naver.com/beyondsajik/224478840216' }
     ],
-    insta: [
-      { caption:'(예시) 할로윈 이벤트', date:'2026-11-01', link:'' },
-      { caption:'(예시) 원서 읽기 시간', date:'2026-10-25', link:'' }
-    ]
+    insta: []
   };
   var url = CONFIG.FEED_URL || (CONFIG.SHEET_URL ? CONFIG.SHEET_URL + '?action=feed' : '');
   if(!url){ render(DEMO, true); return; }
   render({ blog: [], insta: [] }, false);
   fetch(url).then(function(r){ return r.json(); }).then(function(f){ render(f || {}, false); })
-    .catch(function(){ render({ blog: [], insta: [] }, false); });
+    .catch(function(){ render(DEMO, true); });  // 연결이 안 될 때(미리보기 등)는 저장해 둔 글을 보여 줘요
 })();
 
 /* ============================================================
