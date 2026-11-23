@@ -731,7 +731,8 @@
   .fd-dot.blog{ background:#03C75A; } .fd-dot.insta{ background: linear-gradient(45deg,#F9A13A,#E1306C,#833AB4); }
   .blog-item{ display:flex; gap: 12px; align-items:center; padding: 10px 0; border-top: 1px solid var(--line); text-decoration:none; color: var(--ink); }
   .blog-item:first-child{ border-top: none; }
-  .blog-item .bi-thumb{ width: 64px; height: 64px; border-radius: 8px; background: #EEF5EF center/cover no-repeat; flex: none; }
+  .blog-item .bi-thumb{ width: 64px; height: 64px; border-radius: 8px; background: #EEF5EF; flex: none; overflow:hidden; }
+  .bi-thumb img, .hl-thumb img{ width:100%; height:100%; object-fit: cover; display:block; }
   .blog-item b{ display:block; font-size: .95rem; line-height: 1.45; word-break: keep-all; }
   .blog-item small{ color: var(--ink-soft); }
   .insta-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -746,7 +747,7 @@
   .hl-head a{ font-size: .88rem; color: var(--ink-soft); }
   .hl-list{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
   .hl-item{ display:flex; gap: 10px; align-items:center; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; text-decoration:none; color: var(--ink); min-width: 0; }
-  .hl-item .hl-thumb{ width: 56px; height: 56px; border-radius: 8px; background: #EEE center/cover no-repeat; flex:none; }
+  .hl-item .hl-thumb{ width: 56px; height: 56px; border-radius: 8px; background: #EEE; flex:none; overflow:hidden; }
   .hl-item .hl-txt{ min-width: 0; }
   .hl-item b{ display:block; font-size: .9rem; line-height: 1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; word-break: keep-all; }
   .hl-item small{ color: var(--ink-soft); font-size: .78rem; }
@@ -1743,12 +1744,14 @@ var CONFIG = {
   var esc = function(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var safeUrl = function(u){ return /^https:\/\//.test(u || '') ? u : ''; };
   var dstr = function(d){ var t = new Date(d); return isNaN(t) ? '' : (t.getFullYear() + '.' + (t.getMonth()+1) + '.' + t.getDate()); };
+  // 네이버 사진은 다른 사이트에서 부르면 막힐 수 있어서, 보낸 곳 정보를 빼고(no-referrer) 불러요. 못 불러오면 빈 칸으로 둬요.
+  var thumb = function(cls, u){ u = safeUrl(u); return '<span class="' + cls + '">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '</span>'; };
   var cleanT = function(t){ return String(t || '').replace(/^\s*\[[^\]]*\]\s*/, ''); };
   var bg = function(u){ u = safeUrl(u); return u ? ' style="background-image:url(&quot;' + esc(u) + '&quot;)"' : ''; };
   function render(feed, demo){
     var blog = (feed.blog || []).slice(0, 5), insta = (feed.insta || []).slice(0, 6);
     document.getElementById('blogList').innerHTML = blog.length ? blog.map(function(b){
-      return '<a class="blog-item" href="' + esc(safeUrl(b.link) || 'https://blog.naver.com/beyondsajik') + '" target="_blank" rel="noopener"><span class="bi-thumb"' + bg(b.thumb) + '></span><span><b>' + esc(cleanT(b.title)) + '</b><small>' + esc(dstr(b.date)) + '</small></span></a>';
+      return '<a class="blog-item" href="' + esc(safeUrl(b.link) || 'https://blog.naver.com/beyondsajik') + '" target="_blank" rel="noopener">' + thumb('bi-thumb', b.thumb) + '<span><b>' + esc(cleanT(b.title)) + '</b><small>' + esc(dstr(b.date)) + '</small></span></a>';
     }).join('') : '<p class="feed-note">블로그 글을 불러오지 못했어요. 위 \'블로그 가기\'를 눌러 주세요.</p>';
     var ig = insta.map(function(p){
       return '<a class="insta-item" href="' + esc(safeUrl(p.link) || 'https://www.instagram.com/beyondenglish_sajik') + '" target="_blank" rel="noopener"' + bg(p.thumb) + ' aria-label="' + esc(p.caption || '인스타그램 게시물') + '"><span class="ii-cap">' + esc(p.caption || '') + '</span></a>';
@@ -1761,13 +1764,13 @@ var CONFIG = {
     var home = document.getElementById('homeLatest');
     home.parentNode.hidden = !all.length;
     home.innerHTML = all.map(function(x){
-      return '<a class="hl-item" href="' + esc(safeUrl(x.l) || '#news') + '" target="_blank" rel="noopener"><span class="hl-thumb"' + bg(x.th) + '></span><span class="hl-txt"><b>' + esc(x.t || '새 게시물') + '</b><small><span class="src ' + x.src + '">' + x.label + '</span>' + esc(dstr(x.d)) + '</small></span></a>';
+      return '<a class="hl-item" href="' + esc(safeUrl(x.l) || '#news') + '" target="_blank" rel="noopener">' + thumb('hl-thumb', x.th) + '<span class="hl-txt"><b>' + esc(x.t || '새 게시물') + '</b><small><span class="src ' + x.src + '">' + x.label + '</span>' + esc(dstr(x.d)) + '</small></span></a>';
     }).join('');
     document.getElementById('feedNote').textContent = demo ? '미리보기 화면이라 11월 23일 기준 블로그 글을 보여 드려요. 실제 주소에서는 새 글이 자동으로 보여요.' : '';
   }
   var DEMO = {
     blog: [
-      { title:'[사직동영어학원] 파닉스, 알파벳만 외우면 끝일까요?', date:'2026-11-22T03:29:35Z', link:'https://blog.naver.com/beyondsajik/224486911611' },
+      { title:'[사직동영어학원] 파닉스, 알파벳만 외우면 끝일까요?', date:'2026-11-22T03:29:35Z', link:'https://blog.naver.com/beyondsajik/224486911611', thumb:'https://blogthumb.pstatic.net/MjAyNjExMjJfMjkw/MDAxNzk1MzE4MDgxNTEx.tb4CLNDEK4zbWsy4ehiPTnn8mSauz7Cv2XdiaC6Uhwog.c25AAV1X43C30iDcTUVkQnJD7fjToQErgm8NOre48P4g.JPEG/2026-11-22_%BA%ED%B7%CE%B1%D7%BB%E7%C1%F8_00_%B4%EB%C7%A5.jpg?type=s3' },
       { title:'[사직동영어학원] 가방 주인들은 지금 어디에 있을까요?', date:'2026-11-18T10:10:53Z', link:'https://blog.naver.com/beyondsajik/224482379368' },
       { title:'[사직동영어학원] 처음 시작은 파닉스부터? 1월 16일·23일 신규 설명회', date:'2026-11-16T02:04:46Z', link:'https://blog.naver.com/beyondsajik/224478840216' }
     ],
