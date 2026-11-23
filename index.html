@@ -614,6 +614,38 @@
     .brand-mark{ width:32px; height:32px; }
     .site-bar{ padding: 12px 16px; }
   }
+  /* ---------- 학습법: 본사 자료(특허·수업 관리·수상) ---------- */
+  #philosophy{ padding-bottom: 0; }
+  .method-more{ padding-top: 48px; }
+  .mm-title{ font-family: var(--serif); font-size: 1.3rem; margin: 0 0 6px; text-align:center; }
+  .mm-lead{ color: var(--ink-soft); text-align:center; margin: 0 0 20px; word-break: keep-all; }
+  .pat-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 52px; }
+  .pat{ background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 14px; text-align:center; display:flex; flex-direction:column; align-items:center; gap: 4px; }
+  .pat svg{ width: 64px; height: 64px; margin-bottom: 4px; }
+  .pat b{ font-size: 1rem; word-break: keep-all; }
+  .pat span{ font-size: .82rem; color: var(--ink-soft); word-break: keep-all; line-height: 1.45; }
+  .pat em{ font-style: normal; font-weight: 700; color: var(--accent-deep); font-size: .88rem; margin-top: 4px; }
+  .pat small{ font-size: .74rem; background: var(--ink); color:#fff; border-radius: 999px; padding: 2px 8px; }
+  .plan-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; padding-bottom: 56px; }
+  .plan{ position:relative; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 30px 20px 22px; text-align:center; }
+  .plan .no{ position:absolute; top:-16px; left:50%; transform: translateX(-50%); width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color:#fff; font-weight:700; font-size:.85rem; display:flex; align-items:center; justify-content:center; }
+  .plan img{ width: 150px; height: 150px; border-radius: 50%; object-fit: cover; display:block; margin: 0 auto 14px; border: 1px solid var(--line); }
+  .plan b{ display:block; font-size: 1.05rem; margin-bottom: 8px; }
+  .plan p{ margin: 0; color: var(--ink-soft); font-size: .9rem; line-height: 1.6; word-break: keep-all; }
+  .award-band{ background: #1B2236; color:#fff; padding: 44px 0 48px; }
+  .award-band .mm-title{ color:#fff; margin-bottom: 22px; }
+  .award-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+  .award{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .award .laurel{ width: 84px; height: auto; margin-bottom: 8px; }
+  .award .aw-txt{ display:flex; flex-direction:column; gap: 2px; color: #F1D58A; }
+  .award small{ font-size: .78rem; } .award b{ font-size: 1rem; line-height: 1.3; word-break: keep-all; } .award span{ font-size: .8rem; opacity: .85; word-break: keep-all; }
+  .award em{ font-style: normal; font-size: .76rem; color: rgba(255,255,255,.55); margin-top: 12px; }
+  @media (max-width: 720px){
+    .pat-grid{ grid-template-columns: 1fr 1fr; gap: 10px; }
+    .plan-grid{ grid-template-columns: 1fr; gap: 26px; }
+    .award-grid{ grid-template-columns: 1fr 1fr; row-gap: 22px; }
+  }
+
   /* ---------- 과정별 학습 내용 ---------- */
   .courses{ margin-top: 40px; }
   .cr-title{ font-family: var(--serif); font-size: 1.3rem; margin: 0 0 6px; }
@@ -888,6 +920,22 @@
           <div class="cells"><span class="cell">I want to speak up.</span></div>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- 본사 자료(2026-11-23 원장쌤 제공 캡처를 보기 좋게 다시 정리): 특허·수업 관리·수상 -->
+  <div class="wrap method-more">
+    <h3 class="mm-title">특허받은 학습 시스템과 교재</h3>
+    <p class="mm-lead">비욘드잉글리쉬의 학습 방법과 교재는 특허로 등록되어 있어요. (발명자·특허권자 박정선)</p>
+    <div class="pat-grid"><div class="pat"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 2h8l2 14h-8zM34 2h8l-2 14h-8z" fill="#1E2A44"/><circle cx="32" cy="38" r="22" fill="#E2A33B"/><circle cx="32" cy="38" r="17" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 2.5"/><text x="32" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">특허</text></svg><b>센텐스빌드업 영어학습 시스템</b><span>영어학습 시스템과 이를 이용한 영어학습 방법</span><em>특허 제10-1668581호</em><small>국제특허 PCT/KR2016/012720</small></div><div class="pat"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 2h8l2 14h-8zM34 2h8l-2 14h-8z" fill="#1E2A44"/><circle cx="32" cy="38" r="22" fill="#E2A33B"/><circle cx="32" cy="38" r="17" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 2.5"/><text x="32" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">특허</text></svg><b>파닉스 교재</b><span>파닉스 학습용 교재</span><em>특허 제10-1924295호</em><small>국제특허 PCT/KR2018/016962</small></div><div class="pat"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 2h8l2 14h-8zM34 2h8l-2 14h-8z" fill="#1E2A44"/><circle cx="32" cy="38" r="22" fill="#E2A33B"/><circle cx="32" cy="38" r="17" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 2.5"/><text x="32" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">특허</text></svg><b>스토리 교재</b><span>영어학습 시스템을 이용한 스토리 교재</span><em>특허 제10-1977223호</em></div><div class="pat"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 2h8l2 14h-8zM34 2h8l-2 14h-8z" fill="#1E2A44"/><circle cx="32" cy="38" r="22" fill="#E2A33B"/><circle cx="32" cy="38" r="17" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 2.5"/><text x="32" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">특허</text></svg><b>미니북</b><span>학습용 미니북 및 미니북 편집 구조</span><em>특허 제10-1866148호</em></div></div>
+
+    <h3 class="mm-title">체계적인 수업 관리</h3>
+    <p class="mm-lead">같은 매뉴얼과 계획안으로 수업하기 때문에 수업의 질이 고르게 유지돼요.</p>
+    <div class="plan-grid"><div class="plan"><span class="no">01</span><img src="img/method/plan1.jpg" width="200" height="200" loading="lazy" alt="비욘드잉글리쉬 수업 매뉴얼 예시"><b>수업 매뉴얼</b><p>모든 단계의 교구·교재 사용법과 교재 활용 방법이 자세히 정리되어 있어요. 어느 선생님이 가르쳐도 같은 결과를 만들 수 있어요.</p></div><div class="plan"><span class="no">02</span><img src="img/method/plan2.jpg" width="200" height="200" loading="lazy" alt="비욘드잉글리쉬 연간 수업 계획안 예시"><b>연간 수업 계획안</b><p>1년 단위 수업 계획표로 수업이 체계적으로 진행되고, 원장이 직접 진도를 확인하며 관리해요.</p></div><div class="plan"><span class="no">03</span><img src="img/method/plan3.jpg" width="200" height="200" loading="lazy" alt="비욘드잉글리쉬 월간 수업 계획안 예시"><b>월간 수업 계획안</b><p>모든 단계의 교육과정이 월간 계획안으로 만들어져 있어 매달 가정으로 보내 드려요.</p></div></div>
+  </div>
+  <div class="award-band">
+    <div class="wrap">
+      <h3 class="mm-title">수상 경력</h3>
+      <div class="award-grid"><div class="award"><svg class="laurel" viewBox="0 0 200 120" aria-hidden="true"><g fill="#D9B45A"><ellipse cx="30" cy="95" rx="9" ry="4.5" transform="rotate(-60 30 95)"/><ellipse cx="22" cy="78" rx="9" ry="4.5" transform="rotate(-75 22 78)"/><ellipse cx="19" cy="60" rx="9" ry="4.5" transform="rotate(-90 19 60)"/><ellipse cx="21" cy="42" rx="9" ry="4.5" transform="rotate(-105 21 42)"/><ellipse cx="28" cy="26" rx="9" ry="4.5" transform="rotate(-120 28 26)"/><ellipse cx="170" cy="95" rx="9" ry="4.5" transform="rotate(60 170 95)"/><ellipse cx="178" cy="78" rx="9" ry="4.5" transform="rotate(75 178 78)"/><ellipse cx="181" cy="60" rx="9" ry="4.5" transform="rotate(90 181 60)"/><ellipse cx="179" cy="42" rx="9" ry="4.5" transform="rotate(105 179 42)"/><ellipse cx="172" cy="26" rx="9" ry="4.5" transform="rotate(120 172 26)"/><polygon points="100,22 111,50 141,50 117,68 126,97 100,79 74,97 83,68 59,50 89,50"/></g></svg><div class="aw-txt"><small>2011 제2회</small><b>올해의 신한국인 대상</b><span>신한국인 교육 부문</span></div><em>주관 시사투데이 · 후원 헤럴드경제</em></div><div class="award"><svg class="laurel" viewBox="0 0 200 120" aria-hidden="true"><g fill="#D9B45A"><ellipse cx="30" cy="95" rx="9" ry="4.5" transform="rotate(-60 30 95)"/><ellipse cx="22" cy="78" rx="9" ry="4.5" transform="rotate(-75 22 78)"/><ellipse cx="19" cy="60" rx="9" ry="4.5" transform="rotate(-90 19 60)"/><ellipse cx="21" cy="42" rx="9" ry="4.5" transform="rotate(-105 21 42)"/><ellipse cx="28" cy="26" rx="9" ry="4.5" transform="rotate(-120 28 26)"/><ellipse cx="170" cy="95" rx="9" ry="4.5" transform="rotate(60 170 95)"/><ellipse cx="178" cy="78" rx="9" ry="4.5" transform="rotate(75 178 78)"/><ellipse cx="181" cy="60" rx="9" ry="4.5" transform="rotate(90 181 60)"/><ellipse cx="179" cy="42" rx="9" ry="4.5" transform="rotate(105 179 42)"/><ellipse cx="172" cy="26" rx="9" ry="4.5" transform="rotate(120 172 26)"/><polygon points="100,22 111,50 141,50 117,68 126,97 100,79 74,97 83,68 59,50 89,50"/></g></svg><div class="aw-txt"><small>VISION 2011</small><b>대한민국 교육경영 대상</b><span>교육문화콘텐츠 부문</span></div><em>주관 서울신문사</em></div><div class="award"><svg class="laurel" viewBox="0 0 200 120" aria-hidden="true"><g fill="#D9B45A"><ellipse cx="30" cy="95" rx="9" ry="4.5" transform="rotate(-60 30 95)"/><ellipse cx="22" cy="78" rx="9" ry="4.5" transform="rotate(-75 22 78)"/><ellipse cx="19" cy="60" rx="9" ry="4.5" transform="rotate(-90 19 60)"/><ellipse cx="21" cy="42" rx="9" ry="4.5" transform="rotate(-105 21 42)"/><ellipse cx="28" cy="26" rx="9" ry="4.5" transform="rotate(-120 28 26)"/><ellipse cx="170" cy="95" rx="9" ry="4.5" transform="rotate(60 170 95)"/><ellipse cx="178" cy="78" rx="9" ry="4.5" transform="rotate(75 178 78)"/><ellipse cx="181" cy="60" rx="9" ry="4.5" transform="rotate(90 181 60)"/><ellipse cx="179" cy="42" rx="9" ry="4.5" transform="rotate(105 179 42)"/><ellipse cx="172" cy="26" rx="9" ry="4.5" transform="rotate(120 172 26)"/><polygon points="100,22 111,50 141,50 117,68 126,97 100,79 74,97 83,68 59,50 89,50"/></g></svg><div class="aw-txt"><small>2011 THE BEST</small><b>KOREA AWARDS</b><span>고객감동 부문 영어교육 분야 대상</span></div><em>주관 한국일보사</em></div><div class="award"><svg class="laurel" viewBox="0 0 200 120" aria-hidden="true"><g fill="#D9B45A"><ellipse cx="30" cy="95" rx="9" ry="4.5" transform="rotate(-60 30 95)"/><ellipse cx="22" cy="78" rx="9" ry="4.5" transform="rotate(-75 22 78)"/><ellipse cx="19" cy="60" rx="9" ry="4.5" transform="rotate(-90 19 60)"/><ellipse cx="21" cy="42" rx="9" ry="4.5" transform="rotate(-105 21 42)"/><ellipse cx="28" cy="26" rx="9" ry="4.5" transform="rotate(-120 28 26)"/><ellipse cx="170" cy="95" rx="9" ry="4.5" transform="rotate(60 170 95)"/><ellipse cx="178" cy="78" rx="9" ry="4.5" transform="rotate(75 178 78)"/><ellipse cx="181" cy="60" rx="9" ry="4.5" transform="rotate(90 181 60)"/><ellipse cx="179" cy="42" rx="9" ry="4.5" transform="rotate(105 179 42)"/><ellipse cx="172" cy="26" rx="9" ry="4.5" transform="rotate(120 172 26)"/><polygon points="100,22 111,50 141,50 117,68 126,97 100,79 74,97 83,68 59,50 89,50"/></g></svg><div class="aw-txt"><small>2012</small><b>바른교육 대상</b><span>영어교육 부문</span></div><em>주관 이투데이</em></div></div>
     </div>
   </div>
 </section>
