@@ -143,7 +143,7 @@ function doPost(e) {
       Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm'),
       '대기',
       clean(d.purpose), d.date, d.time,
-      clean(d.name), clean(d.phone), clean(d.student), clean(d.grade),
+      clean(d.name), "'" + clean(d.phone), clean(d.student), clean(d.grade),
       clean(d.q_kinder), clean(d.q_academy), clean(d.q_phonics), clean(d.q_level), clean(d.q_test),
       clean(d.message), '홈페이지', ''
     ]);
