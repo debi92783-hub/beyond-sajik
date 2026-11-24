@@ -97,6 +97,7 @@
   .site-bar .cta-small:hover{ background: var(--accent-deep); }
 
   /* ---------- Hero: BEYOND SAJIK 글자 안에 그림이 비치는 첫 화면 ---------- */
+  .m-br{ display:none; }
   .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
   .hero{ padding: 28px 0 40px; border-bottom: none; }
   .hm{ position:relative; aspect-ratio: 1200 / 520; background:#FFF9F2; border-radius: 18px; overflow:hidden; }
@@ -814,7 +815,7 @@
   body[data-view] .site-nav a.on{ color: var(--accent-deep); }
   .hero{ padding-bottom: 28px; }
   @media (max-width: 720px){
-    .pc-br{ display:none; }
+    .pc-br{ display:none; } .m-br{ display:inline; }
     .hi-title{ font-size: 1.3rem; }
     .menu-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
     .menu-card{ padding: 14px; }
@@ -906,8 +907,8 @@
 <!-- 처음 화면: 한 줄 인사 + 큰 카드. 카드를 누르면 그 내용만 열려요 (내용은 아래 섹션 그대로) -->
 <section class="home-intro" aria-label="인사말">
   <div class="wrap">
-    <p class="hi-title">아이의 영어가, 말이 되고 표현이 될 때까지</p>
-    <p class="hi-text">비욘드잉글리쉬 사직어학원은 파닉스부터 중·고등 문법까지,<br class="pc-br"> 단어에서 문장으로 쌓아 스스로 말하고 쓰는 영어를 함께 만들어 갑니다.</p>
+    <p class="hi-title">아이의 영어가,<br class="m-br"> 말이 되고 표현이 될 때까지</p>
+    <p class="hi-text">비욘드잉글리쉬 사직어학원은<br class="m-br"> 파닉스부터 중·고등 문법까지,<br> 단어에서 문장으로 쌓아<br class="m-br"> 스스로 말하고 쓰는 영어를 만들어 갑니다.</p>
     <div class="hi-btns">
       <a class="btn-primary" href="#reserve">상담 예약하기</a>
       <a class="hi-tel" href="tel:051-502-3596">전화 051-502-3596</a>
