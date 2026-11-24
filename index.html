@@ -112,8 +112,8 @@
   .hm-t b{ display:block; font-family:'Playfair Display', Georgia, serif; font-weight:500; font-size:58px; line-height:1.12; }
   .hm-t span{ display:block; margin-top:16px; font-family:'Noto Serif KR', serif; font-size:20px; color:#5A6378; word-break:keep-all; }
   @media (max-width: 720px){
-    .hm{ aspect-ratio:auto; height: 560px; } .hm .wide{ display:none; } .hm .narrow{ display:block; }
-    .hm-t b{ font-size: 42px; } .hm-t span{ font-size: 16px; }
+    .hm{ aspect-ratio: 1 / 1; max-height: 420px; margin: 0 auto; } .hm .wide{ display:none; } .hm .narrow{ display:block; }
+    .hm-t b{ font-size: 32px; } .hm-t span{ font-size: 13.5px; margin-top: 10px; padding: 0 30px; }
   }
   .btn-primary{
     background: var(--accent);
@@ -883,22 +883,20 @@
  <text class="lb" x="160" y="352" style="font-size:24px" transform="rotate(-6 160 352)">read the world</text>
  <text class="lb" x="800" y="262" style="font-size:22px">Bonjour · Hola · 안녕</text>
 </svg>
-      <svg class="narrow" viewBox="0 0 400 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
- <g transform="translate(70 92)"><ellipse rx="36" ry="24" class="doodle"/><circle r="5" fill="#E0913F"/></g><text class="lb" x="22" y="56" style="font-size:24px">London</text>
- <g transform="translate(250 64)"><ellipse rx="28" ry="17" class="doodle" stroke-dasharray="3 5"/><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="284" y="52" style="font-size:24px">Paris</text>
- <g transform="translate(352 150)"><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="318" y="132" style="font-size:22px">Tokyo</text>
- <g transform="translate(312 470)"><ellipse rx="44" ry="28" class="doodle"/><circle r="9" fill="none" stroke="#E0913F" stroke-dasharray="2 4"/><circle r="5" fill="#E0913F"/></g><text class="lb" x="246" y="528" style="font-size:24px">Sajik, Busan</text>
- <g transform="translate(70 452)"><circle r="8" fill="none" stroke="#E0913F" stroke-dasharray="2 4"/><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="22" y="496" style="font-size:24px">New York</text>
- <g transform="translate(176 524)"><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="190" y="546" style="font-size:20px">Sydney</text>
- <path class="ln" d="M312 470 C 380 360, 380 200, 330 120 S 280 60, 250 64"/>
- <path class="ln" style="animation-delay:.6s" d="M250 64 C 190 50, 130 60, 70 92"/>
- <path class="ln" style="animation-delay:1.1s" d="M70 92 C 20 200, 20 360, 70 452"/>
- <path class="dash" d="M70 452 C 100 510, 140 528, 176 524"/>
- <path class="dash" d="M176 524 C 230 528, 280 500, 312 470"/>
- <path class="dash" d="M330 120 C 340 130, 348 140, 352 150"/>
- <g class="doodle" transform="translate(150 118) rotate(-12)"><path d="M0 0 L30 0 M20 -8 L30 0 L20 8 M10 0 L3 -10 M10 0 L3 10"/></g>
- <text class="lb" x="96" y="390" style="font-size:20px" transform="rotate(-6 96 390)">read the world</text>
- <text class="lb" x="230" y="410" style="font-size:19px">Hello! · 안녕</text>
+      <svg class="narrow" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+ <g transform="translate(62 72)"><ellipse rx="32" ry="20" class="doodle"/><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="14" y="40" style="font-size:24px">London</text>
+ <g transform="translate(250 48)"><ellipse rx="26" ry="15" class="doodle" stroke-dasharray="3 5"/><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="282" y="40" style="font-size:24px">Paris</text>
+ <g transform="translate(354 112)"><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="322" y="98" style="font-size:22px">Tokyo</text>
+ <g transform="translate(318 326)"><ellipse rx="40" ry="24" class="doodle"/><circle r="8" fill="none" stroke="#E0913F" stroke-dasharray="2 4"/><circle r="5" fill="#E0913F"/></g><text class="lb" x="252" y="382" style="font-size:24px">Sajik, Busan</text>
+ <g transform="translate(62 316)"><circle r="8" fill="none" stroke="#E0913F" stroke-dasharray="2 4"/><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="14" y="356" style="font-size:24px">New York</text>
+ <g transform="translate(170 374)"><circle r="4.5" fill="#E0913F"/></g><text class="lb" x="120" y="396" style="font-size:20px">Sydney</text>
+ <path class="ln" d="M318 326 C 386 250, 386 140, 332 92 S 280 46, 250 48"/>
+ <path class="ln" style="animation-delay:.6s" d="M250 48 C 190 36, 120 44, 62 72"/>
+ <path class="ln" style="animation-delay:1.1s" d="M62 72 C 16 150, 16 250, 62 316"/>
+ <path class="dash" d="M62 316 C 90 360, 130 378, 170 374"/>
+ <path class="dash" d="M170 374 C 230 370, 280 354, 318 326"/>
+ <path class="dash" d="M332 92 C 344 100, 350 106, 354 112"/>
+ <g class="doodle" transform="translate(140 96) rotate(-12)"><path d="M0 0 L26 0 M17 -7 L26 0 L17 7 M9 0 L3 -9 M9 0 L3 9"/></g>
 </svg>
       <div class="hm-t" aria-hidden="true"><b>From BEYOND<br>to the World.</b><span>사직에서 시작해, 세계로 이어지는 우리 아이들의 꿈</span></div>
     </div>
