@@ -649,8 +649,8 @@
   .award small{ font-size: .78rem; } .award b{ font-size: 1rem; line-height: 1.3; word-break: keep-all; } .award span{ font-size: .8rem; opacity: .85; word-break: keep-all; }
   .award em{ font-style: normal; font-size: .76rem; color: rgba(255,255,255,.55); margin-top: 12px; }
   @media (max-width: 720px){
-    .pat-grid{ grid-template-columns: 1fr; gap: 10px; }
-    .pat img{ max-width: 300px; }
+    .pat-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+    .pat{ padding: 12px 8px; } .pat img{ max-width: 150px; } .pat b{ font-size: .86rem; }
     .award .seal{ width: 96px; height: 96px; }
     .plan-grid{ grid-template-columns: 1fr; gap: 26px; }
     .award-grid{ grid-template-columns: 1fr 1fr; row-gap: 22px; }
