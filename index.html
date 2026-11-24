@@ -773,7 +773,14 @@
   .menu-card .mc-ico svg{ width: 44px; height: 44px; display:block; }
   .menu-card b{ font-size: 1.08rem; }
   .menu-card span:not(.mc-ico){ font-size: 0.9rem; color: var(--ink-soft); line-height: 1.5; word-break: keep-all; }
+  .menu-grid .mc-main{ grid-column: span 2; }
   .menu-card.mc-main{ background: var(--ink); border-color: var(--ink); color: #fff; }
+  .insta-link{ display:block; }
+  .ig-go{ display:flex; align-items:center; gap:14px; padding:18px; border-radius:14px; text-decoration:none; color:#fff; background: linear-gradient(120deg,#F9A13A,#E1306C 55%,#833AB4); }
+  .ig-go svg{ width:52px; height:52px; flex:none; } .ig-go svg rect:first-child{ fill: rgba(255,255,255,.18); }
+  .ig-go span{ display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; } .ig-go b{ font-size:1.05rem; } .ig-go small{ font-size:.86rem; opacity:.92; word-break:keep-all; line-height:1.45; }
+  .ig-go em{ font-style:normal; font-weight:700; font-size:.9rem; white-space:nowrap; background: rgba(255,255,255,.2); padding:8px 12px; border-radius:999px; }
+  @media (max-width: 520px){ .ig-go{ flex-wrap:wrap; } .ig-go em{ width:100%; text-align:center; } }
   .menu-card.mc-main span:not(.mc-ico){ color: rgba(255,255,255,0.8); }
   .home-note{ margin-top: 22px; background: #FBF3E3; border: 1px solid #EED9AE; border-radius: 12px; padding: 16px 20px; }
   .home-note b{ display:block; margin-bottom: 4px; }
@@ -869,15 +876,10 @@
         <b>커리큘럼·교재</b>
         <span>PHONICS부터 ADVANCED까지 단계별 교재 구성</span>
       </a>
-      <a class="menu-card" href="#blog">
-        <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="6" y="8" width="36" height="32" rx="4" fill="#03C75A"/><path d="M15 17h6.5c3 0 4.5 1.4 4.5 3.4 0 1.3-.8 2.3-2 2.7 1.6.4 2.6 1.5 2.6 3.1 0 2.4-1.8 3.8-5 3.8H15z" fill="#fff"/><rect x="29" y="17" width="4" height="13" rx="1" fill="#fff"/></svg></span>
-        <b>블로그 소식</b>
-        <span>네이버 블로그 최신 글을 바로 볼 수 있어요</span>
-      </a>
-      <a class="menu-card" href="#insta">
-        <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#F9A13A"/><stop offset=".5" stop-color="#E1306C"/><stop offset="1" stop-color="#833AB4"/></linearGradient></defs><rect x="6" y="6" width="36" height="36" rx="10" fill="url(#igg)"/><rect x="14" y="14" width="20" height="20" rx="6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="24" cy="24" r="4.6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="31" cy="17" r="1.6" fill="#fff"/></svg></span>
-        <b>인스타 소식</b>
-        <span>수업 모습과 행사 사진을 최신순으로 보여 드려요</span>
+      <a class="menu-card" href="#news">
+        <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#F9A13A"/><stop offset=".5" stop-color="#E1306C"/><stop offset="1" stop-color="#833AB4"/></linearGradient></defs><rect x="3" y="5" width="28" height="26" rx="4" fill="#03C75A"/><path d="M9 11h5c2.3 0 3.5 1.1 3.5 2.6 0 1-.6 1.8-1.5 2.1 1.2.3 2 1.2 2 2.4 0 1.9-1.4 2.9-3.9 2.9H9z" fill="#fff"/><rect x="20" y="11" width="3.2" height="10" rx="1" fill="#fff"/><rect x="21" y="19" width="24" height="24" rx="7" fill="url(#igg)" stroke="#fff" stroke-width="2"/><rect x="27" y="25" width="12" height="12" rx="4" fill="none" stroke="#fff" stroke-width="2"/><circle cx="33" cy="31" r="2.8" fill="none" stroke="#fff" stroke-width="2"/></svg></span>
+        <b>블로그·인스타 소식</b>
+        <span>블로그 최신 글과 인스타 수업 모습을 한곳에서 봐요</span>
       </a>
       <a class="menu-card" href="#info">
         <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 44s14-13 14-24a14 14 0 0 0-28 0c0 11 14 24 14 24z" fill="#fff" stroke="#1E2A44" stroke-width="2"/><circle cx="24" cy="20" r="5" fill="#E2A33B"/></svg></span>
@@ -1120,7 +1122,7 @@
         <div class="blog-list" id="blogList"></div>
       </div>
       <div class="feed-col" id="insta">
-        <div class="feed-head"><h3><span class="fd-dot insta"></span>인스타그램 최신 게시물</h3><a href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타 가기 →</a></div>
+        <div class="feed-head"><h3><span class="fd-dot insta"></span>인스타그램</h3><a href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타 가기 →</a></div>
         <div class="insta-grid" id="instaGrid"></div>
       </div>
     </div>
@@ -1756,8 +1758,11 @@ var CONFIG = {
     var ig = insta.map(function(p){
       return '<a class="insta-item" href="' + esc(safeUrl(p.link) || 'https://www.instagram.com/beyondenglish_sajik') + '" target="_blank" rel="noopener"' + bg(p.thumb) + ' aria-label="' + esc(p.caption || '인스타그램 게시물') + '"><span class="ii-cap">' + esc(p.caption || '') + '</span></a>';
     });
-    while(ig.length < 6) ig.push('<a class="insta-item ph" href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타에서<br>보기</a>');
-    document.getElementById('instaGrid').innerHTML = ig.join('');
+    // 인스타 연결(토큰) 전에는 인스타 계정으로 가는 버튼 하나만 보여 줘요
+    if(ig.length){ while(ig.length < 6) ig.push('<a class="insta-item ph" href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener">인스타에서<br>보기</a>'); }
+    var igBox = document.getElementById('instaGrid');
+    igBox.className = ig.length ? 'insta-grid' : 'insta-link';
+    igBox.innerHTML = ig.length ? ig.join('') : '<a class="ig-go" href="https://www.instagram.com/beyondenglish_sajik" target="_blank" rel="noopener"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="6" width="36" height="36" rx="10" fill="url(#igg)"/><rect x="14" y="14" width="20" height="20" rx="6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="24" cy="24" r="4.6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="31" cy="17" r="1.6" fill="#fff"/></svg><span><b>@beyondenglish_sajik</b><small>수업 모습과 행사 사진은 인스타그램에서 볼 수 있어요</small></span><em>인스타에서 보기 →</em></a>';
     var all = blog.map(function(b){ return { src:'blog', label:'블로그', t:cleanT(b.title), d:b.date, l:b.link, th:b.thumb }; })
       .concat(insta.map(function(p){ return { src:'insta', label:'인스타', t:p.caption, d:p.date, l:p.link, th:p.thumb }; }))
       .sort(function(a, b){ return new Date(b.d) - new Date(a.d); }).slice(0, 3);
