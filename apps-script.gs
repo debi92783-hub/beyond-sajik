@@ -101,7 +101,8 @@ function adminRows_(sh) {
   rows.forEach(function (r, i) {
     if (r[3] && r[3] < since) return;
     out.push({ row: i + 2, created: r[0], status: r[1], kind: r[2], date: r[3], time: r[4], name: r[5], phone: r[6],
-      student: r[7], grade: r[8], message: r[14], src: r[15] || '홈페이지' });
+      student: r[7], grade: r[8], kinder: r[9], academy: r[10], phonics: r[11], level: r[12], test: r[13],
+      message: r[14], src: r[15] || '홈페이지' });
   });
   return out;
 }
