@@ -587,6 +587,15 @@
   .consent{ grid-column: 1 / -1; font-size: 0.9rem; color: var(--ink-soft); }
   .consent label{ display:flex; gap: 10px; align-items:flex-start; font-weight: 500; }
   .consent input{ margin-top: 4px; width: 18px; height: 18px; flex: 0 0 auto; }
+  .rs-faq{ margin: 0 0 22px; padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+  .rs-faq h3{ margin: 0 0 8px; font-size: 1.05rem; }
+  .rs-faq details{ border-top: 1px solid var(--line); }
+  .rs-faq summary{ cursor: pointer; list-style: none; padding: 12px 26px 12px 0; font-weight: 700; position: relative; word-break: keep-all; }
+  .rs-faq summary::-webkit-details-marker{ display:none; }
+  .rs-faq summary::after{ content: "+"; position: absolute; right: 2px; top: 10px; font-size: 1.2rem; color: var(--accent-deep); }
+  .rs-faq details[open] summary::after{ content: "−"; }
+  .rs-faq details p{ margin: 0 0 14px; color: var(--ink-soft); line-height: 1.7; word-break: keep-all; }
+  .rs-faq-more{ margin: 10px 0 0; font-size: .88rem; color: var(--ink-soft); } .rs-faq-more a{ color: var(--accent-deep); font-weight: 700; }
   .consent details{ margin-top: 6px; font-size: 0.85rem; }
   .privacy-note{ display:flex; gap:10px; align-items:flex-start; margin:0 0 12px; padding:12px 14px; background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); color:var(--ink); font-size:0.88rem; line-height:1.6; }
   .privacy-note svg{ flex:0 0 auto; margin-top:3px; color:var(--accent-deep); }
@@ -1232,6 +1241,17 @@
     <h2 class="section-title">상담 예약</h2>
     <div class="reserve-panel" id="reservePanel">
       <p class="reserve-note">원하시는 시간 최대한 반영하여 상담 확정하도록 하겠습니다. 편하게 문의주세요~</p>
+
+      <div class="rs-faq">
+        <h3>상담 전에 많이 물어보시는 질문</h3>
+        <details><summary>우리 아이 수준을 잘 모르겠어요.</summary><p>괜찮아요. 상담하는 날 레벨테스트로 읽기와 말하기를 확인하고, 아이에게 맞는 시작 단계를 안내해 드려요.</p></details>
+        <details><summary>영어를 처음 배우는데 괜찮을까요?</summary><p>네, 괜찮아요. FUN PHONICS 첫 단계부터 알파벳 소리를 차근차근 익히며 시작해요.</p></details>
+        <details><summary>학년이 높으면 높은 단계부터 시작하나요?</summary><p>학년보다 지금의 실력을 기준으로 정해요. 같은 학년이라도 시작점은 다를 수 있어요. 문장 구조를 탄탄히 다지고 올라가는 것이 다음 단계의 힘이 돼요.</p></details>
+        <details><summary>추천받은 반에 바로 등록할 수 있나요?</summary><p>레벨테스트 결과와 반 정원(한 반 최대 12명), 시간표를 함께 보고 들어갈 수 있는 반을 안내해 드려요.</p></details>
+        <details><summary>수업 내용은 어떻게 알 수 있나요?</summary><p>수업이 끝나면 그날의 진도와 과제를 담은 데일리 리포트를 보내 드리고, 한 달이 끝나면 월말 리포트로 성장 과정을 전해 드려요.</p></details>
+        <details><summary>학원 차량을 운행하나요?</summary><p>학원 차량은 운행하지 않아요. 학원은 부산 연제구 종합운동장로28번길 10 JS빌딩 4층에 있어요.</p></details>
+        <p class="rs-faq-more">회비는 <a href="#fees">회비 안내</a>에서, 운영시간은 <a href="#info">오시는 길·운영시간</a>에서 볼 수 있어요.</p>
+      </div>
 
       <form class="reserve-form" id="reserveForm" novalidate>
         <h3 class="form-section-title">1. 신청 종류와 날짜</h3>
