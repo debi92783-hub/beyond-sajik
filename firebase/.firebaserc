@@ -1,3 +1,11 @@
 {
-  "projects": { "default": "beyond-sajik" }
+  "projects": { "default": "beyond-sajik" },
+  "targets": {
+    "beyond-sajik": {
+      "hosting": {
+        "admin": ["beyond-sajik"],
+        "home": ["beyond-sajik-home"]
+      }
+    }
+  }
 }
