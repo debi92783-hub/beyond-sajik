@@ -362,6 +362,12 @@
   .day-item .del:hover{ color:var(--warn); }
   .day-item .edit{ border:0; background:none; color:var(--accent); cursor:pointer; font-size:12px; font-weight:700; padding:2px 4px; }
   .day-item .acts{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .day-item .move{ border:0; background:none; color:var(--good); cursor:pointer; font-size:12px; font-weight:700; padding:2px 4px; }
+  .day-item .mv-row{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; font-size:12px; }
+  .day-item .mv-row input{ font:inherit; padding:4px 6px; border:1px solid var(--line); border-radius:6px; background:var(--surface); color:var(--ink); }
+  .day-item .mv-row button{ font:inherit; font-weight:700; border:0; border-radius:6px; padding:5px 10px; cursor:pointer; }
+  .day-item .mv-row .ok{ background:var(--accent); color:#fff; }
+  .day-item .mv-row .no{ background:none; color:var(--ink-faint); }
   .empty{ font-size:13px; color:var(--ink-soft); padding:6px 0; }
   .overlay{ position:fixed; inset:0; background:rgba(20,22,26,0.45); display:flex; align-items:center; justify-content:center; padding:16px; z-index:30; }
   .modal{ background:var(--surface); border-radius:16px; padding:24px; width:100%; max-width:420px; box-shadow:0 12px 40px rgba(0,0,0,0.2); display:flex; flex-direction:column; gap:14px; max-height:calc(100vh - 32px); overflow:auto; }
@@ -3485,14 +3491,15 @@ function renderDay(){
     var label = { common:'공통일정', mine:'개인일정', consult:'상담 예약' }[e.kind];
     return '<div class="day-item"><span class="bar-v" style="background:var('+color+')"></span><div class="body">' +
       '<b>'+esc(e.title)+'</b><small>'+label+(spanDays(e)>1?' · '+rangeText(e):'')+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
-      (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') + '</div>' +
-      (e.kind === 'consult' ? '' : '<div class="acts">' + (evCanEdit(e) ? '<button type="button" class="edit" data-edit="'+e.id+'" aria-label="'+esc(e.title)+' 수정">수정</button>' : '') + (delPending('event', { eid:e.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">'+(delIsDirector() || (e.kind === 'mine' && e.owner === me()) ? '삭제' : '삭제 요청')+'</button>') + '</div>') + '</div>';
+      (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') +
+      (evMoveId === e.id ? '<div class="mv-row">옮길 날짜 <input type="date" class="mv-date" value="'+e.date+'"><button type="button" class="ok" data-mvok="'+e.id+'">옮기기</button><button type="button" class="no" data-mvno="1">취소</button></div>' : '') + '</div>' +
+      (e.kind === 'consult' ? '' : '<div class="acts">' + (evCanEdit(e) ? '<button type="button" class="edit" data-edit="'+e.id+'" aria-label="'+esc(e.title)+' 수정">수정</button><button type="button" class="move" data-move="'+e.id+'" aria-label="'+esc(e.title)+' 날짜 이동">이동</button>' : '') + (delPending('event', { eid:e.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">'+(delIsDirector() || (e.kind === 'mine' && e.owner === me()) ? '삭제' : '삭제 요청')+'</button>') + '</div>') + '</div>';
   }).join('') : '<div class="empty">이 날은 일정이 없어요.</div>';
 }
 
 $('calGrid').addEventListener('click', function(e){
   var c = e.target.closest('[data-date]'); if(!c) return;
-  selDate = c.dataset.date;
+  selDate = c.dataset.date; evMoveId = null;
   var d = parseYmd(selDate);
   if(d.getMonth() !== calMonth.getMonth()){ calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
   renderCalendar();
@@ -3512,9 +3519,27 @@ $('dayAdd').addEventListener('click', function(){ openEvForm(selDate); });
 
 // 일정 수정: 원장님은 모든 일정, 선생님은 본인이 쓴 일정만 (2026-11-24 원장쌤 요청)
 function evCanEdit(e){ return delIsDirector() || e.owner === me(); }
-var evEditId = null;
+var evEditId = null, evMoveId = null;
+// 날짜만 옮기기: 여러 날 일정은 기간 길이를 그대로 두고 함께 옮겨요. 고치기 전 날짜는 기록으로 남겨요.
+function evMove(id, to){
+  var old = EVENTS.find(function(x){ return x.id === id; }); if(!old || !to || !evCanEdit(old)) return;
+  if(to === old.date){ evMoveId = null; return renderCalendar(); }
+  var ev = JSON.parse(JSON.stringify(old)), span = spanDays(old) - 1;
+  ev.date = to;
+  if(span > 0){ var d = parseYmd(to); d.setDate(d.getDate() + span); ev.end = ymd(d); } else delete ev.end;
+  ev.edited = (old.edited || []).concat([{ at:new Date().toISOString(), by:me(), before:{ title:old.title, date:old.date, end:old.end||'', time:old.time||'', kind:old.kind }, move:true }]).slice(-10);
+  EVENTS[EVENTS.indexOf(old)] = ev; saveEvents();
+  evMoveId = null; selDate = to; var nd = parseYmd(to); calMonth = new Date(nd.getFullYear(), nd.getMonth(), 1);
+  renderCalendar();
+  toast('‘' + ev.title + '’ 일정을 ' + (nd.getMonth()+1) + '월 ' + nd.getDate() + '일로 옮겼어요.');
+}
 var pendingDel = null;
 $('dayList').addEventListener('click', function(e){
+  var mb = e.target.closest('[data-move]');
+  if(mb){ evMoveId = evMoveId === mb.dataset.move ? null : mb.dataset.move; renderDay(); var inp = $('dayList').querySelector('.mv-date'); if(inp) inp.focus(); return; }
+  var mok = e.target.closest('[data-mvok]');
+  if(mok){ var row = mok.closest('.mv-row'); return evMove(mok.dataset.mvok, row.querySelector('.mv-date').value); }
+  if(e.target.closest('[data-mvno]')){ evMoveId = null; return renderDay(); }
   var eb = e.target.closest('[data-edit]');
   if(eb){ var ev1 = EVENTS.find(function(x){ return x.id === eb.dataset.edit; }); if(ev1 && evCanEdit(ev1)) openEvForm(ev1.date, ev1); return; }
   var b = e.target.closest('[data-del]'); if(!b) return;
