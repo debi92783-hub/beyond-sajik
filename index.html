@@ -891,7 +891,7 @@
       </a>
       <a class="menu-card" href="#fees">
         <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="5" y="12" width="38" height="26" rx="4" fill="#fff" stroke="#1E2A44" stroke-width="2"/><rect x="5" y="18" width="38" height="5" fill="#1E2A44"/><rect x="10" y="29" width="12" height="4" rx="1" fill="#E2A33B"/></svg></span>
-        <b>회비·교재비</b>
+        <b>회비 안내</b>
         <span>납부일, 납부 방법, 교습비 안내</span>
       </a>
       <a class="menu-card mc-main" href="#reserve">
@@ -1293,15 +1293,12 @@
 <!-- 회비·교재비: 내용은 아래 스크립트의 FEES 한 곳에서 고쳐요 -->
 <section id="fees" class="view-sec">
   <div class="wrap">
-    <h2 class="section-title">회비·교재비</h2>
+    <h2 class="section-title">회비 안내</h2>
     <p class="fee-lead" id="feeLead"></p>
     <div class="fee-grid">
       <div class="fee-card">
         <h3>회비 납부 방법</h3>
         <ul class="fee-methods" id="feeMethods"></ul>
-        <h4>교재비 안내</h4>
-        <p id="feeBook"></p>
-        <p class="fee-account" id="feeAccount" hidden></p>
         <details class="fee-table" open>
           <summary>등록 교습비 보기</summary>
           <table><tbody id="feeRows"></tbody></table>
@@ -1370,7 +1367,7 @@
 /* 처음 화면 ↔ 카드 눌러 보기 (주소 끝 #이름 으로 구분해요) */
 (function(){
   var VIEWS = { concerns:'learn', philosophy:'learn', curriculum:'curriculum', news:'news', blog:'news', insta:'news', audio:'audio', fees:'fees', reserve:'reserve', info:'info' };
-  var TITLES = { learn:'학습법', curriculum:'커리큘럼·교재', news:'블로그·인스타 소식', audio:'수업 음원 앱', fees:'회비·교재비', reserve:'상담 예약', info:'오시는 길·운영시간' };
+  var TITLES = { learn:'학습법', curriculum:'커리큘럼·교재', news:'블로그·인스타 소식', audio:'수업 음원 앱', fees:'회비 안내', reserve:'상담 예약', info:'오시는 길·운영시간' };
   var HOME_TITLE = document.title;
   function route(){
     var h = decodeURIComponent(location.hash.slice(1));
@@ -1410,7 +1407,7 @@ var CONFIG = {
   CONTACT_EMAIL: 'debi92@naver.com',
   // ── 회비·교재비 화면 (2026-11-23) ── 고칠 때는 여기만 바꾸면 돼요. 빈칸('')은 화면에 안 보이거나 '학원에 문의'로 보여요.
   FEES: {
-    lead: '회비는 매달 정해진 날까지 납부해 주세요. 교재비는 교재가 나갈 때 카카오톡으로 안내드려요.',  // 예: '매월 25일은 다음 달 회비 납부일이에요.'
+    lead: '회비는 매달 정해진 날까지 납부해 주세요.',  // 예: '매월 25일은 다음 달 회비 납부일이에요.'
     methods: ['카드 결제', '동백전', '제로페이', '학원 방문 결제'],
     book: '교재비는 학원 카톡으로 안내받으신 금액을 안내드린 계좌로 입금해 주세요.',
     account: '',            // 예: '부산은행 000-0000-0000-00 (예금주: 홍길동)'
@@ -1791,8 +1788,6 @@ var CONFIG = {
   var esc = function(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   $('feeLead').textContent = F.lead || '';
   $('feeMethods').innerHTML = (F.methods || []).map(function(m){ return '<li>' + esc(m) + '</li>'; }).join('');
-  $('feeBook').textContent = F.book || '';
-  if(F.account){ $('feeAccount').textContent = F.account; $('feeAccount').hidden = false; }
   $('feeRows').innerHTML = (F.items || []).map(function(it){
     var p = it.price === '' || it.price == null ? '학원에 문의' : (typeof it.price === 'number' ? it.price.toLocaleString('ko-KR') + '원' : it.price);
     return '<tr><td><b>' + esc(it.name) + '</b></td><td>' + esc(p) + '</td></tr>';
