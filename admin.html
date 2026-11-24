@@ -1898,7 +1898,7 @@
     </section>
 
     <section id="view-pnotice" hidden>
-      <div class="greet"><div><h1>학원 공지</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원 공지’에 보이고, <b>공지는 데일리 리포트와 따로, 목록의 ‘학부모님께 발송’으로 보내요.</b> 공지마다 미발송·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원 공지 등록</button></div>
+      <div class="greet"><div><h1>학원공지알림</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원공지알림’에 보이고, <b>공지는 데일리 리포트와 따로, 목록의 ‘학부모님께 발송’으로 보내요.</b> 공지마다 미발송·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원공지알림 등록</button></div>
       <div class="card an-card an-box" id="anList"></div>
     </section>
 
@@ -2380,7 +2380,7 @@ function $(id){ return document.getElementById(id); }
 var MENU = {
   director: [
     ['홈', [['grid','대시보드','dashboard'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
-    ['학원 운영', [['users','반·학생 관리','roster'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비','pay'],['msg','상담 관리','consult'],['bell','학원 공지','pnotice'],['trash','삭제 요청·휴지통','trash']]],
+    ['학원 운영', [['users','반·학생 관리','roster'],['gear','선생님 계정·권한','settings'],['card','수강료·교재비','pay'],['msg','상담 관리','consult'],['bell','학원공지알림','pnotice'],['trash','삭제 요청·휴지통','trash']]],
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지(자동) 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
@@ -2390,7 +2390,7 @@ var MENU = {
     ['홈', [['grid','오늘 한눈에','thome'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
     ['내 수업', [['book','업무 체크리스트','journal'],['pen','수업 기록(진도·과제)','progress'],['stamp','교무일지(자동)','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records'],['users','반·학생 명단','roster']]],
     ['상담', [['msg','상담 관리','consult']]],
-    ['학부모 알림', [['bell','학원 공지','pnotice']]],
+    ['학부모 알림', [['bell','학원공지알림','pnotice']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
     ['', [['clock','태블릿 등원 화면','kiosk'],['bell','학부모·학생 화면 미리보기','pview']]]
@@ -3892,10 +3892,10 @@ function dtText(s, e){
   if(jx.hw) L.push('숙제: ' + jx.hw);
   if(memoText(r, jx)) L.push('기타사항: ' + memoText(r, jx));
   var ans = dtAnOf(s, e);
-  if(ans.length){ L.push('', '[학원 공지]'); ans.forEach(function(a){ L.push(anLine(a)); }); }
+  if(ans.length){ L.push('', '[학원공지알림]'); ans.forEach(function(a){ L.push(anLine(a)); }); }
   return L.join('\n');
 }
-/* 학원 공지는 2026-10-30부터 학원 공지 화면에서 따로 발송해요. 데일리 리포트에는 붙지 않아요.
+/* 학원공지알림은 2026-10-30부터 학원공지알림 화면에서 따로 발송해요. 데일리 리포트에는 붙지 않아요.
    예전에 리포트와 함께 보낸 기록(anSent)만 그때 모습 그대로 보여 줘요. */
 function dtAnOf(s, e){
   if(e.stage !== 'sent' || !e.anSent) return [];
@@ -8044,8 +8044,8 @@ document.addEventListener('click', function(ev){
   try{ el.showPicker(); }catch(e){}
 });
 /* ===== 학원 안내사항 =====
-   행사·보강 수업·휴원/휴일 등 학원 전체 일을 모든 학부모님께. 학부모·학생 화면 맨 위 '학원 공지'에 보여요.
-   원장님·선생님 누구나 올려요(학원 공지 메뉴, 수업 기록 화면). 예전에 반·부서로 올린 것도 그대로 보여요(anFor).
+   행사·보강 수업·휴원/휴일 등 학원 전체 일을 모든 학부모님께. 학부모·학생 화면 맨 위 '학원공지알림'에 보여요.
+   원장님·선생님 누구나 올려요(학원공지알림 메뉴, 수업 기록 화면). 예전에 반·부서로 올린 것도 그대로 보여요(anFor).
    지우지 않고 '내리기'로 지난 안내에 남겨요(다시 올리기 가능). 저장: 'beyond-notice-v1'.ann */
 var AN_KIND = [['event','행사'],['mk','보강 수업'],['off','휴원·휴일'],['info','안내']];
 var an = { edit:null, showOld:false };
@@ -8070,7 +8070,7 @@ function anPeriod(a){ return a.to ? pvDate(a.from) + ' ~ ' + pvDate(a.to) : pvDa
 function anHtml(cid, s){
   var l = anAll().filter(function(a){ return anLive(a) && anFor(a, cid, s); }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
   if(!l.length) return '';
-  return '<section class="pv-ann" aria-label="학원 공지"><h3>학원 공지</h3>' + l.map(function(a){
+  return '<section class="pv-ann" aria-label="학원공지알림"><h3>학원공지알림</h3>' + l.map(function(a){
     return '<article class="pv-post an-post ' + a.kind + '"><div class="pv-post-h"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><b>' + esc(a.title) + '</b>' + (a.date ? '<time>' + esc(pvDate(a.date)) + (a.time ? ' ' + esc(korTime(a.time)) : '') + '</time>' : '') + '</div>' + (a.text ? '<pre>' + esc(a.text) + '</pre>' : '') + bdFilesHtml({ id:a.id, files:a.files || [] }) + '</article>';
   }).join('') + '</section>';
 }
@@ -8078,10 +8078,10 @@ function anLoadFiles(cid, s){ anAll().forEach(function(a){ if(a.files && a.files
 function anAttHtml(){
   return an.att.length ? '<ul class="bd-att">' + an.att.map(function(f, i){ return '<li><span aria-hidden="true">' + bdIcon(f) + '</span><span class="nm">' + esc(f.name) + '</span><span class="sz">' + bdSize(f.size) + '</span><button type="button" data-anattdel="' + i + '">빼기</button></li>'; }).join('') + '</ul>' : '';
 }
-// 원장님·선생님 모두 학원 공지를 올릴 수 있어요. 고치기·내리기는 원장님과 쓴 사람만.
+// 원장님·선생님 모두 학원공지알림을 올릴 수 있어요. 고치기·내리기는 원장님과 쓴 사람만.
 function anCanEdit(a){ return state.view === 'director' || !!(a.byId && session && a.byId === session.id); }
 function anRefresh(){ if(state.page === 'pnotice') renderAnList(); if(state.page === 'pview') renderPView(); }
-// 발송: 학원 공지 화면에서 공지마다 '학부모님께 발송'을 눌러 따로 보내요(a.sentAt). 예전 데일리 리포트로 보낸 기록(sentTo)은 '일부 발송'으로만 보여요.
+// 발송: 학원공지알림 화면에서 공지마다 '학부모님께 발송'을 눌러 따로 보내요(a.sentAt). 예전 데일리 리포트로 보낸 기록(sentTo)은 '일부 발송'으로만 보여요.
 function anSendState(a){
   var tot = 0, got = 0;
   CLASSES.forEach(function(c){ c.students.forEach(function(st){ if(!anFor(a, c.id, st)) return; tot++; if(a.sentTo && a.sentTo[c.id + '|' + st]) got++; }); });
@@ -8102,15 +8102,15 @@ function renderAnList(el, only, head, emptyMsg){
     return '<div class="an-row"><span class="pv-pill an-' + a.kind + '">' + anKind(a.kind) + '</span><div><b>' + esc(a.title) + '</b> ' + anSendTag(a) + '<small>' + esc(anScopeText(a)) + ' · ' + esc(anPeriod(a)) + ' · ' + esc(a.by || '') + (a.files && a.files.length ? ' · 📎 ' + a.files.length : '') + '</small></div>'
       + '<span class="an-acts">' + (anLive(a) && anCanEdit(a) ? '<button type="button" class="btn' + (a.sentAt ? ' soft' : '') + '" data-ansend="' + a.id + '">' + (a.sentAt ? '다시 발송' : '학부모님께 발송') + '</button>' : '') + '<button type="button" class="btn soft" data-ancopy="' + a.id + '">가져와서 새로 쓰기</button>' + (anCanEdit(a) ? '<button type="button" class="btn soft" data-anedit="' + a.id + '">수정</button>' + (anLive(a) ? '<button type="button" class="btn soft" data-andown="' + a.id + '">내리기</button>' : '<button type="button" class="btn soft" data-anup="' + a.id + '">다시 올리기</button>') : '') + '</span></div>';
   };
-  el.innerHTML = '<div class="card-head"><h2>' + (head || '올린 학원 공지') + ' <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
-    + (live.length ? live.map(row).join('') : '<p class="empty">' + (emptyMsg || '아직 올린 공지가 없어요. ‘학원 공지 등록’으로 행사·휴원·학원 소식을 알려 주세요.') + '</p>')
+  el.innerHTML = '<div class="card-head"><h2>' + (head || '올린 학원공지알림') + ' <small class="muted">' + live.length + '건</small></h2>' + (old.length ? '<button type="button" class="btn soft" data-anold>' + (an.showOld ? '지난 안내 접기' : '지난 안내 ' + old.length + '건') + '</button>' : '') + '</div>'
+    + (live.length ? live.map(row).join('') : '<p class="empty">' + (emptyMsg || '아직 올린 공지가 없어요. ‘학원공지알림 등록’으로 행사·휴원·학원 소식을 알려 주세요.') + '</p>')
     + (an.showOld && old.length ? '<div class="an-old"><b>지난 안내</b> <small class="muted">기간이 끝났거나 내린 안내예요. 지워지지 않아요.</small>' + old.map(row).join('') + '</div>' : '');
 }
 function anOpen(id, scope){
   var dir = state.view === 'director', a = id ? anAll().find(function(x){ return x.id === id; }) : null;
   an.edit = a ? a.id : null; an.att = a && a.files ? a.files.slice() : [];
   a = a || { kind:'info', title:'', text:'', scope:'all', names:[], date:'', time:'', from:ymd(new Date()), to:'' };
-  $('anForm').innerHTML = '<h2>' + (id ? '학원 공지 고치기' : '학원 공지 등록') + '</h2>'
+  $('anForm').innerHTML = '<h2>' + (id ? '학원공지알림 고치기' : '학원공지알림 등록') + '</h2>'
     + '<div class="kind an-kinds" role="radiogroup" aria-label="안내 종류">' + AN_KIND.map(function(k){ return '<label><input type="radio" name="anKind" value="' + k[0] + '"' + (a.kind === k[0] ? ' checked' : '') + '><span class="an-k ' + k[0] + '">' + k[1] + '</span></label>'; }).join('') + '</div>'
     + '<p class="an-to">받는 사람: <b>학원 전체 학부모님·학생</b></p>'
     + '<div class="an-tools"><button type="button" class="mo-tb" data-anpaste>붙여넣기</button>' + (anAll().length ? '<select id="anLoad" aria-label="다른 공지 불러오기"><option value="">다른 공지 불러오기…</option>' + anAll().slice().sort(function(x, y){ return (y.at || 0) - (x.at || 0); }).filter(function(x){ return x.id !== (id || ''); }).map(function(x){ return '<option value="' + x.id + '">[' + anKind(x.kind) + '] ' + esc(x.title) + ' · ' + esc(x.by || '') + '</option>'; }).join('') + '</select>' : '') + '</div>'
