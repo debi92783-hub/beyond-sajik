@@ -1975,7 +1975,7 @@
 
     <!-- 상담 관리 (원장님 전용) -->
     <section id="view-consult" hidden>
-      <div class="greet"><div><h1>상담 관리</h1><p>예약 현황과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요. 학부모 연락처가 들어가서 원장님 화면에서만 열려요.</p></div></div>
+      <div class="greet"><div><h1>상담 관리</h1><p>예약 현황과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요. 학부모 연락처가 들어 있어 로그인한 원장님과 선생님만 볼 수 있어요.</p></div></div>
       <div id="csBody"></div>
       <div class="man-pop" id="manPop" hidden role="dialog" aria-modal="true" aria-labelledby="manPopT">
         <div class="man-pop-box">
@@ -2381,6 +2381,7 @@ var MENU = {
   teacher: [
     ['홈', [['grid','오늘 한눈에','thome'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
     ['내 수업', [['book','업무 체크리스트','journal'],['pen','수업 기록(진도·과제)','progress'],['stamp','교무일지(자동)','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records'],['users','반·학생 명단','roster']]],
+    ['상담', [['msg','상담 관리','consult']]],
     ['학부모 알림', [['bell','학원 공지','pnotice']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
@@ -2408,10 +2409,10 @@ var state = {
 };
 
 function setView(v, page){
-  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'consult' || page === 'lcsum') page = 'main'; }
+  if(session && session.role === 'teacher'){ v = 'teacher'; if(page === 'settings' || page === 'lcsum') page = 'main'; }
   state.view = v;
   state.page = page || 'main';
-  if((state.page === 'settings' || state.page === 'consult' || state.page === 'lcsum' || state.page === 'trash' || state.page === 'pay') && v !== 'director') state.page = 'main';
+  if((state.page === 'settings' || state.page === 'lcsum' || state.page === 'trash' || state.page === 'pay') && v !== 'director') state.page = 'main';
   if(state.page === 'thome' && v !== 'teacher') state.page = 'main';
   var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash', records = state.page === 'records', roster_ = state.page === 'roster', pnotice = state.page === 'pnotice', payp = state.page === 'pay';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
@@ -3325,14 +3326,23 @@ function allReservations(){
   });
   else sheetConsults.forEach(function(c){
     seen[c.date + ' ' + c.time] = 1;
-    out.push({ key:'p' + c.date + ' ' + c.time, src:c.src === '네이버' ? 'naver' : 'web', date:c.date, time:c.time, grade:c.grade, kind:c.kind, status:c.status || '대기', hidden:true });
+    var mr = (resStore.mirror || {})[c.date + ' ' + c.time];
+    out.push(mr ? { key:'p' + c.date + ' ' + c.time, src:c.src === '네이버' ? 'naver' : 'web', date:c.date, time:c.time, grade:mr.grade || c.grade, kind:mr.kind || c.kind, status:c.status || '대기',
+        student:mr.student, parent:mr.parent, phone:mr.phone, memo:mr.memo, q:mr.q }
+      : { key:'p' + c.date + ' ' + c.time, src:c.src === '네이버' ? 'naver' : 'web', date:c.date, time:c.time, grade:c.grade, kind:c.kind, status:c.status || '대기', hidden:true });
   });
   webLocal().forEach(function(c){
     var k = c.date + ' ' + c.time; if(seen[k] || !c.date || !c.time) return; seen[k] = 1;
     out.push({ key:'w' + k, src:'web', date:c.date, time:c.time, student:c.student || '', grade:c.grade, parent:c.name || '', kind:c.kind, memo:c.message || '', status:c.status || '대기', local:true,
       q:{ kinder:c.q_kinder || '', academy:c.q_academy || '', phonics:c.q_phonics || '', level:c.q_level || '', test:c.q_test || '' } });
   });
-  out.forEach(function(r){ var x = resStore.ext[r.key]; if(x){ if(x.status && !r.row) r.status = x.status; if(x.csId) r.csId = x.csId; } });
+  // 예약마다 남기는 기록(상태·기록지 연결·연락)은 직접 넣은 예약은 그 항목에, 홈페이지·시트 예약은 '날짜 시간' 이름으로 남겨요.
+  // 그래야 원장님(시트 행 번호로 봄)과 선생님(날짜·시간으로 봄)이 같은 기록을 같이 봐요.
+  out.forEach(function(r){
+    r.mkey = r.manual ? r.key : 'd' + r.date + ' ' + r.time;
+    var x = resStore.ext[r.mkey] || resStore.ext[r.key];
+    if(x){ if(x.status && (!r.row || x.stAt)) r.status = x.status; if(x.csId) r.csId = x.csId; }
+  });
   return out.filter(function(r){ return r.date && r.time && RES_SRC[r.src]; });
 }
 function consultEvents(){
@@ -3340,7 +3350,7 @@ function consultEvents(){
     var src = RES_SRC[r.src][0];
     return { id:'consult-' + r.key, kind:'consult', date:r.date, time:r.time,
       title:'상담 예약' + (r.grade ? ' · ' + r.grade : '') + ' · ' + src,
-      memo:(r.kind || '상담') + ' · ' + r.status + '\n학생·학부모 이름과 연락처는 상담 관리(원장님 화면)에서 확인해요.',
+      memo:(r.kind || '상담') + ' · ' + r.status + '\n학생·학부모 이름과 연락처는 상담 관리에서 확인해요.',
       owner:src };
   });
 }
@@ -3356,8 +3366,23 @@ function loadSheetConsults(){
   var pub = function(){ return fetch(SHEET_URL + '?action=booked').then(function(r){ return r.json(); }).then(function(j){ sheetConsults = j.items || []; redraw(); }); };
   if(!sheetKey()) return pub().catch(function(){});
   sheetPost({ action:'list' })
-    .then(function(j){ if(j.ok){ sheetRows = j.rows || []; sheetErr = ''; redraw(); } else { sheetRows = null; sheetErr = '시트 관리 키가 맞지 않아요. 다시 넣어 주세요.'; return pub(); } })
+    .then(function(j){ if(j.ok){ sheetRows = j.rows || []; sheetErr = ''; sheetShare(); redraw(); } else { sheetRows = null; sheetErr = '시트 관리 키가 맞지 않아요. 다시 넣어 주세요.'; return pub(); } })
     .catch(function(){ sheetErr = '구글 시트에 연결하지 못했어요.'; redraw(); });
+}
+
+// 원장님 기기에서 시트를 불러오면: ① 선생님이 바꾼 상태를 시트에도 옮기고 ② 선생님 화면에서도 이름·연락처·사전 질문을 볼 수 있게
+// 직원 전용 저장소(로그인한 직원만 읽음)에 예약 정보를 함께 남겨요. 시트 관리 키는 원장님 기기에만 있어요.
+function sheetShare(){
+  if(!sheetRows) return;
+  var mir = {}, changed = false;
+  sheetRows.forEach(function(r){
+    var dk = r.date + ' ' + r.time, x = resStore.ext['d' + dk];
+    if(x && x.status && x.stAt && x.status !== r.status){ r.status = x.status; sheetPost({ action:'status', row:r.row, status:x.status }); }
+    mir[dk] = { student:r.student || '', grade:r.grade || '', parent:r.name || '', phone:fixPhone(r.phone), kind:r.kind || '', memo:r.message || '',
+      q:{ kinder:r.kinder || '', academy:r.academy || '', phonics:r.phonics || '', level:r.level || '', test:r.test || '' } };
+  });
+  if(JSON.stringify(mir) !== JSON.stringify(resStore.mirror || {})){ resStore.mirror = mir; changed = true; }
+  if(changed) saveRes();
 }
 
 var calMonth = new Date(day.getFullYear(), day.getMonth(), 1);
@@ -5664,7 +5689,7 @@ window.addEventListener('storage', function(e){
 
 /* ===== 상담 관리 (원장님 전용) =====
    예약 현황(네이버 플레이스·홈페이지·전화·문자)과 신규·신규 등록 7일·재원생·퇴원생 상담 기록을 한곳에서 봐요.
-   학부모 연락처가 들어가서 원장님 화면에서만 열려요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
+   학부모 연락처가 들어가서 원장님과 선생님이 함께 봐요. 시안이라 이 브라우저(localStorage)에만 저장돼요.
    실제 운영 때는 홈페이지 상담 신청과 같은 구글 시트(원장님 계정)로 옮길 예정이에요. */
 var CS_KEY = 'beyond-consult-record-v1';
 var CS_FORM = [
@@ -5938,28 +5963,29 @@ function resFormHtml(){
 }
 function resSyncHtml(){
   var key = sheetKey();
-  var web = !SHEET_URL ? '구글 시트 주소를 아직 넣지 않았어요. 지금은 이 브라우저에서 넣은 미리보기 신청만 보여요.'
+  var web = (session && session.role === 'teacher' && SHEET_URL) ? '홈페이지 예약은 원장님 화면에서 구글 시트를 불러올 때마다 이름·연락처·사전 질문이 여기에도 채워져요.'
+    : !SHEET_URL ? '구글 시트 주소를 아직 넣지 않았어요. 지금은 이 브라우저에서 넣은 미리보기 신청만 보여요.'
     : sheetRows ? '구글 시트와 연결됐어요. 홈페이지에서 예약하면 이 화면과 공통 일정표에 바로 떠요.'
     : key ? (sheetErr || '구글 시트에서 불러오는 중이에요…') : '아래에 시트 관리 키를 넣으면 학생·학부모 이름까지 보여요. 지금은 날짜·시간·학년만 보여요.';
   return '<div class="rs-sync"><h3>자동 연결 상태</h3><ul>' +
     '<li><span class="rs-src s-web">홈페이지</span>'+web+'</li>' +
     '<li><span class="rs-src s-naver">네이버 플레이스</span>네이버 예약 알림은 톡톡으로 와요. 알림을 복사해서 \'네이버 톡톡 알림 붙여넣기\'에 넣으면 날짜·시간·예약자·연락처가 자동으로 채워져요. 같은 예약번호는 두 번 들어가지 않아요.</li>' +
     '<li><span class="rs-src s-phone">전화</span><span class="rs-src s-sms">문자</span>받은 즉시 \'+ 전화·문자 예약 추가\'로 적어요.</li></ul>' +
-    (SHEET_URL ? '<form id="rsKeyForm" class="rs-key"><label>시트 관리 키 <input type="password" id="rsKey" autocomplete="off" placeholder="'+(key ? '저장됨 · 바꾸려면 새로 입력' : '원장님만 아는 키')+'"></label><button type="submit" class="btn soft">저장</button><small>이 기기에만 저장돼요. 다른 사람과 공유하지 마세요.</small></form>' : '') + '</div>';
+    (SHEET_URL && !(session && session.role === 'teacher') ? '<form id="rsKeyForm" class="rs-key"><label>시트 관리 키 <input type="password" id="rsKey" autocomplete="off" placeholder="'+(key ? '저장됨 · 바꾸려면 새로 입력' : '원장님만 아는 키')+'"></label><button type="submit" class="btn soft">저장</button><small>이 기기에만 저장돼요. 다른 사람과 공유하지 마세요.</small></form>' : '') + '</div>';
 }
 function resFind(key){ return allReservations().find(function(x){ return x.key === key; }); }
 function resLink(key, csId){
   if(key.charAt(0) === 'm'){ var i = resStore.items.find(function(x){ return 'm' + x.id === key; }); if(i) i.csId = csId; }
-  else (resStore.ext[key] = resStore.ext[key] || {}).csId = csId;
+  else resMeta(key).csId = csId;
   saveRes();
 }
 function resSetStatus(key, st){
   var r = resFind(key); if(!r) return;
   if(st === '완료'){ var mt = resMeta(key); if(!mt.doneAt) mt.doneAt = ymd(new Date()); }
   if(r.manual) resStore.items.find(function(x){ return 'm' + x.id === key; }).status = st;
-  else if(r.row){ sheetRows.find(function(x){ return x.row === r.row; }).status = st; sheetPost({ action:'status', row:r.row, status:st }); }
+  else if(r.row){ sheetRows.find(function(x){ return x.row === r.row; }).status = st; sheetPost({ action:'status', row:r.row, status:st }); var m0 = resMeta(key); m0.status = st; m0.stAt = Date.now(); }
   else {
-    (resStore.ext[key] = resStore.ext[key] || {}).status = st;
+    var m1 = resMeta(key); m1.status = st; m1.stAt = Date.now();
     if(r.local) try{ var a = webLocal(); a.forEach(function(c){ if('w' + c.date + ' ' + c.time === key) c.status = st; }); localStorage.setItem(WEB_KEY, JSON.stringify(a)); }catch(e){}
   }
   saveRes();
@@ -5996,7 +6022,9 @@ var cp = { key:'', open:-1, edit:-1, editTpl:'', del:-1, fuAll:false };
 
 function resMeta(key){
   if(key.charAt(0) === 'm') return resStore.items.find(function(x){ return 'm' + x.id === key; }) || {};
-  return (resStore.ext[key] = resStore.ext[key] || {});
+  var r = resFind(key), k = r ? r.mkey : key;
+  if(!resStore.ext[k]){ resStore.ext[k] = resStore.ext[key] ? JSON.parse(JSON.stringify(resStore.ext[key])) : {}; }
+  return resStore.ext[k];
 }
 function addDays(s, n){ var d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); }
 function parentCall(p){ p = String(p || '').replace(/^\(예시\)\s*/, '').trim(); return p ? (/님$/.test(p) ? p : p + '님') : '학부모님'; }
