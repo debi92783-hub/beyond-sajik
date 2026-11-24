@@ -360,6 +360,8 @@
   .day-item p{ margin:6px 0 0; font-size:12.5px; white-space:pre-line; }
   .day-item .del{ border:0; background:none; color:var(--ink-faint); cursor:pointer; font-size:12px; padding:2px 4px; }
   .day-item .del:hover{ color:var(--warn); }
+  .day-item .edit{ border:0; background:none; color:var(--accent); cursor:pointer; font-size:12px; font-weight:700; padding:2px 4px; }
+  .day-item .acts{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
   .empty{ font-size:13px; color:var(--ink-soft); padding:6px 0; }
   .overlay{ position:fixed; inset:0; background:rgba(20,22,26,0.45); display:flex; align-items:center; justify-content:center; padding:16px; z-index:30; }
   .modal{ background:var(--surface); border-radius:16px; padding:24px; width:100%; max-width:420px; box-shadow:0 12px 40px rgba(0,0,0,0.2); display:flex; flex-direction:column; gap:14px; max-height:calc(100vh - 32px); overflow:auto; }
@@ -2127,7 +2129,7 @@
 
 <div class="overlay" id="evOverlay" hidden>
   <form class="modal" id="evForm" novalidate>
-    <h2>일정 추가</h2>
+    <h2 id="evHead">일정 추가</h2>
     <div class="kind" role="radiogroup" aria-label="일정 구분">
       <label><input type="radio" name="evKind" id="kindCommon" value="common" checked><span class="common">공통일정</span></label>
       <label><input type="radio" name="evKind" id="kindMine" value="mine"><span class="mine">개인일정</span></label>
@@ -3484,7 +3486,7 @@ function renderDay(){
     return '<div class="day-item"><span class="bar-v" style="background:var('+color+')"></span><div class="body">' +
       '<b>'+esc(e.title)+'</b><small>'+label+(spanDays(e)>1?' · '+rangeText(e):'')+(e.time?' · '+e.time:'')+' · '+esc(e.owner)+'</small>' +
       (e.memo ? '<p>'+esc(e.memo)+'</p>' : '') + '</div>' +
-      (e.kind === 'consult' ? '' : (delPending('event', { eid:e.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">'+(delIsDirector() || (e.kind === 'mine' && e.owner === me()) ? '삭제' : '삭제 요청')+'</button>')) + '</div>';
+      (e.kind === 'consult' ? '' : '<div class="acts">' + (evCanEdit(e) ? '<button type="button" class="edit" data-edit="'+e.id+'" aria-label="'+esc(e.title)+' 수정">수정</button>' : '') + (delPending('event', { eid:e.id }) ? '<span class="del-tag">삭제 요청 중</span>' : '<button type="button" class="del" data-del="'+e.id+'" aria-label="'+esc(e.title)+' 삭제">'+(delIsDirector() || (e.kind === 'mine' && e.owner === me()) ? '삭제' : '삭제 요청')+'</button>') + '</div>') + '</div>';
   }).join('') : '<div class="empty">이 날은 일정이 없어요.</div>';
 }
 
@@ -3508,8 +3510,13 @@ window.addEventListener('storage', function(e){ if(e.key === CONSULT_KEY && stat
 $('calAdd').addEventListener('click', function(){ openEvForm(selDate); });
 $('dayAdd').addEventListener('click', function(){ openEvForm(selDate); });
 
+// 일정 수정: 원장님은 모든 일정, 선생님은 본인이 쓴 일정만 (2026-11-24 원장쌤 요청)
+function evCanEdit(e){ return delIsDirector() || e.owner === me(); }
+var evEditId = null;
 var pendingDel = null;
 $('dayList').addEventListener('click', function(e){
+  var eb = e.target.closest('[data-edit]');
+  if(eb){ var ev1 = EVENTS.find(function(x){ return x.id === eb.dataset.edit; }); if(ev1 && evCanEdit(ev1)) openEvForm(ev1.date, ev1); return; }
   var b = e.target.closest('[data-del]'); if(!b) return;
   var ev0 = EVENTS.find(function(x){ return x.id === b.dataset.del; }); if(!ev0) return;
   // 내 개인일정은 바로 휴지통으로, 그 밖의 일정은 원장님 규칙(delAsk)을 따라요
@@ -3520,13 +3527,21 @@ $('dayList').addEventListener('click', function(e){
   delAsk('event', { eid:ev0.id }, renderCalendar);
 });
 
-function openEvForm(dateStr){
+function openEvForm(dateStr, ev){
   $('evForm').reset();
+  evEditId = ev ? ev.id : null;
+  $('evHead').textContent = ev ? '일정 수정' : '일정 추가';
   $('evDate').value = dateStr || ymd(day);
-  $('evEnd').value = $('evDate').value;
+  $('evEnd').value = ev && ev.end ? ev.end : $('evDate').value;
   $('evEnd').min = $('evDate').value;
   $('evErr').textContent = '';
+  if(ev){
+    $(ev.mk ? 'kindMk' : (ev.kind === 'mine' ? 'kindMine' : 'kindCommon')).checked = true;
+    $('evTitle').value = ev.title || ''; $('evTime').value = ev.time || ''; $('evMemo').value = ev.memo || '';
+    if(ev.mk){ evMkFill(); $('evMkCls').value = ev.mk.cid; $('evMkWhy').value = ev.mk.why || ''; }
+  }
   evMkFill(); evMkToggle();
+  if(ev && ev.mk) [].forEach.call($('evMkStu').querySelectorAll('input'), function(x){ x.checked = ev.mk.names.indexOf(x.value) >= 0; });
   $('evOverlay').hidden = false;
   $('evTitle').focus();
 }
@@ -3543,7 +3558,7 @@ function evMkToggle(){
   $('evTime').closest('label').firstChild.textContent = on ? '보강 시간' : '시간 (선택)';
 }
 $('evForm').addEventListener('change', function(e){ if(e.target.name === 'evKind') evMkToggle(); if(e.target.id === 'evMkCls') evMkFill(); });
-function closeEvForm(){ $('evOverlay').hidden = true; }
+function closeEvForm(){ $('evOverlay').hidden = true; evEditId = null; }
 $('evCancel').addEventListener('click', closeEvForm);
 $('evDate').addEventListener('change', function(){ if(!$('evEnd').value || $('evEnd').value < this.value) $('evEnd').value = this.value; $('evEnd').min = this.value; });
 $('evOverlay').addEventListener('click', function(e){ if(e.target === this) closeEvForm(); });
@@ -3565,15 +3580,22 @@ $('evForm').addEventListener('submit', function(e){
   if(!date){ $('evErr').textContent = '시작 날짜를 골라 주세요.'; $('evDate').focus(); return; }
   if(end < date){ $('evErr').textContent = '끝나는 날짜가 시작 날짜보다 빨라요. 다시 골라 주세요.'; $('evEnd').focus(); return; }
   var kind = $('kindMine').checked ? 'mine' : 'common';
-  var ev = { id:'e' + Date.now(), kind:kind, title:title, date:date, time:$('evTime').value, memo:$('evMemo').value.trim(), owner:me() };
+  var old = evEditId ? EVENTS.find(function(x){ return x.id === evEditId; }) : null;
+  var ev = { id: old ? old.id : 'e' + Date.now(), kind:kind, title:title, date:date, time:$('evTime').value, memo:$('evMemo').value.trim(), owner: old ? old.owner : me() };
   if(mk){ ev.mk = mk; if(mk.why && !ev.memo) ev.memo = '보강 내용: ' + mk.why; }
   if(end > date) ev.end = end;
-  EVENTS.push(ev);
+  if(old){
+    // 고치기 전 내용도 남겨 둬요(지우지 않음 규칙)
+    ev.edited = (old.edited || []).concat([{ at:new Date().toISOString(), by:me(), before:{ title:old.title, date:old.date, end:old.end||'', time:old.time||'', kind:old.kind } }]).slice(-10);
+    EVENTS[EVENTS.indexOf(old)] = ev;
+  } else EVENTS.push(ev);
+  evEditId = null;
   saveEvents();
   if(kind === 'common') $('showCommon').checked = true; else $('showMine').checked = true;
   selDate = date;
   var d = parseYmd(date); calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
   closeEvForm(); renderCalendar();
+  if(old) return toast('일정을 고쳤어요.' + (old.date !== date ? ' (' + (+date.slice(5,7)) + '월 ' + (+date.slice(8)) + '일로 옮김)' : ''));
   if(mk) return toast('보강 일정을 저장했어요. 그날 교무일지에 자동으로 들어가요.');
   toast((kind === 'common' ? '공통일정' : '개인일정') + '을 저장했어요.' + (ev.end ? ' (' + spanDays(ev) + '일 연속)' : ''));
 });
