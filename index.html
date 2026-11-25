@@ -731,13 +731,6 @@
   @media (max-width: 720px){ .fee-grid{ grid-template-columns: 1fr; } }
 
   /* ---------- 수업 음원 앱 ---------- */
-  .play-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
-  .play-card{ display:flex; flex-direction:column; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; text-decoration:none; color: var(--ink); transition: transform .15s ease, box-shadow .15s ease; }
-  .play-card:hover{ transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30,42,68,0.12); }
-  .play-card small{ align-self:flex-start; font-size: .74rem; font-weight: 700; color: var(--accent-deep); background: rgba(226,163,59,.14); border-radius: 999px; padding: 3px 9px; }
-  .play-card b{ font-size: 1.1rem; margin-top: 4px; } .play-card p{ margin: 0; color: var(--ink-soft); font-size: .9rem; line-height: 1.6; word-break: keep-all; flex:1; }
-  .play-card em{ font-style: normal; font-weight: 700; font-size: .86rem; margin-top: 6px; }
-  @media (max-width: 720px){ .play-grid{ grid-template-columns: 1fr; gap: 10px; } }
   .audio-lead{ color: var(--ink-soft); margin: 0 0 20px; word-break: keep-all; }
   .audio-btns{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
   .audio-btn{ display:flex; flex-direction:column; gap: 2px; padding: 16px 18px; background: var(--ink); color:#fff; border-radius: 12px; text-decoration:none; }
@@ -795,6 +788,7 @@
   .home-menu{ padding: 32px 0 56px; }
   .menu-title{ font-family: var(--serif); font-size: 1.3rem; margin: 0 0 18px; text-align:center; }
   .menu-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+  .menu-grid .mc-main{ grid-column: span 2; }
   .menu-card{ display:flex; flex-direction:column; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; text-decoration:none; color: var(--ink); box-shadow: 0 6px 18px rgba(30,42,68,0.06); transition: transform .15s ease, box-shadow .15s ease; }
   .menu-card:hover{ transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30,42,68,0.12); }
   .menu-card .mc-ico svg{ width: 44px; height: 44px; display:block; }
@@ -960,11 +954,6 @@
         <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 26v-2a14 14 0 0 1 28 0v2" fill="none" stroke="#1E2A44" stroke-width="2.4"/><rect x="7" y="25" width="9" height="14" rx="3" fill="#E2A33B"/><rect x="32" y="25" width="9" height="14" rx="3" fill="#E2A33B"/></svg></span>
         <b>수업 음원 앱</b>
         <span>오늘 배운 음원을 집에서 다시 들어요</span>
-      </a>
-      <a class="menu-card" href="#play">
-        <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="4" y="14" width="40" height="22" rx="11" fill="#fff" stroke="#1E2A44" stroke-width="2"/><path d="M15 20v10M10 25h10" stroke="#1E2A44" stroke-width="2.6" stroke-linecap="round"/><circle cx="31" cy="22" r="2.6" fill="#E2A33B"/><circle cx="36" cy="28" r="2.6" fill="#E2A33B"/></svg></span>
-        <b>집에서 하는 파닉스 놀이</b>
-        <span>배운 소리를 게임으로 복습하는 사이트 모음</span>
       </a>
       <a class="menu-card" href="#fees">
         <span class="mc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="5" y="12" width="38" height="26" rx="4" fill="#fff" stroke="#1E2A44" stroke-width="2"/><rect x="5" y="18" width="38" height="5" fill="#1E2A44"/><rect x="10" y="29" width="12" height="4" rx="1" fill="#E2A33B"/></svg></span>
@@ -1203,19 +1192,6 @@
     </div>
     <p class="feed-note" id="feedNote"></p>
 
-  </div>
-</section>
-
-<!-- ===== 집에서 하는 파닉스 놀이 ===== -->
-<section id="play" class="view-sec">
-  <div class="wrap">
-    <h2 class="section-title">집에서 하는 파닉스 놀이</h2>
-    <p class="audio-lead">학원에서 배운 소리와 단어를 집에서 게임으로 한 번 더 만나 보세요. 하루 10분이면 충분해요. 위쪽 작은 글씨는 함께 하기 좋은 우리 학원 과정이에요.</p>
-    <div class="play-grid"><a class="play-card" href="https://www.teachyourmonster.org" target="_blank" rel="noopener"><small>FUN PHONICS</small><b>Teach Your Monster</b><p>알파벳 소리부터 블렌딩(소리 합치기)까지, 몬스터를 키우며 단계별로 익혀요.</p><em>teachyourmonster.org →</em></a><a class="play-card" href="https://www.abcya.com" target="_blank" rel="noopener"><small>FUN PHONICS · FUN STORY</small><b>ABCya</b><p>알파벳, 사이트 워드 빙고 같은 짧은 게임이 학년별로 나뉘어 있어요.</p><em>abcya.com →</em></a><a class="play-card" href="https://www.phonicsbloom.com" target="_blank" rel="noopener"><small>FUN PHONICS</small><b>Phonics Bloom</b><p>소리 단계(Phase)별로 고를 수 있는 파닉스 게임이에요.</p><em>phonicsbloom.com →</em></a><a class="play-card" href="https://games4esl.com" target="_blank" rel="noopener"><small>BASIC</small><b>Games4esl</b><p>주제별 단어 퀴즈와 게임으로 배운 단어를 다시 확인해요.</p><em>games4esl.com →</em></a><a class="play-card" href="https://www.kizclub.com" target="_blank" rel="noopener"><small>FUN PHONICS · FUN STORY</small><b>Kizclub</b><p>알파벳·파닉스 활동지와 카드를 내려받아 출력해서 써요.</p><em>kizclub.com →</em></a></div>
-    <div class="audio-tips">
-      <div><b>보호자와 함께 해 주세요</b><p>모두 학원 밖의 외부 사이트예요. 광고나 다른 사이트로 가는 링크가 있을 수 있어서, 아이 혼자보다 보호자와 함께 하는 걸 권해요.</p></div>
-      <div><b>무료 범위는 바뀔 수 있어요</b><p>무료로 쓸 수 있는 범위와 앱 가격은 각 사이트가 정해요. 결제 안내가 나오면 결제하지 않고 무료 게임만 골라 하셔도 괜찮아요.</p></div>
-    </div>
   </div>
 </section>
 
@@ -1467,8 +1443,8 @@
 <script>
 /* 처음 화면 ↔ 카드 눌러 보기 (주소 끝 #이름 으로 구분해요) */
 (function(){
-  var VIEWS = { concerns:'learn', philosophy:'learn', curriculum:'curriculum', news:'news', blog:'news', insta:'news', audio:'audio', play:'play', fees:'fees', reserve:'reserve', info:'info' };
-  var TITLES = { learn:'학습법', curriculum:'커리큘럼·교재', news:'블로그·인스타 소식', audio:'수업 음원 앱', play:'집에서 하는 파닉스 놀이', fees:'회비 안내', reserve:'상담 예약', info:'오시는 길·운영시간' };
+  var VIEWS = { concerns:'learn', philosophy:'learn', curriculum:'curriculum', news:'news', blog:'news', insta:'news', audio:'audio', fees:'fees', reserve:'reserve', info:'info' };
+  var TITLES = { learn:'학습법', curriculum:'커리큘럼·교재', news:'블로그·인스타 소식', audio:'수업 음원 앱', fees:'회비 안내', reserve:'상담 예약', info:'오시는 길·운영시간' };
   var HOME_TITLE = document.title;
   function route(){
     var h = decodeURIComponent(location.hash.slice(1));
