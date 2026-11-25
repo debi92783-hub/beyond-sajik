@@ -1,0 +1,55 @@
+rules_version = '2';
+// 비욘드잉글리쉬 사직 학원 관리 화면 · Firestore 권한 규칙
+// 로그인 이메일 형식: 아이디.g세대번호@beyond-sajik.app (예: director.g0@beyond-sajik.app)
+// - staff/{아이디}: 원장님이 등록한 직원 명단(역할·퇴사·세대번호). 세대번호가 맞고 퇴사하지 않은 계정만 들어와요.
+// - kv/{저장 이름}: 업무 기록. 직원은 읽고 쓰고, 수강료·계정 명단은 원장님만 고쳐요.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function doc(p) { return /databases/$(database)/documents/$(p); }
+    function signedIn() {
+      return request.auth != null && request.auth.token.email is string
+        && request.auth.token.email.matches('^[a-z0-9_]+[.]g[0-9]+@beyond-sajik[.]app$');
+    }
+    function local() { return request.auth.token.email.split('@')[0]; }
+    function sid() { return local().split('[.]g')[0]; }
+    function sgen() { return int(local().split('[.]g')[1]); }
+    function me() { return get(/databases/$(database)/documents/staff/$(sid())).data; }
+    function isStaff() {
+      return signedIn() && exists(/databases/$(database)/documents/staff/$(sid()))
+        && me().gen == sgen() && me().left == false;
+    }
+    function isDirector() { return isStaff() && me().role == 'director'; }
+
+    // 첫 원장님 계정: 아직 원장님이 없을 때 한 번만 만들 수 있어요.
+    match /config/owner {
+      allow get: if true;
+      allow create: if signedIn() && request.resource.data.id == sid()
+        && !exists(/databases/$(database)/documents/config/owner)
+        && getAfter(/databases/$(database)/documents/staff/$(sid())).data.role == 'director';
+    }
+    // 로그인 전에 세대번호만 알려 줘요(이름·역할은 안 보여요).
+    match /login/{id} {
+      allow get: if true;
+      allow write: if isDirector()
+        || (signedIn() && id == sid() && !exists(/databases/$(database)/documents/config/owner)
+            && getAfter(/databases/$(database)/documents/config/owner).data.id == id);
+    }
+    match /staff/{id} {
+      allow read: if isStaff();
+      allow write: if isDirector();
+      // 선생님은 임시 비밀번호를 바꾼 뒤 '임시' 표시만 끌 수 있어요.
+      allow update: if isStaff() && id == sid()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['temp'])
+        && request.resource.data.temp == false;
+      allow create: if signedIn() && id == sid() && request.resource.data.role == 'director'
+        && request.resource.data.gen == sgen() && request.resource.data.left == false
+        && !exists(/databases/$(database)/documents/config/owner)
+        && getAfter(/databases/$(database)/documents/config/owner).data.id == id;
+    }
+    match /kv/{key} {
+      allow read: if isDirector() || (isStaff() && key != 'beyond-pay-v1');
+      allow write: if isDirector()
+        || (isStaff() && !(key in ['beyond-pay-v1', 'beyond-accounts-v1']));
+    }
+  }
+}
