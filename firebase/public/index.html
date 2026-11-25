@@ -1437,6 +1437,30 @@
     .day-panel{ position:static; }
     .cal-title h1{ font-size:19px; min-width:120px; }
   }
+
+  /* 앱 안 알림 */
+  .nf-wrap{ position:relative; }
+  .icon-btn .nf-n{ position:absolute; top:-6px; right:-7px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--warn); color:#fff; font-size:11px; font-weight:800; line-height:18px; text-align:center; box-sizing:border-box; }
+  .icon-btn .nf-n[hidden]{ display:none; }
+  .nf-pop{ position:absolute; right:0; top:44px; width:370px; max-width:calc(100vw - 32px); max-height:72vh; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:0 12px 32px rgba(20,24,32,.18); z-index:40; text-align:left; }
+  .nf-pop[hidden]{ display:none; }
+  .nf-hd{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface); z-index:1; }
+  .nf-hd b{ font-size:15px; }
+  .nf-hd button, .nf-ft button{ border:0; background:none; color:var(--accent); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; padding:4px 2px; }
+  .nf-sec{ padding:10px 14px 4px; font-size:11.5px; font-weight:800; color:var(--ink-soft); }
+  .nf-li{ display:flex; gap:10px; width:100%; border:0; background:none; text-align:left; padding:9px 14px; cursor:pointer; color:var(--ink); font:inherit; align-items:flex-start; }
+  .nf-li:hover, .nf-li:focus-visible{ background:var(--surface-soft); }
+  .nf-li .ic{ flex:none; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:var(--accent-soft); color:var(--accent); }
+  .nf-li.todo .ic{ background:var(--warn-soft); color:var(--warn); }
+  .nf-li .tx{ flex:1; min-width:0; }
+  .nf-li .tx b{ display:block; font-size:13px; line-height:1.4; }
+  .nf-li .tx small{ display:block; color:var(--ink-soft); font-size:12px; line-height:1.4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nf-li .tm{ flex:none; font-size:11px; color:var(--ink-faint); padding-top:2px; }
+  .nf-li.read{ opacity:.62; } .nf-li.read .tx b{ font-weight:600; }
+  .nf-li.unread .tx b::after{ content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--warn); margin-left:6px; vertical-align:middle; }
+  .nf-empty{ padding:6px 14px 10px; color:var(--ink-soft); font-size:12.5px; }
+  .nf-ft{ border-top:1px solid var(--border); padding:10px 14px 12px; font-size:12px; color:var(--ink-soft); line-height:1.5; }
+  @media (max-width:860px){ .nf-pop{ position:fixed; left:16px; right:16px; top:64px; width:auto; max-width:none; max-height:calc(100vh - 90px); } }
 </style>
 </head>
 <body>
@@ -1456,7 +1480,7 @@
     <div class="login-hero-txt">
       <span class="lh-kicker">비욘드잉글리쉬 사직어학원</span>
       <b class="lh-title">BEYOND SAJIK</b>
-      <span class="lh-sub">원장님·선생님 · 학부모·학생</span>
+      <span class="lh-sub">원장님·선생님 업무 화면</span>
     </div>
   </div>
   <div class="login-side">
@@ -1466,7 +1490,7 @@
       <div class="brand-text"><b>비욘드잉글리쉬</b><small>사직어학원</small></div>
     </div>
 
-    <div class="login-tabs" role="tablist" aria-label="누가 들어오나요">
+    <div class="login-tabs" role="tablist" aria-label="누가 들어오나요" hidden style="display:none">
       <button type="button" role="tab" data-lt="staff" aria-selected="true">원장님·선생님</button>
       <button type="button" role="tab" data-lt="parent" aria-selected="false">학부모·학생</button>
     </div>
@@ -1550,10 +1574,11 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5"/></svg>
       <input type="search" id="search" placeholder="학생명으로 검색" aria-label="학생명으로 검색" autocomplete="off">
     </label><span class="dt-qres search-res" id="searchRes" hidden></span></div>
-    <button class="icon-btn" type="button" data-only="director" data-soon="알림" aria-label="알림">
+    <div class="nf-wrap"><button class="icon-btn" type="button" id="nfBtn" aria-label="알림" aria-haspopup="dialog" aria-expanded="false">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 17h12l-1.5-2.5V10a4.5 4.5 0 00-9 0v4.5z"/><path d="M10.3 20a1.8 1.8 0 003.4 0"/></svg>
-      <span class="dot"></span>
+      <span class="nf-n" id="nfN" hidden></span>
     </button>
+    <div class="nf-pop" id="nfPop" role="dialog" aria-label="알림" hidden></div></div>
     <div class="who" data-only="director"><div class="avatar">원</div>원장님</div>
     <div class="who" data-only="teacher" hidden>
       <div class="avatar" id="teacherInitial">이</div>
@@ -1898,7 +1923,7 @@
     </section>
 
     <section id="view-pnotice" hidden>
-      <div class="greet"><div><h1>학원공지알림</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. 학부모·학생 화면 맨 위 ‘학원공지알림’에 보이고, <b>공지는 데일리 리포트와 따로, 목록의 ‘학부모님께 발송’으로 보내요.</b> 공지마다 미발송·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원공지알림 등록</button></div>
+      <div class="greet"><div><h1>학원공지알림</h1><p>행사·보강 수업·휴원·학원 소식 등 학원 전체에서 하는 일을 모든 학부모님·학생에게 알려요. <b>공지는 데일리 리포트와 따로, 목록의 ‘학부모님께 발송’으로 보내요.</b> 공지마다 미발송·발송 완료가 표시돼요. 원장님·선생님 누구나 올릴 수 있어요. 고치기·내리기는 쓴 사람과 원장님이 해요.</p></div><button type="button" class="btn" data-annew="all">+ 학원공지알림 등록</button></div>
       <div class="card an-card an-box" id="anList"></div>
     </section>
 
@@ -2384,7 +2409,7 @@ var MENU = {
     ['수업 관리', [['book','업무 체크리스트','lcsum'],['stamp','교무일지(자동) 결재','gyomu'],['chart','데일리 테스트','daily'],['check','출결·지각','attend'],['doc','월말 리포트','monthly'],['table','기록 모아보기','records']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
-    ['', [['clock','태블릿 등원 화면','kiosk'],['bell','학부모·학생 화면 미리보기','pview']]]
+    ['', [['clock','태블릿 등원 화면','kiosk']]]
   ],
   teacher: [
     ['홈', [['grid','오늘 한눈에','thome'],['cal','일정','calendar'],['mail','쪽지함','mail']]],
@@ -2393,7 +2418,7 @@ var MENU = {
     ['학부모 알림', [['bell','학원공지알림','pnotice']]],
     ['소통', [['board','게시판 (전달사항)','board:comm:notice'],['box','교재 출고 요청','board:comm:book'],['bulb','건의사항','board:comm:idea'],['users','주간회의','board:comm:meet']]],
     ['자료', [['video','TTC 교육','board:data:ttc'],['talk','교재 연구','board:data:study'],['doc','시험 대비 자료','board:data:exam'],['dict','뉘앙스 사전','board:data:nuance'],['manual','업무 매뉴얼','manual']]],
-    ['', [['clock','태블릿 등원 화면','kiosk'],['bell','학부모·학생 화면 미리보기','pview']]]
+    ['', [['clock','태블릿 등원 화면','kiosk']]]
   ]
 };
 
@@ -2422,6 +2447,7 @@ function setView(v, page){
   state.page = page || 'main';
   if((state.page === 'settings' || state.page === 'lcsum' || state.page === 'trash' || state.page === 'pay') && v !== 'director') state.page = 'main';
   if(state.page === 'thome' && v !== 'teacher') state.page = 'main';
+  if(state.page === 'pview') state.page = 'main';   // 학부모·학생 화면 미리보기는 뺐어요(2026-11-25)
   var lcsum = state.page === 'lcsum', gyomu = state.page === 'gyomu', mail = state.page === 'mail', thome = state.page === 'thome', pview = state.page === 'pview', trash = state.page === 'trash', records = state.page === 'records', roster_ = state.page === 'roster', pnotice = state.page === 'pnotice', payp = state.page === 'pay';
   var cal = state.page === 'calendar', set = state.page === 'settings', daily = state.page === 'daily', monthly = state.page === 'monthly', attend = state.page === 'attend', manual = state.page === 'manual', board = state.page === 'board', consult = state.page === 'consult';
   document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.view === v); });
@@ -2491,6 +2517,7 @@ function renderSide(){
   }
   $('side').innerHTML = html;
   var ca = $('side').querySelector('a[aria-current="page"]'); $('menuCur').textContent = ca ? ca.dataset.name : '';
+  nfRefresh();
 }
 function menuToggle(open){ var l = $('appLayout'); open = open == null ? !l.classList.contains('menu-open') : open; l.classList.toggle('menu-open', open); $('menuBtn').setAttribute('aria-expanded', open); }
 $('menuBtn').addEventListener('click', function(){ menuToggle(); });
@@ -3903,7 +3930,7 @@ function dtAnOf(s, e){
   return (e.anSent[s] || []).map(function(id){ return all.find(function(a){ return a.id === id; }); }).filter(Boolean);
 }
 function anLine(a){
-  return '· [' + anKind(a.kind) + '] ' + a.title + (a.date ? ' · ' + pvDate(a.date) + (a.time ? ' ' + korTime(a.time) : '') : '') + (a.text ? '\n' + a.text : '') + (a.files && a.files.length ? '\n※ 사진·첨부 파일은 학부모·학생 화면에서 볼 수 있어요.' : '');
+  return '· [' + anKind(a.kind) + '] ' + a.title + (a.date ? ' · ' + pvDate(a.date) + (a.time ? ' ' + korTime(a.time) : '') : '') + (a.text ? '\n' + a.text : '');
 }
 
 $('dtRows').addEventListener('input', function(ev){
@@ -7733,7 +7760,7 @@ function rsOpen(id, cid){
     + '<div class="row2"><label>등록일<input type="date" id="rsJoin" value="' + esc(s.joined) + '"' + ro + '></label>'
     + '<label>상태<select id="rsSt"' + ro + '>' + Object.keys(RS_ST).map(function(k){ return '<option value="' + k + '"' + (k === s.status ? ' selected' : '') + '>' + RS_ST[k] + '</option>'; }).join('') + '</select></label></div>'
     + '<label>메모 <span class="hint">알레르기·하원 방법 등 수업에 필요한 것만</span><textarea id="rsMemo" maxlength="300">' + esc(s.memo || '') + '</textarea></label>'
-    + '<p class="hint">학부모 번호 뒷자리 4개는 학부모·학생 화면 로그인과 등원 태블릿에 쓰여요.' + (id && dir ? ' 이름을 바꾸면 지난 기록은 예전 이름으로 남아요.' : '') + '</p>'
+    + '<p class="hint">학부모 번호 뒷자리 4개는 등원 태블릿에 쓰여요.' + (id && dir ? ' 이름을 바꾸면 지난 기록은 예전 이름으로 남아요.' : '') + '</p>'
     + (id ? '<div id="rsTalk">' + rsTalkHtml(s) + '</div>' : '')
     + (s.hist && s.hist.length ? '<div class="rs-hist"><b>변경 기록</b>' + s.hist.slice().reverse().map(function(x){ return '<div><span class="dt">' + esc(x.d) + '</span> ' + esc(x.t) + ' <small class="muted">' + esc(x.by || '') + '</small></div>'; }).join('') + '</div>' : '')
     + '<p class="form-err" id="rsErr"></p>'
@@ -8093,7 +8120,7 @@ function anSendTag(a){
   if(!x.got) return '<span class="tag warn an-st">미발송</span>';
   return '<span class="tag info an-st">일부 발송 ' + x.got + ' / ' + x.tot + '명</span>';
 }
-function anMsg(a){ return '[비욘드잉글리쉬 사직어학원 공지]\n' + anLine(a).replace(/^· /, '') + '\n\n학부모·학생 화면에서도 확인하실 수 있어요.'; }
+function anMsg(a){ return '[비욘드잉글리쉬 사직어학원 공지]\n' + anLine(a).replace(/^· /, ''); }
 function renderAnList(el, only, head, emptyMsg){
   el = el || $('anList');
   var all = anAll().filter(only || function(){ return true; }).sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
@@ -8183,7 +8210,7 @@ $('anForm').addEventListener('submit', function(ev){
   if(a){ a.hist = a.hist || []; a.hist.push({ at:Date.now(), title:a.title, text:a.text, files:a.files || [], sentTo:a.sentTo });
     Object.assign(a, v); a.edAt = Date.now(); }
   else { list.push(Object.assign({ id:'a' + Date.now(), at:Date.now(), byId:session && session.id, by:state.view === 'director' ? '원장님' : state.teacher + ' 선생님' }, v)); }
-  var done = function(){ anSaveAll(list); $('anOv').hidden = true; anRefresh(); toast(a ? (a.sentAt ? '공지를 고쳤어요. 고친 내용을 알리려면 \'다시 발송\'을 눌러 주세요.' : '공지를 고쳤어요. 목록에서 \'학부모님께 발송\'을 누르면 보내져요.') : '학부모·학생 화면에 올렸어요. 목록에서 \'학부모님께 발송\'을 누르면 보내져요.'); };
+  var done = function(){ anSaveAll(list); $('anOv').hidden = true; anRefresh(); toast(a ? (a.sentAt ? '공지를 고쳤어요. 고친 내용을 알리려면 \'다시 발송\'을 눌러 주세요.' : '공지를 고쳤어요. 목록에서 \'학부모님께 발송\'을 누르면 보내져요.') : '학원공지알림에 등록했어요. 목록에서 \'학부모님께 발송\'을 누르면 보내져요.'); };
   Promise.all(fresh.map(function(f){ return bdFile('put', f.id, f.blob); })).then(done, function(){ toast('첨부 파일을 저장하지 못했어요. 파일 없이 올렸어요.'); v.files = v.files.filter(function(f){ return !fresh.some(function(x){ return x.id === f.id; }); }); (a || list[list.length - 1]).files = v.files; done(); });
 });
 document.addEventListener('click', function(ev){
@@ -8471,6 +8498,232 @@ $('ttCard').addEventListener('click', function(ev){
 });
 ['ttFrom','ttTo'].forEach(function(id){ $(id).addEventListener('change', function(){ var f = +$('ttFrom').value, t = +$('ttTo').value; if(t <= f){ toast('끝 시간이 시작보다 늦어야 해요.'); renderTimetable(); return; } ttStore.from = f; ttStore.to = t; ttSave(); renderTimetable(); }); });
 
+/* ===== 앱 안 알림 (원장님·선생님) — 2026-11-25 =====
+   상단 종 모양을 누르면 알림이 보여요.
+   - 확인할 일: 결재 대기·삭제 요청·월말 리포트·상담 예약 확인처럼 할 일이 남은 것. 일을 마치면 저절로 사라져요.
+   - 새 소식(최근 2주): 새 쪽지·게시판 새 글·새 상담 예약·새 공통 일정·교무일지 결재 완료·삭제 요청 결과. 눌러 보면 읽음이 돼요.
+   알림은 지우지 않고 '읽음' 표시만 해요. 읽음 기록은 beyond-notify-v1에 사람마다 저장돼서 다른 기기에서도 같아요.
+   화면을 열어 둔 동안 약 1분 30초마다 새 기록을 받아 와서, 새 알림이 오면 화면 아래에 잠깐 알려 줘요.
+   '이 기기에도 알림 창 띄우기'를 켜면 다른 창을 보고 있을 때도 컴퓨터 알림 창으로 알려 줘요(브라우저가 허락할 때만). */
+var NF_KEY = 'beyond-notify-v1', NF_DAYS = 14, NF_DEV = 'beyond-notify-device', NF_TITLE = document.title;
+function nfLoad(){ try{ var o = JSON.parse(localStorage.getItem(NF_KEY) || 'null'); if(o && o.seen) return o; }catch(e){} return { seen:{}, first:{}, init:{} }; }
+var nfStore = nfLoad(), nfDirty = false, nfOpen = false, nfKnown = null, nfTodoN = {}, nfCur = { todo:[], news:[] };
+function nfSave(){
+  // 30일 지난 읽음 기록은 정리해요(알림 자체는 원래 기록에서 만들어서 지워지는 내용은 없어요).
+  var old = Date.now() - 30 * 86400000;
+  Object.keys(nfStore.seen || {}).forEach(function(u){ var m = nfStore.seen[u]; Object.keys(m).forEach(function(k){ if(m[k] < old) delete m[k]; }); });
+  Object.keys(nfStore.first || {}).forEach(function(k){ if(nfStore.first[k] < old) delete nfStore.first[k]; });
+  try{ localStorage.setItem(NF_KEY, JSON.stringify(nfStore)); }catch(e){}
+}
+function nfMine(){ if(!session) return {}; nfStore.seen = nfStore.seen || {}; return (nfStore.seen[session.id] = nfStore.seen[session.id] || {}); }
+function nfFirst(nid){ var f = nfStore.first = nfStore.first || {}; if(!f[nid]){ f[nid] = Date.now(); nfDirty = true; } return f[nid]; }
+function nfAgo(ts){
+  var m = Math.floor((Date.now() - ts) / 60000);
+  if(m < 1) return '방금'; if(m < 60) return m + '분 전';
+  var h = Math.floor(m / 60); if(h < 24) return h + '시간 전';
+  var d = new Date(ts); return (d.getMonth() + 1) + '/' + d.getDate();
+}
+function nfDate(s){ if(!s) return ''; var d = parseYmd(s); return (d.getMonth() + 1) + '/' + d.getDate() + '(' + DAYS[d.getDay()] + ')'; }
+function nfMonthly(dir){
+  var n = 0;
+  Object.keys(moStore).forEach(function(k){
+    var e = moStore[k], c = CLASSES.find(function(x){ return x.id === k.split('|')[0]; });
+    if(!c || !e) return;
+    if(dir && e.stage === 'req') n += (e.made || []).filter(function(s){ return !(e.gen && e.gen[s]); }).length;
+    if(!dir && c.teacher === session.name && e.stage === 'made') n += (e.made || []).filter(function(s){ return !(e.tOk && e.tOk[s]); }).length;
+  });
+  return n;
+}
+function nfGyOpen(t, d){ gy.t = t; gy.d = d; gy.backing = false; gy.base = parseYmd(d); setView(state.view, 'gyomu'); }
+function nfCollect(){
+  var dir = session.role === 'director', myName = session.name, myLabel = dir ? '원장님' : session.name + ' 선생님';
+  var todo = [], news = [], cut = Date.now() - NF_DAYS * 86400000, td = ymd(new Date()), seen = nfMine();
+  function T(id, ic, n, title, sub, go){ if(n) todo.push({ id:id, ic:ic, n:n, title:title, sub:sub, go:go, todo:true }); }
+  function N(id, ic, title, sub, at, read, go){ if(!at || at < cut) return; news.push({ id:id, ic:ic, title:title, sub:sub, at:at, read:!!(read || seen[id]), go:go }); }
+  var resv = []; try{ resv = allReservations(); }catch(e){}
+
+  // ── 확인할 일 ──
+  if(dir){
+    var gp = gyPending();
+    T('gy', 'stamp', gp.length, '교무일지 결재 요청 ' + gp.length + '건', gp.slice(0, 3).map(function(k){ var p = k.split('|'); return p[0] + ' ' + nfDate(p[1]); }).join(' · '), function(){ gy.t = null; gy.d = null; setView('director', 'gyomu'); });
+    var dw = delWaiting();
+    T('del', 'trash', dw.length, '삭제 요청 ' + dw.length + '건', dw.slice(0, 2).map(function(r){ return (r.by || '') + ' · ' + r.label; }).join(' / '), function(){ setView('director', 'trash'); });
+    var mp = nfMonthly(true);
+    T('mo', 'doc', mp, '월말 리포트 만들기 요청 ' + mp + '명', '선생님이 요청한 리포트를 만들어 주세요', function(){ setView('director', 'monthly'); });
+    var rw = resv.filter(function(r){ return (r.status === '대기' || r.status === '확인필요') && r.date >= td; });
+    T('rs', 'msg', rw.length, '상담 예약 확인 대기 ' + rw.length + '건', rw.slice(0, 2).map(function(r){ return nfDate(r.date) + ' ' + r.time + (r.grade ? ' ' + r.grade : ''); }).join(' · '), function(){ cs.mode = 'list'; setView('director', 'consult'); });
+    var fu = 0; try{ fu = fuTodayCount(); }catch(e){}
+    T('fu', 'msg', fu, '오늘 상담 후 연락 ' + fu + '명', '상담 관리 > 상담 후 연락에서 문구를 복사해 보내요', function(){ cs.mode = 'list'; setView('director', 'consult'); });
+    var rq = Object.keys(store.resetReq || {}).filter(function(id){ return findAcc(id); });
+    T('pw', 'gear', rq.length, '비밀번호 재설정 요청 ' + rq.length + '명', rq.map(function(id){ return findAcc(id).name + ' 선생님'; }).join(', '), function(){ setView('director', 'settings'); });
+  } else {
+    var mt = nfMonthly(false);
+    T('mo', 'doc', mt, '월말 리포트 확인 ' + mt + '명', '원장님이 만든 리포트를 확인하고 다듬어요', function(){ setView('teacher', 'monthly'); });
+    var gb = Object.keys(gyStore).filter(function(k){ return k.split('|')[0] === myName && gyStore[k] && gyStore[k].st === 'back'; }).sort();
+    T('gyb', 'stamp', gb.length, '교무일지 반려 ' + gb.length + '건', gb.slice(0, 3).map(function(k){ return nfDate(k.split('|')[1]); }).join(' · ') + ' · 고쳐서 다시 제출해요', function(){ var p = gb[0].split('|'); nfGyOpen(p[0], p[1]); });
+  }
+
+  // ── 새 소식 ──
+  mlIn().forEach(function(m){
+    N('ml:' + m.id, 'mail', '새 쪽지 · ' + mlName(m.from), m.subj, m.date, mlIsRead(m), function(){
+      ml.id = m.id; ml.mode = 'view'; ml.box = 'in';
+      if(!mlIsRead(m)){ (m.read = m.read || {})[session.id] = Date.now(); saveMl(); }
+      setView(state.view, 'mail');
+    });
+  });
+  bdStore.posts.forEach(function(p){
+    if(p.authorId === session.id || (!p.authorId && dir)) return;
+    N('bd:' + p.id, 'board', '새 글 · ' + bdCatName(p.board, p.cat), p.title + (p.author ? ' · ' + p.author : ''), p.date, bdIsRead(p), function(){
+      openBoard(p.board, p.cat); p.views = (p.views || 0) + 1; saveBd(); bdMarkRead(p);
+      bd.id = p.id; bd.mode = 'view'; bd.cedit = null; renderBoard(); window.scrollTo(0, 0);
+    });
+  });
+  resv.forEach(function(r){
+    if(r.manual || !r.date || r.date < td) return;
+    var nid = 'rs:' + r.date + ' ' + r.time;
+    N(nid, 'msg', '새 상담 예약' + (r.src === 'naver' ? ' · 네이버' : ' · 홈페이지'), nfDate(r.date) + ' ' + r.time + (r.grade ? ' · ' + r.grade : '') + (r.kind ? ' · ' + r.kind : ''), nfFirst(nid), false, function(){ cs.mode = 'list'; setView(state.view, 'consult'); });
+  });
+  EVENTS.forEach(function(ev){
+    if(ev.kind !== 'common' || !ev.owner || ev.owner === myLabel) return;
+    var m = /^e(\d{12,})$/.exec(ev.id || ''); if(!m) return;
+    N('ev:' + ev.id, 'cal', '새 일정 · ' + ev.owner, nfDate(ev.date) + (ev.time ? ' ' + ev.time : '') + ' ' + ev.title, +m[1], false, function(){
+      selDate = ev.date; var d = parseYmd(ev.date); calMonth = new Date(d.getFullYear(), d.getMonth(), 1); setView(state.view, 'calendar');
+    });
+  });
+  if(!dir){
+    Object.keys(gyStore).forEach(function(k){
+      var r = gyStore[k], p = k.split('|');
+      if(!r || p[0] !== myName || r.st !== 'ok' || !r.okAt) return;
+      N('gyok:' + k + ':' + r.okAt, 'stamp', '교무일지 결재 완료', nfDate(p[1]) + ' 일지 · ' + (r.okBy || '원장님'), r.okAt, false, function(){ nfGyOpen(p[0], p[1]); });
+    });
+    delStore.req.forEach(function(r){
+      if(r.byId !== session.id || r.st === 'wait' || !r.done) return;
+      N('dl:' + r.id, 'trash', r.st === 'ok' ? '삭제 요청 승인됨' : '삭제 요청 거절됨', (DEL_KIND[r.kind] || '') + ' · ' + r.label + (r.st === 'no' ? ' (내용은 그대로 남아요)' : ''), r.done, false, null);
+    });
+  }
+
+  // 처음 쓰는 날: 예전 기록이 한꺼번에 '새 소식'으로 뜨지 않게 읽음으로 두어요(안 읽은 쪽지는 그대로).
+  nfStore.init = nfStore.init || {};
+  if(!nfStore.init[session.id]){
+    nfStore.init[session.id] = Date.now();
+    news.forEach(function(n){ if(n.id.indexOf('ml:') !== 0 && !n.read){ seen[n.id] = Date.now(); n.read = true; } });
+    nfDirty = true;
+  }
+  news.sort(function(a, b){ return b.at - a.at; });
+  return { todo:todo, news:news.slice(0, 40) };
+}
+function nfDevOn(){ try{ return localStorage.getItem(NF_DEV) === '1' && 'Notification' in window && Notification.permission === 'granted'; }catch(e){ return false; } }
+function nfPing(list){
+  if(!list.length) return;
+  var f = list[0], more = list.length > 1 ? ' 외 ' + (list.length - 1) + '개' : '';
+  if(document.hidden && nfDevOn()){
+    try{
+      var n = new Notification('비욘드 알림 · ' + f.title, { body:(f.sub || '') + more, icon:'logo.png', tag:'beyond-' + f.id });
+      n.onclick = function(){ window.focus(); n.close(); if(f.go){ nfMark(f); f.go(); } };
+    }catch(e){}
+  } else if(!document.hidden) toast('🔔 ' + f.title + (f.sub ? ' · ' + f.sub : '') + more);
+}
+function nfRefresh(){
+  var btn = $('nfBtn'); if(!btn) return;
+  if(!session){ $('nfN').hidden = true; document.title = NF_TITLE; return; }
+  var c; try{ c = nfCollect(); }catch(e){ return; }
+  nfCur = c;
+  if(nfDirty){ nfDirty = false; nfSave(); }
+  var un = c.news.filter(function(x){ return !x.read; }), cnt = un.length + c.todo.length;
+  $('nfN').hidden = !cnt; $('nfN').textContent = cnt > 99 ? '99+' : cnt;
+  btn.setAttribute('aria-label', cnt ? '알림 ' + cnt + '개' : '알림');
+  document.title = (cnt ? '(' + cnt + ') ' : '') + NF_TITLE;
+  // 이번에 새로 생긴 것만 알려요.
+  var fresh = [];
+  if(nfKnown){
+    un.forEach(function(x){ if(!nfKnown[x.id]) fresh.push(x); });
+    c.todo.forEach(function(x){ if((nfTodoN[x.id] || 0) < x.n) fresh.push(x); });
+  } else nfKnown = {};
+  un.forEach(function(x){ nfKnown[x.id] = 1; });
+  nfTodoN = {}; c.todo.forEach(function(x){ nfTodoN[x.id] = x.n; });
+  if(fresh.length) nfPing(fresh);
+  if(nfOpen) nfDraw();
+}
+function nfRow(x, i, kind){
+  return '<button type="button" class="nf-li ' + (kind === 'todo' ? 'todo' : x.read ? 'read' : 'unread') + '" data-nf="' + kind + ':' + i + '">' +
+    '<span class="ic">' + icon(x.ic, 16) + '</span><span class="tx"><b>' + esc(x.title) + '</b>' + (x.sub ? '<small>' + esc(x.sub) + '</small>' : '') + '</span>' +
+    (x.at ? '<span class="tm">' + nfAgo(x.at) + '</span>' : '') + '</button>';
+}
+function nfDraw(){
+  var c = nfCur, anyUn = c.news.some(function(x){ return !x.read; });
+  var h = '<div class="nf-hd"><b>알림</b>' + (anyUn ? '<button type="button" data-nfall>모두 읽음으로</button>' : '') + '</div>';
+  h += '<div class="nf-sec">확인할 일</div>' + (c.todo.length ? c.todo.map(function(x, i){ return nfRow(x, i, 'todo'); }).join('') : '<div class="nf-empty">지금 확인할 일이 없어요.</div>');
+  h += '<div class="nf-sec">새 소식 · 최근 2주</div>' + (c.news.length ? c.news.map(function(x, i){ return nfRow(x, i, 'news'); }).join('') : '<div class="nf-empty">새 소식이 없어요.</div>');
+  h += '<div class="nf-ft">';
+  if('Notification' in window){
+    var on = nfDevOn(), denied = Notification.permission === 'denied';
+    h += on ? '이 기기 알림 창: <b>켜짐</b> <button type="button" data-nfdev="off">끄기</button>'
+      : denied ? '이 기기는 브라우저에서 알림을 막아 두었어요. 주소창 왼쪽 자물쇠 → 알림 → 허용으로 바꾸면 켤 수 있어요.'
+      : '<button type="button" data-nfdev="on">이 기기에도 알림 창 띄우기</button> · 다른 창을 보고 있어도 알려 줘요';
+    h += '<br>';
+  }
+  h += '알림은 지워지지 않고 읽음 표시만 돼요. 화면을 열어 둔 동안 1~2분마다 새 알림을 받아요.</div>';
+  $('nfPop').innerHTML = h;
+}
+function nfMark(x){ if(x && !x.todo){ nfMine()[x.id] = Date.now(); nfSave(); } }
+function nfShow(open){
+  nfOpen = open; $('nfPop').hidden = !open; $('nfBtn').setAttribute('aria-expanded', open);
+  if(open){ nfRefresh(); nfDraw(); }
+}
+$('nfBtn').addEventListener('click', function(e){ e.stopPropagation(); nfShow(!nfOpen); });
+$('nfPop').addEventListener('click', function(e){
+  e.stopPropagation();
+  var b = e.target.closest('[data-nf]');
+  if(b){
+    var p = b.dataset.nf.split(':'), x = (p[0] === 'todo' ? nfCur.todo : nfCur.news)[+p[1]];
+    if(!x) return;
+    nfMark(x); nfShow(false); menuToggle(false);
+    if(x.go) x.go(); else nfRefresh();
+    renderSide();
+    return;
+  }
+  if(e.target.closest('[data-nfall]')){
+    var seen = nfMine(); nfCur.news.forEach(function(x){ if(!x.read) seen[x.id] = Date.now(); }); nfSave(); nfRefresh(); return;
+  }
+  var d = e.target.closest('[data-nfdev]');
+  if(d){
+    if(d.dataset.nfdev === 'off'){ try{ localStorage.removeItem(NF_DEV); }catch(x){} nfDraw(); return; }
+    try{
+      Notification.requestPermission().then(function(r){
+        if(r === 'granted'){ try{ localStorage.setItem(NF_DEV, '1'); }catch(x){} toast('이 기기에서도 알림 창으로 알려 드릴게요.'); }
+        else toast('브라우저에서 알림을 허락하지 않아 켜지 못했어요.');
+        nfDraw();
+      });
+    }catch(x){ toast('이 브라우저는 알림 창을 지원하지 않아요. 화면 안 알림은 그대로 돼요.'); }
+  }
+});
+document.addEventListener('click', function(){ if(nfOpen) nfShow(false); });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && nfOpen){ nfShow(false); $('nfBtn').focus(); } });
+// 다른 사람이 고친 쪽지·결재·게시판·상담 예약·일정은 새로고침 없이 받아서 알림에 바로 보여요.
+CLOUD.live = {
+  'beyond-mail-v1': function(v){ if(v && v.msgs) mlStore = v; },
+  'beyond-gyomu-v1': function(v){ if(v && typeof v === 'object') gyStore = v; },
+  'beyond-delete-v1': function(v){ if(v && v.req && v.trash) delStore = v; },
+  'beyond-board-v1': function(v){ if(v && v.posts) bdStore = v; },
+  'beyond-monthly-v1': function(v){ if(v && typeof v === 'object') moStore = v; },
+  'beyond-reserve-v1': function(v){ if(v && v.items) resStore = v; },
+  'beyond-schedule-v1': function(v){ if(Array.isArray(v)) EVENTS = v; },
+  'beyond-notify-v1': function(v){ if(v && v.seen) nfStore = v; }
+};
+CLOUD.onLive = function(keys){
+  keys.forEach(function(k){ try{ CLOUD.live[k](JSON.parse(localStorage.getItem(k))); }catch(e){} });
+  if(!session) return;
+  renderSide();
+  var has = function(k){ return keys.indexOf('beyond-' + k + '-v1') !== -1; };
+  if(state.page === 'mail' && ml.mode === 'list' && has('mail')) renderMail();
+  else if(state.page === 'trash' && has('delete')) renderTrash();
+  else if(state.page === 'board' && bd.mode === 'list' && has('board')) renderBoard();
+  else if(state.page === 'main' && state.view === 'director' && (has('reserve') || has('gyomu'))) hmDirector();
+};
+setInterval(nfRefresh, 60000);
+// 원장님 기기: 홈페이지·네이버 예약(구글 시트)을 5분마다 다시 받아 새 상담 예약을 알려요.
+setInterval(function(){ if(session && session.role === 'director' && !document.hidden){ try{ loadSheetConsults(); }catch(e){} setTimeout(nfRefresh, 8000); } }, 300000);
+
 /* ===== 시작 ===== */
 applyAssign();
 loadSheetConsults();
@@ -8498,9 +8751,9 @@ $('cloudReload').addEventListener('click', function(){ CLOUD.flush().then(functi
   // 학부모 로그인 유지: 저장된 번호가 지금 기록과 맞을 때만 들어가요.
   var ps = null; try{ ps = JSON.parse(sessionStorage.getItem(PSES_KEY) || 'null') || JSON.parse(localStorage.getItem(PAUTO_KEY) || 'null'); }catch(e){}
   var pc = ps && CLASSES.find(function(c){ return c.id === ps.cid; });
-  if(pc && pc.students.indexOf(ps.s) !== -1 && (!ps.pin || ps.pin === PHONE4[ps.cid + '|' + ps.s])) return enterParent(ps.cid, ps.s, false);
+  // 2026-11-25 원장쌤: 학부모·학생 화면은 쓰지 않아요(개별 알림으로 대신). 저장돼 있던 학부모 로그인은 지워요.
+  if(ps){ try{ sessionStorage.removeItem(PSES_KEY); localStorage.removeItem(PAUTO_KEY); }catch(e){} }
   showLogin();
-  if(/parent/.test(location.hash)) loginTab('parent');
 })();
 </script>
 <script>
@@ -8519,7 +8772,7 @@ var CLOUD = (function(){
   var TOKEN = (EMU ? EMU.auth + '/securetoken.googleapis.com' : 'https://securetoken.googleapis.com') + '/v1/token?key=' + FB.apiKey;
   var DB = (EMU ? EMU.db : 'https://firestore.googleapis.com') + '/v1/projects/' + FB.projectId + '/databases/(default)/documents/';
   var DOMAIN = 'beyond-sajik.app', AKEY = 'bxfb-auth';
-  var SYNC = ['beyond-accounts-v1','beyond-attend-v1','beyond-board-v1','beyond-consult-record-v1','beyond-daily-v2','beyond-delete-v1','beyond-gyomu-v1',
+  var SYNC = ['beyond-notify-v1','beyond-accounts-v1','beyond-attend-v1','beyond-board-v1','beyond-consult-record-v1','beyond-daily-v2','beyond-delete-v1','beyond-gyomu-v1',
     'beyond-journal-v1','beyond-lesson-check-v1','beyond-lesson-items-v1','beyond-mail-v1','beyond-monthly-v1','beyond-notice-v1','beyond-pay-v1','beyond-phrases-v1','beyond-classes-v1',
     'beyond-public-v1','beyond-reserve-v1','beyond-guide-v1','beyond-copilot-v1','beyond-roster-v1','beyond-schedule-v1','beyond-timetable-v1'];
   var DIRECTOR_ONLY_READ = ['beyond-pay-v1'];
@@ -8659,12 +8912,25 @@ var CLOUD = (function(){
   document.addEventListener('visibilitychange', function(){ if(!C.ok || !C.user) return; if(document.hidden) C.flush(); else checkRemote(); });
   // 다른 사람이 고친 내용 알리기
   function showStale(){ var b = document.getElementById('cloudStale'); if(b) b.hidden = false; }
+  // 알림에 쓰는 기록(쪽지·결재 등)은 내가 고치는 중이 아니면 새로고침 없이 바로 받아요. 나머지는 '새로고침해서 보기'로 알려요.
+  C.live = {}; C.onLive = null;
+  C.adopt = function(k, v, ut){
+    if(!C.ok || !C.user || C.pending[k] || busy[k] || typeof v !== 'string' || v === C.base[k]) return false;
+    if(localStorage.getItem(k) !== C.base[k]) return false;
+    rawSet.call(localStorage, k, v); C.base[k] = v; C.ut[k] = ut; return true;
+  };
   function checkRemote(){
-    if(!C.ok || !C.user || C.stale) return;
-    var keys = SYNC.filter(function(k){ return C.user.role === 'director' || DIRECTOR_ONLY_READ.indexOf(k) === -1; });
-    Promise.all(keys.map(function(k){ return getDoc('kv/' + k).then(function(d){ return d && typeof d.data.v === 'string' && d.data.v !== C.base[k] && d.updateTime !== C.ut[k] && !C.pending[k]; }, function(){ return false; }); }))
-      .then(function(r){ if(r.some(Boolean)){ C.stale = true; showStale(); } });
+    if(!C.ok || !C.user) return;
+    var keys = SYNC.filter(function(k){ return (C.user.role === 'director' || DIRECTOR_ONLY_READ.indexOf(k) === -1) && (!C.stale || C.live[k]); });
+    var got = [];
+    Promise.all(keys.map(function(k){ return getDoc('kv/' + k).then(function(d){
+      var diff = d && typeof d.data.v === 'string' && d.data.v !== C.base[k] && d.updateTime !== C.ut[k] && !C.pending[k];
+      if(diff && C.live[k] && C.adopt(k, d.data.v, d.updateTime)){ got.push(k); return false; }
+      return diff;
+    }, function(){ return false; }); }))
+      .then(function(r){ if(got.length && C.onLive) try{ C.onLive(got); }catch(e){} if(r.some(Boolean)){ C.stale = true; showStale(); } });
   }
+  C.check = checkRemote;
   setInterval(checkRemote, 90000);
 
   // 계정
